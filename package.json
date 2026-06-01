@@ -1,0 +1,13 @@
+{
+  "name": "scanner-bot-gh",
+  "version": "1.0.0",
+  "description": "0DTE Scanner Bot for Telegram (GitHub Actions Edition)",
+  "main": "scan.js",
+  "type": "module",
+  "scripts": {
+    "start": "node scan.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
