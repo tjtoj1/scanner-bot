@@ -1,7 +1,3 @@
-🤖 Scanner Bot v9 — GitHub Actions Edition
-// يشتغل كل 15 دقيقة، يفحص، يرسل تنبيهات، ثم ينطفئ
-// ════════════════════════════════════════════════════════════════
-
 const ALPACA_KEY    = process.env.ALPACA_KEY;
 const ALPACA_SECRET = process.env.ALPACA_SECRET;
 const TG_TOKEN      = process.env.TG_TOKEN;
@@ -9,20 +5,20 @@ const TG_CHAT_ID    = process.env.TG_CHAT_ID;
 const MIN_SCORE     = parseInt(process.env.MIN_SCORE || "70");
 
 if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN || !TG_CHAT_ID) {
-  console.error("❌ متغيرات البيئة ناقصة!");
+  console.error("Missing env vars");
   process.exit(1);
 }
 
 const TICKERS = ["SPY", "QQQ", "NVDA", "TSLA", "META", "AAPL", "MSTR"];
 
 const META = {
-  SPY:  { strikeStep: 1,  posSize: "عادي 100%", risk: "عادي" },
-  QQQ:  { strikeStep: 1,  posSize: "عادي 100%", risk: "عادي" },
-  NVDA: { strikeStep: 1,  posSize: "50% فقط",   risk: "⚠ متوسط" },
-  TSLA: { strikeStep: 1,  posSize: "50% فقط",   risk: "⚠ متوسط" },
-  META: { strikeStep: 2.5,posSize: "عادي 100%", risk: "عادي" },
-  AAPL: { strikeStep: 1,  posSize: "عادي 100%", risk: "عادي" },
-  MSTR: { strikeStep: 5,  posSize: "25% فقط",   risk: "🚨 عالي" },
+  SPY:  { strikeStep: 1,   posSize: "100%",     risk: "normal" },
+  QQQ:  { strikeStep: 1,   posSize: "100%",     risk: "normal" },
+  NVDA: { strikeStep: 1,   posSize: "50% only", risk: "elevated" },
+  TSLA: { strikeStep: 1,   posSize: "50% only", risk: "elevated" },
+  META: { strikeStep: 2.5, posSize: "100%",     risk: "normal" },
+  AAPL: { strikeStep: 1,   posSize: "100%",     risk: "normal" },
+  MSTR: { strikeStep: 5,   posSize: "25% only", risk: "extreme" },
 };
 
 const ALPACA_HEADERS = {
@@ -30,9 +26,6 @@ const ALPACA_HEADERS = {
   "APCA-API-SECRET-KEY": ALPACA_SECRET,
 };
 
-// ────────────────────────────────────────────────────────────────
-// Alpaca API
-// ────────────────────────────────────────────────────────────────
 async function getLatestTrade(symbol) {
   const r = await fetch(`https://data.alpaca.markets/v2/stocks/${symbol}/trades/latest?feed=iex`, { headers: ALPACA_HEADERS });
   if (!r.ok) throw new Error(`Trade ${symbol}: HTTP ${r.status}`);
@@ -40,17 +33,13 @@ async function getLatestTrade(symbol) {
 }
 
 async function getBars(symbol, timeframe, daysBack) {
-  const end = new Date(Date.now() - 60_000).toISOString();
-  const start = new Date(Date.now() - daysBack * 86400_000).toISOString();
+  const end = new Date(Date.now() - 60000).toISOString();
+  const start = new Date(Date.now() - daysBack * 86400000).toISOString();
   const url = `https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=${timeframe}&start=${start}&end=${end}&feed=iex&limit=500&adjustment=raw`;
   const r = await fetch(url, { headers: ALPACA_HEADERS });
   if (!r.ok) throw new Error(`Bars ${symbol} ${timeframe}: HTTP ${r.status}`);
   return (await r.json()).bars || [];
 }
-
-// ────────────────────────────────────────────────────────────────
-// Indicators
-// ────────────────────────────────────────────────────────────────
 
 function rsi(closes, period = 14) {
   if (closes.length < period + 1) return null;
@@ -121,42 +110,34 @@ function sma(closes, period) {
   return parseFloat((closes.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(2));
 }
 
-// ────────────────────────────────────────────────────────────────
-// Setup Detection
-// ────────────────────────────────────────────────────────────────
-
 function detectSetup(d) {
   if (d.volRatio > 2 && d.macd5m.bias === "bullish" && d.price > d.vwap) {
-    return { name: "Order Flow", icon: "💥", quality: "ممتاز", direction: "CALL" };
+    return { name: "Order Flow", icon: "FLOW", quality: "excellent", direction: "CALL" };
   }
   if (d.volRatio > 2 && d.macd5m.bias === "bearish" && d.price < d.vwap) {
-    return { name: "Order Flow", icon: "💥", quality: "ممتاز", direction: "PUT" };
+    return { name: "Order Flow", icon: "FLOW", quality: "excellent", direction: "PUT" };
   }
   if (d.price > d.bollinger.upper && d.volRatio > 1.3 && d.macd5m.bias === "bullish") {
-    return { name: "Breakout", icon: "🚀", quality: "ممتاز", direction: "CALL" };
+    return { name: "Breakout", icon: "BREAK", quality: "excellent", direction: "CALL" };
   }
   if (d.price < d.bollinger.lower && d.volRatio > 1.3 && d.macd5m.bias === "bearish") {
-    return { name: "Breakout", icon: "🚀", quality: "ممتاز", direction: "PUT" };
+    return { name: "Breakout", icon: "BREAK", quality: "excellent", direction: "PUT" };
   }
   const vwapDist = Math.abs(d.price - d.vwap) / d.vwap;
   if (vwapDist < 0.002 && d.macd5m.bias === "bullish" && d.rsi5m > 45 && d.rsi5m < 65) {
-    return { name: "VWAP Bounce", icon: "🎯", quality: "جيد", direction: "CALL" };
+    return { name: "VWAP Bounce", icon: "VWAP", quality: "good", direction: "CALL" };
   }
   if (vwapDist < 0.002 && d.macd5m.bias === "bearish" && d.rsi5m < 55 && d.rsi5m > 35) {
-    return { name: "VWAP Bounce", icon: "🎯", quality: "جيد", direction: "PUT" };
+    return { name: "VWAP Bounce", icon: "VWAP", quality: "good", direction: "PUT" };
   }
   if (d.rsi5m < 30 && d.macd5m.histogram > d.macd15m.histogram) {
-    return { name: "Oversold Reversal", icon: "↗", quality: "جيد", direction: "CALL" };
+    return { name: "Oversold Reversal", icon: "UP", quality: "good", direction: "CALL" };
   }
   if (d.rsi5m > 70 && d.macd5m.histogram < d.macd15m.histogram) {
-    return { name: "Overbought Reversal", icon: "↘", quality: "جيد", direction: "PUT" };
+    return { name: "Overbought Reversal", icon: "DN", quality: "good", direction: "PUT" };
   }
   return null;
 }
-
-// ────────────────────────────────────────────────────────────────
-// Analysis
-// ────────────────────────────────────────────────────────────────
 
 async function analyzeTicker(symbol) {
   const [trade, bars5m, bars15m] = await Promise.all([
@@ -165,7 +146,7 @@ async function analyzeTicker(symbol) {
     getBars(symbol, "15Min", 5),
   ]);
 
-  if (!bars5m.length || !bars15m.length) return { symbol, error: "لا توجد شموع" };
+  if (!bars5m.length || !bars15m.length) return { symbol, error: "no bars" };
 
   const price = trade.p;
   const closes5m = bars5m.map(b => b.c);
@@ -201,19 +182,19 @@ async function analyzeTicker(symbol) {
 
   if (mtfAligned && setup && setup.direction === (trend15m === "bullish" ? "CALL" : "PUT")) {
     signal = setup.direction;
-    confirmed.push("MTF Aligned ✓", `Setup: ${setup.name}`);
+    confirmed.push("MTF Aligned", `Setup: ${setup.name}`);
     score = 60;
     if (volRatio > 1.5) { confirmed.push(`Volume ${volRatio}x`); score += 10; }
     if (volRatio > 2.5) score += 5;
-    if (signal === "CALL" && rsi5m < 70) { confirmed.push("RSI صحي"); score += 5; }
-    if (signal === "PUT" && rsi5m > 30) { confirmed.push("RSI صحي"); score += 5; }
-    if (setup.quality === "ممتاز") score += 10;
+    if (signal === "CALL" && rsi5m < 70) { confirmed.push("RSI healthy"); score += 5; }
+    if (signal === "PUT" && rsi5m > 30) { confirmed.push("RSI healthy"); score += 5; }
+    if (setup.quality === "excellent") score += 10;
     if (sma20 && sma50 && signal === "CALL" && sma20 > sma50) { confirmed.push("SMA20>SMA50"); score += 5; }
     if (sma20 && sma50 && signal === "PUT" && sma20 < sma50) { confirmed.push("SMA20<SMA50"); score += 5; }
     score = Math.min(score, 95);
   }
 
-  const strength = score >= 85 ? "قوية جداً" : score >= 70 ? "قوية" : score >= 55 ? "متوسطة" : score > 0 ? "ضعيفة" : "لا فرصة";
+  const strengthAr = score >= 85 ? "قوية جداً" : score >= 70 ? "قوية" : score >= 55 ? "متوسطة" : score > 0 ? "ضعيفة" : "لا فرصة";
 
   const meta = META[symbol];
   const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
@@ -224,15 +205,11 @@ async function analyzeTicker(symbol) {
     macd5m: macd5m?.bias, macd15m: macd15m?.bias,
     vwap: vwap5m, vwapBias: price > vwap5m ? "above" : "below",
     trend15m, trigger5m, mtfAligned,
-    setup, signal, strength, score, confirmed,
+    setup, signal, strengthAr, score, confirmed,
     suggestedStrike: atmStrike,
     riskNote: meta.risk, posSize: meta.posSize,
   };
 }
-
-// ────────────────────────────────────────────────────────────────
-// Telegram
-// ────────────────────────────────────────────────────────────────
 
 async function sendTelegram(text) {
   const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
@@ -247,53 +224,45 @@ async function sendTelegram(text) {
 function formatAlert(r) {
   const emoji = r.signal === "CALL" ? "📈" : "📉";
   const arrow = r.pct >= 0 ? "▲" : "▼";
-  return `🚨 <b>${r.symbol} — ${emoji} ${r.signal} ${r.strength}</b> (${r.score}%)
+  return `🚨 <b>${r.symbol} — ${emoji} ${r.signal} ${r.strengthAr}</b> (${r.score}%)
 
 💵 <b>السعر:</b> $${r.price} ${arrow}${Math.abs(r.pct)}%
-📊 <b>المخاطرة:</b> ${r.riskNote} · <b>حجم:</b> ${r.posSize}
+📊 <b>Risk:</b> ${r.riskNote} · <b>Size:</b> ${r.posSize}
 
-${r.setup ? `<b>${r.setup.icon} Setup:</b> ${r.setup.name} (${r.setup.quality})\n` : ""}<b>⏱ MTF:</b> 15m ${r.trend15m === "bullish" ? "▲" : "▼"} · 5m ${r.trigger5m === "bullish" ? "▲" : "▼"} ${r.mtfAligned ? "✓" : "⚠"}
+<b>Setup:</b> ${r.setup ? r.setup.name : "-"}
+<b>MTF:</b> 15m ${r.trend15m === "bullish" ? "▲" : "▼"} / 5m ${r.trigger5m === "bullish" ? "▲" : "▼"} ${r.mtfAligned ? "OK" : "MISMATCH"}
 
 <b>📊 المؤشرات:</b>
 • RSI 5m: <code>${r.rsi5m}</code> / 15m: <code>${r.rsi15m}</code>
 • MACD: 5m ${r.macd5m === "bullish" ? "🟢" : "🔴"} / 15m ${r.macd15m === "bullish" ? "🟢" : "🔴"}
-• VWAP: $${r.vwap} (${r.vwapBias === "above" ? "فوق ✓" : "تحت ✗"})
-• Volume: <b>${r.volRatio}x</b> ${r.volRatio > 1.5 ? "🔥" : ""}
+• VWAP: $${r.vwap} (${r.vwapBias === "above" ? "فوق" : "تحت"})
+• Volume: <b>${r.volRatio}x</b>
 
 ━━━━━━━━━━━━━━━━━━━
 ⭐ <b>اقتراح العقد (0DTE):</b>
 ${r.signal} <b>$${r.suggestedStrike}</b> — ينتهي اليوم
-🎯 هدف: <b>+35%</b> على الـ Premium
-🛑 وقف: <b>-30%</b> على الـ Premium
-⏱ <b>مدة:</b> 5-30 دقيقة
+🎯 هدف: <b>+35%</b> على Premium
+🛑 وقف: <b>-30%</b> على Premium
+⏱ مدة: 5-30 دقيقة
 
 ⚠ افتح Webull للسعر الحقيقي
 ⚠ اخرج قبل 2 ظهر إجبارياً
 ⚠ ${r.posSize}`;
 }
 
-// ────────────────────────────────────────────────────────────────
-// Market Hours Check
-// ────────────────────────────────────────────────────────────────
-
 function isMarketOpen() {
   const now = new Date();
   const day = now.getUTCDay();
   if (day === 0 || day === 6) return false;
-  // CDT = UTC-5, السوق 9:30-14:00 CDT = 14:30-19:00 UTC
   const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
   return utcMin >= 14 * 60 + 30 && utcMin <= 19 * 60;
 }
 
-// ────────────────────────────────────────────────────────────────
-// Main
-// ────────────────────────────────────────────────────────────────
-
 async function main() {
-  console.log(`\n═══ ${new Date().toISOString()} — بدأ الفحص ═══`);
+  console.log(`\n=== Scan started ${new Date().toISOString()} ===`);
 
   if (!isMarketOpen()) {
-    console.log("⏭ السوق مغلق");
+    console.log("Market closed, skipping");
     return;
   }
 
@@ -302,27 +271,26 @@ async function main() {
     try {
       const r = await analyzeTicker(symbol);
       results.push(r);
-      console.log(`✓ ${symbol}: $${r.price} | ${r.signal} ${r.score}% | ${r.setup?.name || "—"}`);
+      console.log(`OK ${symbol}: $${r.price} | ${r.signal} ${r.score}% | ${r.setup?.name || "-"}`);
     } catch (e) {
-      console.error(`✗ ${symbol}: ${e.message}`);
+      console.error(`FAIL ${symbol}: ${e.message}`);
     }
     await new Promise(r => setTimeout(r, 300));
   }
 
-  // إرسال تنبيهات للفرص القوية
   const alerts = results.filter(r => r.score >= MIN_SCORE);
-  console.log(`📊 ${alerts.length} فرصة قوية من ${results.length}`);
+  console.log(`Alerts: ${alerts.length} / ${results.length}`);
 
   for (const r of alerts) {
     await sendTelegram(formatAlert(r));
-    console.log(`📱 ${r.symbol}: تم الإرسال`);
+    console.log(`Sent: ${r.symbol}`);
   }
 
-  console.log(`═══ انتهى ═══\n`);
+  console.log(`=== Done ===\n`);
 }
 
 main().catch(e => {
-  console.error("💥 خطأ فادح:", e);
-  sendTelegram(`❌ <b>خطأ في البوت</b>\n${e.message}`).catch(() => {});
+  console.error("Fatal error:", e);
+  sendTelegram(`Bot error: ${e.message}`).catch(() => {});
   process.exit(1);
 });
