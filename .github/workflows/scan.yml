@@ -1,0 +1,31 @@
+name: Scanner Bot
+
+on:
+  schedule:
+    # كل 15 دقيقة، أيام الإثنين-الجمعة
+    # GitHub Actions يستخدم UTC
+    # نشغّل من 14:30 UTC (9:30 CDT) إلى 19:00 UTC (14:00 CDT)
+    - cron: '*/15 14-19 * * 1-5'
+  workflow_dispatch:  # للتشغيل اليدوي
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run scanner
+        env:
+          ALPACA_KEY:    ${{ secrets.ALPACA_KEY }}
+          ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
+          TG_TOKEN:      ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
+          MIN_SCORE:     ${{ vars.MIN_SCORE || '70' }}
+        run: node scan.js
