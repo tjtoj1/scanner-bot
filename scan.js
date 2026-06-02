@@ -412,7 +412,7 @@ async function main() {
     await new Promise(r => setTimeout(r, 300));
   }
 
-  const alerts = results.filter(r => !r.error && r.score >= MIN_SCORE);
+  const alerts = results.filter(r => !r.error && (r.strengthAr === "قوية" || r.strengthAr === "قوية جداً"));
   console.log(`Alerts: ${alerts.length} / ${results.length}`);
 
   for (const r of alerts) {
