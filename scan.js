@@ -285,7 +285,7 @@ async function analyzeTicker(symbol) {
                    : "محايد";
 
   const meta = META[symbol];
-  const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
+  const STRIKE_OFFSET = parseInt(process.env.STRIKE_OFFSET || "1"); const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep; const suggestedStrike = signal === "CALL" ? atmStrike + (STRIKE_OFFSET * meta.strikeStep)                       : signal === "PUT"  ? atmStrike - (STRIKE_OFFSET * meta.strikeStep)                       : atmStrike;
 
   return {
     symbol, price: parseFloat(price.toFixed(2)), pct, volRatio,
@@ -293,7 +293,7 @@ async function analyzeTicker(symbol) {
     macd5m: macd5m?.bias, macd15m: macd15m?.bias,
     vwap: vwap5m, vwapBias: price > vwap5m ? "above" : "below",
     gamma, setup, signal, strengthAr, score, reasons,
-    suggestedStrike: atmStrike, riskNote: meta.risk, posSize: meta.posSize,
+    suggestedStrike, riskNote: meta.risk, posSize: meta.posSize,
     bullScore: bull.score, bearScore: bear.score,
   };
 }
