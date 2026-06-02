@@ -2,11 +2,11 @@ name: Scanner Bot
 
 on:
   schedule:
-    # كل 15 دقيقة، أيام الإثنين-الجمعة
-    # GitHub Actions يستخدم UTC
-    # نشغّل من 14:30 UTC (9:30 CDT) إلى 19:00 UTC (14:00 CDT)
-    - cron: '*/15 14-19 * * 1-5'
-  workflow_dispatch:  # للتشغيل اليدوي
+    - cron: '*/5 14-19 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   scan:
@@ -27,5 +27,14 @@ jobs:
           ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
           TG_TOKEN:      ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
-          MIN_SCORE:     ${{ vars.MIN_SCORE || '70' }}
+          MIN_SCORE:     ${{ vars.MIN_SCORE || '65' }}
+          SEND_SUMMARY:  ${{ vars.SEND_SUMMARY || 'false' }}
         run: node scan.js
+
+      - name: Commit state
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add state.json || true
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update state [skip ci]"
+          git push || true
