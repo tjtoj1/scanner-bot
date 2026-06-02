@@ -285,7 +285,7 @@ async function analyzeTicker(symbol) {
                    : "محايد";
 
   const meta = META[symbol];
-  const STRIKE_OFFSET = parseInt(process.env.STRIKE_OFFSET || "1"); const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep; const suggestedStrike = signal === "CALL" ? atmStrike + (STRIKE_OFFSET * meta.strikeStep)                       : signal === "PUT"  ? atmStrike - (STRIKE_OFFSET * meta.strikeStep)                       : atmStrike;
+  const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
 
   return {
     symbol, price: parseFloat(price.toFixed(2)), pct, volRatio,
@@ -293,7 +293,7 @@ async function analyzeTicker(symbol) {
     macd5m: macd5m?.bias, macd15m: macd15m?.bias,
     vwap: vwap5m, vwapBias: price > vwap5m ? "above" : "below",
     gamma, setup, signal, strengthAr, score, reasons,
-    suggestedStrike, riskNote: meta.risk, posSize: meta.posSize,
+    suggestedStrike: atmStrike, riskNote: meta.risk, posSize: meta.posSize,
     bullScore: bull.score, bearScore: bear.score,
   };
 }
@@ -309,65 +309,42 @@ async function sendTelegram(text) {
 }
 
 function formatNewAlert(r) {
-  const emoji = r.signal === "CALL" ? "📈" : "📉";
   const arrow = r.pct >= 0 ? "▲" : "▼";
+  const signalEmoji = r.signal === "CALL" ? "🟢" : "🔴";
   const g = r.gamma;
   const gammaEmoji = g.gammaRegime === "positive" ? "🟢" : g.gammaRegime === "negative" ? "🔴" : "⚪";
 
-  return `🚨 <b>${r.symbol} — ${emoji} ${r.signal} ${r.strengthAr}</b> (${r.score}%)
+  return `🚨 <b>${r.symbol} — ${r.signal} ${r.score}%</b> ${signalEmoji}
 
-💵 <b>السعر:</b> $${r.price} ${arrow}${Math.abs(r.pct)}%
-📊 <b>المخاطرة:</b> ${r.riskNote} · <b>حجم:</b> ${r.posSize}
+💰 $${r.price} ${arrow} ${Math.abs(r.pct)}%
+${r.setup ? `🎯 ${r.setup.name}\n` : ""}⚡ Strike: <b>${r.signal} $${r.suggestedStrike}</b> (0DTE)
 
-${r.setup ? `<b>🎯 Setup:</b> ${r.setup.name} (${r.setup.quality})\n` : ""}<b>📊 المؤشرات:</b>
-• RSI 5m: <code>${r.rsi5m}</code> / 15m: <code>${r.rsi15m}</code>
-• MACD: 5m ${r.macd5m === "bullish" ? "🟢" : r.macd5m === "bearish" ? "🔴" : "⚪"} / 15m ${r.macd15m === "bullish" ? "🟢" : r.macd15m === "bearish" ? "🔴" : "⚪"}
-• VWAP: $${r.vwap} (${r.vwapBias === "above" ? "فوق ✓" : "تحت ✗"})
-• Volume: <b>${r.volRatio}x</b>
+💼 Walls: $${g.putWall} ⟷ $${g.callWall}
+🎯 Gamma: ${gammaEmoji} ${g.gammaRegime}
 
-<b>🎯 Gamma (تقديري):</b>
-• Call Wall: $${g.callWall} (+${g.callWallDist}%)
-• Put Wall: $${g.putWall} (-${g.putWallDist}%)
-• Gamma Flip: $${g.gammaFlip}
-• Regime: ${gammaEmoji} ${g.gammaRegime}${g.proximityWarning ? `\n• ⚠ <b>${g.proximityWarning === "near_call_wall" ? "قرب Call Wall — مقاومة" : "قرب Put Wall — دعم"}</b>` : ""}
-
-<b>✓ التأكيدات:</b>
-${r.reasons.map(x => `• ${x}`).join("\n")}
-
-━━━━━━━━━━━━━━━━━━━
-⭐ <b>اقتراح العقد (0DTE):</b>
-${r.signal} <b>$${r.suggestedStrike}</b> — ينتهي اليوم
-🎯 هدف: <b>+35%</b> على Premium
-🛑 وقف: <b>-30%</b> على Premium
-⏱ مدة: 5-30 دقيقة
-
-⚠ افتح Webull للسعر الحقيقي
-⚠ ${r.posSize}`;
+━━━━━━━━━━━━━━━━━
+🎯 Target +35% | 🛑 Stop -30%
+⏱ 5-30 min | 💼 Size ${r.posSize}`;
 }
 
 function formatWeakening(r, prev) {
-  return `⚠️ <b>${r.symbol} — الإشارة ضعفت!</b>
+  return `⚠️ <b>${r.symbol} — ضعفت الإشارة</b>
 
-السابقة: ${prev.signal} ${prev.strengthAr} (${prev.score}%)
-الحالية: ${r.signal} ${r.strengthAr} (${r.score}%)
+📉 ${prev.signal} ${prev.score}% → ${r.signal} ${r.score}%
+💰 $${r.price}
 
-💵 السعر: $${r.price}
-⏰ ${new Date().toLocaleTimeString("ar-SA", { timeZone: "America/Chicago" })}
-
-<i>إذا كنت في صفقة، فكّر في الخروج</i>`;
+<i>فكر في الخروج إذا أنت في صفقة</i>`;
 }
 
 function formatReversal(r, prev) {
-  const emoji = r.signal === "CALL" ? "📈" : "📉";
-  return `🔄 <b>${r.symbol} — انعكاس الاتجاه!</b>
+  const signalEmoji = r.signal === "CALL" ? "🟢" : "🔴";
+  return `🔄 <b>${r.symbol} — انعكاس الاتجاه!</b> ${signalEmoji}
 
-السابق: ${prev.signal} (${prev.score}%)
-الجديد: ${emoji} <b>${r.signal} ${r.strengthAr}</b> (${r.score}%)
+❌ ${prev.signal} ${prev.score}% → ✅ <b>${r.signal} ${r.score}%</b>
+💰 $${r.price}
+${r.setup ? `🎯 ${r.setup.name}\n` : ""}⚡ Strike: <b>${r.signal} $${r.suggestedStrike}</b>
 
-💵 السعر: $${r.price}
-${r.setup ? `🎯 Setup: ${r.setup.name}\n` : ""}
-⚠ إذا كنت في صفقة سابقة، اخرج فوراً!
-⭐ فرصة جديدة في الاتجاه المعاكس`;
+⚠️ اخرج من الصفقة السابقة فوراً!`;
 }
 
 function isMarketOpen() {
