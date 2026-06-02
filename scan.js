@@ -127,6 +127,113 @@ function sma(closes, period) {
   return parseFloat((closes.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(2));
 }
 
+function calculateLiquidity(bars5m, atr5m, price) {
+  if (!bars5m || bars5m.length < 5) return { score: 0, reasons: [], tier: "none" };
+
+  let score = 0;
+  const reasons = [];
+
+  const recentBars = bars5m.slice(-5);
+  const lastBar = recentBars[recentBars.length - 1];
+  const avgVol = bars5m.slice(-20).reduce((a, b) => a + b.v, 0) / Math.min(bars5m.length, 20);
+  const currentVolRatio = lastBar.v / avgVol;
+
+  if (currentVolRatio > 5) {
+    score += 35;
+    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x (massive)`);
+  } else if (currentVolRatio > 3) {
+    score += 25;
+    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x (strong)`);
+  } else if (currentVolRatio > 2) {
+    score += 15;
+    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x`);
+  } else if (currentVolRatio > 1.5) {
+    score += 8;
+    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x (elevated)`);
+  }
+
+  let strongBarsCount = 0;
+  for (let i = recentBars.length - 1; i >= 0; i--) {
+    const bar = recentBars[i];
+    const barAvgVol = bars5m.slice(Math.max(0, bars5m.length - 20 + (i - recentBars.length)), bars5m.length + (i - recentBars.length + 1)).reduce((a, b) => a + b.v, 0) / 20;
+    if (bar.v > barAvgVol * 1.5) {
+      strongBarsCount++;
+    } else {
+      break;
+    }
+  }
+  if (strongBarsCount >= 3) {
+    score += 20;
+    reasons.push(`${strongBarsCount} consecutive strong bars`);
+  } else if (strongBarsCount >= 2) {
+    score += 10;
+    reasons.push(`${strongBarsCount} strong bars`);
+  }
+
+  if (atr5m && lastBar) {
+    const barRange = lastBar.h - lastBar.l;
+    const rangeVsAtr = barRange / atr5m;
+    if (rangeVsAtr > 2) {
+      score += 15;
+      reasons.push(`Range ${rangeVsAtr.toFixed(1)}x ATR`);
+    } else if (rangeVsAtr > 1.5) {
+      score += 8;
+      reasons.push(`Range ${rangeVsAtr.toFixed(1)}x ATR`);
+    }
+  }
+
+  const barTotal = lastBar.h - lastBar.l;
+  if (barTotal > 0) {
+    const closePos = (lastBar.c - lastBar.l) / barTotal;
+    if (closePos > 0.8) {
+      score += 8;
+      reasons.push("Strong buying pressure");
+    } else if (closePos < 0.2) {
+      score += 8;
+      reasons.push("Strong selling pressure");
+    }
+  }
+
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const utcMin = now.getUTCMinutes();
+  const totalMin = utcHour * 60 + utcMin;
+  
+  if ((totalMin >= 14 * 60 + 30 && totalMin <= 15 * 60 + 30) ||
+      (totalMin >= 18 * 60 + 30 && totalMin <= 19 * 60)) {
+    score += 10;
+    reasons.push("Prime trading hour");
+  } else if (totalMin >= 17 * 60 + 30 && totalMin <= 18 * 60 + 30) {
+    score -= 5;
+    reasons.push("Low activity time");
+  }
+
+  if (recentBars.length >= 3) {
+    const lastClose = recentBars[recentBars.length - 1].c;
+    const prevClose = recentBars[recentBars.length - 2].c;
+    const prev2Close = recentBars[recentBars.length - 3].c;
+    
+    const move1 = Math.abs(lastClose - prevClose);
+    const move2 = Math.abs(prevClose - prev2Close);
+    
+    if (move1 > move2 * 1.5 && currentVolRatio > 1.5) {
+      score += 12;
+      reasons.push("Price acceleration");
+    }
+  }
+
+  score = Math.max(0, Math.min(score, 100));
+
+  let tier;
+  if (score >= 86) tier = "whale";
+  else if (score >= 71) tier = "very_strong";
+  else if (score >= 51) tier = "strong";
+  else if (score >= 31) tier = "elevated";
+  else tier = "normal";
+
+  return { score, reasons, tier };
+}
+
 function atr(bars, period = 14) {
   if (bars.length < period + 1) return null;
   const trs = bars.slice(1).map((c, i) =>
@@ -249,6 +356,7 @@ async function analyzeTicker(symbol) {
   const pct = parseFloat(((price - prevClose) / prevClose * 100).toFixed(2));
 
   const gamma = estimateGamma(symbol, price, atr5m, vwap5m, sma20, boll);
+  const liquidity = calculateLiquidity(bars5m, atr5m, price);
 
   const indicators = {
     price, rsi5m, rsi15m, macd5m, macd15m, bollinger: boll,
@@ -285,15 +393,19 @@ async function analyzeTicker(symbol) {
                    : "محايد";
 
   const meta = META[symbol];
+  const STRIKE_OFFSET = parseInt(process.env.STRIKE_OFFSET || "1");
   const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
+  const suggestedStrike = signal === "CALL" ? atmStrike + (STRIKE_OFFSET * meta.strikeStep)
+                        : signal === "PUT"  ? atmStrike - (STRIKE_OFFSET * meta.strikeStep)
+                        : atmStrike;
 
   return {
     symbol, price: parseFloat(price.toFixed(2)), pct, volRatio,
     rsi5m, rsi15m,
     macd5m: macd5m?.bias, macd15m: macd15m?.bias,
     vwap: vwap5m, vwapBias: price > vwap5m ? "above" : "below",
-    gamma, setup, signal, strengthAr, score, reasons,
-    suggestedStrike: atmStrike, riskNote: meta.risk, posSize: meta.posSize,
+    gamma, liquidity, setup, signal, strengthAr, score, reasons,
+    suggestedStrike, riskNote: meta.risk, posSize: meta.posSize,
     bullScore: bull.score, bearScore: bear.score,
   };
 }
@@ -313,12 +425,34 @@ function formatNewAlert(r) {
   const signalEmoji = r.signal === "CALL" ? "🟢" : "🔴";
   const g = r.gamma;
   const gammaEmoji = g.gammaRegime === "positive" ? "🟢" : g.gammaRegime === "negative" ? "🔴" : "⚪";
+  
+  const liq = r.liquidity;
+  let liquiditySection = "";
+  let whaleHeader = "";
+  
+  if (liq && liq.score >= 51) {
+    let tierEmoji, tierName;
+    if (liq.tier === "whale") {
+      tierEmoji = "🐋";
+      tierName = "Whale";
+      whaleHeader = "\n🐋 <b>WHALE ACTIVITY!</b>";
+    } else if (liq.tier === "very_strong") {
+      tierEmoji = "💎";
+      tierName = "Very Strong";
+    } else {
+      tierEmoji = "🔵";
+      tierName = "Strong";
+    }
+    
+    const topReasons = liq.reasons.slice(0, 3).map(x => `   • ${x}`).join("\n");
+    liquiditySection = `\n💧 <b>Liquidity: ${liq.score}/100</b> ${tierEmoji} ${tierName}\n${topReasons}\n`;
+  }
 
-  return `🚨 <b>${r.symbol} — ${r.signal} ${r.score}%</b> ${signalEmoji}
+  return `🚨 <b>${r.symbol} — ${r.signal} ${r.score}%</b> ${signalEmoji}${whaleHeader}
 
 💰 $${r.price} ${arrow} ${Math.abs(r.pct)}%
 ${r.setup ? `🎯 ${r.setup.name}\n` : ""}⚡ Strike: <b>${r.signal} $${r.suggestedStrike}</b> (0DTE)
-
+${liquiditySection}
 💼 Walls: $${g.putWall} ⟷ $${g.callWall}
 🎯 Gamma: ${gammaEmoji} ${g.gammaRegime}
 
@@ -397,7 +531,7 @@ async function main() {
       const r = await analyzeTicker(symbol);
       results.push(r);
       const g = r.gamma;
-      console.log(`OK ${symbol}: $${r.price} | ${r.signal} ${r.score}% (b:${r.bullScore} s:${r.bearScore}) | CW:$${g.callWall} PW:$${g.putWall} | ${r.setup?.name || "-"}`);
+      console.log(`OK ${symbol}: $${r.price} | ${r.signal} ${r.score}% | Liq:${r.liquidity.score}(${r.liquidity.tier}) | CW:$${g.callWall} PW:$${g.putWall} | ${r.setup?.name || "-"}`);
 
       newState[symbol] = {
         signal: r.signal,
