@@ -1,44 +1,44 @@
 {
   "SPY": {
-    "signal": "NEUTRAL",
-    "score": 0,
-    "strengthAr": "محايد",
-    "timestamp": 1780508727196
+    "signal": "CALL",
+    "score": 72,
+    "strengthAr": "قوية",
+    "timestamp": 1780509024402
   },
   "QQQ": {
     "signal": "CALL",
     "score": 52,
     "strengthAr": "متوسطة",
-    "timestamp": 1780508727553
+    "timestamp": 1780509024747
   },
   "NVDA": {
     "signal": "CALL",
     "score": 45,
     "strengthAr": "ضعيفة",
-    "timestamp": 1780508727884
+    "timestamp": 1780509025094
   },
   "TSLA": {
     "signal": "PUT",
     "score": 63,
     "strengthAr": "متوسطة",
-    "timestamp": 1780508728210
+    "timestamp": 1780509025432
   },
   "META": {
     "signal": "CALL",
     "score": 83,
     "strengthAr": "قوية جداً",
-    "timestamp": 1780508728546
+    "timestamp": 1780509025766
   },
   "AAPL": {
     "signal": "PUT",
     "score": 63,
     "strengthAr": "متوسطة",
-    "timestamp": 1780508729116
+    "timestamp": 1780509026239
   },
   "MSTR": {
     "signal": "CALL",
-    "score": 95,
-    "strengthAr": "قوية جداً",
-    "timestamp": 1780508729440
+    "score": 70,
+    "strengthAr": "قوية",
+    "timestamp": 1780509026558
   }
 }
