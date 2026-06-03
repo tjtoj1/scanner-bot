@@ -2,7 +2,7 @@ name: Scanner Bot
 
 on:
   schedule:
-    - cron: '*/5 14-19 * * 1-5'
+    - cron: '*/5 13-20 * * 1-5'
   workflow_dispatch:
 
 permissions:
