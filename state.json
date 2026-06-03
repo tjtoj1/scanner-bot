@@ -1,9 +1,15 @@
 {
   "SPY": {
+    "active": true,
     "signal": "CALL",
-    "score": 62,
-    "strengthAr": "متوسطة",
-    "timestamp": 1780510524500
+    "entryScore": 67,
+    "entryPrice": 755.69,
+    "entryTime": 1780511120073,
+    "entryMessageId": 39,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "QQQ": {
     "active": true,
