@@ -486,7 +486,7 @@ function isMarketOpen() {
   const day = now.getUTCDay();
   if (day === 0 || day === 6) return false;
   const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-  return utcMin >= 14 * 60 + 30 && utcMin <= 19 * 60;
+  return utcMin >= 13 * 60 + 30 && utcMin <= 20 * 60;
 }
 
 function shouldAlert(current, previous) {
