@@ -6,10 +6,16 @@
     "timestamp": 1780510524500
   },
   "QQQ": {
+    "active": true,
     "signal": "CALL",
-    "score": 47,
-    "strengthAr": "ضعيفة",
-    "timestamp": 1780510525240
+    "entryScore": 77,
+    "entryPrice": 744.28,
+    "entryTime": 1780510826982,
+    "entryMessageId": 37,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "NVDA": {
     "signal": "PUT",
@@ -24,10 +30,16 @@
     "timestamp": 1780510525937
   },
   "META": {
+    "active": true,
     "signal": "CALL",
-    "score": 93,
-    "strengthAr": "قوية جداً",
-    "timestamp": 1780510526267
+    "entryScore": 83,
+    "entryPrice": 622.97,
+    "entryTime": 1780510826982,
+    "entryMessageId": 38,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "AAPL": {
     "signal": "PUT",
