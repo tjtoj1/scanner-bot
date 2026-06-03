@@ -12,7 +12,7 @@
     "cooldownUntil": null
   },
   "QQQ": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 77,
     "entryPrice": 744.28,
@@ -20,14 +20,20 @@
     "entryMessageId": 37,
     "evals10Sent": true,
     "evals20Sent": true,
-    "evals30Sent": false,
-    "cooldownUntil": null
+    "evals30Sent": true,
+    "cooldownUntil": 1780514428204
   },
   "NVDA": {
-    "signal": "PUT",
-    "score": 48,
-    "strengthAr": "ضعيفة",
-    "timestamp": 1780510525606
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 70,
+    "entryPrice": 215.95,
+    "entryTime": 1780512628204,
+    "entryMessageId": 47,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "TSLA": {
     "signal": "NEUTRAL",
@@ -36,7 +42,7 @@
     "timestamp": 1780510525937
   },
   "META": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 83,
     "entryPrice": 622.97,
@@ -44,8 +50,8 @@
     "entryMessageId": 38,
     "evals10Sent": true,
     "evals20Sent": true,
-    "evals30Sent": false,
-    "cooldownUntil": null
+    "evals30Sent": true,
+    "cooldownUntil": 1780514428204
   },
   "AAPL": {
     "signal": "PUT",
