@@ -127,113 +127,6 @@ function sma(closes, period) {
   return parseFloat((closes.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(2));
 }
 
-function calculateLiquidity(bars5m, atr5m, price) {
-  if (!bars5m || bars5m.length < 5) return { score: 0, reasons: [], tier: "none" };
-
-  let score = 0;
-  const reasons = [];
-
-  const recentBars = bars5m.slice(-5);
-  const lastBar = recentBars[recentBars.length - 1];
-  const avgVol = bars5m.slice(-20).reduce((a, b) => a + b.v, 0) / Math.min(bars5m.length, 20);
-  const currentVolRatio = lastBar.v / avgVol;
-
-  if (currentVolRatio > 5) {
-    score += 35;
-    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x (massive)`);
-  } else if (currentVolRatio > 3) {
-    score += 25;
-    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x (strong)`);
-  } else if (currentVolRatio > 2) {
-    score += 15;
-    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x`);
-  } else if (currentVolRatio > 1.5) {
-    score += 8;
-    reasons.push(`Volume ${currentVolRatio.toFixed(1)}x (elevated)`);
-  }
-
-  let strongBarsCount = 0;
-  for (let i = recentBars.length - 1; i >= 0; i--) {
-    const bar = recentBars[i];
-    const barAvgVol = bars5m.slice(Math.max(0, bars5m.length - 20 + (i - recentBars.length)), bars5m.length + (i - recentBars.length + 1)).reduce((a, b) => a + b.v, 0) / 20;
-    if (bar.v > barAvgVol * 1.5) {
-      strongBarsCount++;
-    } else {
-      break;
-    }
-  }
-  if (strongBarsCount >= 3) {
-    score += 20;
-    reasons.push(`${strongBarsCount} consecutive strong bars`);
-  } else if (strongBarsCount >= 2) {
-    score += 10;
-    reasons.push(`${strongBarsCount} strong bars`);
-  }
-
-  if (atr5m && lastBar) {
-    const barRange = lastBar.h - lastBar.l;
-    const rangeVsAtr = barRange / atr5m;
-    if (rangeVsAtr > 2) {
-      score += 15;
-      reasons.push(`Range ${rangeVsAtr.toFixed(1)}x ATR`);
-    } else if (rangeVsAtr > 1.5) {
-      score += 8;
-      reasons.push(`Range ${rangeVsAtr.toFixed(1)}x ATR`);
-    }
-  }
-
-  const barTotal = lastBar.h - lastBar.l;
-  if (barTotal > 0) {
-    const closePos = (lastBar.c - lastBar.l) / barTotal;
-    if (closePos > 0.8) {
-      score += 8;
-      reasons.push("Strong buying pressure");
-    } else if (closePos < 0.2) {
-      score += 8;
-      reasons.push("Strong selling pressure");
-    }
-  }
-
-  const now = new Date();
-  const utcHour = now.getUTCHours();
-  const utcMin = now.getUTCMinutes();
-  const totalMin = utcHour * 60 + utcMin;
-  
-  if ((totalMin >= 14 * 60 + 30 && totalMin <= 15 * 60 + 30) ||
-      (totalMin >= 18 * 60 + 30 && totalMin <= 19 * 60)) {
-    score += 10;
-    reasons.push("Prime trading hour");
-  } else if (totalMin >= 17 * 60 + 30 && totalMin <= 18 * 60 + 30) {
-    score -= 5;
-    reasons.push("Low activity time");
-  }
-
-  if (recentBars.length >= 3) {
-    const lastClose = recentBars[recentBars.length - 1].c;
-    const prevClose = recentBars[recentBars.length - 2].c;
-    const prev2Close = recentBars[recentBars.length - 3].c;
-    
-    const move1 = Math.abs(lastClose - prevClose);
-    const move2 = Math.abs(prevClose - prev2Close);
-    
-    if (move1 > move2 * 1.5 && currentVolRatio > 1.5) {
-      score += 12;
-      reasons.push("Price acceleration");
-    }
-  }
-
-  score = Math.max(0, Math.min(score, 100));
-
-  let tier;
-  if (score >= 86) tier = "whale";
-  else if (score >= 71) tier = "very_strong";
-  else if (score >= 51) tier = "strong";
-  else if (score >= 31) tier = "elevated";
-  else tier = "normal";
-
-  return { score, reasons, tier };
-}
-
 function atr(bars, period = 14) {
   if (bars.length < period + 1) return null;
   const trs = bars.slice(1).map((c, i) =>
@@ -356,7 +249,6 @@ async function analyzeTicker(symbol) {
   const pct = parseFloat(((price - prevClose) / prevClose * 100).toFixed(2));
 
   const gamma = estimateGamma(symbol, price, atr5m, vwap5m, sma20, boll);
-  const liquidity = calculateLiquidity(bars5m, atr5m, price);
 
   const indicators = {
     price, rsi5m, rsi15m, macd5m, macd15m, bollinger: boll,
@@ -393,31 +285,35 @@ async function analyzeTicker(symbol) {
                    : "محايد";
 
   const meta = META[symbol];
-  const STRIKE_OFFSET = parseInt(process.env.STRIKE_OFFSET || "1");
   const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
-  const suggestedStrike = signal === "CALL" ? atmStrike + (STRIKE_OFFSET * meta.strikeStep)
-                        : signal === "PUT"  ? atmStrike - (STRIKE_OFFSET * meta.strikeStep)
-                        : atmStrike;
 
   return {
     symbol, price: parseFloat(price.toFixed(2)), pct, volRatio,
     rsi5m, rsi15m,
     macd5m: macd5m?.bias, macd15m: macd15m?.bias,
     vwap: vwap5m, vwapBias: price > vwap5m ? "above" : "below",
-    gamma, liquidity, setup, signal, strengthAr, score, reasons,
-    suggestedStrike, riskNote: meta.risk, posSize: meta.posSize,
+    gamma, setup, signal, strengthAr, score, reasons,
+    suggestedStrike: atmStrike, riskNote: meta.risk, posSize: meta.posSize,
     bullScore: bull.score, bearScore: bear.score,
   };
 }
 
-async function sendTelegram(text) {
+async function sendTelegram(text, replyToMessageId = null) {
+  const body = { chat_id: TG_CHAT_ID, text, parse_mode: "HTML", disable_web_page_preview: true };
+  if (replyToMessageId) {
+    body.reply_parameters = { message_id: replyToMessageId, allow_sending_without_reply: true };
+  }
   const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: TG_CHAT_ID, text, parse_mode: "HTML", disable_web_page_preview: true }),
+    body: JSON.stringify(body),
   });
-  if (!r.ok) console.error(`Telegram error: ${await r.text()}`);
-  return r.ok;
+  if (!r.ok) {
+    console.error(`Telegram error: ${await r.text()}`);
+    return null;
+  }
+  const data = await r.json();
+  return data.result?.message_id || null;
 }
 
 function formatNewAlert(r) {
@@ -425,34 +321,12 @@ function formatNewAlert(r) {
   const signalEmoji = r.signal === "CALL" ? "🟢" : "🔴";
   const g = r.gamma;
   const gammaEmoji = g.gammaRegime === "positive" ? "🟢" : g.gammaRegime === "negative" ? "🔴" : "⚪";
-  
-  const liq = r.liquidity;
-  let liquiditySection = "";
-  let whaleHeader = "";
-  
-  if (liq && liq.score >= 51) {
-    let tierEmoji, tierName;
-    if (liq.tier === "whale") {
-      tierEmoji = "🐋";
-      tierName = "Whale";
-      whaleHeader = "\n🐋 <b>WHALE ACTIVITY!</b>";
-    } else if (liq.tier === "very_strong") {
-      tierEmoji = "💎";
-      tierName = "Very Strong";
-    } else {
-      tierEmoji = "🔵";
-      tierName = "Strong";
-    }
-    
-    const topReasons = liq.reasons.slice(0, 3).map(x => `   • ${x}`).join("\n");
-    liquiditySection = `\n💧 <b>Liquidity: ${liq.score}/100</b> ${tierEmoji} ${tierName}\n${topReasons}\n`;
-  }
 
-  return `🚨 <b>${r.symbol} — ${r.signal} ${r.score}%</b> ${signalEmoji}${whaleHeader}
+  return `🚨 <b>${r.symbol} — ${r.signal} ${r.score}%</b> ${signalEmoji}
 
 💰 $${r.price} ${arrow} ${Math.abs(r.pct)}%
 ${r.setup ? `🎯 ${r.setup.name}\n` : ""}⚡ Strike: <b>${r.signal} $${r.suggestedStrike}</b> (0DTE)
-${liquiditySection}
+
 💼 Walls: $${g.putWall} ⟷ $${g.callWall}
 🎯 Gamma: ${gammaEmoji} ${g.gammaRegime}
 
@@ -461,24 +335,38 @@ ${liquiditySection}
 ⏱ 5-30 min | 💼 Size ${r.posSize}`;
 }
 
-function formatWeakening(r, prev) {
-  return `⚠️ <b>${r.symbol} — ضعفت الإشارة</b>
+function formatEvaluation(r, prev, minutesElapsed, isFinal = false) {
+  const priceDiff = ((r.price - prev.entryPrice) / prev.entryPrice * 100);
+  const priceDiffStr = (priceDiff >= 0 ? "+" : "") + priceDiff.toFixed(2);
+  const scoreDiff = r.score - prev.entryScore;
+  const label = isFinal ? "FINAL" : `${minutesElapsed}min`;
 
-📉 ${prev.signal} ${prev.score}% → ${r.signal} ${r.score}%
-💰 $${r.price}
+  if (r.score < 65) {
+    return `🚪 <b>EXIT: ${r.symbol} ${r.signal} ${r.score}%</b> (ضعفت)
+السعر: $${r.price} (${priceDiffStr}%)
+انتهت المتابعة`;
+  }
 
-<i>فكر في الخروج إذا أنت في صفقة</i>`;
+  if (scoreDiff >= 10) {
+    return `💎 <b>${label}: ${r.symbol} ${r.signal} ${r.score}%</b> (تعززت)
+السعر: $${r.price} (${priceDiffStr}%)${isFinal ? "\n⚠️ لا متابعة بعد الآن" : ""}`;
+  }
+
+  if (scoreDiff <= -10) {
+    return `⚠️ <b>${label}: ${r.symbol} ${r.signal} ${r.score}%</b> (تراجع ${Math.abs(scoreDiff)})
+السعر: $${r.price} (${priceDiffStr}%)${isFinal ? "\n⚠️ لا متابعة بعد الآن" : ""}`;
+  }
+
+  return `📊 <b>${label}: ${r.symbol} ${r.signal} ${r.score}%</b> ✅
+السعر: $${r.price} (${priceDiffStr}%)${isFinal ? "\n⚠️ لا متابعة بعد الآن" : ""}`;
 }
 
 function formatReversal(r, prev) {
-  const signalEmoji = r.signal === "CALL" ? "🟢" : "🔴";
-  return `🔄 <b>${r.symbol} — انعكاس الاتجاه!</b> ${signalEmoji}
-
-❌ ${prev.signal} ${prev.score}% → ✅ <b>${r.signal} ${r.score}%</b>
-💰 $${r.price}
-${r.setup ? `🎯 ${r.setup.name}\n` : ""}⚡ Strike: <b>${r.signal} $${r.suggestedStrike}</b>
-
-⚠️ اخرج من الصفقة السابقة فوراً!`;
+  const priceDiff = ((r.price - prev.entryPrice) / prev.entryPrice * 100);
+  const priceDiffStr = (priceDiff >= 0 ? "+" : "") + priceDiff.toFixed(2);
+  return `🔄 <b>REVERSAL: ${prev.signal} → ${r.signal} ${r.score}%</b>
+السعر: $${r.price} (${priceDiffStr}%)
+[تقييمات ملغية - انتهت المتابعة]`;
 }
 
 function isMarketOpen() {
@@ -486,36 +374,45 @@ function isMarketOpen() {
   const day = now.getUTCDay();
   if (day === 0 || day === 6) return false;
   const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-  return utcMin >= 13 * 60 + 30 && utcMin <= 20 * 60;
+  return utcMin >= 14 * 60 + 30 && utcMin <= 19 * 60;
 }
 
-function shouldAlert(current, previous) {
+function decideAction(current, previous, now) {
   const isStrong = current.score >= MIN_SCORE && (current.strengthAr === "قوية" || current.strengthAr === "قوية جداً");
 
-  if (!previous) {
-    return isStrong ? { send: true, type: "new" } : { send: false };
+  if (!previous || !previous.active) {
+    if (previous && previous.cooldownUntil && now < previous.cooldownUntil) {
+      return { action: "cooldown" };
+    }
+    return isStrong ? { action: "new_entry" } : { action: "none" };
   }
 
-  const prevWasStrong = previous.score >= MIN_SCORE && (previous.strengthAr === "قوية" || previous.strengthAr === "قوية جداً");
+  const minutesElapsed = (now - previous.entryTime) / 60000;
 
-  if (prevWasStrong && current.signal !== previous.signal && current.signal !== "NEUTRAL" && isStrong) {
-    return { send: true, type: "reversal" };
+  if (current.signal !== "NEUTRAL" && current.signal !== previous.signal && isStrong) {
+    return { action: "reversal" };
   }
 
-  if (prevWasStrong && (current.strengthAr === "ضعيفة" || current.strengthAr === "محايد" || current.signal === "NEUTRAL")) {
-    return { send: true, type: "weakening" };
+  if (previous.evals30Sent) {
+    return { action: "none" };
   }
 
-  if (!prevWasStrong && isStrong) {
-    return { send: true, type: "new" };
+  if (!previous.evals10Sent && minutesElapsed >= 10) {
+    return { action: "eval", minutesElapsed: 10, isFinal: false };
+  }
+  if (!previous.evals20Sent && minutesElapsed >= 20) {
+    return { action: "eval", minutesElapsed: 20, isFinal: false };
+  }
+  if (!previous.evals30Sent && minutesElapsed >= 30) {
+    return { action: "eval", minutesElapsed: 30, isFinal: true };
   }
 
-  return { send: false };
+  return { action: "none" };
 }
 
 async function main() {
   console.log(`\n=== Scan started ${new Date().toISOString()} ===`);
-  console.log(`MIN_SCORE = ${MIN_SCORE}, SEND_SUMMARY = ${SEND_SUMMARY}`);
+  console.log(`MIN_SCORE = ${MIN_SCORE}`);
 
   if (!isMarketOpen()) {
     console.log("Market closed, skipping");
@@ -525,20 +422,14 @@ async function main() {
   const state = loadState();
   const newState = {};
   const results = [];
+  const now = Date.now();
 
   for (const symbol of TICKERS) {
     try {
       const r = await analyzeTicker(symbol);
       results.push(r);
       const g = r.gamma;
-      console.log(`OK ${symbol}: $${r.price} | ${r.signal} ${r.score}% | Liq:${r.liquidity.score}(${r.liquidity.tier}) | CW:$${g.callWall} PW:$${g.putWall} | ${r.setup?.name || "-"}`);
-
-      newState[symbol] = {
-        signal: r.signal,
-        score: r.score,
-        strengthAr: r.strengthAr,
-        timestamp: Date.now(),
-      };
+      console.log(`OK ${symbol}: $${r.price} | ${r.signal} ${r.score}% | CW:$${g.callWall} PW:$${g.putWall} | ${r.setup?.name || "-"}`);
     } catch (e) {
       console.error(`FAIL ${symbol}: ${e.message}`);
       results.push({ symbol, error: e.message });
@@ -548,22 +439,73 @@ async function main() {
 
   let sentCount = 0;
   for (const r of results) {
-    if (r.error) continue;
+    if (r.error) {
+      const prev = state[r.symbol];
+      if (prev) newState[r.symbol] = prev;
+      continue;
+    }
 
     const previous = state[r.symbol];
-    const decision = shouldAlert(r, previous);
+    const decision = decideAction(r, previous, now);
 
-    if (decision.send) {
-      let msg;
-      if (decision.type === "new") msg = formatNewAlert(r);
-      else if (decision.type === "reversal") msg = formatReversal(r, previous);
-      else if (decision.type === "weakening") msg = formatWeakening(r, previous);
-
-      await sendTelegram(msg);
-      console.log(`Sent (${decision.type}): ${r.symbol}`);
+    if (decision.action === "new_entry") {
+      const msg = formatNewAlert(r);
+      const messageId = await sendTelegram(msg);
+      console.log(`Sent NEW_ENTRY: ${r.symbol} (msg_id: ${messageId})`);
       sentCount++;
-    } else {
-      console.log(`Silent: ${r.symbol} (no change)`);
+      newState[r.symbol] = {
+        active: true,
+        signal: r.signal,
+        entryScore: r.score,
+        entryPrice: r.price,
+        entryTime: now,
+        entryMessageId: messageId,
+        evals10Sent: false,
+        evals20Sent: false,
+        evals30Sent: false,
+        cooldownUntil: null,
+      };
+    }
+    else if (decision.action === "reversal") {
+      const msg = formatReversal(r, previous);
+      await sendTelegram(msg, previous.entryMessageId);
+      console.log(`Sent REVERSAL: ${r.symbol}`);
+      sentCount++;
+      newState[r.symbol] = {
+        active: false,
+        cooldownUntil: now + (5 * 60 * 1000),
+      };
+    }
+    else if (decision.action === "eval") {
+      const msg = formatEvaluation(r, previous, decision.minutesElapsed, decision.isFinal);
+      await sendTelegram(msg, previous.entryMessageId);
+      console.log(`Sent EVAL_${decision.minutesElapsed}min: ${r.symbol} (score: ${r.score})`);
+      sentCount++;
+
+      const isExit = r.score < 65;
+      const updated = { ...previous };
+      if (decision.minutesElapsed === 10) updated.evals10Sent = true;
+      if (decision.minutesElapsed === 20) updated.evals20Sent = true;
+      if (decision.minutesElapsed === 30) updated.evals30Sent = true;
+
+      if (isExit || decision.isFinal) {
+        updated.active = false;
+        updated.cooldownUntil = now + (30 * 60 * 1000);
+      }
+      newState[r.symbol] = updated;
+    }
+    else if (decision.action === "cooldown") {
+      console.log(`Cooldown: ${r.symbol}`);
+      newState[r.symbol] = previous;
+    }
+    else {
+      if (previous && previous.active) {
+        newState[r.symbol] = previous;
+        console.log(`Active (no eval due): ${r.symbol}`);
+      } else if (previous) {
+        newState[r.symbol] = previous;
+      }
+      console.log(`Silent: ${r.symbol}`);
     }
   }
 
