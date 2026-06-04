@@ -24,16 +24,16 @@
     "cooldownUntil": 1780514428204
   },
   "NVDA": {
-    "active": false,
+    "active": true,
     "signal": "CALL",
-    "entryScore": 70,
-    "entryPrice": 215.95,
-    "entryTime": 1780512628204,
-    "entryMessageId": 47,
-    "evals10Sent": true,
+    "entryScore": 90,
+    "entryPrice": 214.51,
+    "entryTime": 1780584325580,
+    "entryMessageId": 55,
+    "evals10Sent": false,
     "evals20Sent": false,
     "evals30Sent": false,
-    "cooldownUntil": 1780515035356
+    "cooldownUntil": null
   },
   "TSLA": {
     "active": true,
@@ -42,7 +42,7 @@
     "entryPrice": 421.4,
     "entryTime": 1780583428845,
     "entryMessageId": 51,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
     "cooldownUntil": null
@@ -54,7 +54,7 @@
     "entryPrice": 638.12,
     "entryTime": 1780583428845,
     "entryMessageId": 52,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
     "cooldownUntil": null
@@ -66,21 +66,21 @@
     "entryPrice": 310.28,
     "entryTime": 1780583428845,
     "entryMessageId": 53,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
     "cooldownUntil": null
   },
   "MSTR": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 83,
     "entryPrice": 129.89,
     "entryTime": 1780583428845,
     "entryMessageId": 54,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
-    "cooldownUntil": null
+    "cooldownUntil": 1780586125580
   }
 }
