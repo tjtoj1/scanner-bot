@@ -7,7 +7,7 @@
     "entryTime": 1780585235519,
     "entryMessageId": 63,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
@@ -18,7 +18,7 @@
     "entryPrice": 739.17,
     "entryTime": 1780585822757,
     "entryMessageId": 67,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
     "cooldownUntil": null
