@@ -24,16 +24,16 @@
     "cooldownUntil": 1780589424059
   },
   "NVDA": {
-    "active": false,
+    "active": true,
     "signal": "CALL",
-    "entryScore": 90,
-    "entryPrice": 214.51,
-    "entryTime": 1780584325580,
-    "entryMessageId": 55,
-    "evals10Sent": true,
-    "evals20Sent": true,
-    "evals30Sent": true,
-    "cooldownUntil": 1780588221055
+    "entryScore": 83,
+    "entryPrice": 216.47,
+    "entryTime": 1780588221962,
+    "entryMessageId": 81,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "TSLA": {
     "active": true,
