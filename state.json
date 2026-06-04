@@ -6,7 +6,7 @@
     "entryPrice": 754.25,
     "entryTime": 1780585235519,
     "entryMessageId": 63,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
     "cooldownUntil": null
