@@ -681,7 +681,7 @@ async function executeEntry(symbol, r, account, now) {
   }
 
   const entryPremium = quote.ask;
-  const portfolioValue = parseFloat(account.portfolio_value);
+  const portfolioValue = 10000; // Fixed $10K for testing
   const qty = calculateQty(portfolioValue, entryPremium, 0.10);
 
   if (qty < 1) {
