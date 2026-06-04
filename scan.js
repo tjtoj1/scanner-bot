@@ -405,7 +405,7 @@ function calculateQty(portfolioValue, premiumPerContract, pctOfPortfolio = 0.10)
 function isPastForceExitTime(now) {
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin < 19 * 60 + 30;
+  return utcMin >= 19 * 60 + 55;
 }
 
 function isBeforeNoEntryTime(now) {
