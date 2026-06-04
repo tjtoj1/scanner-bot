@@ -1,5 +1,20 @@
 {
   "_date": "2026-06-04",
   "_dailyTrades": [],
-  "_reportSent": false
+  "_reportSent": false,
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 68,
+    "entryPrice": 743.1,
+    "entryTime": 1780597733996,
+    "optionSymbol": "QQQ260604C00744000",
+    "strike": "744",
+    "entryPremium": 0.46,
+    "qty": 217,
+    "orderId": "f6cf10ea-7b11-49e4-82fa-5e38c7af91c0",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 111
+  }
 }
