@@ -337,13 +337,19 @@ async function getOptionContracts(symbol, expirationDate, type, strikeMin, strik
 
 async function getOptionQuote(optionSymbol) {
   try {
-    const data = await alpacaCall(`${OPTIONS_BASE}/snapshots/${optionSymbol.split(/[\?&]/)[0]}`);
-    const snap = data.snapshots?.[optionSymbol];
-    if (!snap) return null;
-    const bid = snap.latestQuote?.bp || 0;
-    const ask = snap.latestQuote?.ap || 0;
-    return { bid, ask, mid: (bid + ask) / 2 };
-  } catch {
+    const url = `https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${encodeURIComponent(optionSymbol)}`;
+    const data = await alpacaCall(url);
+    const quote = data.quotes?.[optionSymbol];
+    if (!quote) {
+      console.log(`  No quote data for ${optionSymbol}`);
+      return null;
+    }
+    const bid = quote.bp || 0;
+    const ask = quote.ap || 0;
+    const mid = bid > 0 && ask > 0 ? (bid + ask) / 2 : (ask || bid);
+    return { bid, ask, mid };
+  } catch (e) {
+    console.log(`  Quote fetch error for ${optionSymbol}: ${e.message}`);
     return null;
   }
 }
