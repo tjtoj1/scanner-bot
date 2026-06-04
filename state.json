@@ -12,16 +12,16 @@
     "cooldownUntil": null
   },
   "QQQ": {
-    "active": false,
+    "active": true,
     "signal": "CALL",
-    "entryScore": 77,
-    "entryPrice": 744.28,
-    "entryTime": 1780510826982,
-    "entryMessageId": 37,
-    "evals10Sent": true,
-    "evals20Sent": true,
-    "evals30Sent": true,
-    "cooldownUntil": 1780514428204
+    "entryScore": 90,
+    "entryPrice": 739.17,
+    "entryTime": 1780585822757,
+    "entryMessageId": 67,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "NVDA": {
     "active": true,
@@ -31,7 +31,7 @@
     "entryTime": 1780584325580,
     "entryMessageId": 55,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
