@@ -19,7 +19,7 @@
     "entryTime": 1780589725475,
     "entryMessageId": 91,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
@@ -60,19 +60,19 @@
     "cooldownUntil": 1780591825091
   },
   "AAPL": {
-    "active": false,
-    "signal": "PUT",
-    "entryScore": 90,
-    "entryPrice": 309.94,
-    "entryTime": 1780587319424,
-    "entryMessageId": 77,
-    "evals10Sent": true,
-    "evals20Sent": true,
-    "evals30Sent": true,
-    "cooldownUntil": 1780590926581
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 311.29,
+    "entryTime": 1780591226494,
+    "entryMessageId": 100,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "MSTR": {
-    "active": true,
+    "active": false,
     "signal": "PUT",
     "entryScore": 68,
     "entryPrice": 128.12,
@@ -80,7 +80,7 @@
     "entryMessageId": 88,
     "evals10Sent": true,
     "evals20Sent": true,
-    "evals30Sent": false,
-    "cooldownUntil": null
+    "evals30Sent": true,
+    "cooldownUntil": 1780593026494
   }
 }
