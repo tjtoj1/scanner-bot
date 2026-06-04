@@ -411,7 +411,7 @@ function isPastForceExitTime(now) {
 function isBeforeNoEntryTime(now) {
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin < 19 * 60;
+  return utcMin < 19 * 60 + 30;
 }
 
 function isReportTime(now) {
