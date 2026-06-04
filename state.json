@@ -1,15 +1,15 @@
 {
   "SPY": {
-    "active": false,
+    "active": true,
     "signal": "CALL",
-    "entryScore": 67,
-    "entryPrice": 754.25,
-    "entryTime": 1780585235519,
-    "entryMessageId": 63,
-    "evals10Sent": true,
-    "evals20Sent": true,
-    "evals30Sent": true,
-    "cooldownUntil": 1780589119424
+    "entryScore": 75,
+    "entryPrice": 756.27,
+    "entryTime": 1780589423423,
+    "entryMessageId": 89,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "QQQ": {
     "active": false,
@@ -31,7 +31,7 @@
     "entryTime": 1780588221962,
     "entryMessageId": 81,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
