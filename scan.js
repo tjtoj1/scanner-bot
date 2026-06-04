@@ -297,7 +297,6 @@ async function analyzeTicker(symbol) {
     bullScore: bull.score, bearScore: bear.score,
   };
 }
-
 // ============================================================
 // ALPACA TRADING API (Paper Trading)
 // ============================================================
@@ -353,7 +352,7 @@ async function placeOptionOrder(optionSymbol, qty, side) {
   return alpacaCall(`${TRADING_BASE}/orders`, "POST", {
     symbol: optionSymbol,
     qty: String(qty),
-    side, // "buy" or "sell"
+    side,
     type: "market",
     time_in_force: "day",
   });
@@ -371,9 +370,6 @@ async function closePosition(optionSymbol) {
   return alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
-// ============================================================
-// Pick best option contract for a signal
-// ============================================================
 async function pickOptionContract(symbol, signal, atmStrike, strikeStep) {
   const today = new Date().toISOString().split("T")[0];
   const targetStrike = signal === "CALL" ? atmStrike + strikeStep : atmStrike - strikeStep;
@@ -382,55 +378,43 @@ async function pickOptionContract(symbol, signal, atmStrike, strikeStep) {
 
   const contracts = await getOptionContracts(symbol, today, signal, min, max);
   if (contracts.length === 0) {
-    // No 0DTE found, try wider range
     const wideMin = targetStrike - strikeStep * 2;
     const wideMax = targetStrike + strikeStep * 2;
     const wider = await getOptionContracts(symbol, today, signal, wideMin, wideMax);
     if (wider.length === 0) return null;
-    // Pick closest to target
     wider.sort((a, b) => Math.abs(a.strike_price - targetStrike) - Math.abs(b.strike_price - targetStrike));
     return wider[0];
   }
-  // Pick exact match or closest
   contracts.sort((a, b) => Math.abs(a.strike_price - targetStrike) - Math.abs(b.strike_price - targetStrike));
   return contracts[0];
 }
 
-// ============================================================
-// Calculate quantity based on portfolio %
-// ============================================================
 function calculateQty(portfolioValue, premiumPerContract, pctOfPortfolio = 0.10) {
   const targetDollar = portfolioValue * pctOfPortfolio;
-  const contractCost = premiumPerContract * 100; // each contract = 100 shares
+  const contractCost = premiumPerContract * 100;
   const qty = Math.floor(targetDollar / contractCost);
-  return Math.max(qty, 1); // at least 1 contract
+  return Math.max(qty, 1);
 }
 
-// ============================================================
-// Time helpers (CDT = UTC-5)
-// ============================================================
 function isPastForceExitTime(now) {
-  // 2:45 PM CDT = 19:45 UTC
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
   return utcMin >= 19 * 60 + 45;
 }
 
 function isBeforeNoEntryTime(now) {
-  // No new entries after 2:00 PM CDT = 19:00 UTC
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
   return utcMin < 19 * 60;
 }
 
 function isReportTime(now) {
-  // 3:00 PM CDT = 20:00 UTC, fire once
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
   return utcMin >= 20 * 60 && utcMin < 20 * 60 + 10;
 }
 
-
+async function sendTelegram(text, replyToMessageId = null) {
   const body = { chat_id: TG_CHAT_ID, text, parse_mode: "HTML", disable_web_page_preview: true };
   if (replyToMessageId) {
     body.reply_parameters = { message_id: replyToMessageId, allow_sending_without_reply: true };
@@ -494,8 +478,7 @@ function formatExitTime(pos, currentPremium, minutesElapsed) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  const emoji = pct >= 0 ? "🏁" : "🏁";
-  return `${emoji} <b>EXIT: انتهت المدة (30 دقيقة)</b>
+  return `🏁 <b>EXIT: انتهت المدة (30 دقيقة)</b>
 💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
 ${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 }
@@ -548,51 +531,41 @@ function formatDailyReport(state) {
 
 📈 الرصيد: $${newBalance.toFixed(0)}`;
 }
-
-
-
 function isMarketOpen() {
   const now = new Date();
   const day = now.getUTCDay();
   if (day === 0 || day === 6) return false;
   const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-  return utcMin >= 14 * 60 + 30 && utcMin <= 19 * 60;
+  return utcMin >= 13 * 60 + 30 && utcMin <= 20 * 60;
 }
 
 function decideAction(current, previous, now) {
   const isStrong = current.score >= MIN_SCORE && (current.strengthAr === "قوية" || current.strengthAr === "قوية جداً");
 
-  // Force exit at 2:45 PM if position active
   if (previous && previous.active && isPastForceExitTime(now)) {
     return { action: "force_exit" };
   }
 
-  // No active position
   if (!previous || !previous.active) {
     if (previous && previous.cooldownUntil && now < previous.cooldownUntil) {
       return { action: "cooldown" };
     }
-    // No entries after 2:00 PM
     if (!isBeforeNoEntryTime(now)) {
       return { action: "no_entry_time" };
     }
     return isStrong ? { action: "new_entry" } : { action: "none" };
   }
 
-  // Active position - check exit conditions
   const minutesElapsed = (now - previous.entryTime) / 60000;
 
-  // Reversal
   if (current.signal !== "NEUTRAL" && current.signal !== previous.signal && isStrong) {
     return { action: "exit_reversal", newSignal: current.signal };
   }
 
-  // Time-based exit (30 min)
   if (minutesElapsed >= 30 && !previous.exitTimeChecked) {
     return { action: "exit_time", minutesElapsed: Math.floor(minutesElapsed) };
   }
 
-  // Status updates at 10 and 20 min
   if (!previous.eval10Sent && minutesElapsed >= 10 && minutesElapsed < 20) {
     return { action: "status", label: "10min", minutesElapsed: Math.floor(minutesElapsed) };
   }
@@ -600,22 +573,17 @@ function decideAction(current, previous, now) {
     return { action: "status", label: "20min", minutesElapsed: Math.floor(minutesElapsed) };
   }
 
-  // Premium-based check (target/stop) - need to query premium
   return { action: "check_premium", minutesElapsed: Math.floor(minutesElapsed) };
 }
 
-// ============================================================
-// MAIN ORCHESTRATION (v15 - Auto Trading)
-// ============================================================
 async function processActivePosition(symbol, r, previous, now, decision) {
   const pos = previous;
   const minutesElapsed = decision.minutesElapsed || Math.floor((now - pos.entryTime) / 60000);
 
-  // Get current option premium
   const quote = await getOptionQuote(pos.optionSymbol);
   if (!quote || quote.mid === 0) {
     console.log(`  ${symbol}: Could not fetch premium for ${pos.optionSymbol}`);
-    return pos; // keep position as-is
+    return pos;
   }
 
   const currentPremium = quote.mid;
@@ -623,32 +591,26 @@ async function processActivePosition(symbol, r, previous, now, decision) {
 
   console.log(`  ${symbol}: Position active. Premium ${pos.entryPremium} → ${currentPremium.toFixed(2)} (${pct.toFixed(1)}%), Minutes: ${minutesElapsed}`);
 
-  // FORCE EXIT (2:45 PM)
   if (decision.action === "force_exit") {
     return await executeExit(symbol, pos, currentPremium, "force", minutesElapsed);
   }
 
-  // REVERSAL
   if (decision.action === "exit_reversal") {
     return await executeExit(symbol, pos, currentPremium, "reversal", minutesElapsed, decision.newSignal);
   }
 
-  // TARGET HIT (+35%)
   if (pct >= 35) {
     return await executeExit(symbol, pos, currentPremium, "profit", minutesElapsed);
   }
 
-  // STOP HIT (-30%)
   if (pct <= -30) {
     return await executeExit(symbol, pos, currentPremium, "loss", minutesElapsed);
   }
 
-  // TIME EXIT (30 min)
   if (decision.action === "exit_time") {
     return await executeExit(symbol, pos, currentPremium, "time", minutesElapsed);
   }
 
-  // STATUS UPDATE
   if (decision.action === "status") {
     const msg = formatStatusUpdate(decision.label, pos, currentPremium);
     await sendTelegram(msg, pos.entryMessageId);
@@ -658,12 +620,10 @@ async function processActivePosition(symbol, r, previous, now, decision) {
     return updated;
   }
 
-  // Just monitoring, no message needed
   return pos;
 }
 
 async function executeExit(symbol, pos, currentPremium, reason, minutesElapsed, newSignal = null) {
-  // Try to close position via Alpaca
   try {
     await closePosition(pos.optionSymbol);
     console.log(`  ${symbol}: Closed position ${pos.optionSymbol}`);
@@ -671,7 +631,6 @@ async function executeExit(symbol, pos, currentPremium, reason, minutesElapsed, 
     console.error(`  ${symbol}: Failed to close: ${e.message}`);
   }
 
-  // Format exit message
   let msg;
   if (reason === "profit") msg = formatExitProfit(pos, currentPremium, "خروج بربح (Target)", minutesElapsed);
   else if (reason === "loss") msg = formatExitLoss(pos, currentPremium, "خروج بخسارة (Stop)", minutesElapsed);
@@ -681,14 +640,12 @@ async function executeExit(symbol, pos, currentPremium, reason, minutesElapsed, 
 
   await sendTelegram(msg, pos.entryMessageId);
 
-  // Calculate P&L for daily report
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pnlPct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
 
   return {
     active: false,
     cooldownUntil: reason === "reversal" ? Date.now() + 5 * 60 * 1000 : Date.now() + 30 * 60 * 1000,
-    // Save trade for daily report
     _lastTrade: {
       symbol,
       signal: pos.signal,
@@ -717,7 +674,7 @@ async function executeEntry(symbol, r, account, now) {
     return null;
   }
 
-  const entryPremium = quote.ask; // use ask for buying
+  const entryPremium = quote.ask;
   const portfolioValue = parseFloat(account.portfolio_value);
   const qty = calculateQty(portfolioValue, entryPremium, 0.10);
 
@@ -726,7 +683,6 @@ async function executeEntry(symbol, r, account, now) {
     return null;
   }
 
-  // Place market order
   let orderResult;
   try {
     orderResult = await placeOptionOrder(contract.symbol, qty, "buy");
@@ -773,7 +729,6 @@ async function main() {
   const results = [];
   const now = Date.now();
 
-  // Get account info first
   let account;
   try {
     account = await getAccount();
@@ -783,7 +738,6 @@ async function main() {
     return;
   }
 
-  // Analyze all tickers
   for (const symbol of TICKERS) {
     try {
       const r = await analyzeTicker(symbol);
@@ -796,7 +750,6 @@ async function main() {
     await new Promise(r => setTimeout(r, 300));
   }
 
-  // Initialize daily trades log
   const today = new Date().toISOString().split("T")[0];
   if (state._date !== today) {
     state._dailyTrades = [];
@@ -807,7 +760,6 @@ async function main() {
   newState._dailyTrades = state._dailyTrades || [];
   newState._reportSent = state._reportSent || false;
 
-  // Process each ticker
   for (const r of results) {
     if (r.error) {
       const prev = state[r.symbol];
@@ -834,7 +786,6 @@ async function main() {
     else if (previous && previous.active) {
       const result = await processActivePosition(r.symbol, r, previous, now, decision);
       if (result._lastTrade) {
-        // Trade closed, save for report
         newState._dailyTrades.push(result._lastTrade);
         delete result._lastTrade;
       }
@@ -848,7 +799,6 @@ async function main() {
     }
   }
 
-  // Daily report at 3:00 PM
   if (isReportTime(now) && !newState._reportSent) {
     const reportMsg = formatDailyReport(newState);
     await sendTelegram(reportMsg);
