@@ -12,7 +12,7 @@
     "cooldownUntil": 1780589119424
   },
   "QQQ": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 90,
     "entryPrice": 739.17,
@@ -20,8 +20,8 @@
     "entryMessageId": 67,
     "evals10Sent": true,
     "evals20Sent": true,
-    "evals30Sent": false,
-    "cooldownUntil": null
+    "evals30Sent": true,
+    "cooldownUntil": 1780589424059
   },
   "NVDA": {
     "active": false,
@@ -36,16 +36,16 @@
     "cooldownUntil": 1780588221055
   },
   "TSLA": {
-    "active": false,
+    "active": true,
     "signal": "PUT",
-    "entryScore": 68,
-    "entryPrice": 421.4,
-    "entryTime": 1780583428845,
-    "entryMessageId": 51,
-    "evals10Sent": true,
-    "evals20Sent": true,
-    "evals30Sent": true,
-    "cooldownUntil": 1780587035519
+    "entryScore": 83,
+    "entryPrice": 418.23,
+    "entryTime": 1780587624059,
+    "entryMessageId": 79,
+    "evals10Sent": false,
+    "evals20Sent": false,
+    "evals30Sent": false,
+    "cooldownUntil": null
   },
   "META": {
     "active": false,
