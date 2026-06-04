@@ -19,7 +19,7 @@
     "entryTime": 1780585822757,
     "entryMessageId": 67,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
@@ -72,15 +72,15 @@
     "cooldownUntil": 1780587035519
   },
   "MSTR": {
-    "active": true,
+    "active": false,
     "signal": "PUT",
     "entryScore": 75,
     "entryPrice": 128.69,
     "entryTime": 1780586421055,
     "entryMessageId": 71,
-    "evals10Sent": false,
+    "evals10Sent": true,
     "evals20Sent": false,
     "evals30Sent": false,
-    "cooldownUntil": null
+    "cooldownUntil": 1780588825192
   }
 }
