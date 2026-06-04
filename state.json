@@ -67,7 +67,7 @@
     "entryTime": 1780591226494,
     "entryMessageId": 100,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
