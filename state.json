@@ -24,7 +24,7 @@
     "cooldownUntil": null
   },
   "NVDA": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 90,
     "entryPrice": 214.51,
@@ -32,8 +32,8 @@
     "entryMessageId": 55,
     "evals10Sent": true,
     "evals20Sent": true,
-    "evals30Sent": false,
-    "cooldownUntil": null
+    "evals30Sent": true,
+    "cooldownUntil": 1780588221055
   },
   "TSLA": {
     "active": false,
@@ -72,15 +72,15 @@
     "cooldownUntil": 1780587035519
   },
   "MSTR": {
-    "active": false,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 129.89,
-    "entryTime": 1780583428845,
-    "entryMessageId": 54,
-    "evals10Sent": true,
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 75,
+    "entryPrice": 128.69,
+    "entryTime": 1780586421055,
+    "entryMessageId": 71,
+    "evals10Sent": false,
     "evals20Sent": false,
     "evals30Sent": false,
-    "cooldownUntil": 1780586125580
+    "cooldownUntil": null
   }
 }
