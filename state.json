@@ -12,7 +12,7 @@
     "cooldownUntil": 1780591825091
   },
   "QQQ": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 67,
     "entryPrice": 739.7,
@@ -20,8 +20,8 @@
     "entryMessageId": 91,
     "evals10Sent": true,
     "evals20Sent": true,
-    "evals30Sent": false,
-    "cooldownUntil": null
+    "evals30Sent": true,
+    "cooldownUntil": 1780593624739
   },
   "NVDA": {
     "active": false,
