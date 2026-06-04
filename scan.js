@@ -786,7 +786,7 @@ async function main() {
       }
     }
     else if (decision.action === "no_entry_time") {
-      console.log(`  ${r.symbol}: No new entries after 2:00 PM`);
+      console.log(`  ${r.symbol}: No new entries after 2:35 PM`);
       if (previous) newState[r.symbol] = previous;
     }
     else if (previous && previous.active) {
