@@ -43,21 +43,21 @@
     "entryTime": 1780583428845,
     "entryMessageId": 51,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
   "META": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "entryScore": 83,
     "entryPrice": 638.12,
     "entryTime": 1780583428845,
     "entryMessageId": 52,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
-    "cooldownUntil": null
+    "cooldownUntil": 1780586721506
   },
   "AAPL": {
     "active": true,
@@ -67,7 +67,7 @@
     "entryTime": 1780583428845,
     "entryMessageId": 53,
     "evals10Sent": true,
-    "evals20Sent": false,
+    "evals20Sent": true,
     "evals30Sent": false,
     "cooldownUntil": null
   },
