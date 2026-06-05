@@ -396,6 +396,17 @@
       "pnlPct": 6.7901234567901145,
       "reason": "time",
       "minutes": 30
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 1.59,
+      "exitPremium": 0.895,
+      "qty": 6,
+      "pnl": -417,
+      "pnlPct": -43.710691823899374,
+      "reason": "loss",
+      "minutes": 5
     }
   ],
   "_reportSent": false,
@@ -414,36 +425,47 @@
     "entryPremium": 1.65,
     "qty": 6,
     "orderId": "3bf7b03e-dd89-4868-abc9-6a35fb1cddc8",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 211
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1780685721389
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 83,
+    "entryPrice": 205.72,
+    "entryTime": 1780686025237,
+    "optionSymbol": "NVDA260605P00205000",
+    "strike": "205",
+    "entryPremium": 0.51,
+    "qty": 19,
+    "orderId": "2e0e27e5-cd6e-442a-b179-8f7fb44d78c1",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 216
   },
   "TSLA": {
     "active": false,
     "cooldownUntil": 1780687523160
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 593.67,
-    "entryTime": 1780685718893,
-    "optionSymbol": "META260605P00590000",
-    "strike": "590",
-    "entryPremium": 1.59,
-    "qty": 6,
-    "orderId": "3766bbf1-179c-48a6-ae14-9bb3b9025def",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 214
+    "active": false,
+    "cooldownUntil": 1780687829384
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1780685722355
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 93,
+    "entryPrice": 309.35,
+    "entryTime": 1780686025237,
+    "optionSymbol": "AAPL260605P00307500",
+    "strike": "307.5",
+    "entryPremium": 0.22,
+    "qty": 45,
+    "orderId": "bd52f645-33cb-41ba-9553-9307a0ddebce",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 218
   },
   "MSTR": {
     "active": false,
