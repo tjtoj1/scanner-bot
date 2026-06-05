@@ -154,6 +154,17 @@
       "pnlPct": 56.27802690582961,
       "reason": "profit",
       "minutes": 4
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 2.43,
+      "exitPremium": 2.835,
+      "qty": 4,
+      "pnl": 161.99999999999991,
+      "pnlPct": 16.666666666666657,
+      "reason": "time",
+      "minutes": 34
     }
   ],
   "_reportSent": false,
@@ -174,19 +185,8 @@
     "cooldownUntil": 1780673722030
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 616.91,
-    "entryTime": 1780670121749,
-    "optionSymbol": "META260605P00615000",
-    "strike": "615",
-    "entryPremium": 2.43,
-    "qty": 4,
-    "orderId": "8fd3e059-8744-4d76-a579-a82b4628b424",
-    "eval10Sent": true,
-    "eval20Sent": true,
-    "entryMessageId": 144
+    "active": false,
+    "cooldownUntil": 1780674022675
   },
   "AAPL": {
     "active": false,
