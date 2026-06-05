@@ -104,7 +104,7 @@
     "qty": 2,
     "orderId": "af644ded-38b6-4ef3-bfdb-b112c7cc60b9",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 127
   },
   "META": {
@@ -116,7 +116,18 @@
     "cooldownUntil": 1780669834790
   },
   "MSTR": {
-    "active": false,
-    "cooldownUntil": 1780668625152
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 68,
+    "entryPrice": 119.32,
+    "entryTime": 1780668922571,
+    "optionSymbol": "MSTR260605P00115000",
+    "strike": "115",
+    "entryPremium": 0.56,
+    "qty": 17,
+    "orderId": "d56eff82-e4e2-4915-a42c-668c406f259f",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 136
   }
 }
