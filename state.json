@@ -407,12 +407,34 @@
       "pnlPct": -43.710691823899374,
       "reason": "loss",
       "minutes": 5
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 0.51,
+      "exitPremium": 0.255,
+      "qty": 19,
+      "pnl": -484.5,
+      "pnlPct": -50,
+      "reason": "loss",
+      "minutes": 4
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1780686027441
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 68,
+    "entryPrice": 738.88,
+    "entryTime": 1780686315999,
+    "optionSymbol": "SPY260605P00738000",
+    "strike": "738",
+    "entryPremium": 1.04,
+    "qty": 9,
+    "orderId": "e5ed654a-b856-4c8f-b1ff-bf93177d74d8",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 219
   },
   "QQQ": {
     "active": true,
@@ -430,19 +452,8 @@
     "entryMessageId": 211
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 205.72,
-    "entryTime": 1780686025237,
-    "optionSymbol": "NVDA260605P00205000",
-    "strike": "205",
-    "entryPremium": 0.51,
-    "qty": 19,
-    "orderId": "2e0e27e5-cd6e-442a-b179-8f7fb44d78c1",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 216
+    "active": false,
+    "cooldownUntil": 1780688119563
   },
   "TSLA": {
     "active": false,
