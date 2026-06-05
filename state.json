@@ -429,6 +429,28 @@
       "pnlPct": 37.980769230769226,
       "reason": "profit",
       "minutes": 5
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "entryPremium": 1.65,
+      "exitPremium": 3.0300000000000002,
+      "qty": 6,
+      "pnl": 828.0000000000001,
+      "pnlPct": 83.63636363636367,
+      "reason": "profit",
+      "minutes": 25
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "PUT",
+      "entryPremium": 0.22,
+      "exitPremium": 0.41500000000000004,
+      "qty": 45,
+      "pnl": 877.5000000000002,
+      "pnlPct": 88.63636363636364,
+      "reason": "profit",
+      "minutes": 14
     }
   ],
   "_reportSent": false,
@@ -437,19 +459,8 @@
     "cooldownUntil": 1780688421053
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 78,
-    "entryPrice": 708.68,
-    "entryTime": 1780685417953,
-    "optionSymbol": "QQQ260605P00708000",
-    "strike": "708",
-    "entryPremium": 1.65,
-    "qty": 6,
-    "orderId": "3bf7b03e-dd89-4868-abc9-6a35fb1cddc8",
-    "eval10Sent": true,
-    "eval20Sent": false,
-    "entryMessageId": 211
+    "active": false,
+    "cooldownUntil": 1780688722753
   },
   "NVDA": {
     "active": false,
@@ -464,19 +475,8 @@
     "cooldownUntil": 1780687829384
   },
   "AAPL": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 93,
-    "entryPrice": 309.35,
-    "entryTime": 1780686025237,
-    "optionSymbol": "AAPL260605P00307500",
-    "strike": "307.5",
-    "entryPremium": 0.22,
-    "qty": 45,
-    "orderId": "bd52f645-33cb-41ba-9553-9307a0ddebce",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 218
+    "active": false,
+    "cooldownUntil": 1780688722958
   },
   "MSTR": {
     "active": false,
