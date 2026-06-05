@@ -266,8 +266,19 @@
     "cooldownUntil": 1780674022675
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1780676421786
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 312.17,
+    "entryTime": 1780676718401,
+    "optionSymbol": "AAPL260605P00310000",
+    "strike": "310",
+    "entryPremium": 0.29,
+    "qty": 34,
+    "orderId": "8613fbfe-bc15-4c2d-8c6c-35404e7adff5",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 176
   },
   "MSTR": {
     "active": true,
