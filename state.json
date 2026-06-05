@@ -204,7 +204,18 @@
     "cooldownUntil": 1780672222649
   },
   "MSTR": {
-    "active": false,
-    "cooldownUntil": 1780671627363
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 78,
+    "entryPrice": 119.08,
+    "entryTime": 1780672819331,
+    "optionSymbol": "MSTR260605P00115000",
+    "strike": "115",
+    "entryPremium": 0.33,
+    "qty": 30,
+    "orderId": "ed3147cd-3ff7-470b-a3b2-871cc10aea63",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 154
   }
 }
