@@ -169,8 +169,19 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1780671320147
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 73,
+    "entryPrice": 748.25,
+    "entryTime": 1780672518593,
+    "optionSymbol": "SPY260605P00747000",
+    "strike": "747",
+    "entryPremium": 0.8,
+    "qty": 12,
+    "orderId": "9ce5ebc7-3722-4e88-8681-0367fd4baea1",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 153
   },
   "QQQ": {
     "active": false,
