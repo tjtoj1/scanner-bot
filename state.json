@@ -67,7 +67,7 @@
     "qty": 9,
     "orderId": "c90e3f18-e3b4-4b26-bcf4-5fc2aea0e403",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 117
   },
   "TSLA": {
@@ -85,6 +85,21 @@
     "eval20Sent": false,
     "entryMessageId": 127
   },
+  "META": {
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 93,
+    "entryPrice": 620.99,
+    "entryTime": 1780667715878,
+    "optionSymbol": "META260605P00617500",
+    "strike": "617.5",
+    "entryPremium": 2.08,
+    "qty": 4,
+    "orderId": "7820876b-08d5-4264-9260-c599d0c10b5c",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 129
+  },
   "AAPL": {
     "active": true,
     "signal": "CALL",
@@ -97,7 +112,7 @@
     "qty": 13,
     "orderId": "a7057f80-0dee-43ea-969f-aa65f8f94d4e",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 119
   },
   "MSTR": {
