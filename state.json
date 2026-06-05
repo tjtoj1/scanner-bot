@@ -228,7 +228,7 @@
     "qty": 6,
     "orderId": "ced4559f-1cfa-4fcb-b262-ec8c129b0435",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 163
   },
   "NVDA": {
@@ -247,7 +247,7 @@
     "qty": 5,
     "orderId": "5b1a879e-2780-4de7-b12a-5b328ee3bfef",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 165
   },
   "META": {
