@@ -1,6 +1,29 @@
 {
   "_date": "2026-06-05",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "entryPremium": 2.88,
+      "exitPremium": 1.36,
+      "qty": 3,
+      "pnl": -455.99999999999994,
+      "pnlPct": -52.77777777777777,
+      "reason": "reversal",
+      "minutes": 9
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "PUT",
+      "entryPremium": 0.67,
+      "exitPremium": 1.115,
+      "qty": 14,
+      "pnl": 623,
+      "pnlPct": 66.41791044776119,
+      "reason": "profit",
+      "minutes": 5
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": true,
@@ -48,19 +71,8 @@
     "entryMessageId": 117
   },
   "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 93,
-    "entryPrice": 423.09,
-    "entryTime": 1780666223067,
-    "optionSymbol": "TSLA260605C00425000",
-    "strike": "425",
-    "entryPremium": 2.88,
-    "qty": 3,
-    "orderId": "74b2e7ac-3f31-4dab-84d7-6c7a7b174794",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 118
+    "active": false,
+    "cooldownUntil": 1780667124822
   },
   "AAPL": {
     "active": true,
@@ -78,18 +90,7 @@
     "entryMessageId": 119
   },
   "MSTR": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 124.67,
-    "entryTime": 1780666516294,
-    "optionSymbol": "MSTR260605P00120000",
-    "strike": "120",
-    "entryPremium": 0.67,
-    "qty": 14,
-    "orderId": "f8a5b253-aeae-4e39-afaa-506cfe94d6e4",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 120
+    "active": false,
+    "cooldownUntil": 1780668625152
   }
 }
