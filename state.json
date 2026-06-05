@@ -188,8 +188,19 @@
     "cooldownUntil": 1780671320364
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1780672525194
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 208.73,
+    "entryTime": 1780673116577,
+    "optionSymbol": "NVDA260605P00207500",
+    "strike": "207.5",
+    "entryPremium": 0.71,
+    "qty": 14,
+    "orderId": "fd5ef2f7-7e74-4035-a109-78d7d45dd1ab",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 155
   },
   "TSLA": {
     "active": false,
