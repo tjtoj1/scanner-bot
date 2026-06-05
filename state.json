@@ -179,7 +179,7 @@
     "entryPremium": 0.8,
     "qty": 12,
     "orderId": "9ce5ebc7-3722-4e88-8681-0367fd4baea1",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 153
   },
@@ -225,7 +225,7 @@
     "entryPremium": 0.33,
     "qty": 30,
     "orderId": "ed3147cd-3ff7-470b-a3b2-871cc10aea63",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 154
   }
