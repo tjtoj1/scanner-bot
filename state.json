@@ -253,6 +253,17 @@
       "pnlPct": 96.55172413793107,
       "reason": "profit",
       "minutes": 14
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "PUT",
+      "entryPremium": 0.48,
+      "exitPremium": 0.33499999999999996,
+      "qty": 20,
+      "pnl": -290.00000000000006,
+      "pnlPct": -30.208333333333336,
+      "reason": "loss",
+      "minutes": 29
     }
   ],
   "_reportSent": false,
@@ -286,7 +297,7 @@
     "entryPremium": 0.99,
     "qty": 10,
     "orderId": "96c92157-a006-4df0-9594-3eacbe37267c",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 181
   },
@@ -314,18 +325,7 @@
     "cooldownUntil": 1780679421815
   },
   "MSTR": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 73,
-    "entryPrice": 118.14,
-    "entryTime": 1780676419418,
-    "optionSymbol": "MSTR260605P00115000",
-    "strike": "115",
-    "entryPremium": 0.48,
-    "qty": 20,
-    "orderId": "d0433431-d736-4462-99e1-eee1cb74feb9",
-    "eval10Sent": true,
-    "eval20Sent": true,
-    "entryMessageId": 175
+    "active": false,
+    "cooldownUntil": 1780680022069
   }
 }
