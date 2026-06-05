@@ -341,6 +341,28 @@
       "pnlPct": 107.5,
       "reason": "profit",
       "minutes": 5
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 0.28,
+      "exitPremium": 0.395,
+      "qty": 35,
+      "pnl": 402.49999999999994,
+      "pnlPct": 41.07142857142856,
+      "reason": "profit",
+      "minutes": 9
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 0.11,
+      "exitPremium": 0.035,
+      "qty": 90,
+      "pnl": -675,
+      "pnlPct": -68.18181818181817,
+      "reason": "loss",
+      "minutes": 4
     }
   ],
   "_reportSent": false,
@@ -364,42 +386,31 @@
     "cooldownUntil": 1780685122806
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 206.59,
-    "entryTime": 1780683318647,
-    "optionSymbol": "NVDA260605P00205000",
-    "strike": "205",
-    "entryPremium": 0.28,
-    "qty": 35,
-    "orderId": "7e4cc51d-132a-4ad4-b84a-79b786ca1204",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 200
+    "active": false,
+    "cooldownUntil": 1780685721389
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1780677926012
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 78,
+    "entryPrice": 392.13,
+    "entryTime": 1780683917108,
+    "optionSymbol": "TSLA260605P00390000",
+    "strike": "390",
+    "entryPremium": 0.81,
+    "qty": 12,
+    "orderId": "3d697893-7368-40e1-96c9-765ac0cff9bc",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 205
   },
   "META": {
     "active": false,
     "cooldownUntil": 1780685422455
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 85,
-    "entryPrice": 312.67,
-    "entryTime": 1780683619189,
-    "optionSymbol": "AAPL260605C00315000",
-    "strike": "315",
-    "entryPremium": 0.11,
-    "qty": 90,
-    "orderId": "1f7e27c2-f79d-4157-8e45-56a3db685cf8",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 203
+    "active": false,
+    "cooldownUntil": 1780685722355
   },
   "MSTR": {
     "active": false,
