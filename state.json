@@ -220,12 +220,34 @@
       "pnlPct": 53.020134228187935,
       "reason": "profit",
       "minutes": 29
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 1.86,
+      "exitPremium": 2.585,
+      "qty": 5,
+      "pnl": 362.4999999999999,
+      "pnlPct": 38.978494623655905,
+      "reason": "profit",
+      "minutes": 34
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1780675825257
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 68,
+    "entryPrice": 745.46,
+    "entryTime": 1780676120249,
+    "optionSymbol": "SPY260605P00744000",
+    "strike": "744",
+    "entryPremium": 0.93,
+    "qty": 10,
+    "orderId": "b6151bf2-cf37-4685-a9df-36e7376322fa",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 173
   },
   "QQQ": {
     "active": false,
@@ -236,19 +258,8 @@
     "cooldownUntil": 1780675826130
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 68,
-    "entryPrice": 401.14,
-    "entryTime": 1780674020535,
-    "optionSymbol": "TSLA260605P00400000",
-    "strike": "400",
-    "entryPremium": 1.86,
-    "qty": 5,
-    "orderId": "5b1a879e-2780-4de7-b12a-5b328ee3bfef",
-    "eval10Sent": true,
-    "eval20Sent": true,
-    "entryMessageId": 165
+    "active": false,
+    "cooldownUntil": 1780677926012
   },
   "META": {
     "active": false,
