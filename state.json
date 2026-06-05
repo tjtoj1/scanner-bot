@@ -165,6 +165,17 @@
       "pnlPct": 16.666666666666657,
       "reason": "time",
       "minutes": 34
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "PUT",
+      "entryPremium": 0.33,
+      "exitPremium": 0.565,
+      "qty": 30,
+      "pnl": 704.9999999999998,
+      "pnlPct": 71.21212121212119,
+      "reason": "profit",
+      "minutes": 14
     }
   ],
   "_reportSent": false,
@@ -180,7 +191,7 @@
     "qty": 12,
     "orderId": "9ce5ebc7-3722-4e88-8681-0367fd4baea1",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 153
   },
   "QQQ": {
@@ -198,7 +209,7 @@
     "entryPremium": 0.71,
     "qty": 14,
     "orderId": "fd5ef2f7-7e74-4035-a109-78d7d45dd1ab",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 155
   },
@@ -211,22 +222,22 @@
     "cooldownUntil": 1780674022675
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1780672222649
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 73,
+    "entryPrice": 313.95,
+    "entryTime": 1780673719041,
+    "optionSymbol": "AAPL260605C00315000",
+    "strike": "315",
+    "entryPremium": 0.55,
+    "qty": 18,
+    "orderId": "d66237d1-4cc3-4b32-8cf2-a16f382f474b",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 160
   },
   "MSTR": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 78,
-    "entryPrice": 119.08,
-    "entryTime": 1780672819331,
-    "optionSymbol": "MSTR260605P00115000",
-    "strike": "115",
-    "entryPremium": 0.33,
-    "qty": 30,
-    "orderId": "ed3147cd-3ff7-470b-a3b2-871cc10aea63",
-    "eval10Sent": true,
-    "eval20Sent": false,
-    "entryMessageId": 154
+    "active": false,
+    "cooldownUntil": 1780675523796
   }
 }
