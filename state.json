@@ -71,8 +71,19 @@
     "entryMessageId": 117
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1780667124822
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 411.21,
+    "entryTime": 1780667420325,
+    "optionSymbol": "TSLA260605P00410000",
+    "strike": "410",
+    "entryPremium": 3.42,
+    "qty": 2,
+    "orderId": "af644ded-38b6-4ef3-bfdb-b112c7cc60b9",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 127
   },
   "AAPL": {
     "active": true,
