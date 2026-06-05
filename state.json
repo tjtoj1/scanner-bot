@@ -385,6 +385,17 @@
       "pnlPct": -50,
       "reason": "loss",
       "minutes": 4
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 0.81,
+      "exitPremium": 0.865,
+      "qty": 12,
+      "pnl": 65.99999999999993,
+      "pnlPct": 6.7901234567901145,
+      "reason": "time",
+      "minutes": 30
     }
   ],
   "_reportSent": false,
@@ -412,23 +423,23 @@
     "cooldownUntil": 1780685721389
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 78,
-    "entryPrice": 392.13,
-    "entryTime": 1780683917108,
-    "optionSymbol": "TSLA260605P00390000",
-    "strike": "390",
-    "entryPremium": 0.81,
-    "qty": 12,
-    "orderId": "3d697893-7368-40e1-96c9-765ac0cff9bc",
-    "eval10Sent": true,
-    "eval20Sent": true,
-    "entryMessageId": 205
+    "active": false,
+    "cooldownUntil": 1780687523160
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1780685422455
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 83,
+    "entryPrice": 593.67,
+    "entryTime": 1780685718893,
+    "optionSymbol": "META260605P00590000",
+    "strike": "590",
+    "entryPremium": 1.59,
+    "qty": 6,
+    "orderId": "3766bbf1-179c-48a6-ae14-9bb3b9025def",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 214
   },
   "AAPL": {
     "active": false,
