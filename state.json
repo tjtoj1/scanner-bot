@@ -143,6 +143,17 @@
       "pnlPct": 50.000000000000014,
       "reason": "profit",
       "minutes": 9
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 2.23,
+      "exitPremium": 3.4850000000000003,
+      "qty": 4,
+      "pnl": 502.0000000000001,
+      "pnlPct": 56.27802690582961,
+      "reason": "profit",
+      "minutes": 4
     }
   ],
   "_reportSent": false,
@@ -159,19 +170,8 @@
     "cooldownUntil": 1780672525194
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 68,
-    "entryPrice": 405.49,
-    "entryTime": 1780671628846,
-    "optionSymbol": "TSLA260605P00405000",
-    "strike": "405",
-    "entryPremium": 2.23,
-    "qty": 4,
-    "orderId": "87ab8e25-abce-4298-b7a4-c1a9e6718d97",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 149
+    "active": false,
+    "cooldownUntil": 1780673722030
   },
   "META": {
     "active": true,
