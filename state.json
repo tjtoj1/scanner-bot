@@ -44,6 +44,28 @@
       "pnlPct": 70.09803921568626,
       "reason": "profit",
       "minutes": 14
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 1.08,
+      "exitPremium": 1.4849999999999999,
+      "qty": 9,
+      "pnl": 364.49999999999983,
+      "pnlPct": 37.49999999999998,
+      "reason": "profit",
+      "minutes": 30
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 0.72,
+      "exitPremium": 0.71,
+      "qty": 13,
+      "pnl": -13.00000000000001,
+      "pnlPct": -1.3888888888888902,
+      "reason": "time",
+      "minutes": 30
     }
   ],
   "_reportSent": false,
@@ -56,19 +78,8 @@
     "cooldownUntil": 1780668925040
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 78,
-    "entryPrice": 213.51,
-    "entryTime": 1780666223067,
-    "optionSymbol": "NVDA260605P00212500",
-    "strike": "212.5",
-    "entryPremium": 1.08,
-    "qty": 9,
-    "orderId": "c90e3f18-e3b4-4b26-bcf4-5fc2aea0e403",
-    "eval10Sent": true,
-    "eval20Sent": true,
-    "entryMessageId": 117
+    "active": false,
+    "cooldownUntil": 1780669834143
   },
   "TSLA": {
     "active": true,
@@ -81,7 +92,7 @@
     "entryPremium": 3.42,
     "qty": 2,
     "orderId": "af644ded-38b6-4ef3-bfdb-b112c7cc60b9",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 127
   },
@@ -101,19 +112,8 @@
     "entryMessageId": 129
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 93,
-    "entryPrice": 313.4,
-    "entryTime": 1780666223067,
-    "optionSymbol": "AAPL260605C00315000",
-    "strike": "315",
-    "entryPremium": 0.72,
-    "qty": 13,
-    "orderId": "a7057f80-0dee-43ea-969f-aa65f8f94d4e",
-    "eval10Sent": true,
-    "eval20Sent": true,
-    "entryMessageId": 119
+    "active": false,
+    "cooldownUntil": 1780669834790
   },
   "MSTR": {
     "active": false,
