@@ -264,6 +264,17 @@
       "pnlPct": -30.208333333333336,
       "reason": "loss",
       "minutes": 29
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "entryPremium": 1.9,
+      "exitPremium": 1.13,
+      "qty": 5,
+      "pnl": -385,
+      "pnlPct": -40.526315789473685,
+      "reason": "loss",
+      "minutes": 9
     }
   ],
   "_reportSent": false,
@@ -272,19 +283,8 @@
     "cooldownUntil": 1780679118128
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 715.22,
-    "entryTime": 1780677918924,
-    "optionSymbol": "QQQ260605P00714000",
-    "strike": "714",
-    "entryPremium": 1.9,
-    "qty": 5,
-    "orderId": "8a8186e8-f48a-43a5-a37b-254b1ec64ac3",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 183
+    "active": false,
+    "cooldownUntil": 1780680319547
   },
   "NVDA": {
     "active": true,
@@ -317,7 +317,7 @@
     "qty": 5,
     "orderId": "54944687-930c-4f64-9619-05c2b41bbe39",
     "eval10Sent": true,
-    "eval20Sent": false,
+    "eval20Sent": true,
     "entryMessageId": 180
   },
   "AAPL": {
