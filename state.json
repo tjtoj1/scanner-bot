@@ -254,7 +254,7 @@
     "entryPremium": 0.55,
     "qty": 18,
     "orderId": "d66237d1-4cc3-4b32-8cf2-a16f382f474b",
-    "eval10Sent": false,
+    "eval10Sent": true,
     "eval20Sent": false,
     "entryMessageId": 160
   },
