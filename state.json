@@ -363,23 +363,23 @@
       "pnlPct": -68.18181818181817,
       "reason": "loss",
       "minutes": 4
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "entryPremium": 0.79,
+      "exitPremium": 1.3450000000000002,
+      "qty": 12,
+      "pnl": 666.0000000000002,
+      "pnlPct": 70.25316455696205,
+      "reason": "profit",
+      "minutes": 15
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 742,
-    "entryTime": 1780683318647,
-    "optionSymbol": "SPY260605P00741000",
-    "strike": "741",
-    "entryPremium": 0.79,
-    "qty": 12,
-    "orderId": "af759f36-06fe-4ee1-8343-8c34c6a0150b",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 198
+    "active": false,
+    "cooldownUntil": 1780686027441
   },
   "QQQ": {
     "active": false,
@@ -413,7 +413,18 @@
     "cooldownUntil": 1780685722355
   },
   "MSTR": {
-    "active": false,
-    "cooldownUntil": 1780683919752
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 68,
+    "entryPrice": 115.2,
+    "entryTime": 1780684222285,
+    "optionSymbol": "MSTR260605P00110000",
+    "strike": "110",
+    "entryPremium": 0.13,
+    "qty": 76,
+    "orderId": "9b0c0571-6083-40b2-b0b9-709538c8d558",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 208
   }
 }
