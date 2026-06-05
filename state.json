@@ -76,5 +76,20 @@
     "eval10Sent": false,
     "eval20Sent": false,
     "entryMessageId": 119
+  },
+  "MSTR": {
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 124.67,
+    "entryTime": 1780666516294,
+    "optionSymbol": "MSTR260605P00120000",
+    "strike": "120",
+    "entryPremium": 0.67,
+    "qty": 14,
+    "orderId": "f8a5b253-aeae-4e39-afaa-506cfe94d6e4",
+    "eval10Sent": false,
+    "eval20Sent": false,
+    "entryMessageId": 120
   }
 }
