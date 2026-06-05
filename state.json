@@ -121,6 +121,17 @@
       "pnlPct": 46.42857142857142,
       "reason": "profit",
       "minutes": 15
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 1.06,
+      "exitPremium": 0.66,
+      "qty": 9,
+      "pnl": -360,
+      "pnlPct": -37.735849056603776,
+      "reason": "loss",
+      "minutes": 4
     }
   ],
   "_reportSent": false,
@@ -167,19 +178,8 @@
     "entryMessageId": 144
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 93,
-    "entryPrice": 314.67,
-    "entryTime": 1780670121749,
-    "optionSymbol": "AAPL260605C00315000",
-    "strike": "315",
-    "entryPremium": 1.06,
-    "qty": 9,
-    "orderId": "f31e743b-8cd3-4916-81c7-0ea9579fafe5",
-    "eval10Sent": false,
-    "eval20Sent": false,
-    "entryMessageId": 145
+    "active": false,
+    "cooldownUntil": 1780672222649
   },
   "MSTR": {
     "active": false,
