@@ -297,6 +297,7 @@ async function analyzeTicker(symbol) {
     bullScore: bull.score, bearScore: bear.score,
   };
 }
+
 // ============================================================
 // ALPACA TRADING API (Paper Trading)
 // ============================================================
@@ -337,6 +338,7 @@ async function getOptionContracts(symbol, expirationDate, type, strikeMin, strik
 
 async function getOptionQuote(optionSymbol) {
   try {
+    // Use the correct endpoint: /v1beta1/options/quotes/latest?symbols=...
     const url = `https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${encodeURIComponent(optionSymbol)}`;
     const data = await alpacaCall(url);
     const quote = data.quotes?.[optionSymbol];
@@ -358,7 +360,7 @@ async function placeOptionOrder(optionSymbol, qty, side) {
   return alpacaCall(`${TRADING_BASE}/orders`, "POST", {
     symbol: optionSymbol,
     qty: String(qty),
-    side,
+    side, // "buy" or "sell"
     type: "market",
     time_in_force: "day",
   });
@@ -376,6 +378,9 @@ async function closePosition(optionSymbol) {
   return alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
+// ============================================================
+// Pick best option contract for a signal
+// ============================================================
 async function pickOptionContract(symbol, signal, atmStrike, strikeStep) {
   const today = new Date().toISOString().split("T")[0];
   const targetStrike = signal === "CALL" ? atmStrike + strikeStep : atmStrike - strikeStep;
@@ -384,40 +389,91 @@ async function pickOptionContract(symbol, signal, atmStrike, strikeStep) {
 
   const contracts = await getOptionContracts(symbol, today, signal, min, max);
   if (contracts.length === 0) {
+    // No 0DTE found, try wider range
     const wideMin = targetStrike - strikeStep * 2;
     const wideMax = targetStrike + strikeStep * 2;
     const wider = await getOptionContracts(symbol, today, signal, wideMin, wideMax);
     if (wider.length === 0) return null;
+    // Pick closest to target
     wider.sort((a, b) => Math.abs(a.strike_price - targetStrike) - Math.abs(b.strike_price - targetStrike));
     return wider[0];
   }
+  // Pick exact match or closest
   contracts.sort((a, b) => Math.abs(a.strike_price - targetStrike) - Math.abs(b.strike_price - targetStrike));
   return contracts[0];
 }
 
+// ============================================================
+// Calculate quantity based on portfolio %
+// ============================================================
 function calculateQty(portfolioValue, premiumPerContract, pctOfPortfolio = 0.10) {
   const targetDollar = portfolioValue * pctOfPortfolio;
-  const contractCost = premiumPerContract * 100;
+  const contractCost = premiumPerContract * 100; // each contract = 100 shares
   const qty = Math.floor(targetDollar / contractCost);
-  return Math.max(qty, 1);
+  return Math.max(qty, 1); // at least 1 contract
 }
 
+// ============================================================
+// Time helpers (CDT = UTC-5)
+// ============================================================
 function isPastForceExitTime(now) {
+  // 2:39 PM CDT = 19:39 UTC
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
   return utcMin >= 19 * 60 + 39;
 }
 
 function isBeforeNoEntryTime(now) {
+  // No new entries after 2:30 PM CDT = 19:30 UTC
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
   return utcMin < 19 * 60 + 30;
 }
 
 function isReportTime(now) {
+  // 3:00 PM CDT = 20:00 UTC, fire once
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
   return utcMin >= 20 * 60 && utcMin < 20 * 60 + 10;
+}
+
+// ============================================================
+// V16: PHASED TRAILING STOP SYSTEM
+// ============================================================
+function calculatePhase(entryPremium, peakPremium) {
+  const peakPct = ((peakPremium - entryPremium) / entryPremium) * 100;
+  if (peakPct >= 35) return "trailing";
+  if (peakPct >= 20) return "buffer";
+  if (peakPct >= 10) return "breakeven";
+  return "initial";
+}
+
+function calculateStop(entryPremium, peakPremium) {
+  const phase = calculatePhase(entryPremium, peakPremium);
+  switch (phase) {
+    case "trailing":  return peakPremium * 0.95;   // Peak - 5%
+    case "buffer":    return peakPremium * 0.93;   // Peak - 7%
+    case "breakeven": return entryPremium;          // Entry price
+    default:          return entryPremium * 0.70;   // -30%
+  }
+}
+
+function getPhaseLabel(phase) {
+  switch (phase) {
+    case "trailing":  return "Trailing (Peak - 5%)";
+    case "buffer":    return "Buffer (Peak - 7%)";
+    case "breakeven": return "Break-Even";
+    default:          return "Initial (-30%)";
+  }
+}
+
+function getPhaseEmoji(phase) {
+  switch (phase) {
+    case "trailing":  return "🚀";
+    case "buffer":    return "📈";
+    case "breakeven": return "🛡️";
+    default:          return "🛑";
+  }
 }
 
 async function sendTelegram(text, replyToMessageId = null) {
@@ -439,15 +495,65 @@ async function sendTelegram(text, replyToMessageId = null) {
 }
 
 function formatBuyAlert(r, pos) {
-  const arrow = r.pct >= 0 ? "▲" : "▼";
-  const signalEmoji = r.signal === "CALL" ? "🟢" : "🔴";
-  return `✅ <b>BUY: ${r.symbol} ${r.signal} $${pos.strike} 0DTE</b> ${signalEmoji}
-💰 Premium: $${pos.entryPremium.toFixed(2)}
-📊 Size: ${pos.qty} contracts ($${(pos.qty * pos.entryPremium * 100).toFixed(0)})
-🎯 Target: $${(pos.entryPremium * 1.35).toFixed(2)} (+35%)
-🛑 Stop: $${(pos.entryPremium * 0.70).toFixed(2)} (-30%)
-📊 Score: ${r.score}% | ${r.setup?.name || ""}
-💼 $${r.price} ${arrow} ${Math.abs(r.pct)}%`;
+  const target = pos.entryPremium * 1.35;
+  const stop = pos.entryPremium * 0.70;
+  return `✅ <b>BUY ${r.symbol} ${r.signal} $${pos.strike} 0DTE</b>
+💰 Entry: $${pos.entryPremium.toFixed(2)} × ${pos.qty}
+🎯 Target: $${target.toFixed(2)} (+35%)
+🛑 Stop: $${stop.toFixed(2)} (-30%)
+📊 ${r.score}% ${r.setup?.name || ""}`;
+}
+
+function formatMonitor(pos, currentPremium, peakPremium, currentStop, minutesElapsed) {
+  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
+  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
+  const phase = calculatePhase(pos.entryPremium, peakPremium);
+  const emoji = getPhaseEmoji(phase);
+  const phaseLabel = getPhaseLabel(phase);
+  return `📊 <b>${pos.symbol || ""} - مراقبة</b>
+💰 Premium: $${currentPremium.toFixed(2)} (${pctStr}%)
+🎯 Stop: $${currentStop.toFixed(2)} ${emoji} ${phaseLabel}
+📈 Peak: $${peakPremium.toFixed(2)}
+⏱ ${minutesElapsed} دقيقة`;
+}
+
+function formatBreakEven(pos, currentPremium) {
+  return `🛡️ <b>BREAK-EVEN: ${pos.symbol || ""}</b>
+💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
+🔒 Stop: $${pos.entryPremium.toFixed(2)} (سعر الدخول)`;
+}
+
+function formatBuffer(pos, currentPremium, peakPremium, stop) {
+  return `📈 <b>BUFFER: ${pos.symbol || ""}</b>
+💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
+🎯 Stop: $${stop.toFixed(2)} (Peak - 7%)`;
+}
+
+function formatTrailing(pos, currentPremium, peakPremium, stop) {
+  return `🚀 <b>TRAILING: ${pos.symbol || ""}</b>
+💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
+🎯 Stop: $${stop.toFixed(2)} (Peak - 5%)`;
+}
+
+function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
+  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium) * 100;
+  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
+  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
+  const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
+  const emoji = pct >= 0 ? "✅" : "🛑";
+  const reasonText = {
+    profit: "خروج بربح",
+    loss: "خروج بخسارة",
+    trailing: "Trailing Stop",
+    breakeven: "Break-Even Stop",
+    buffer: "Buffer Stop",
+    force: "إغلاق إجباري (2:39 PM)",
+    reversal: "انعكاس",
+  }[reason] || reason;
+  return `${emoji} <b>EXIT: ${pos.symbol || ""} (${reasonText})</b>
+💰 $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)
+⏱ ${minutesElapsed} دقيقة`;
 }
 
 function formatStatusUpdate(label, pos, currentPremium) {
@@ -484,7 +590,8 @@ function formatExitTime(pos, currentPremium, minutesElapsed) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `🏁 <b>EXIT: انتهت المدة (30 دقيقة)</b>
+  const emoji = pct >= 0 ? "🏁" : "🏁";
+  return `${emoji} <b>EXIT: انتهت المدة (30 دقيقة)</b>
 💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
 ${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 }
@@ -511,8 +618,18 @@ ${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 
 function formatDailyReport(state) {
   const trades = state._dailyTrades || [];
+
+  // Get today in CDT timezone
+  const now = new Date();
+  const cdtDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Chicago" }));
+  const dayName = cdtDate.toLocaleDateString("en-US", { weekday: "long" });
+  const monthName = cdtDate.toLocaleDateString("en-US", { month: "long" });
+  const day = cdtDate.getDate();
+  const year = cdtDate.getFullYear();
+  const dateHeader = `${dayName} ${monthName} ${day}, ${year}`;
+
   if (trades.length === 0) {
-    return `📊 <b>تقرير اليوم</b>\n\nلا توجد صفقات اليوم`;
+    return `📊 <b>Daily Report - ${dateHeader}</b>\n\nلا توجد صفقات اليوم`;
   }
 
   const wins = trades.filter(t => t.pnl > 0);
@@ -525,7 +642,7 @@ function formatDailyReport(state) {
   const newBalance = startBalance + totalPnl;
   const pnlPct = (totalPnl / startBalance * 100).toFixed(1);
 
-  return `📊 <b>تقرير اليوم</b>
+  return `📊 <b>Daily Report - ${dateHeader}</b>
 
 💼 الصفقات: ${trades.length}
 ✅ ربحانة: ${wins.length} (${winRate}%)
@@ -537,6 +654,9 @@ function formatDailyReport(state) {
 
 📈 الرصيد: $${newBalance.toFixed(0)}`;
 }
+
+
+
 function isMarketOpen() {
   const now = new Date();
   const day = now.getUTCDay();
@@ -548,10 +668,12 @@ function isMarketOpen() {
 function decideAction(current, previous, now) {
   const isStrong = current.score >= MIN_SCORE && (current.strengthAr === "قوية" || current.strengthAr === "قوية جداً");
 
+  // Force exit at 2:39 PM if position active
   if (previous && previous.active && isPastForceExitTime(now)) {
     return { action: "force_exit" };
   }
 
+  // No active position
   if (!previous || !previous.active) {
     if (previous && previous.cooldownUntil && now < previous.cooldownUntil) {
       return { action: "cooldown" };
@@ -562,74 +684,95 @@ function decideAction(current, previous, now) {
     return isStrong ? { action: "new_entry" } : { action: "none" };
   }
 
-  const minutesElapsed = (now - previous.entryTime) / 60000;
-
+  // Active position - check reversal only (stop logic is in processActivePosition)
   if (current.signal !== "NEUTRAL" && current.signal !== previous.signal && isStrong) {
     return { action: "exit_reversal", newSignal: current.signal };
   }
 
-  if (minutesElapsed >= 30 && !previous.exitTimeChecked) {
-    return { action: "exit_time", minutesElapsed: Math.floor(minutesElapsed) };
-  }
-
-  if (!previous.eval10Sent && minutesElapsed >= 10 && minutesElapsed < 20) {
-    return { action: "status", label: "10min", minutesElapsed: Math.floor(minutesElapsed) };
-  }
-  if (!previous.eval20Sent && minutesElapsed >= 20 && minutesElapsed < 30) {
-    return { action: "status", label: "20min", minutesElapsed: Math.floor(minutesElapsed) };
-  }
-
-  return { action: "check_premium", minutesElapsed: Math.floor(minutesElapsed) };
+  return { action: "monitor" };
 }
 
-async function processActivePosition(symbol, r, previous, now, decision) {
-  const pos = previous;
+// ============================================================
+// MAIN ORCHESTRATION (v15 - Auto Trading)
+// ============================================================
+async function processActivePosition(symbol, r, previous, now, decision, mode = "scan") {
+  const pos = { ...previous, symbol };
   const minutesElapsed = decision.minutesElapsed || Math.floor((now - pos.entryTime) / 60000);
 
+  // Get current option premium
   const quote = await getOptionQuote(pos.optionSymbol);
   if (!quote || quote.mid === 0) {
     console.log(`  ${symbol}: Could not fetch premium for ${pos.optionSymbol}`);
-    return pos;
+    return previous;
   }
 
   const currentPremium = quote.mid;
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
 
-  console.log(`  ${symbol}: Position active. Premium ${pos.entryPremium} → ${currentPremium.toFixed(2)} (${pct.toFixed(1)}%), Minutes: ${minutesElapsed}`);
+  // Update peak
+  const peakPremium = Math.max(previous.peakPremium || previous.entryPremium, currentPremium);
 
+  // Calculate phase and stop
+  const previousPhase = calculatePhase(pos.entryPremium, previous.peakPremium || previous.entryPremium);
+  const currentPhase = calculatePhase(pos.entryPremium, peakPremium);
+  const currentStop = calculateStop(pos.entryPremium, peakPremium);
+
+  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium) * 100;
+  console.log(`  ${symbol}: Premium $${currentPremium.toFixed(2)} (${pct.toFixed(1)}%), Peak $${peakPremium.toFixed(2)}, Stop $${currentStop.toFixed(2)}, Phase: ${currentPhase}, Min: ${minutesElapsed}`);
+
+  // FORCE EXIT (2:39 PM)
   if (decision.action === "force_exit") {
-    return await executeExit(symbol, pos, currentPremium, "force", minutesElapsed);
+    return await executeV16Exit(symbol, pos, currentPremium, "force", minutesElapsed);
   }
 
-  if (decision.action === "exit_reversal") {
-    return await executeExit(symbol, pos, currentPremium, "reversal", minutesElapsed, decision.newSignal);
+  // REVERSAL - only in initial phase
+  if (decision.action === "exit_reversal" && currentPhase === "initial") {
+    return await executeV16Exit(symbol, pos, currentPremium, "reversal", minutesElapsed);
   }
 
-  if (pct >= 35) {
-    return await executeExit(symbol, pos, currentPremium, "profit", minutesElapsed);
+  // STOP HIT (based on phase)
+  if (currentPremium <= currentStop) {
+    const exitReason = currentPhase === "trailing" ? "trailing"
+                     : currentPhase === "buffer" ? "buffer"
+                     : currentPhase === "breakeven" ? "breakeven"
+                     : "loss";
+    return await executeV16Exit(symbol, pos, currentPremium, exitReason, minutesElapsed);
   }
 
-  if (pct <= -30) {
-    return await executeExit(symbol, pos, currentPremium, "loss", minutesElapsed);
+  // PHASE CHANGE - announce
+  if (currentPhase !== previousPhase) {
+    let msg = null;
+    if (currentPhase === "breakeven" && !previous.breakEvenAnnounced) {
+      msg = formatBreakEven(pos, currentPremium);
+    } else if (currentPhase === "buffer" && !previous.bufferAnnounced) {
+      msg = formatBuffer(pos, currentPremium, peakPremium, currentStop);
+    } else if (currentPhase === "trailing" && !previous.trailingAnnounced) {
+      msg = formatTrailing(pos, currentPremium, peakPremium, currentStop);
+    }
+    if (msg) {
+      await sendTelegram(msg, pos.entryMessageId);
+      console.log(`  ${symbol}: Phase change to ${currentPhase}`);
+    }
   }
 
-  if (decision.action === "exit_time") {
-    return await executeExit(symbol, pos, currentPremium, "time", minutesElapsed);
+  // MONITORING MESSAGE - only in scan mode (every 5 min)
+  if (mode === "scan") {
+    const monMsg = formatMonitor(pos, currentPremium, peakPremium, currentStop, minutesElapsed);
+    await sendTelegram(monMsg, pos.entryMessageId);
   }
 
-  if (decision.action === "status") {
-    const msg = formatStatusUpdate(decision.label, pos, currentPremium);
-    await sendTelegram(msg, pos.entryMessageId);
-    const updated = { ...pos };
-    if (decision.label === "10min") updated.eval10Sent = true;
-    if (decision.label === "20min") updated.eval20Sent = true;
-    return updated;
-  }
-
-  return pos;
+  // Update state
+  return {
+    ...previous,
+    peakPremium,
+    currentStop,
+    stopPhase: currentPhase,
+    breakEvenAnnounced: previous.breakEvenAnnounced || currentPhase !== "initial",
+    bufferAnnounced: previous.bufferAnnounced || (currentPhase === "buffer" || currentPhase === "trailing"),
+    trailingAnnounced: previous.trailingAnnounced || currentPhase === "trailing",
+  };
 }
 
-async function executeExit(symbol, pos, currentPremium, reason, minutesElapsed, newSignal = null) {
+async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapsed) {
   try {
     await closePosition(pos.optionSymbol);
     console.log(`  ${symbol}: Closed position ${pos.optionSymbol}`);
@@ -637,17 +780,11 @@ async function executeExit(symbol, pos, currentPremium, reason, minutesElapsed, 
     console.error(`  ${symbol}: Failed to close: ${e.message}`);
   }
 
-  let msg;
-  if (reason === "profit") msg = formatExitProfit(pos, currentPremium, "خروج بربح (Target)", minutesElapsed);
-  else if (reason === "loss") msg = formatExitLoss(pos, currentPremium, "خروج بخسارة (Stop)", minutesElapsed);
-  else if (reason === "time") msg = formatExitTime(pos, currentPremium, minutesElapsed);
-  else if (reason === "reversal") msg = formatExitReversal(pos, currentPremium, newSignal);
-  else if (reason === "force") msg = formatExitForce(pos, currentPremium);
-
+  const msg = formatV16Exit(pos, currentPremium, reason, minutesElapsed);
   await sendTelegram(msg, pos.entryMessageId);
 
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pnlPct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
+  const pnlPct = ((currentPremium - pos.entryPremium) / pos.entryPremium) * 100;
 
   return {
     active: false,
@@ -666,6 +803,11 @@ async function executeExit(symbol, pos, currentPremium, reason, minutesElapsed, 
   };
 }
 
+// Old executeExit kept for backward compatibility (not used in v16)
+async function executeExit_unused(symbol, pos, currentPremium, reason, minutesElapsed) {
+  return await executeV16Exit(symbol, pos, currentPremium, reason, minutesElapsed);
+}
+
 async function executeEntry(symbol, r, account, now) {
   const meta = META[symbol];
   const contract = await pickOptionContract(symbol, r.signal, r.suggestedStrike, meta.strikeStep);
@@ -680,7 +822,7 @@ async function executeEntry(symbol, r, account, now) {
     return null;
   }
 
-  const entryPremium = quote.ask;
+  const entryPremium = quote.ask; // use ask for buying
   const portfolioValue = 10000; // Fixed $10K for testing
   const qty = calculateQty(portfolioValue, entryPremium, 0.10);
 
@@ -689,6 +831,7 @@ async function executeEntry(symbol, r, account, now) {
     return null;
   }
 
+  // Place market order
   let orderResult;
   try {
     orderResult = await placeOptionOrder(contract.symbol, qty, "buy");
@@ -710,8 +853,13 @@ async function executeEntry(symbol, r, account, now) {
     entryPremium,
     qty,
     orderId: orderResult.id,
-    eval10Sent: false,
-    eval20Sent: false,
+    // v16 fields
+    peakPremium: entryPremium,
+    currentStop: entryPremium * 0.70,
+    stopPhase: "initial",
+    breakEvenAnnounced: false,
+    bufferAnnounced: false,
+    trailingAnnounced: false,
   };
 
   const msg = formatBuyAlert(r, pos);
@@ -722,7 +870,8 @@ async function executeEntry(symbol, r, account, now) {
 }
 
 async function main() {
-  console.log(`\n=== Scan v15 started ${new Date().toISOString()} ===`);
+  const MODE = process.env.MODE || "scan"; // "scan" or "monitor"
+  console.log(`\n=== ${MODE === "monitor" ? "Monitor" : "Scan"} v16 started ${new Date().toISOString()} ===`);
   console.log(`MIN_SCORE = ${MIN_SCORE}`);
 
   if (!isMarketOpen()) {
@@ -731,10 +880,41 @@ async function main() {
   }
 
   const state = loadState();
-  const newState = {};
-  const results = [];
   const now = Date.now();
 
+  // MONITOR MODE: only check active positions, no scanning
+  if (MODE === "monitor") {
+    const activeSymbols = Object.keys(state).filter(s => state[s]?.active === true);
+    if (activeSymbols.length === 0) {
+      console.log("No active positions, exiting");
+      return;
+    }
+    console.log(`Monitoring ${activeSymbols.length} position(s): ${activeSymbols.join(", ")}`);
+
+    const newState = { ...state };
+    for (const symbol of activeSymbols) {
+      const previous = state[symbol];
+      const decision = isPastForceExitTime(now)
+        ? { action: "force_exit" }
+        : { action: "monitor" };
+      const result = await processActivePosition(symbol, null, previous, now, decision, "monitor");
+      if (result._lastTrade) {
+        newState._dailyTrades = newState._dailyTrades || [];
+        newState._dailyTrades.push(result._lastTrade);
+        delete result._lastTrade;
+      }
+      newState[symbol] = result;
+    }
+    saveState(newState);
+    console.log(`=== Monitor Done ===\n`);
+    return;
+  }
+
+  // SCAN MODE: full scan
+  const newState = {};
+  const results = [];
+
+  // Get account info first
   let account;
   try {
     account = await getAccount();
@@ -744,6 +924,7 @@ async function main() {
     return;
   }
 
+  // Analyze all tickers
   for (const symbol of TICKERS) {
     try {
       const r = await analyzeTicker(symbol);
@@ -756,6 +937,7 @@ async function main() {
     await new Promise(r => setTimeout(r, 300));
   }
 
+  // Initialize daily trades log
   const today = new Date().toISOString().split("T")[0];
   if (state._date !== today) {
     state._dailyTrades = [];
@@ -766,6 +948,7 @@ async function main() {
   newState._dailyTrades = state._dailyTrades || [];
   newState._reportSent = state._reportSent || false;
 
+  // Process each ticker
   for (const r of results) {
     if (r.error) {
       const prev = state[r.symbol];
@@ -786,11 +969,11 @@ async function main() {
       }
     }
     else if (decision.action === "no_entry_time") {
-      console.log(`  ${r.symbol}: No new entries after 2:35 PM`);
+      console.log(`  ${r.symbol}: No new entries after 2:30 PM`);
       if (previous) newState[r.symbol] = previous;
     }
     else if (previous && previous.active) {
-      const result = await processActivePosition(r.symbol, r, previous, now, decision);
+      const result = await processActivePosition(r.symbol, r, previous, now, decision, "scan");
       if (result._lastTrade) {
         newState._dailyTrades.push(result._lastTrade);
         delete result._lastTrade;
@@ -805,6 +988,7 @@ async function main() {
     }
   }
 
+  // Daily report at 3:00 PM
   if (isReportTime(now) && !newState._reportSent) {
     const reportMsg = formatDailyReport(newState);
     await sendTelegram(reportMsg);
@@ -813,7 +997,7 @@ async function main() {
   }
 
   saveState(newState);
-  console.log(`=== Done ===\n`);
+  console.log(`=== Scan Done ===\n`);
 }
 
 main().catch(e => {
