@@ -290,8 +290,23 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1780940656693
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 67,
+    "entryPrice": 740.71,
+    "entryTime": 1780940718866,
+    "optionSymbol": "SPY260608P00740000",
+    "strike": "740",
+    "entryPremium": 0.94,
+    "qty": 10,
+    "orderId": "74b2f110-e092-4759-9ee3-4de065bbb354",
+    "peakPremium": 0.94,
+    "currentStop": 0.6579999999999999,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 355
   },
   "QQQ": {
     "active": false,
