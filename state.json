@@ -1,6 +1,29 @@
 {
   "_date": "2026-06-08",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "entryPremium": 2.75,
+      "exitPremium": 2.64,
+      "qty": 3,
+      "pnl": -32.999999999999964,
+      "pnlPct": -3.999999999999995,
+      "reason": "buffer",
+      "minutes": 1
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "entryPremium": 4.25,
+      "exitPremium": 3.9050000000000002,
+      "qty": 2,
+      "pnl": -68.99999999999994,
+      "pnlPct": -8.117647058823524,
+      "reason": "buffer",
+      "minutes": 1
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": true,
@@ -22,23 +45,8 @@
     "entryMessageId": 226
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 717.85,
-    "entryTime": 1780925425137,
-    "optionSymbol": "QQQ260608C00719000",
-    "strike": "719",
-    "entryPremium": 2.75,
-    "qty": 3,
-    "orderId": "77bbf37c-4ce7-426c-b61e-e9fc096f5ea1",
-    "peakPremium": 3.325,
-    "currentStop": 3.0922500000000004,
-    "stopPhase": "buffer",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": false,
-    "entryMessageId": 227
+    "active": false,
+    "cooldownUntil": 1780927338150
   },
   "NVDA": {
     "active": true,
@@ -60,23 +68,8 @@
     "entryMessageId": 228
   },
   "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 68,
-    "entryPrice": 396.32,
-    "entryTime": 1780925425137,
-    "optionSymbol": "TSLA260608C00397500",
-    "strike": "397.5",
-    "entryPremium": 4.25,
-    "qty": 2,
-    "orderId": "c1ef1a7e-443d-4250-936a-fcaa034b22bb",
-    "peakPremium": 5.51,
-    "currentStop": 5.1243,
-    "stopPhase": "buffer",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": false,
-    "entryMessageId": 229
+    "active": false,
+    "cooldownUntil": 1780927338580
   },
   "AAPL": {
     "active": true,
@@ -89,12 +82,12 @@
     "entryPremium": 2.71,
     "qty": 3,
     "orderId": "b1d85e13-0c4a-446c-a698-5886155e0ab6",
-    "peakPremium": 3.425,
-    "currentStop": 3.18525,
-    "stopPhase": "buffer",
+    "peakPremium": 3.76,
+    "currentStop": 3.5719999999999996,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
     "bufferAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": 230
   }
 }
