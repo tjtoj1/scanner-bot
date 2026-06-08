@@ -1,6 +1,18 @@
 {
   "_date": "2026-06-08",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "AAPL",
+      "signal": "PUT",
+      "entryPremium": 1.83,
+      "exitPremium": 1.21,
+      "qty": 5,
+      "pnl": -310.00000000000006,
+      "pnlPct": -33.879781420765035,
+      "reason": "loss",
+      "minutes": 0
+    }
+  ],
   "_reportSent": false,
   "NVDA": {
     "active": true,
@@ -23,23 +35,7 @@
     "entryMessageId": 372
   },
   "AAPL": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 78,
-    "entryPrice": 304.6,
-    "entryTime": 1780942518231,
-    "optionSymbol": "AAPL260608P00305000",
-    "strike": "305",
-    "entryPremium": 1.83,
-    "qty": 5,
-    "orderId": "e167136c-65f6-470c-bcd8-2b6f6dee03e5",
-    "stopOrderId": "28cda212-9e95-44ec-83e4-094c869930eb",
-    "peakPremium": 1.83,
-    "currentStop": 1.281,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 374
+    "active": false,
+    "cooldownUntil": 1780944376038
   }
 }
