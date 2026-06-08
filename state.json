@@ -220,12 +220,12 @@
     "entryPremium": 0.53,
     "qty": 18,
     "orderId": "25c595b0-81d7-4780-b3f8-8153aabbc5f6",
-    "peakPremium": 0.7,
-    "currentStop": 0.651,
-    "stopPhase": "buffer",
+    "peakPremium": 0.725,
+    "currentStop": 0.68875,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
     "bufferAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": 309
   },
   "TSLA": {
