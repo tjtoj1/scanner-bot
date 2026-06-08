@@ -29,6 +29,26 @@
     "active": false,
     "cooldownUntil": 1780944674349
   },
+  "META": {
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 67,
+    "entryPrice": 588.36,
+    "entryTime": 1780943122615,
+    "optionSymbol": "META260608C00590000",
+    "strike": "590",
+    "entryPremium": 0.93,
+    "qty": 10,
+    "orderId": "e88ace81-24f6-4493-b9b3-6bd9423674a1",
+    "stopOrderId": "ebb39a85-3f0f-4b11-8a6f-7b017931e395",
+    "peakPremium": 0.93,
+    "currentStop": 0.651,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 379
+  },
   "AAPL": {
     "active": false,
     "cooldownUntil": 1780944376038
