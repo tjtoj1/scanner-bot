@@ -1,1 +1,45 @@
-{}
+{
+  "_date": "2026-06-08",
+  "_dailyTrades": [],
+  "_reportSent": false,
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 208.98,
+    "entryTime": 1780942518231,
+    "optionSymbol": "NVDA260608C00210000",
+    "strike": "210",
+    "entryPremium": 0.24,
+    "qty": 41,
+    "orderId": "1078f4ff-5c74-49b5-b41d-f21e0ed83c90",
+    "stopOrderId": "4c412f48-c83f-49fa-9f69-9dc9ae7a03dc",
+    "peakPremium": 0.24,
+    "currentStop": 0.16799999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 372
+  },
+  "AAPL": {
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 78,
+    "entryPrice": 304.6,
+    "entryTime": 1780942518231,
+    "optionSymbol": "AAPL260608P00305000",
+    "strike": "305",
+    "entryPremium": 1.83,
+    "qty": 5,
+    "orderId": "e167136c-65f6-470c-bcd8-2b6f6dee03e5",
+    "stopOrderId": "28cda212-9e95-44ec-83e4-094c869930eb",
+    "peakPremium": 1.83,
+    "currentStop": 1.281,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 374
+  }
+}
