@@ -309,8 +309,23 @@
     "cooldownUntil": 1780940656981
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1780937477637
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 208.85,
+    "entryTime": 1780941018479,
+    "optionSymbol": "NVDA260608C00210000",
+    "strike": "210",
+    "entryPremium": 0.24,
+    "qty": 41,
+    "orderId": "ab38e91f-d3e2-4dad-ba6d-bdb20eff3723",
+    "peakPremium": 0.24,
+    "currentStop": 0.16799999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 357
   },
   "TSLA": {
     "active": false,
