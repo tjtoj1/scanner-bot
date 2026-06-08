@@ -290,12 +290,12 @@
     "entryPremium": 1.13,
     "qty": 8,
     "orderId": "1e23b741-e130-4d22-9ebd-3423d39dd2e7",
-    "peakPremium": 1.42,
-    "currentStop": 1.3206,
-    "stopPhase": "buffer",
+    "peakPremium": 1.59,
+    "currentStop": 1.5105,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
     "bufferAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": 344
   },
   "META": {
