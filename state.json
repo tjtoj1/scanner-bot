@@ -70,27 +70,87 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1780927396472
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 67,
+    "entryPrice": 741.13,
+    "entryTime": 1780927521015,
+    "optionSymbol": "SPY260608C00742000",
+    "strike": "742",
+    "entryPremium": 1.83,
+    "qty": 5,
+    "orderId": "ba123e11-6a2f-4ed0-9087-506678d07e96",
+    "peakPremium": 1.83,
+    "currentStop": 1.281,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 245
   },
   "QQQ": {
     "active": false,
     "cooldownUntil": 1780927338150
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1780927458487
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 78,
+    "entryPrice": 206.51,
+    "entryTime": 1780927521015,
+    "optionSymbol": "NVDA260608P00205000",
+    "strike": "205",
+    "entryPremium": 0.9,
+    "qty": 11,
+    "orderId": "1cd3795d-adff-4f0a-ae71-d7e4da531c9f",
+    "peakPremium": 0.9,
+    "currentStop": 0.63,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 246
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1780927338580
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 68,
+    "entryPrice": 401.18,
+    "entryTime": 1780927521015,
+    "optionSymbol": "TSLA260608C00402500",
+    "strike": "402.5",
+    "entryPremium": 2.67,
+    "qty": 3,
+    "orderId": "c2301c26-87ad-4479-81d9-1564ad5110b1",
+    "peakPremium": 2.67,
+    "currentStop": 1.8689999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 247
   },
   "META": {
     "active": false,
     "cooldownUntil": 1780927996596
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1780927519776
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 90,
+    "entryPrice": 311.43,
+    "entryTime": 1780927521015,
+    "optionSymbol": "AAPL260608C00312500",
+    "strike": "312.5",
+    "entryPremium": 2.15,
+    "qty": 4,
+    "orderId": "9f364899-0d43-428f-be77-e9c999649b4e",
+    "peakPremium": 2.15,
+    "currentStop": 1.505,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 248
   }
 }
