@@ -324,8 +324,23 @@
     "cooldownUntil": 1780943175393
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1780941436622
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 410.03,
+    "entryTime": 1780941627121,
+    "optionSymbol": "TSLA260608C00410000",
+    "strike": "410",
+    "entryPremium": 1.66,
+    "qty": 6,
+    "orderId": "704458f4-df25-45f0-a681-702dfd6520eb",
+    "peakPremium": 1.66,
+    "currentStop": 1.162,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 362
   },
   "META": {
     "active": false,
