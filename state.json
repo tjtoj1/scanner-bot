@@ -195,7 +195,7 @@
     "entryPremium": 2.009,
     "qty": 4,
     "orderId": "34ac003b-e820-4679-892d-db15a26b47cc",
-    "peakPremium": 2.009,
+    "peakPremium": 2.1100000000000003,
     "currentStop": 1.4062999999999999,
     "stopPhase": "initial",
     "breakEvenAnnounced": false,
