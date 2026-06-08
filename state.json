@@ -185,11 +185,11 @@
     "entryPremium": 1.58,
     "qty": 6,
     "orderId": "1281261e-8285-4bf0-8d8f-a98c319ae458",
-    "peakPremium": 1.7650000000000001,
-    "currentStop": 1.58,
-    "stopPhase": "breakeven",
+    "peakPremium": 1.9945,
+    "currentStop": 1.8548850000000001,
+    "stopPhase": "buffer",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
+    "bufferAnnounced": true,
     "trailingAnnounced": false,
     "entryMessageId": 262
   }
