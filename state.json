@@ -297,6 +297,17 @@
       "pnlPct": -33.51063829787233,
       "reason": "loss",
       "minutes": 1
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "entryPremium": 0.24,
+      "exitPremium": 0.255,
+      "qty": 41,
+      "pnl": 61.50000000000006,
+      "pnlPct": 6.250000000000005,
+      "reason": "buffer",
+      "minutes": 5
     }
   ],
   "_reportSent": false,
@@ -309,23 +320,8 @@
     "cooldownUntil": 1780940656981
   },
   "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 208.85,
-    "entryTime": 1780941018479,
-    "optionSymbol": "NVDA260608C00210000",
-    "strike": "210",
-    "entryPremium": 0.24,
-    "qty": 41,
-    "orderId": "ab38e91f-d3e2-4dad-ba6d-bdb20eff3723",
-    "peakPremium": 0.295,
-    "currentStop": 0.27435,
-    "stopPhase": "buffer",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": false,
-    "entryMessageId": 357
+    "active": false,
+    "cooldownUntil": 1780943175393
   },
   "TSLA": {
     "active": false,
