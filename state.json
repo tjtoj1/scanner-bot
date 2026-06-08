@@ -231,6 +231,17 @@
       "pnlPct": 12.903225806451623,
       "reason": "trailing",
       "minutes": 20
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 1.61,
+      "exitPremium": 1.75,
+      "qty": 6,
+      "pnl": 83.99999999999994,
+      "pnlPct": 8.695652173913036,
+      "reason": "buffer",
+      "minutes": 10
     }
   ],
   "_reportSent": false,
@@ -281,23 +292,8 @@
     "cooldownUntil": 1780938979925
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 88,
-    "entryPrice": 586.71,
-    "entryTime": 1780937718656,
-    "optionSymbol": "META260608P00585000",
-    "strike": "585",
-    "entryPremium": 1.61,
-    "qty": 6,
-    "orderId": "b53f40c1-ade6-451e-ae65-d4bd1ecfc5f7",
-    "peakPremium": 2.035,
-    "currentStop": 1.8925500000000002,
-    "stopPhase": "buffer",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": false,
-    "entryMessageId": 330
+    "active": false,
+    "cooldownUntil": 1780940179390
   },
   "AAPL": {
     "active": false,
