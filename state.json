@@ -308,6 +308,17 @@
       "pnlPct": 6.250000000000005,
       "reason": "buffer",
       "minutes": 5
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "entryPremium": 1.66,
+      "exitPremium": 1.85,
+      "qty": 6,
+      "pnl": 114.0000000000001,
+      "pnlPct": 11.445783132530131,
+      "reason": "buffer",
+      "minutes": 7
     }
   ],
   "_reportSent": false,
@@ -324,23 +335,8 @@
     "cooldownUntil": 1780943175393
   },
   "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 410.03,
-    "entryTime": 1780941627121,
-    "optionSymbol": "TSLA260608C00410000",
-    "strike": "410",
-    "entryPremium": 1.66,
-    "qty": 6,
-    "orderId": "704458f4-df25-45f0-a681-702dfd6520eb",
-    "peakPremium": 2.015,
-    "currentStop": 1.8739500000000002,
-    "stopPhase": "buffer",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": false,
-    "entryMessageId": 362
+    "active": false,
+    "cooldownUntil": 1780943894487
   },
   "META": {
     "active": false,
