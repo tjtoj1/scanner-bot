@@ -378,6 +378,51 @@ async function closePosition(optionSymbol) {
   return alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
+// V16.4: Stop Loss Order Management
+async function placeStopLossOrder(optionSymbol, qty, stopPrice) {
+  return alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+    symbol: optionSymbol,
+    qty: String(qty),
+    side: "sell",
+    type: "stop",
+    stop_price: stopPrice.toFixed(2),
+    time_in_force: "day",
+  });
+}
+
+async function cancelOrder(orderId) {
+  try {
+    return await alpacaCall(`${TRADING_BASE}/orders/${orderId}`, "DELETE");
+  } catch (e) {
+    console.error(`  Cancel order ${orderId} failed: ${e.message}`);
+    return null;
+  }
+}
+
+async function getOrder(orderId) {
+  try {
+    return await alpacaCall(`${TRADING_BASE}/orders/${orderId}`);
+  } catch {
+    return null;
+  }
+}
+
+async function updateStopLoss(pos, newStopPrice) {
+  // Cancel old, place new
+  if (pos.stopOrderId) {
+    await cancelOrder(pos.stopOrderId);
+    await new Promise(r => setTimeout(r, 500)); // Let Alpaca process
+  }
+  try {
+    const order = await placeStopLossOrder(pos.optionSymbol, pos.qty, newStopPrice);
+    console.log(`  ${pos.symbol}: Stop Loss updated to $${newStopPrice.toFixed(2)} (order ${order.id})`);
+    return order.id;
+  } catch (e) {
+    console.error(`  ${pos.symbol}: Failed to place new Stop Loss: ${e.message}`);
+    return null;
+  }
+}
+
 // ============================================================
 // Pick best option contract for a signal
 // ============================================================
@@ -442,8 +487,7 @@ function isReportTime(now) {
 // ============================================================
 function calculatePhase(entryPremium, peakPremium) {
   const peakPct = ((peakPremium - entryPremium) / entryPremium) * 100;
-  if (peakPct >= 35) return "trailing";
-  if (peakPct >= 20) return "buffer";
+  if (peakPct >= 30) return "trailing";
   if (peakPct >= 10) return "breakeven";
   return "initial";
 }
@@ -451,17 +495,15 @@ function calculatePhase(entryPremium, peakPremium) {
 function calculateStop(entryPremium, peakPremium) {
   const phase = calculatePhase(entryPremium, peakPremium);
   switch (phase) {
-    case "trailing":  return peakPremium * 0.95;   // Peak - 5%
-    case "buffer":    return peakPremium * 0.93;   // Peak - 7%
-    case "breakeven": return entryPremium;          // Entry price
-    default:          return entryPremium * 0.70;   // -30%
+    case "trailing":  return Math.max(entryPremium * 1.30, peakPremium * 0.95); // Lock +30% or Peak-5%
+    case "breakeven": return entryPremium;                                       // Entry price
+    default:          return entryPremium * 0.70;                                // -30%
   }
 }
 
 function getPhaseLabel(phase) {
   switch (phase) {
-    case "trailing":  return "Trailing (Peak - 5%)";
-    case "buffer":    return "Buffer (Peak - 7%)";
+    case "trailing":  return "Trailing (+30% Min / Peak - 5%)";
     case "breakeven": return "Break-Even";
     default:          return "Initial (-30%)";
   }
@@ -470,7 +512,6 @@ function getPhaseLabel(phase) {
 function getPhaseEmoji(phase) {
   switch (phase) {
     case "trailing":  return "🚀";
-    case "buffer":    return "📈";
     case "breakeven": return "🛡️";
     default:          return "🛑";
   }
@@ -530,9 +571,11 @@ function formatBuffer(pos, currentPremium, peakPremium, stop) {
 }
 
 function formatTrailing(pos, currentPremium, peakPremium, stop) {
-  return `🚀 <b>TRAILING: ${pos.symbol || ""}</b>
+  const stopPct = ((stop - pos.entryPremium) / pos.entryPremium * 100).toFixed(1);
+  return `🚀 <b>TRAILING ACTIVATED: ${pos.symbol || ""}</b>
 💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-🎯 Stop: $${stop.toFixed(2)} (Peak - 5%)`;
+🔒 Stop: $${stop.toFixed(2)} (+${stopPct}% مضمون)
+📈 سيرتفع مع Peak (-5%)`;
 }
 
 function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
@@ -546,7 +589,6 @@ function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
     loss: "خروج بخسارة",
     trailing: "Trailing Stop",
     breakeven: "Break-Even Stop",
-    buffer: "Buffer Stop",
     force: "إغلاق إجباري (2:39 PM)",
     reversal: "انعكاس",
   }[reason] || reason;
@@ -684,6 +726,11 @@ function decideAction(current, previous, now) {
     return isStrong ? { action: "new_entry" } : { action: "none" };
   }
 
+  // V16.2: Block duplicate entry on same symbol + same direction
+  if (isStrong && current.signal === previous.signal) {
+    return { action: "duplicate" };
+  }
+
   // Active position - check reversal only (stop logic is in processActivePosition)
   if (current.signal !== "NEUTRAL" && current.signal !== previous.signal && isStrong) {
     return { action: "exit_reversal", newSignal: current.signal };
@@ -699,14 +746,50 @@ async function processActivePosition(symbol, r, previous, now, decision, mode = 
   const pos = { ...previous, symbol };
   const minutesElapsed = decision.minutesElapsed || Math.floor((now - pos.entryTime) / 60000);
 
-  // Get current option premium
-  const quote = await getOptionQuote(pos.optionSymbol);
-  if (!quote || quote.mid === 0) {
-    console.log(`  ${symbol}: Could not fetch premium for ${pos.optionSymbol}`);
-    return previous;
+  // V16.1: Use Position API (reliable for open positions, no options data subscription needed)
+  let currentPremium;
+  let position;
+  try {
+    position = await getPosition(pos.optionSymbol);
+  } catch (e) {
+    console.error(`  ${symbol}: getPosition error: ${e.message}`);
+    position = null;
   }
 
-  const currentPremium = quote.mid;
+  if (position) {
+    currentPremium = parseFloat(position.current_price);
+    console.log(`  ${symbol}: Position found - Current: $${currentPremium}, P&L: ${(parseFloat(position.unrealized_plpc) * 100).toFixed(1)}%`);
+  } else {
+    // V16.4: Position gone - likely Stop Loss in Alpaca was executed!
+    if (pos.stopOrderId) {
+      console.log(`  ${symbol}: Position closed - checking if Stop Loss was executed`);
+      const stopOrder = await getOrder(pos.stopOrderId);
+      if (stopOrder && stopOrder.status === "filled") {
+        const exitPrice = parseFloat(stopOrder.filled_avg_price || pos.currentStop);
+        console.log(`  ${symbol}: Stop Loss filled @ $${exitPrice}`);
+        // Determine reason based on phase
+        const currentPhase = calculatePhase(pos.entryPremium, previous.peakPremium || previous.entryPremium);
+        const exitReason = currentPhase === "trailing" ? "trailing"
+                         : currentPhase === "breakeven" ? "breakeven"
+                         : "loss";
+        return await executeV16Exit(symbol, pos, exitPrice, exitReason, minutesElapsed, true); // skipClose=true
+      }
+    }
+    // Fallback to getOptionQuote
+    const quote = await getOptionQuote(pos.optionSymbol);
+    if (quote && quote.mid > 0) {
+      currentPremium = quote.mid;
+      console.log(`  ${symbol}: Using quote fallback - Premium: $${currentPremium}`);
+    } else {
+      // CRITICAL: Cannot fetch price - send emergency alert
+      console.error(`  ${symbol}: CANNOT FETCH PRICE - Emergency alert sent`);
+      await sendTelegram(
+        `🚨 <b>تنبيه طوارئ: ${symbol}</b>\nالبوت لا يقدر يجيب السعر الحالي!\n\nالصفقة: ${pos.optionSymbol}\nالدخول: $${pos.entryPremium}\nالكمية: ${pos.qty}\n\n⚠️ يرجى التحقق يدوياً من Alpaca`,
+        pos.entryMessageId
+      );
+      return previous;
+    }
+  }
 
   // Update peak
   const peakPremium = Math.max(previous.peakPremium || previous.entryPremium, currentPremium);
@@ -732,25 +815,40 @@ async function processActivePosition(symbol, r, previous, now, decision, mode = 
   // STOP HIT (based on phase)
   if (currentPremium <= currentStop) {
     const exitReason = currentPhase === "trailing" ? "trailing"
-                     : currentPhase === "buffer" ? "buffer"
                      : currentPhase === "breakeven" ? "breakeven"
                      : "loss";
     return await executeV16Exit(symbol, pos, currentPremium, exitReason, minutesElapsed);
   }
 
-  // PHASE CHANGE - announce
+  // PHASE CHANGE - announce + update Stop Loss in Alpaca
   if (currentPhase !== previousPhase) {
     let msg = null;
     if (currentPhase === "breakeven" && !previous.breakEvenAnnounced) {
       msg = formatBreakEven(pos, currentPremium);
-    } else if (currentPhase === "buffer" && !previous.bufferAnnounced) {
-      msg = formatBuffer(pos, currentPremium, peakPremium, currentStop);
     } else if (currentPhase === "trailing" && !previous.trailingAnnounced) {
       msg = formatTrailing(pos, currentPremium, peakPremium, currentStop);
     }
     if (msg) {
       await sendTelegram(msg, pos.entryMessageId);
       console.log(`  ${symbol}: Phase change to ${currentPhase}`);
+    }
+  }
+
+  // V16.4: Update Stop Loss in Alpaca if stop value changed
+  let newStopOrderId = pos.stopOrderId;
+  const stopDiff = Math.abs(currentStop - (previous.currentStop || 0));
+  if (stopDiff > 0.01 && pos.stopOrderId) {
+    console.log(`  ${symbol}: Stop changed $${previous.currentStop?.toFixed(2)} → $${currentStop.toFixed(2)}, updating Alpaca...`);
+    const newId = await updateStopLoss(pos, currentStop);
+    if (newId) newStopOrderId = newId;
+  } else if (currentPhase === "trailing" && peakPremium > (previous.peakPremium || 0)) {
+    // In Trailing phase, update stop if Peak rose (even small changes)
+    const trailingStop = peakPremium * 0.95;
+    const lockedStop = pos.entryPremium * 1.30;
+    if (trailingStop > lockedStop && Math.abs(trailingStop - (previous.currentStop || 0)) > 0.01) {
+      console.log(`  ${symbol}: Trailing stop rising with peak, updating Alpaca...`);
+      const newId = await updateStopLoss(pos, currentStop);
+      if (newId) newStopOrderId = newId;
     }
   }
 
@@ -766,18 +864,30 @@ async function processActivePosition(symbol, r, previous, now, decision, mode = 
     peakPremium,
     currentStop,
     stopPhase: currentPhase,
+    stopOrderId: newStopOrderId,
     breakEvenAnnounced: previous.breakEvenAnnounced || currentPhase !== "initial",
     bufferAnnounced: previous.bufferAnnounced || (currentPhase === "buffer" || currentPhase === "trailing"),
     trailingAnnounced: previous.trailingAnnounced || currentPhase === "trailing",
   };
 }
 
-async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapsed) {
-  try {
-    await closePosition(pos.optionSymbol);
-    console.log(`  ${symbol}: Closed position ${pos.optionSymbol}`);
-  } catch (e) {
-    console.error(`  ${symbol}: Failed to close: ${e.message}`);
+async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapsed, skipClose = false) {
+  // V16.4: Cancel Stop Loss order if it exists (avoid double-sell)
+  if (pos.stopOrderId && !skipClose) {
+    await cancelOrder(pos.stopOrderId);
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // Close position via Market Order (unless Alpaca already did it)
+  if (!skipClose) {
+    try {
+      await closePosition(pos.optionSymbol);
+      console.log(`  ${symbol}: Closed position ${pos.optionSymbol}`);
+    } catch (e) {
+      console.error(`  ${symbol}: Failed to close: ${e.message}`);
+    }
+  } else {
+    console.log(`  ${symbol}: Position already closed by Alpaca Stop Loss`);
   }
 
   const msg = formatV16Exit(pos, currentPremium, reason, minutesElapsed);
@@ -842,6 +952,19 @@ async function executeEntry(symbol, r, account, now) {
     return null;
   }
 
+  // V16.4: Place Stop Loss in Alpaca for instant protection
+  const initialStop = entryPremium * 0.70; // -30%
+  let stopOrderId = null;
+  await new Promise(r => setTimeout(r, 1500)); // Wait for buy to settle
+  try {
+    const stopOrder = await placeStopLossOrder(contract.symbol, qty, initialStop);
+    stopOrderId = stopOrder.id;
+    console.log(`  ${symbol}: Stop Loss placed @ $${initialStop.toFixed(2)} (order ${stopOrderId})`);
+  } catch (e) {
+    console.error(`  ${symbol}: Stop Loss placement failed: ${e.message}`);
+    // Continue without Stop Loss - bot monitoring is backup
+  }
+
   const pos = {
     active: true,
     signal: r.signal,
@@ -853,9 +976,10 @@ async function executeEntry(symbol, r, account, now) {
     entryPremium,
     qty,
     orderId: orderResult.id,
+    stopOrderId, // V16.4: track Stop Loss order
     // v16 fields
     peakPremium: entryPremium,
-    currentStop: entryPremium * 0.70,
+    currentStop: initialStop,
     stopPhase: "initial",
     breakEvenAnnounced: false,
     bufferAnnounced: false,
@@ -971,6 +1095,19 @@ async function main() {
     else if (decision.action === "no_entry_time") {
       console.log(`  ${r.symbol}: No new entries after 2:30 PM`);
       if (previous) newState[r.symbol] = previous;
+    }
+    else if (decision.action === "duplicate") {
+      console.log(`  ${r.symbol}: Duplicate signal blocked (already have ${previous.signal} position)`);
+      if (previous && previous.active) {
+        const result = await processActivePosition(r.symbol, r, previous, now, { action: "monitor" }, "scan");
+        if (result._lastTrade) {
+          newState._dailyTrades.push(result._lastTrade);
+          delete result._lastTrade;
+        }
+        newState[r.symbol] = result;
+      } else {
+        newState[r.symbol] = previous;
+      }
     }
     else if (previous && previous.active) {
       const result = await processActivePosition(r.symbol, r, previous, now, decision, "scan");
