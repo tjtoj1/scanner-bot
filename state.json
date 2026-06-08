@@ -180,8 +180,23 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1780931898962
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 744.9,
+    "entryTime": 1780932018391,
+    "optionSymbol": "SPY260608C00746000",
+    "strike": "746",
+    "entryPremium": 1.01,
+    "qty": 9,
+    "orderId": "83500309-961a-4d85-9fa7-94459e48c685",
+    "peakPremium": 1.01,
+    "currentStop": 0.707,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 293
   },
   "QQQ": {
     "active": false,
@@ -200,7 +215,22 @@
     "cooldownUntil": 1780931545287
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1780931958063
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 314.3,
+    "entryTime": 1780932018391,
+    "optionSymbol": "AAPL260608C00315000",
+    "strike": "315",
+    "entryPremium": 2.19,
+    "qty": 4,
+    "orderId": "50ec8aef-7760-4952-bf1a-271d645b240e",
+    "peakPremium": 2.19,
+    "currentStop": 1.533,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 294
   }
 }
