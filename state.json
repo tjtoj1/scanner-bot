@@ -130,8 +130,23 @@
     "cooldownUntil": 1780929797611
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1780927996596
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 68,
+    "entryPrice": 586.88,
+    "entryTime": 1780929318755,
+    "optionSymbol": "META260608P00585000",
+    "strike": "585",
+    "entryPremium": 2.61,
+    "qty": 3,
+    "orderId": "e583d376-12c8-455c-bdb3-ad196850e1bd",
+    "peakPremium": 2.61,
+    "currentStop": 1.8269999999999997,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 258
   },
   "AAPL": {
     "active": false,
