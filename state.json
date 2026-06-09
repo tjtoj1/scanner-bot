@@ -178,7 +178,7 @@
       "minutes": 0
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "SPY": {
     "active": false,
     "cooldownUntil": 1781033434583,
