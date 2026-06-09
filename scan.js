@@ -658,7 +658,7 @@ function formatExitForce(pos, currentPremium) {
 ${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 }
 
-function formatDailyReport(state) {
+async function formatDailyReport(state) {
   const trades = state._dailyTrades || [];
 
   // Get today in CDT timezone
@@ -670,19 +670,29 @@ function formatDailyReport(state) {
   const year = cdtDate.getFullYear();
   const dateHeader = `${dayName} ${monthName} ${day}, ${year}`;
 
+  // V16.5: Get real values from Alpaca
+  let portfolioValue = 0;
+  let dailyChange = 0;
+  let dailyChangePct = 0;
+  try {
+    const account = await getAccount();
+    portfolioValue = parseFloat(account.portfolio_value);
+    const lastEquity = parseFloat(account.last_equity || portfolioValue);
+    dailyChange = portfolioValue - lastEquity;
+    dailyChangePct = lastEquity > 0 ? (dailyChange / lastEquity * 100) : 0;
+  } catch (e) {
+    console.error("Failed to fetch account for report:", e.message);
+  }
+
   if (trades.length === 0) {
-    return `📊 <b>Daily Report - ${dateHeader}</b>\n\nلا توجد صفقات اليوم`;
+    return `📊 <b>Daily Report - ${dateHeader}</b>\n\nلا توجد صفقات اليوم\n\n📈 الرصيد: $${portfolioValue.toFixed(0)}`;
   }
 
   const wins = trades.filter(t => t.pnl > 0);
   const losses = trades.filter(t => t.pnl <= 0);
-  const totalPnl = trades.reduce((s, t) => s + t.pnl, 0);
   const winRate = (wins.length / trades.length * 100).toFixed(1);
   const best = trades.reduce((b, t) => t.pnl > b.pnl ? t : b, trades[0]);
   const worst = trades.reduce((w, t) => t.pnl < w.pnl ? t : w, trades[0]);
-  const startBalance = 10000;
-  const newBalance = startBalance + totalPnl;
-  const pnlPct = (totalPnl / startBalance * 100).toFixed(1);
 
   return `📊 <b>Daily Report - ${dateHeader}</b>
 
@@ -690,11 +700,11 @@ function formatDailyReport(state) {
 ✅ ربحانة: ${wins.length} (${winRate}%)
 ❌ خسرانة: ${losses.length}
 
-💰 صافي: ${totalPnl >= 0 ? "+" : ""}$${totalPnl.toFixed(0)} (${pnlPct >= 0 ? "+" : ""}${pnlPct}%)
+💰 صافي: ${dailyChange >= 0 ? "+" : ""}$${dailyChange.toFixed(0)} (${dailyChangePct >= 0 ? "+" : ""}${dailyChangePct.toFixed(1)}%)
 🥇 أفضل: ${best.symbol} ${best.signal} ${(best.pnlPct >= 0 ? "+" : "")}${best.pnlPct.toFixed(1)}%
 🥉 أسوأ: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}%
 
-📈 الرصيد: $${newBalance.toFixed(0)}`;
+📈 الرصيد: $${portfolioValue.toFixed(0)}`;
 }
 
 
@@ -718,6 +728,11 @@ function decideAction(current, previous, now) {
   // No active position
   if (!previous || !previous.active) {
     if (previous && previous.cooldownUntil && now < previous.cooldownUntil) {
+      // V16.6: Allow reversal during cooldown if signal is opposite + strong
+      if (isStrong && previous.lastSignal && current.signal !== "NEUTRAL" && current.signal !== previous.lastSignal) {
+        console.log(`  ${current.symbol}: Reversal allowed during cooldown (${previous.lastSignal} → ${current.signal})`);
+        return { action: "new_entry" };
+      }
       return { action: "cooldown" };
     }
     if (!isBeforeNoEntryTime(now)) {
@@ -899,6 +914,7 @@ async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapse
   return {
     active: false,
     cooldownUntil: reason === "reversal" ? Date.now() + 5 * 60 * 1000 : Date.now() + 30 * 60 * 1000,
+    lastSignal: pos.signal, // V16.6: preserve for reversal check during cooldown
     _lastTrade: {
       symbol,
       signal: pos.signal,
@@ -933,7 +949,7 @@ async function executeEntry(symbol, r, account, now) {
   }
 
   const entryPremium = quote.ask; // use ask for buying
-  const portfolioValue = 10000; // Fixed $10K for testing
+  const portfolioValue = parseFloat(account.portfolio_value); // V16.5: real from Alpaca
   const qty = calculateQty(portfolioValue, entryPremium, 0.10);
 
   if (qty < 1) {
@@ -1127,7 +1143,7 @@ async function main() {
 
   // Daily report at 3:00 PM
   if (isReportTime(now) && !newState._reportSent) {
-    const reportMsg = formatDailyReport(newState);
+    const reportMsg = await formatDailyReport(newState);
     await sendTelegram(reportMsg);
     newState._reportSent = true;
     console.log("Daily report sent");
