@@ -950,7 +950,7 @@ async function executeEntry(symbol, r, account, now) {
 
   const entryPremium = quote.ask; // use ask for buying
   const portfolioValue = parseFloat(account.portfolio_value); // V16.5: real from Alpaca
-  const qty = calculateQty(portfolioValue, entryPremium, 0.10);
+  const qty = calculateQty(portfolioValue, entryPremium, 0.01);
 
   if (qty < 1) {
     console.log(`  ${symbol}: Not enough buying power`);
