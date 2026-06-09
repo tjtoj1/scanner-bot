@@ -108,9 +108,24 @@
     "lastSignal": "PUT"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781020578144,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 68,
+    "entryPrice": 697.96,
+    "entryTime": 1781021123100,
+    "optionSymbol": "QQQ260609P00697000",
+    "strike": "697",
+    "entryPremium": 3.04,
+    "qty": 4,
+    "orderId": "70eeda1b-3a5b-4869-8f2f-d25eb56bb0cd",
+    "stopOrderId": "18d850d0-e255-4bb6-9b3e-a71fcf99d366",
+    "peakPremium": 3.04,
+    "currentStop": 2.1279999999999997,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 440
   },
   "NVDA": {
     "active": false,
