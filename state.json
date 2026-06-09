@@ -14,7 +14,7 @@
     "qty": 9,
     "orderId": "13710179-e221-4f15-b3d0-01c54836354b",
     "stopOrderId": "87652e39-789b-48a2-86fe-3f38ce967ff3",
-    "peakPremium": 1.03,
+    "peakPremium": 1.1,
     "currentStop": 0.721,
     "stopPhase": "initial",
     "breakEvenAnnounced": false,
