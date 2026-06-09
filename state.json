@@ -158,9 +158,24 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781031076383,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 735.73,
+    "entryTime": 1781031320579,
+    "optionSymbol": "SPY260609C00737000",
+    "strike": "737",
+    "entryPremium": 0.9,
+    "qty": 14,
+    "orderId": "7eb33883-d2d6-4c9c-9698-1c0cf67189a6",
+    "stopOrderId": "bb9af436-499d-44b4-865a-2da08cb0f1d1",
+    "peakPremium": 0.9,
+    "currentStop": 0.63,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 464
   },
   "QQQ": {
     "active": false,
