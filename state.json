@@ -627,6 +627,28 @@
       "pnlPct": -0.6172839506172845,
       "reason": "breakeven",
       "minutes": 6
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 0.46,
+      "exitPremium": 0.33,
+      "qty": 25,
+      "pnl": -325,
+      "pnlPct": -28.26086956521739,
+      "reason": "loss",
+      "minutes": 8
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 0.65,
+      "exitPremium": 0.44,
+      "qty": 18,
+      "pnl": -378,
+      "pnlPct": -32.30769230769231,
+      "reason": "loss",
+      "minutes": 2
     }
   ],
   "_reportSent": false,
@@ -646,44 +668,14 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 381.92,
-    "entryTime": 1781117716535,
-    "optionSymbol": "TSLA260610P00380000",
-    "strike": "380",
-    "entryPremium": 0.46,
-    "qty": 25,
-    "orderId": "488713f8-7ede-45d0-80bf-1bec10bfcad1",
-    "stopOrderId": "a43e836a-e558-43ff-bd02-f4d5bdfa0f4e",
-    "peakPremium": 0.46,
-    "currentStop": 0.322,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 694
+    "active": false,
+    "cooldownUntil": 1781118799039,
+    "lastSignal": "PUT"
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 93,
-    "entryPrice": 572.24,
-    "entryTime": 1781118025860,
-    "optionSymbol": "META260610P00570000",
-    "strike": "570",
-    "entryPremium": 0.65,
-    "qty": 18,
-    "orderId": "483aede9-efdd-4027-be1b-736b9302bbd2",
-    "stopOrderId": "60ce81e6-cce4-4089-a3ed-aa0f288be156",
-    "peakPremium": 0.65,
-    "currentStop": 0.45499999999999996,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 699
+    "active": false,
+    "cooldownUntil": 1781118799838,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": false,
