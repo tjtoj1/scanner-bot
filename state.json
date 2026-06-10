@@ -165,6 +165,28 @@
       "pnlPct": -0.2680965147453026,
       "reason": "breakeven",
       "minutes": 18
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 2.83,
+      "exitPremium": 2.85,
+      "qty": 4,
+      "pnl": 8.000000000000007,
+      "pnlPct": 0.7067137809187285,
+      "reason": "breakeven",
+      "minutes": 3
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 1.62,
+      "exitPremium": 1.53,
+      "qty": 7,
+      "pnl": -63.00000000000006,
+      "pnlPct": -5.55555555555556,
+      "reason": "breakeven",
+      "minutes": 3
     }
   ],
   "_reportSent": false,
@@ -184,44 +206,14 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 390.45,
-    "entryTime": 1781101827647,
-    "optionSymbol": "TSLA260610P00390000",
-    "strike": "390",
-    "entryPremium": 2.83,
-    "qty": 4,
-    "orderId": "ba35c89b-f3ff-467b-a4ac-25abb2b93654",
-    "stopOrderId": "d9c92deb-620a-4d54-bbd8-f5ff436dc2e1",
-    "peakPremium": 3.35,
-    "currentStop": 2.83,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 539
+    "active": false,
+    "cooldownUntil": 1781102360372,
+    "lastSignal": "PUT"
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 583.41,
-    "entryTime": 1781101827647,
-    "optionSymbol": "META260610P00580000",
-    "strike": "580",
-    "entryPremium": 1.62,
-    "qty": 7,
-    "orderId": "caef26a5-4e37-4470-9f67-e4de9c148aae",
-    "stopOrderId": "3341de48-ab07-4dd9-aa40-4c1db9067dac",
-    "peakPremium": 1.88,
-    "currentStop": 1.62,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 540
+    "active": false,
+    "cooldownUntil": 1781102360788,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": false,
