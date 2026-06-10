@@ -88,28 +88,24 @@
       "pnlPct": 31.220657276995308,
       "reason": "trailing",
       "minutes": 5
+    },
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "entryPremium": 2.94,
+      "exitPremium": 3.81,
+      "qty": 4,
+      "pnl": 348.00000000000006,
+      "pnlPct": 29.59183673469388,
+      "reason": "trailing",
+      "minutes": 9
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 70,
-    "entryPrice": 734.36,
-    "entryTime": 1781098825017,
-    "optionSymbol": "SPY260610C00735000",
-    "strike": "735",
-    "entryPremium": 2.94,
-    "qty": 4,
-    "orderId": "4743b04d-795b-49c9-929b-d33823260d9c",
-    "stopOrderId": "b1afc945-5650-4b7f-b10d-4bb1ab8bacf0",
-    "peakPremium": 3.94,
-    "currentStop": 3.822,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 486
+    "active": false,
+    "cooldownUntil": 1781099721281,
+    "lastSignal": "CALL"
   },
   "QQQ": {
     "active": false,
