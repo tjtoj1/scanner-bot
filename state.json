@@ -11,6 +11,17 @@
       "pnlPct": -47.658402203856745,
       "reason": "loss",
       "minutes": 0
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 2.06,
+      "exitPremium": 1.38,
+      "qty": 6,
+      "pnl": -408.0000000000001,
+      "pnlPct": -33.00970873786409,
+      "reason": "loss",
+      "minutes": 3
     }
   ],
   "_reportSent": false,
@@ -54,23 +65,8 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 67,
-    "entryPrice": 290.47,
-    "entryTime": 1781098226814,
-    "optionSymbol": "AAPL260610C00290000",
-    "strike": "290",
-    "entryPremium": 2.06,
-    "qty": 6,
-    "orderId": "4c37ca2b-11ce-460d-9da1-998fdd7c984d",
-    "stopOrderId": "ccb9cb75-1a26-4f00-b93e-b4b05005c20e",
-    "peakPremium": 2.19,
-    "currentStop": 1.442,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 474
+    "active": false,
+    "cooldownUntil": 1781100259490,
+    "lastSignal": "CALL"
   }
 }
