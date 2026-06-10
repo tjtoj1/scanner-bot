@@ -400,14 +400,44 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781107823403,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 83,
+    "entryPrice": 730.67,
+    "entryTime": 1781108426424,
+    "optionSymbol": "SPY260610P00730000",
+    "strike": "730",
+    "entryPremium": 2.13,
+    "qty": 5,
+    "orderId": "8d890d6e-25ee-4a63-ac39-b8eda3c31be9",
+    "stopOrderId": "36946375-52cf-416a-874d-10c9e33d2a32",
+    "peakPremium": 2.13,
+    "currentStop": 1.4909999999999999,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 632
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781107941483,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 83,
+    "entryPrice": 699.03,
+    "entryTime": 1781108426424,
+    "optionSymbol": "QQQ260610P00698000",
+    "strike": "698",
+    "entryPremium": 2.91,
+    "qty": 4,
+    "orderId": "6cf7a554-0f80-4afb-a1c1-4f46b87497cb",
+    "stopOrderId": "9e03da68-d605-4a95-aef8-b6fbda6cd067",
+    "peakPremium": 2.91,
+    "currentStop": 2.037,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 633
   },
   "NVDA": {
     "active": false,
@@ -425,8 +455,23 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781108360429,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 291.22,
+    "entryTime": 1781108426424,
+    "optionSymbol": "AAPL260610C00292500",
+    "strike": "292.5",
+    "entryPremium": 0.53,
+    "qty": 23,
+    "orderId": "ed10d28a-6591-4518-a7c8-8db5705d32ed",
+    "stopOrderId": "c67de61c-7f46-486c-bde8-f5a5e861fec6",
+    "peakPremium": 0.53,
+    "currentStop": 0.371,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 634
   }
 }
