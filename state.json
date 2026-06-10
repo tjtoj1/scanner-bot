@@ -301,12 +301,12 @@
     "qty": 5,
     "orderId": "e0fa247d-e0d9-419f-bd14-e08cbd40e5ad",
     "stopOrderId": "d56187c4-1ab6-42a7-ab96-698c9c9723d5",
-    "peakPremium": 3.03,
-    "currentStop": 2.38,
-    "stopPhase": "breakeven",
+    "peakPremium": 3.39,
+    "currentStop": 3.2205,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 581
   },
   "QQQ": {
