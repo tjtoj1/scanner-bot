@@ -272,9 +272,24 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781103078447,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 83,
+    "entryPrice": 387.04,
+    "entryTime": 1781103322171,
+    "optionSymbol": "TSLA260610P00385000",
+    "strike": "385",
+    "entryPremium": 2.09,
+    "qty": 5,
+    "orderId": "14155aaf-e8bb-4049-b36f-d469e0c9f86c",
+    "stopOrderId": "a4cf59ac-a57b-41a5-baa9-0026a0b3bac1",
+    "peakPremium": 2.09,
+    "currentStop": 1.4629999999999999,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 568
   },
   "META": {
     "active": false,
