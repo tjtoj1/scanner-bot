@@ -1103,6 +1103,17 @@ async function main() {
   newState._dailyTrades = state._dailyTrades || [];
   newState._reportSent = state._reportSent || false;
 
+  // V16.8: Count current open positions in Alpaca for position limit
+  let activeCount = 0;
+  try {
+    const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
+    activeCount = Array.isArray(alpacaPositions) ? alpacaPositions.length : 0;
+    console.log(`Current open positions in Alpaca: ${activeCount}`);
+  } catch (e) {
+    activeCount = Object.keys(state).filter(s => state[s]?.active === true).length;
+    console.log(`Using state count (Alpaca fetch failed): ${activeCount}`);
+  }
+
   // Process each ticker
   for (const r of results) {
     if (r.error) {
@@ -1116,9 +1127,17 @@ async function main() {
     console.log(`  ${r.symbol}: decision = ${decision.action}`);
 
     if (decision.action === "new_entry") {
+      // V16.8: Max 3 positions unless score is 90%+
+      if (activeCount >= 3 && r.score < 90) {
+        console.log(`  ${r.symbol}: Max positions limit (${activeCount}/3), score ${r.score}% < 90% - skipping`);
+        if (previous) newState[r.symbol] = previous;
+        continue;
+      }
+
       const newPos = await executeEntry(r.symbol, r, account, now);
       if (newPos) {
         newState[r.symbol] = newPos;
+        activeCount++;
       } else if (previous) {
         newState[r.symbol] = previous;
       }
