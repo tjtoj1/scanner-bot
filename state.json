@@ -341,6 +341,28 @@
       "pnlPct": -11.554621848739492,
       "reason": "breakeven",
       "minutes": 18
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 1.27,
+      "exitPremium": 0.89,
+      "qty": 9,
+      "pnl": -342,
+      "pnlPct": -29.92125984251969,
+      "reason": "loss",
+      "minutes": 10
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 1.35,
+      "exitPremium": 1.74,
+      "qty": 9,
+      "pnl": 350.9999999999999,
+      "pnlPct": 28.888888888888882,
+      "reason": "trailing",
+      "minutes": 10
     }
   ],
   "_reportSent": false,
@@ -355,24 +377,9 @@
     "lastSignal": "PUT"
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 202.77,
-    "entryTime": 1781105721333,
-    "optionSymbol": "NVDA260610P00202500",
-    "strike": "202.5",
-    "entryPremium": 1.27,
-    "qty": 9,
-    "orderId": "aece7772-f52c-4505-a2d8-9310e173db28",
-    "stopOrderId": "cb5db1e8-f33c-4b5d-8d47-33d68a752b38",
-    "peakPremium": 1.33,
-    "currentStop": 0.8889999999999999,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 605
+    "active": false,
+    "cooldownUntil": 1781106924815,
+    "lastSignal": "PUT"
   },
   "TSLA": {
     "active": false,
@@ -385,23 +392,8 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 82,
-    "entryPrice": 290.38,
-    "entryTime": 1781105721333,
-    "optionSymbol": "AAPL260610C00290000",
-    "strike": "290",
-    "entryPremium": 1.35,
-    "qty": 9,
-    "orderId": "aae882c7-129f-4c37-af55-a2f161f51d0f",
-    "stopOrderId": "a6b7dece-2ca9-49c0-9da1-791138188a00",
-    "peakPremium": 1.84,
-    "currentStop": 1.7550000000000001,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 607
+    "active": false,
+    "cooldownUntil": 1781106925235,
+    "lastSignal": "CALL"
   }
 }
