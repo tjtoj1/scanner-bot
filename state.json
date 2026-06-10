@@ -696,12 +696,12 @@
     "qty": 47,
     "orderId": "f2c7a32c-f069-4380-8464-f4f97101a382",
     "stopOrderId": "b457d331-2622-4893-b2c7-9c8445cdfca7",
-    "peakPremium": 0.3,
-    "currentStop": 0.25,
-    "stopPhase": "breakeven",
+    "peakPremium": 0.33,
+    "currentStop": 0.325,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 708
   },
   "TSLA": {
