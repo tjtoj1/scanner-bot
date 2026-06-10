@@ -913,7 +913,7 @@ async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapse
 
   return {
     active: false,
-    cooldownUntil: reason === "reversal" ? Date.now() + 5 * 60 * 1000 : Date.now() + 5 * 60 * 1000,
+    cooldownUntil: reason === "reversal" ? Date.now() + 5 * 60 * 1000 : Date.now() + 10 * 60 * 1000,
     lastSignal: pos.signal, // V16.6: preserve for reversal check during cooldown
     _lastTrade: {
       symbol,
