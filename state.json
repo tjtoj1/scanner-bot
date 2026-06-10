@@ -253,6 +253,28 @@
       "pnlPct": -1.621621621621623,
       "reason": "breakeven",
       "minutes": 5
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 2.09,
+      "exitPremium": 2.7,
+      "qty": 5,
+      "pnl": 305.00000000000017,
+      "pnlPct": 29.186602870813417,
+      "reason": "trailing",
+      "minutes": 5
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "PUT",
+      "entryPremium": 0.6,
+      "exitPremium": 0.41,
+      "qty": 20,
+      "pnl": -380,
+      "pnlPct": -31.66666666666667,
+      "reason": "loss",
+      "minutes": 10
     }
   ],
   "_reportSent": false,
@@ -272,24 +294,9 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 83,
-    "entryPrice": 387.04,
-    "entryTime": 1781103322171,
-    "optionSymbol": "TSLA260610P00385000",
-    "strike": "385",
-    "entryPremium": 2.09,
-    "qty": 5,
-    "orderId": "14155aaf-e8bb-4049-b36f-d469e0c9f86c",
-    "stopOrderId": "fb427721-557f-4d9e-b582-00f0220b8c74",
-    "peakPremium": 2.84,
-    "currentStop": 2.717,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 568
+    "active": false,
+    "cooldownUntil": 1781103932266,
+    "lastSignal": "PUT"
   },
   "META": {
     "active": false,
@@ -297,23 +304,8 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 68,
-    "entryPrice": 289.08,
-    "entryTime": 1781103024527,
-    "optionSymbol": "AAPL260610P00287500",
-    "strike": "287.5",
-    "entryPremium": 0.6,
-    "qty": 20,
-    "orderId": "b682a0c4-18fa-4ebd-92bc-31aa35830371",
-    "stopOrderId": "48ace621-4c88-434b-8620-29f1865b0930",
-    "peakPremium": 0.6,
-    "currentStop": 0.42,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 567
+    "active": false,
+    "cooldownUntil": 1781103932466,
+    "lastSignal": "PUT"
   }
 }
