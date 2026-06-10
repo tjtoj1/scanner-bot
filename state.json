@@ -108,9 +108,24 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781099481644,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 705.57,
+    "entryTime": 1781099719606,
+    "optionSymbol": "QQQ260610C00707000",
+    "strike": "707",
+    "entryPremium": 3.86,
+    "qty": 3,
+    "orderId": "8309a7ad-f5e4-49c8-981a-fbd66be9576f",
+    "stopOrderId": "29ec319f-3420-4ea4-90ac-fa1c78025b2e",
+    "peakPremium": 3.86,
+    "currentStop": 2.702,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 503
   },
   "NVDA": {
     "active": false,
