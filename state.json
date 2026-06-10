@@ -187,6 +187,28 @@
       "pnlPct": -5.55555555555556,
       "reason": "breakeven",
       "minutes": 3
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "entryPremium": 0.9,
+      "exitPremium": 0.63,
+      "qty": 13,
+      "pnl": -351,
+      "pnlPct": -30,
+      "reason": "loss",
+      "minutes": 2
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 1.39,
+      "exitPremium": 0.96,
+      "qty": 8,
+      "pnl": -343.99999999999994,
+      "pnlPct": -30.935251798561147,
+      "reason": "loss",
+      "minutes": 2
     }
   ],
   "_reportSent": false,
@@ -231,24 +253,9 @@
     "entryMessageId": 546
   },
   "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 206.53,
-    "entryTime": 1781102125597,
-    "optionSymbol": "NVDA260610C00207500",
-    "strike": "207.5",
-    "entryPremium": 0.9,
-    "qty": 13,
-    "orderId": "c42bb8ff-4fde-4736-8472-2856098cbdc6",
-    "stopOrderId": "db4e7ca2-5251-44de-bcc8-8dc1b7279ab9",
-    "peakPremium": 0.9,
-    "currentStop": 0.63,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 547
+    "active": false,
+    "cooldownUntil": 1781102598901,
+    "lastSignal": "CALL"
   },
   "TSLA": {
     "active": false,
@@ -261,23 +268,8 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 67,
-    "entryPrice": 290.31,
-    "entryTime": 1781102125597,
-    "optionSymbol": "AAPL260610C00290000",
-    "strike": "290",
-    "entryPremium": 1.39,
-    "qty": 8,
-    "orderId": "2a1335f5-8351-46db-8428-528c06768c10",
-    "stopOrderId": "3aae406e-378c-4cc5-aad3-60c32887779d",
-    "peakPremium": 1.49,
-    "currentStop": 0.9729999999999999,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 548
+    "active": false,
+    "cooldownUntil": 1781102599098,
+    "lastSignal": "CALL"
   }
 }
