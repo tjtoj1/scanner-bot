@@ -568,8 +568,23 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781116155242,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 294.18,
+    "entryTime": 1781116223813,
+    "optionSymbol": "AAPL260610C00295000",
+    "strike": "295",
+    "entryPremium": 0.33,
+    "qty": 35,
+    "orderId": "af0f145b-73dc-4797-b670-10022e376215",
+    "stopOrderId": "3d2f4661-9b12-4895-ae9c-b87b3dfa4f98",
+    "peakPremium": 0.33,
+    "currentStop": 0.23099999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 674
   }
 }
