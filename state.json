@@ -585,9 +585,24 @@
     "entryMessageId": 676
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781114236767,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 83,
+    "entryPrice": 696.95,
+    "entryTime": 1781117123000,
+    "optionSymbol": "QQQ260610P00696000",
+    "strike": "696",
+    "entryPremium": 1.44,
+    "qty": 8,
+    "orderId": "e68ae638-cf44-4db4-bf60-6d0bf1db45cf",
+    "stopOrderId": "2a84b2df-10b2-434b-9871-3777838d816b",
+    "peakPremium": 1.44,
+    "currentStop": 1.008,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 681
   },
   "NVDA": {
     "active": false,
@@ -600,9 +615,24 @@
     "lastSignal": "PUT"
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1781114175453,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 573.16,
+    "entryTime": 1781117123000,
+    "optionSymbol": "META260610P00570000",
+    "strike": "570",
+    "entryPremium": 0.48,
+    "qty": 24,
+    "orderId": "d5c33a3c-eaef-45d6-a4ce-eb344ea43241",
+    "stopOrderId": "d4b810cd-7e4e-40c2-b226-b793606de66a",
+    "peakPremium": 0.48,
+    "currentStop": 0.33599999999999997,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 682
   },
   "AAPL": {
     "active": false,
