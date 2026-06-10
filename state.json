@@ -429,6 +429,17 @@
       "pnlPct": -30.584192439862544,
       "reason": "loss",
       "minutes": 14
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 1.43,
+      "exitPremium": 1,
+      "qty": 8,
+      "pnl": -343.99999999999994,
+      "pnlPct": -30.069930069930066,
+      "reason": "loss",
+      "minutes": 2
     }
   ],
   "_reportSent": false,
@@ -448,24 +459,9 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 93,
-    "entryPrice": 381.63,
-    "entryTime": 1781110223666,
-    "optionSymbol": "TSLA260610P00380000",
-    "strike": "380",
-    "entryPremium": 1.43,
-    "qty": 8,
-    "orderId": "c8c1c09a-2bb4-455b-a32c-9c327aeec6c1",
-    "stopOrderId": "d3070d37-0484-4131-9226-cd7434120145",
-    "peakPremium": 1.43,
-    "currentStop": 1.001,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 645
+    "active": false,
+    "cooldownUntil": 1781110996717,
+    "lastSignal": "PUT"
   },
   "META": {
     "active": false,
