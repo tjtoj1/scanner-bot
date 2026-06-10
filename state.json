@@ -289,9 +289,24 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781102598901,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 203.67,
+    "entryTime": 1781103919667,
+    "optionSymbol": "NVDA260610P00202500",
+    "strike": "202.5",
+    "entryPremium": 0.93,
+    "qty": 13,
+    "orderId": "9ec56c36-18fe-4e3c-94c6-bc4ede8efcd1",
+    "stopOrderId": "fbe21f61-a925-4a8b-9f18-deddbfbc57c9",
+    "peakPremium": 0.93,
+    "currentStop": 0.651,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 579
   },
   "TSLA": {
     "active": false,
