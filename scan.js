@@ -936,6 +936,21 @@ async function executeExit_unused(symbol, pos, currentPremium, reason, minutesEl
 
 async function executeEntry(symbol, r, account, now) {
   const meta = META[symbol];
+
+  // V16.7: Check Alpaca for existing positions (prevent duplicates after state reset)
+  try {
+    const positions = await alpacaCall(`${TRADING_BASE}/positions`);
+    const hasExisting = Array.isArray(positions) && positions.some(p =>
+      p.symbol && p.symbol.startsWith(symbol)
+    );
+    if (hasExisting) {
+      console.log(`  ${symbol}: Alpaca already has a position - skipping`);
+      return null;
+    }
+  } catch (e) {
+    console.error(`  ${symbol}: Failed to check positions: ${e.message}`);
+  }
+
   const contract = await pickOptionContract(symbol, r.signal, r.suggestedStrike, meta.strikeStep);
   if (!contract) {
     console.log(`  ${symbol}: No suitable 0DTE contract found`);
