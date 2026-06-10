@@ -66,6 +66,17 @@
       "pnlPct": -30.684326710816777,
       "reason": "loss",
       "minutes": 2
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "PUT",
+      "entryPremium": 1.09,
+      "exitPremium": 0.685,
+      "qty": 11,
+      "pnl": -445.5,
+      "pnlPct": -37.15596330275229,
+      "reason": "loss",
+      "minutes": 8
     }
   ],
   "_reportSent": false,
@@ -80,11 +91,11 @@
     "entryPremium": 2.94,
     "qty": 4,
     "orderId": "4743b04d-795b-49c9-929b-d33823260d9c",
-    "stopOrderId": "cb3616f7-f66c-4d02-b0e6-a4c3fcbc5ef6",
-    "peakPremium": 3.23,
-    "currentStop": 2.058,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
+    "stopOrderId": "32d662dc-6d7d-408d-b145-d02c250cc63d",
+    "peakPremium": 3.63,
+    "currentStop": 2.94,
+    "stopPhase": "breakeven",
+    "breakEvenAnnounced": true,
     "bufferAnnounced": false,
     "trailingAnnounced": false,
     "entryMessageId": 486
@@ -100,13 +111,13 @@
     "entryPremium": 4.26,
     "qty": 2,
     "orderId": "6d195f70-80a9-4c48-93d6-006fd5c5a4cd",
-    "stopOrderId": "6c2f04f7-7b73-4537-ab29-78ba2f337ef3",
-    "peakPremium": 4.74,
-    "currentStop": 4.26,
-    "stopPhase": "breakeven",
+    "stopOrderId": "f8c77487-4441-4303-be2f-6388a84f2406",
+    "peakPremium": 5.61,
+    "currentStop": 5.538,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 487
   },
   "NVDA": {
@@ -125,23 +136,8 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 288.93,
-    "entryTime": 1781098523084,
-    "optionSymbol": "AAPL260610P00287500",
-    "strike": "287.5",
-    "entryPremium": 1.09,
-    "qty": 11,
-    "orderId": "da03ce09-cc1c-4390-a5e2-8979e8f355dc",
-    "stopOrderId": "414021ba-f655-4ea0-be71-e4429c83e4b7",
-    "peakPremium": 1.17,
-    "currentStop": 0.763,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 481
+    "active": false,
+    "cooldownUntil": 1781099362058,
+    "lastSignal": "PUT"
   }
 }
