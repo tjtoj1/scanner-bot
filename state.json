@@ -330,6 +330,17 @@
       "pnlPct": 0,
       "reason": "breakeven",
       "minutes": 2
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "entryPremium": 1.54,
+      "exitPremium": 2.43,
+      "qty": 7,
+      "pnl": 623,
+      "pnlPct": 57.7922077922078,
+      "reason": "trailing",
+      "minutes": 20
     }
   ],
   "_reportSent": false,
@@ -339,24 +350,9 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 709.74,
-    "entryTime": 1781202640190,
-    "optionSymbol": "QQQ260611C00711000",
-    "strike": "711",
-    "entryPremium": 1.54,
-    "qty": 7,
-    "orderId": "15fb3493-dabd-4e2f-9032-8ccd38a699f7",
-    "stopOrderId": "273f6844-bed6-48ad-aa08-0640b40347b9",
-    "peakPremium": 2.58,
-    "currentStop": 2.451,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 827
+    "active": false,
+    "cooldownUntil": 1781204001614,
+    "lastSignal": "CALL"
   },
   "NVDA": {
     "active": false,
