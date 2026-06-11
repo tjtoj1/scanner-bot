@@ -2,6 +2,9 @@ name: Monitor Positions
 on:
   workflow_dispatch:
 
+concurrency:
+  group: scanner-bot
+  cancel-in-progress: false
 permissions:
   contents: write
 
