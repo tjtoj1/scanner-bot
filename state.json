@@ -46,12 +46,12 @@
     "qty": 3,
     "orderId": "ce83ea68-4b82-4afc-b2f5-927539aa8ec0",
     "stopOrderId": "2e935146-71dc-4591-b9f9-b6d1be580ae2",
-    "peakPremium": 4.49,
-    "currentStop": 3.49,
-    "stopPhase": "breakeven",
+    "peakPremium": 4.55,
+    "currentStop": 4.537000000000001,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 732
   },
   "NVDA": {
