@@ -1,6 +1,18 @@
 {
   "_date": "2026-06-11",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "entryPremium": 4.45,
+      "exitPremium": 3.1,
+      "qty": 2,
+      "pnl": -270,
+      "pnlPct": -30.337078651685395,
+      "reason": "loss",
+      "minutes": 9
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": false,
@@ -8,24 +20,9 @@
     "lastSignal": "PUT"
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 90,
-    "entryPrice": 698.96,
-    "entryTime": 1781184629112,
-    "optionSymbol": "QQQ260611C00700000",
-    "strike": "700",
-    "entryPremium": 4.45,
-    "qty": 2,
-    "orderId": "cb97c560-7134-45f5-bc0a-45b6c0877a23",
-    "stopOrderId": "4cdffa60-4c03-41d7-b4ad-67f7c71c625e",
-    "peakPremium": 4.45,
-    "currentStop": 3.1149999999999998,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 727
+    "active": false,
+    "cooldownUntil": 1781185822398,
+    "lastSignal": "CALL"
   },
   "NVDA": {
     "active": false,
