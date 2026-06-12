@@ -44,6 +44,28 @@
       "pnlPct": 28.571428571428577,
       "reason": "trailing",
       "minutes": 1
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "entryPremium": 4.19,
+      "exitPremium": 4.18,
+      "qty": 2,
+      "pnl": -2.000000000000135,
+      "pnlPct": -0.23866348448688962,
+      "reason": "breakeven",
+      "minutes": 2
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "PUT",
+      "entryPremium": 0.13,
+      "exitPremium": 0.08,
+      "qty": 90,
+      "pnl": -450,
+      "pnlPct": -38.46153846153847,
+      "reason": "loss",
+      "minutes": 2
     }
   ],
   "_reportSent": false,
@@ -53,24 +75,9 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 713.16,
-    "entryTime": 1781271929234,
-    "optionSymbol": "QQQ260612P00712000",
-    "strike": "712",
-    "entryPremium": 4.19,
-    "qty": 2,
-    "orderId": "f62de167-2f95-4f1f-8557-6fcbc4133e78",
-    "stopOrderId": "7c6519e1-a0f9-4aef-87ca-e767511f7d58",
-    "peakPremium": 4.89,
-    "currentStop": 4.19,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 867
+    "active": false,
+    "cooldownUntil": 1781272393699,
+    "lastSignal": "PUT"
   },
   "NVDA": {
     "active": false,
@@ -98,33 +105,18 @@
     "entryPremium": 1.48,
     "qty": 7,
     "orderId": "251abd15-7973-461d-84ae-1313c489a17e",
-    "stopOrderId": "a4213e0e-8c47-4c04-88e4-3697cc0683ae",
-    "peakPremium": 1.8,
-    "currentStop": 1.48,
-    "stopPhase": "breakeven",
+    "stopOrderId": "6d01db2a-c1d6-4a21-8be6-63032d3c6708",
+    "peakPremium": 1.99,
+    "currentStop": 1.924,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 868
   },
   "MSTR": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 80,
-    "entryPrice": 117.48,
-    "entryTime": 1781271929234,
-    "optionSymbol": "MSTR260612P00110000",
-    "strike": "110",
-    "entryPremium": 0.13,
-    "qty": 90,
-    "orderId": "678541e0-0cd0-4b67-ba13-c9a2889d48c3",
-    "stopOrderId": "7fa7ac28-90fb-4e32-89da-da21e2401cdc",
-    "peakPremium": 0.13,
-    "currentStop": 0.091,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 869
+    "active": false,
+    "cooldownUntil": 1781272695049,
+    "lastSignal": "PUT"
   }
 }
