@@ -1,6 +1,18 @@
 {
   "_date": "2026-06-12",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "entryPremium": 1.33,
+      "exitPremium": 1.3,
+      "qty": 8,
+      "pnl": -24.00000000000002,
+      "pnlPct": -2.2556390977443628,
+      "reason": "breakeven",
+      "minutes": 1
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": false,
@@ -13,24 +25,9 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 204,
-    "entryTime": 1781271037921,
-    "optionSymbol": "NVDA260612C00205000",
-    "strike": "205",
-    "entryPremium": 1.33,
-    "qty": 8,
-    "orderId": "a2013794-c229-4654-9f18-9be4ea9a67ec",
-    "stopOrderId": "b141210c-1b9f-485f-a8ef-74933f21d48d",
-    "peakPremium": 1.47,
-    "currentStop": 1.33,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 857
+    "active": false,
+    "cooldownUntil": 1781271438348,
+    "lastSignal": "CALL"
   },
   "TSLA": {
     "active": false,
