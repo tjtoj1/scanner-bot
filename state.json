@@ -113,9 +113,24 @@
     "lastSignal": "PUT"
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781272338099,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 93,
+    "entryPrice": 206.56,
+    "entryTime": 1781274037003,
+    "optionSymbol": "NVDA260612C00207500",
+    "strike": "207.5",
+    "entryPremium": 0.92,
+    "qty": 12,
+    "orderId": "28f604ce-389a-4ecd-8f95-034bec844d45",
+    "stopOrderId": "e2a39785-6cc3-4496-a8a9-196641b1df52",
+    "peakPremium": 0.92,
+    "currentStop": 0.644,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 881
   },
   "TSLA": {
     "active": false,
@@ -123,9 +138,24 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1781118799838,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 90,
+    "entryPrice": 564.68,
+    "entryTime": 1781274037003,
+    "optionSymbol": "META260612P00562500",
+    "strike": "562.5",
+    "entryPremium": 2.21,
+    "qty": 5,
+    "orderId": "f31abc1a-3482-4045-b6c9-6288c91f31b2",
+    "stopOrderId": "93708233-3e25-4c4b-b44f-d4e2d25e6f45",
+    "peakPremium": 2.21,
+    "currentStop": 1.547,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 882
   },
   "AAPL": {
     "active": false,
@@ -133,8 +163,23 @@
     "lastSignal": "PUT"
   },
   "MSTR": {
-    "active": false,
-    "cooldownUntil": 1781272695049,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 121.39,
+    "entryTime": 1781274037003,
+    "optionSymbol": "MSTR260612C00125000",
+    "strike": "125",
+    "entryPremium": 0.54,
+    "qty": 21,
+    "orderId": "59bd2ad9-6f6d-4ad5-968d-065557ae9039",
+    "stopOrderId": "119f6dd0-6128-4adf-8d90-f55af871b3a7",
+    "peakPremium": 0.54,
+    "currentStop": 0.378,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 883
   }
 }
