@@ -440,6 +440,28 @@
       "pnlPct": 32.97872340425533,
       "reason": "trailing",
       "minutes": 43
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 0.94,
+      "exitPremium": 1.12,
+      "qty": 12,
+      "pnl": 216.0000000000002,
+      "pnlPct": 19.148936170212785,
+      "reason": "trailing",
+      "minutes": 30
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "PUT",
+      "entryPremium": 0.11,
+      "exitPremium": 0.065,
+      "qty": 102,
+      "pnl": -459,
+      "pnlPct": -40.90909090909091,
+      "reason": "loss",
+      "minutes": 1
     }
   ],
   "_reportSent": false,
@@ -494,25 +516,9 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 80,
-    "entryPrice": 0,
-    "entryTime": 1781286976618,
-    "optionSymbol": "META260612P00565000",
-    "strike": "565",
-    "entryPremium": 0.94,
-    "qty": 12,
-    "orderId": null,
-    "stopOrderId": null,
-    "peakPremium": 1.28,
-    "currentStop": 1.222,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": null,
-    "recovered": true,
-    "bufferAnnounced": true
+    "active": false,
+    "cooldownUntil": 1781288957254,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": false,
@@ -520,24 +526,9 @@
     "lastSignal": "PUT"
   },
   "MSTR": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 93,
-    "entryPrice": 122.68,
-    "entryTime": 1781288716799,
-    "optionSymbol": "MSTR260612P00120000",
-    "strike": "120",
-    "entryPremium": 0.11,
-    "qty": 102,
-    "orderId": "d6cd7215-0fdc-49bd-b325-a3b74df19705",
-    "stopOrderId": null,
-    "peakPremium": 0.11,
-    "currentStop": 0.077,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1035
+    "active": false,
+    "cooldownUntil": 1781289437790,
+    "lastSignal": "PUT"
   },
   "AMZN": {
     "active": false,
