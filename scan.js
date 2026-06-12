@@ -278,6 +278,24 @@ async function analyzeTicker(symbol) {
 
   score = Math.min(score, 95);
 
+  // V16.10: TREND FILTER - Block signals against strong trend
+  const above20 = price > sma20;
+  const above50 = price > sma50;
+  const aboveVwap = price > vwap5m;
+  const sma20AboveSma50 = sma20 > sma50;
+  const bullishCount = [above20, above50, aboveVwap, sma20AboveSma50].filter(Boolean).length;
+  const trend = bullishCount === 4 ? "strongly_bullish"
+              : bullishCount === 0 ? "strongly_bearish"
+              : "mixed";
+
+  if ((signal === "PUT" && trend === "strongly_bullish") ||
+      (signal === "CALL" && trend === "strongly_bearish")) {
+    console.log(`  ${symbol}: ${signal} BLOCKED by trend filter (trend: ${trend})`);
+    signal = "NEUTRAL";
+    score = 0;
+    reasons = [`Trend filter: ${trend}`];
+  }
+
   const strengthAr = score >= 80 ? "قوية جداً"
                    : score >= 65 ? "قوية"
                    : score >= 50 ? "متوسطة"
