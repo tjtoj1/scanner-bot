@@ -429,6 +429,17 @@
       "pnlPct": -0.9615384615384623,
       "reason": "breakeven",
       "minutes": 39
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 0.94,
+      "exitPremium": 1.25,
+      "qty": 12,
+      "pnl": 372.00000000000006,
+      "pnlPct": 32.97872340425533,
+      "reason": "trailing",
+      "minutes": 43
     }
   ],
   "_reportSent": false,
@@ -483,25 +494,9 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 80,
-    "entryPrice": 0,
-    "entryTime": 1781286133682,
-    "optionSymbol": "META260612P00565000",
-    "strike": "565",
-    "entryPremium": 0.94,
-    "qty": 12,
-    "orderId": null,
-    "stopOrderId": null,
-    "peakPremium": 1.34,
-    "currentStop": 1.273,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": null,
-    "recovered": true,
-    "bufferAnnounced": true
+    "active": false,
+    "cooldownUntil": 1781288841330,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": false,
@@ -509,9 +504,24 @@
     "lastSignal": "PUT"
   },
   "MSTR": {
-    "active": false,
-    "cooldownUntil": 1781288476163,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 93,
+    "entryPrice": 122.68,
+    "entryTime": 1781288716799,
+    "optionSymbol": "MSTR260612P00120000",
+    "strike": "120",
+    "entryPremium": 0.11,
+    "qty": 102,
+    "orderId": "d6cd7215-0fdc-49bd-b325-a3b74df19705",
+    "stopOrderId": null,
+    "peakPremium": 0.11,
+    "currentStop": 0.077,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1035
   },
   "AMZN": {
     "active": false,
