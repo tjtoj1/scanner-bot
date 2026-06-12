@@ -517,6 +517,17 @@
       "pnlPct": -35,
       "reason": "loss",
       "minutes": 39
+    },
+    {
+      "symbol": "AMZN",
+      "signal": "CALL",
+      "entryPremium": 0.09,
+      "exitPremium": 0.06,
+      "qty": 123,
+      "pnl": -369,
+      "pnlPct": -33.33333333333333,
+      "reason": "loss",
+      "minutes": 14
     }
   ],
   "_reportSent": false,
@@ -556,23 +567,8 @@
     "lastSignal": "PUT"
   },
   "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 237.78,
-    "entryTime": 1781290526360,
-    "optionSymbol": "AMZN260612C00240000",
-    "strike": "240",
-    "entryPremium": 0.09,
-    "qty": 123,
-    "orderId": "dc5e1be1-c406-423d-bc63-d7d5d0c5500a",
-    "stopOrderId": null,
-    "peakPremium": 0.09,
-    "currentStop": 0.063,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1052
+    "active": false,
+    "cooldownUntil": 1781292019456,
+    "lastSignal": "CALL"
   }
 }
