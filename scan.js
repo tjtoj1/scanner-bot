@@ -13,7 +13,7 @@ if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN || !TG_CHAT_ID) {
   process.exit(1);
 }
 
-const TICKERS = ["SPY", "QQQ", "NVDA", "TSLA", "META", "AAPL", "MSTR"];
+const TICKERS = ["SPY", "QQQ", "NVDA", "TSLA", "META", "AAPL", "MSTR", "AMZN"];
 
 const META = {
   SPY:  { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.005 },
@@ -23,9 +23,8 @@ const META = {
   META: { strikeStep: 2.5, posSize: "100%",     risk: "normal",   ivCategory: "medium",  wallPct: 0.010 },
   AAPL: { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.007 },
   MSTR: { strikeStep: 5,   posSize: "25% only", risk: "extreme",  ivCategory: "extreme", wallPct: 0.030 },
-};
-
-const ALPACA_HEADERS = {
+  AMZN: { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.008 },
+};EADERS = {
   "APCA-API-KEY-ID": ALPACA_KEY,
   "APCA-API-SECRET-KEY": ALPACA_SECRET,
 };
@@ -358,10 +357,11 @@ async function analyzeTicker(symbol) {
       console.log(`  ${symbol}: ATR too low (${(atrRatio * 100).toFixed(0)}%) → dead`);
       score = Math.max(0, score - 20);
       reasons.push(`ATR very low`);
-    } else if (atrRatio > 2.0) {
-      console.log(`  ${symbol}: ATR too high (${(atrRatio * 100).toFixed(0)}%) → chaotic`);
-      score = Math.max(0, score - 15);
-      reasons.push(`ATR too high`);
+    } } else if (atrRatio > 2.0) {
+      // V16.12: Chaos = opportunity! Bonus instead of penalty
+      console.log(`  ${symbol}: ATR ${atr5m} high volatility (${(atrRatio * 100).toFixed(0)}% of avg) → opportunity`);
+      score = Math.min(95, score + 10);
+      reasons.push(`High volatility ${(atrRatio * 100).toFixed(0)}% (+10)`);
     } else if (atrRatio >= 0.8 && atrRatio <= 1.5) {
       score = Math.min(95, score + 5);
       reasons.push(`ATR healthy (+5)`);
