@@ -135,6 +135,43 @@ function atr(bars, period = 14) {
   return parseFloat((trs.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(3));
 }
 
+f// V16.11: ADX - Average Directional Index (trend strength)
+function adx(bars, period = 14) {
+  if (bars.length < period * 2 + 1) return null;
+  let plusDM = [], minusDM = [], trs = [];
+  for (let i = 1; i < bars.length; i++) {
+    const upMove = bars[i].h - bars[i - 1].h;
+    const downMove = bars[i - 1].l - bars[i].l;
+    plusDM.push(upMove > downMove && upMove > 0 ? upMove : 0);
+    minusDM.push(downMove > upMove && downMove > 0 ? downMove : 0);
+    trs.push(Math.max(
+      bars[i].h - bars[i].l,
+      Math.abs(bars[i].h - bars[i - 1].c),
+      Math.abs(bars[i].l - bars[i - 1].c)
+    ));
+  }
+  const sum = arr => arr.slice(-period).reduce((a, b) => a + b, 0);
+  const trSum = sum(trs);
+  if (trSum === 0) return null;
+  const plusDI = (sum(plusDM) / trSum) * 100;
+  const minusDI = (sum(minusDM) / trSum) * 100;
+  const dx = (Math.abs(plusDI - minusDI) / (plusDI + minusDI)) * 100;
+  return parseFloat(dx.toFixed(1));
+}
+
+// V16.11: ATR Average for comparison
+function atrAverage(bars, period = 14, lookback = 5) {
+  if (bars.length < period + lookback + 1) return null;
+  const atrs = [];
+  for (let i = 0; i < lookback; i++) {
+    const slice = bars.slice(0, bars.length - i);
+    const atrVal = atr(slice, period);
+    if (atrVal) atrs.push(atrVal);
+  }
+  if (!atrs.length) return null;
+  return parseFloat((atrs.reduce((a, b) => a + b, 0) / atrs.length).toFixed(3));
+}
+
 function estimateGamma(symbol, price, atr5m, vwap, sma20, bollinger) {
   const meta = META[symbol];
   const baseWallPct = meta.wallPct;
