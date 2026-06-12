@@ -326,9 +326,25 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1781286934215,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 80,
+    "entryPrice": 0,
+    "entryTime": 1781284874286,
+    "optionSymbol": "META260612P00565000",
+    "strike": "565",
+    "entryPremium": 0.94,
+    "qty": 12,
+    "orderId": null,
+    "stopOrderId": null,
+    "peakPremium": 0.94,
+    "currentStop": 0.6579999999999999,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": null,
+    "recovered": true,
+    "bufferAnnounced": false
   },
   "AAPL": {
     "active": true,
