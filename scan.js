@@ -1142,6 +1142,53 @@ async function main() {
   const state = loadState();
   const now = Date.now();
 
+  // V16.13: POSITION RECOVERY - Sync state with Alpaca
+  // Any position in Alpaca but missing from state gets added so Monitor tracks it
+  try {
+    const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
+    if (Array.isArray(alpacaPositions)) {
+      for (const pos of alpacaPositions) {
+        const match = pos.symbol && pos.symbol.match(/^([A-Z]+)\d/);
+        if (!match) continue;
+        const symbol = match[1];
+        if (!TICKERS.includes(symbol)) continue;
+
+        if (!state[symbol] || !state[symbol].active) {
+          const isCall = pos.symbol.includes("C0");
+          const entryPremium = parseFloat(pos.avg_entry_price);
+          const qty = parseInt(pos.qty);
+          const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
+          const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
+
+          console.log(`🔄 RECOVERING ${symbol} from Alpaca: ${pos.symbol} (entry $${entryPremium}, qty ${qty})`);
+
+          state[symbol] = {
+            active: true,
+            signal: isCall ? "CALL" : "PUT",
+            entryScore: 80,
+            entryPrice: 0,
+            entryTime: Date.now() - (30 * 60 * 1000),
+            optionSymbol: pos.symbol,
+            strike: strike ? String(strike) : null,
+            entryPremium: entryPremium,
+            qty: qty,
+            orderId: null,
+            stopOrderId: null,
+            peakPremium: entryPremium,
+            currentStop: parseFloat((entryPremium * 0.7).toFixed(2)),
+            stopPhase: "initial",
+            breakEvenAnnounced: false,
+            trailingAnnounced: false,
+            entryMessageId: null,
+            recovered: true,
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Position recovery failed:", e.message);
+  }
+
   // MONITOR MODE: only check active positions, no scanning
   if (MODE === "monitor") {
     const activeSymbols = Object.keys(state).filter(s => state[s]?.active === true);
