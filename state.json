@@ -286,6 +286,17 @@
       "pnlPct": 0,
       "reason": "breakeven",
       "minutes": 34
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "entryPremium": 1.9,
+      "exitPremium": 1.0550000000000002,
+      "qty": 5,
+      "pnl": -422.4999999999999,
+      "pnlPct": -44.4736842105263,
+      "reason": "loss",
+      "minutes": 51
     }
   ],
   "_reportSent": false,
@@ -295,25 +306,9 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 80,
-    "entryPrice": 0,
-    "entryTime": 1781283855815,
-    "optionSymbol": "QQQ260612C00723000",
-    "strike": "723",
-    "entryPremium": 1.9,
-    "qty": 5,
-    "orderId": null,
-    "stopOrderId": null,
-    "peakPremium": 1.9,
-    "currentStop": 1.3299999999999998,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": null,
-    "recovered": true,
-    "bufferAnnounced": false
+    "active": false,
+    "cooldownUntil": 1781287576635,
+    "lastSignal": "CALL"
   },
   "NVDA": {
     "active": false,
@@ -321,9 +316,25 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781286674290,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 80,
+    "entryPrice": 0,
+    "entryTime": 1781285175782,
+    "optionSymbol": "TSLA260612C00402500",
+    "strike": "402.5",
+    "entryPremium": 2.33,
+    "qty": 4,
+    "orderId": null,
+    "stopOrderId": null,
+    "peakPremium": 2.33,
+    "currentStop": 1.631,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": null,
+    "recovered": true,
+    "bufferAnnounced": false
   },
   "META": {
     "active": true,
@@ -337,14 +348,14 @@
     "qty": 12,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 1.14,
-    "currentStop": 0.94,
-    "stopPhase": "breakeven",
+    "peakPremium": 1.28,
+    "currentStop": 1.222,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": null,
     "recovered": true,
-    "bufferAnnounced": false
+    "bufferAnnounced": true
   },
   "AAPL": {
     "active": true,
@@ -358,14 +369,14 @@
     "qty": 21,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 0.55,
-    "currentStop": 0.364,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "trailingAnnounced": false,
+    "peakPremium": 0.7,
+    "currentStop": 0.676,
+    "stopPhase": "trailing",
+    "breakEvenAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": null,
     "recovered": true,
-    "bufferAnnounced": false
+    "bufferAnnounced": true
   },
   "MSTR": {
     "active": false,
