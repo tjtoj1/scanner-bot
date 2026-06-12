@@ -231,6 +231,17 @@
       "pnlPct": 86.95652173913045,
       "reason": "trailing",
       "minutes": 9
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "entryPremium": 3.3,
+      "exitPremium": 3.25,
+      "qty": 3,
+      "pnl": -14.999999999999947,
+      "pnlPct": -1.5151515151515098,
+      "reason": "breakeven",
+      "minutes": 18
     }
   ],
   "_reportSent": false,
@@ -240,9 +251,25 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781272393699,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 80,
+    "entryPrice": 0,
+    "entryTime": 1781283855815,
+    "optionSymbol": "QQQ260612C00723000",
+    "strike": "723",
+    "entryPremium": 1.9,
+    "qty": 5,
+    "orderId": null,
+    "stopOrderId": null,
+    "peakPremium": 1.9,
+    "currentStop": 1.3299999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": null,
+    "recovered": true,
+    "bufferAnnounced": false
   },
   "NVDA": {
     "active": false,
@@ -250,29 +277,30 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 93,
-    "entryPrice": 400.1,
-    "entryTime": 1781284533027,
-    "optionSymbol": "TSLA260612C00400000",
-    "strike": "400",
-    "entryPremium": 3.3,
-    "qty": 3,
-    "orderId": "6b12af66-79e3-4dc3-a7f1-c7f3151f6109",
-    "stopOrderId": "d1647768-d774-4e1f-95f3-0b3b785c4b60",
-    "peakPremium": 4.05,
-    "currentStop": 3.3,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 942
+    "active": false,
+    "cooldownUntil": 1781285956363,
+    "lastSignal": "CALL"
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1781282124047,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 80,
+    "entryPrice": 0,
+    "entryTime": 1781283855815,
+    "optionSymbol": "META260612P00565000",
+    "strike": "565",
+    "entryPremium": 0.94,
+    "qty": 12,
+    "orderId": null,
+    "stopOrderId": null,
+    "peakPremium": 0.94,
+    "currentStop": 0.6579999999999999,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": null,
+    "recovered": true,
+    "bufferAnnounced": false
   },
   "AAPL": {
     "active": false,
