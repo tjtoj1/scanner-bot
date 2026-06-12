@@ -426,14 +426,14 @@
     "qty": 4,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 2.87,
-    "currentStop": 2.33,
-    "stopPhase": "breakeven",
+    "peakPremium": 3.15,
+    "currentStop": 3.0290000000000004,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": null,
     "recovered": true,
-    "bufferAnnounced": false
+    "bufferAnnounced": true
   },
   "META": {
     "active": true,
