@@ -319,7 +319,7 @@
     "qty": 12,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 1.09,
+    "peakPremium": 1.17,
     "currentStop": 0.94,
     "stopPhase": "breakeven",
     "breakEvenAnnounced": true,
