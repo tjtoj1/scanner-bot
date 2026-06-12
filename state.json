@@ -80,13 +80,13 @@
     "entryPremium": 0.98,
     "qty": 12,
     "orderId": "fe16675c-c4c8-4216-9242-13d7363f7b0f",
-    "stopOrderId": "765b2488-c2d6-47d0-8562-8a429168acf0",
-    "peakPremium": 0.98,
-    "currentStop": 0.6859999999999999,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "stopOrderId": "45261e88-62a5-4631-b3d3-e8cc75927cc0",
+    "peakPremium": 1.37,
+    "currentStop": 1.3015,
+    "stopPhase": "trailing",
+    "breakEvenAnnounced": true,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 862
   }
 }
