@@ -217,13 +217,13 @@
     "entryPremium": 0.29,
     "qty": 39,
     "orderId": "9f2b8613-9a9e-4e0e-81fb-5c45cf577998",
-    "stopOrderId": "51910a6a-cddf-4328-8300-743375abe4d2",
-    "peakPremium": 0.37,
-    "currentStop": 0.29,
-    "stopPhase": "breakeven",
+    "stopOrderId": "3848b993-3493-4169-99cd-ae38824c43b4",
+    "peakPremium": 0.4,
+    "currentStop": 0.38,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 894
   }
 }
