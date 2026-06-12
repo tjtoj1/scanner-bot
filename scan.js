@@ -333,6 +333,40 @@ async function analyzeTicker(symbol) {
     reasons = [`Trend filter: ${trend}`];
   }
 
+  // V16.11: ADX FILTER - Detect Sideways markets
+  const adxValue = adx(bars5m);
+  if (adxValue !== null && signal !== "NEUTRAL") {
+    if (adxValue < 20) {
+      console.log(`  ${symbol}: ADX ${adxValue} < 20 → Sideways market, blocking`);
+      signal = "NEUTRAL";
+      score = 0;
+      reasons = [`ADX too low: ${adxValue}`];
+    } else if (adxValue < 25) {
+      score = Math.max(0, score - 15);
+      reasons.push(`ADX weak ${adxValue} (-15)`);
+    } else if (adxValue >= 30) {
+      score = Math.min(95, score + 5);
+      reasons.push(`Strong ADX ${adxValue} (+5)`);
+    }
+  }
+
+  // V16.11: ATR FILTER - Detect dead/chaotic markets
+  const atrAvg = atrAverage(bars5m);
+  if (atrAvg && atr5m && signal !== "NEUTRAL") {
+    const atrRatio = atr5m / atrAvg;
+    if (atrRatio < 0.5) {
+      console.log(`  ${symbol}: ATR too low (${(atrRatio * 100).toFixed(0)}%) → dead`);
+      score = Math.max(0, score - 20);
+      reasons.push(`ATR very low`);
+    } else if (atrRatio > 2.0) {
+      console.log(`  ${symbol}: ATR too high (${(atrRatio * 100).toFixed(0)}%) → chaotic`);
+      score = Math.max(0, score - 15);
+      reasons.push(`ATR too high`);
+    } else if (atrRatio >= 0.8 && atrRatio <= 1.5) {
+      score = Math.min(95, score + 5);
+      reasons.push(`ATR healthy (+5)`);
+    }
+  }
   const strengthAr = score >= 80 ? "قوية جداً"
                    : score >= 65 ? "قوية"
                    : score >= 50 ? "متوسطة"
