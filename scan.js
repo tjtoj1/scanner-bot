@@ -24,7 +24,9 @@ const META = {
   AAPL: { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.007 },
   MSTR: { strikeStep: 5,   posSize: "25% only", risk: "extreme",  ivCategory: "extreme", wallPct: 0.030 },
   AMZN: { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.008 },
-};EADERS = {
+};
+
+const ALPACA_HEADERS = {
   "APCA-API-KEY-ID": ALPACA_KEY,
   "APCA-API-SECRET-KEY": ALPACA_SECRET,
 };
@@ -134,7 +136,7 @@ function atr(bars, period = 14) {
   return parseFloat((trs.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(3));
 }
 
-f// V16.11: ADX - Average Directional Index (trend strength)
+// V16.11: ADX - Average Directional Index (trend strength)
 function adx(bars, period = 14) {
   if (bars.length < period * 2 + 1) return null;
   let plusDM = [], minusDM = [], trs = [];
@@ -158,7 +160,7 @@ function adx(bars, period = 14) {
   return parseFloat(dx.toFixed(1));
 }
 
-// V16.11: ATR Average for comparison
+// V16.11: Get historical ATR average for "market activity" comparison
 function atrAverage(bars, period = 14, lookback = 5) {
   if (bars.length < period + lookback + 1) return null;
   const atrs = [];
@@ -315,6 +317,7 @@ async function analyzeTicker(symbol) {
   score = Math.min(score, 95);
 
   // V16.10: TREND FILTER - Block signals against strong trend
+  // Check 4 indicators on 5m: price vs SMA20, SMA50, VWAP, and SMA20 vs SMA50
   const above20 = price > sma20;
   const above50 = price > sma50;
   const aboveVwap = price > vwap5m;
@@ -336,10 +339,10 @@ async function analyzeTicker(symbol) {
   const adxValue = adx(bars5m);
   if (adxValue !== null && signal !== "NEUTRAL") {
     if (adxValue < 20) {
-      console.log(`  ${symbol}: ADX ${adxValue} < 20 → Sideways market, blocking`);
+      console.log(`  ${symbol}: ADX ${adxValue} < 20 → Sideways market, blocking signal`);
       signal = "NEUTRAL";
       score = 0;
-      reasons = [`ADX too low: ${adxValue}`];
+      reasons = [`ADX too low: ${adxValue} (sideways)`];
     } else if (adxValue < 25) {
       score = Math.max(0, score - 15);
       reasons.push(`ADX weak ${adxValue} (-15)`);
@@ -354,10 +357,10 @@ async function analyzeTicker(symbol) {
   if (atrAvg && atr5m && signal !== "NEUTRAL") {
     const atrRatio = atr5m / atrAvg;
     if (atrRatio < 0.5) {
-      console.log(`  ${symbol}: ATR too low (${(atrRatio * 100).toFixed(0)}%) → dead`);
+      console.log(`  ${symbol}: ATR ${atr5m} too low (${(atrRatio * 100).toFixed(0)}% of avg) → dead market`);
       score = Math.max(0, score - 20);
-      reasons.push(`ATR very low`);
-    } } else if (atrRatio > 2.0) {
+      reasons.push(`ATR very low (${(atrRatio * 100).toFixed(0)}%)`);
+    } else if (atrRatio > 2.0) {
       // V16.12: Chaos = opportunity! Bonus instead of penalty
       console.log(`  ${symbol}: ATR ${atr5m} high volatility (${(atrRatio * 100).toFixed(0)}% of avg) → opportunity`);
       score = Math.min(95, score + 10);
@@ -367,6 +370,7 @@ async function analyzeTicker(symbol) {
       reasons.push(`ATR healthy (+5)`);
     }
   }
+
   const strengthAr = score >= 80 ? "قوية جداً"
                    : score >= 65 ? "قوية"
                    : score >= 50 ? "متوسطة"
@@ -782,6 +786,9 @@ async function formatDailyReport(state) {
   const winRate = (wins.length / trades.length * 100).toFixed(1);
   const best = trades.reduce((b, t) => t.pnl > b.pnl ? t : b, trades[0]);
   const worst = trades.reduce((w, t) => t.pnl < w.pnl ? t : w, trades[0]);
+  // V16.9: Total profit and loss separately
+  const totalProfit = wins.reduce((s, t) => s + t.pnl, 0);
+  const totalLoss = losses.reduce((s, t) => s + t.pnl, 0);
 
   return `📊 <b>Daily Report - ${dateHeader}</b>
 
@@ -789,7 +796,10 @@ async function formatDailyReport(state) {
 ✅ ربحانة: ${wins.length} (${winRate}%)
 ❌ خسرانة: ${losses.length}
 
-💰 صافي: ${dailyChange >= 0 ? "+" : ""}$${dailyChange.toFixed(0)} (${dailyChangePct >= 0 ? "+" : ""}${dailyChangePct.toFixed(1)}%)
+💰 ربح: +$${totalProfit.toFixed(0)}
+💸 خسارة: $${totalLoss.toFixed(0)}
+📊 صافي: ${dailyChange >= 0 ? "+" : ""}$${dailyChange.toFixed(0)} (${dailyChangePct >= 0 ? "+" : ""}${dailyChangePct.toFixed(1)}%)
+
 🥇 أفضل: ${best.symbol} ${best.signal} ${(best.pnlPct >= 0 ? "+" : "")}${best.pnlPct.toFixed(1)}%
 🥉 أسوأ: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}%
 
@@ -1002,12 +1012,13 @@ async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapse
 
   return {
     active: false,
+    // V16.9: Smart cooldown based on exit reason
     cooldownUntil: Date.now() + (
-      reason === "trailing" || reason === "profit" ? 2 * 60 * 1000 :  // ربح: 2 دقايق
-      reason === "breakeven" || reason === "reversal" ? 5 * 60 * 1000 : // Break-Even/Reversal: 5 دقايق
-      10 * 60 * 1000  // خسارة/إجباري: 10 دقايق
+      reason === "trailing" || reason === "profit" ? 2 * 60 * 1000 :    // profit: 2 min
+      reason === "breakeven" || reason === "reversal" ? 5 * 60 * 1000 : // BE/reversal: 5 min
+      10 * 60 * 1000                                                     // loss/force: 10 min
     ),
-    lastSignal: pos.signal, // V16.6: preserve for reversal check during cooldown
+    lastSignal: pos.signal,
     _lastTrade: {
       symbol,
       signal: pos.signal,
@@ -1058,6 +1069,7 @@ async function executeEntry(symbol, r, account, now) {
 
   const entryPremium = quote.ask; // use ask for buying
   const portfolioValue = parseFloat(account.portfolio_value); // V16.5: real from Alpaca
+  // V16.7: Use 1% since Alpaca portfolio is ~$100K (simulates 10% of $10K budget)
   const qty = calculateQty(portfolioValue, entryPremium, 0.01);
 
   if (qty < 1) {
@@ -1196,7 +1208,7 @@ async function main() {
   newState._dailyTrades = state._dailyTrades || [];
   newState._reportSent = state._reportSent || false;
 
-  // V16.8: Count current open positions in Alpaca for position limit
+  // V16.8: Count current open positions for position limit
   let activeCount = 0;
   try {
     const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
@@ -1226,7 +1238,6 @@ async function main() {
         if (previous) newState[r.symbol] = previous;
         continue;
       }
-
       const newPos = await executeEntry(r.symbol, r, account, now);
       if (newPos) {
         newState[r.symbol] = newPos;
