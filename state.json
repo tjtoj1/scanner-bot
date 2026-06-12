@@ -374,6 +374,28 @@
       "pnlPct": 5.7692307692307745,
       "reason": "trailing",
       "minutes": 31
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 0.94,
+      "exitPremium": 0.92,
+      "qty": 12,
+      "pnl": -23.999999999999886,
+      "pnlPct": -2.1276595744680753,
+      "reason": "breakeven",
+      "minutes": 30
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "PUT",
+      "entryPremium": 0.11,
+      "exitPremium": 0.05,
+      "qty": 88,
+      "pnl": -527.9999999999999,
+      "pnlPct": -54.54545454545454,
+      "reason": "loss",
+      "minutes": 34
     }
   ],
   "_reportSent": false,
@@ -414,51 +436,35 @@
     "bufferAnnounced": false
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 80,
-    "entryPrice": 0,
-    "entryTime": 1781286020275,
-    "optionSymbol": "META260612P00565000",
-    "strike": "565",
-    "entryPremium": 0.94,
-    "qty": 12,
-    "orderId": null,
-    "stopOrderId": null,
-    "peakPremium": 1.05,
-    "currentStop": 0.94,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "trailingAnnounced": false,
-    "entryMessageId": null,
-    "recovered": true,
-    "bufferAnnounced": false
-  },
-  "AAPL": {
     "active": false,
-    "cooldownUntil": 1781287941419,
+    "cooldownUntil": 1781288175861,
     "lastSignal": "PUT"
   },
-  "MSTR": {
+  "AAPL": {
     "active": true,
     "signal": "PUT",
     "entryScore": 80,
     "entryPrice": 0,
-    "entryTime": 1781285777411,
-    "optionSymbol": "MSTR260612P00120000",
-    "strike": "120",
-    "entryPremium": 0.11,
-    "qty": 88,
+    "entryTime": 1781286075165,
+    "optionSymbol": "AAPL260612P00290000",
+    "strike": "290",
+    "entryPremium": 0.52,
+    "qty": 21,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 0.11,
-    "currentStop": 0.077,
+    "peakPremium": 0.52,
+    "currentStop": 0.364,
     "stopPhase": "initial",
     "breakEvenAnnounced": false,
     "trailingAnnounced": false,
     "entryMessageId": null,
     "recovered": true,
     "bufferAnnounced": false
+  },
+  "MSTR": {
+    "active": false,
+    "cooldownUntil": 1781288476163,
+    "lastSignal": "PUT"
   },
   "AMZN": {
     "active": false,
