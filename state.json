@@ -187,28 +187,35 @@
       "pnlPct": 27.22222222222222,
       "reason": "trailing",
       "minutes": 7
+    },
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "entryPremium": 2.55,
+      "exitPremium": 1.77,
+      "qty": 4,
+      "pnl": -311.99999999999994,
+      "pnlPct": -30.588235294117645,
+      "reason": "loss",
+      "minutes": 95
+    },
+    {
+      "symbol": "META",
+      "signal": "CALL",
+      "entryPremium": 1.97,
+      "exitPremium": 1.81,
+      "qty": 5,
+      "pnl": -79.99999999999996,
+      "pnlPct": -8.121827411167509,
+      "reason": "breakeven",
+      "minutes": 85
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 88,
-    "entryPrice": 742.08,
-    "entryTime": 1781276117334,
-    "optionSymbol": "SPY260612C00743000",
-    "strike": "743",
-    "entryPremium": 2.55,
-    "qty": 4,
-    "orderId": "7b8ff91c-bbfd-42b8-9d72-7d980a746e3f",
-    "stopOrderId": "c6fd5c57-f258-48db-be0e-06a40e07cdaa",
-    "peakPremium": 2.55,
-    "currentStop": 1.7849999999999997,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 911
+    "active": false,
+    "cooldownUntil": 1781282423764,
+    "lastSignal": "CALL"
   },
   "QQQ": {
     "active": false,
@@ -226,24 +233,9 @@
     "lastSignal": "PUT"
   },
   "META": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 570.39,
-    "entryTime": 1781276720727,
-    "optionSymbol": "META260612C00572500",
-    "strike": "572.5",
-    "entryPremium": 1.97,
-    "qty": 5,
-    "orderId": "8c7d4586-cf5e-45d1-b224-3a69076306b2",
-    "stopOrderId": "53405d3f-7c13-46e1-bda7-88816f3abdec",
-    "peakPremium": 2.26,
-    "currentStop": 1.97,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 920
+    "active": false,
+    "cooldownUntil": 1781282124047,
+    "lastSignal": "CALL"
   },
   "AAPL": {
     "active": false,
