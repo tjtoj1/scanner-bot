@@ -143,6 +143,17 @@
       "pnlPct": 0,
       "reason": "breakeven",
       "minutes": 4
+    },
+    {
+      "symbol": "MSTR",
+      "signal": "CALL",
+      "entryPremium": 0.29,
+      "exitPremium": 0.38,
+      "qty": 39,
+      "pnl": 351.0000000000001,
+      "pnlPct": 31.0344827586207,
+      "reason": "trailing",
+      "minutes": 6
     }
   ],
   "_reportSent": false,
@@ -207,23 +218,8 @@
     "lastSignal": "PUT"
   },
   "MSTR": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 124.05,
-    "entryTime": 1781274917909,
-    "optionSymbol": "MSTR260612C00130000",
-    "strike": "130",
-    "entryPremium": 0.29,
-    "qty": 39,
-    "orderId": "9f2b8613-9a9e-4e0e-81fb-5c45cf577998",
-    "stopOrderId": "3848b993-3493-4169-99cd-ae38824c43b4",
-    "peakPremium": 0.4,
-    "currentStop": 0.38,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 894
+    "active": false,
+    "cooldownUntil": 1781275401255,
+    "lastSignal": "CALL"
   }
 }
