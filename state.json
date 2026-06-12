@@ -293,14 +293,14 @@
     "qty": 12,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 1.05,
-    "currentStop": 0.94,
-    "stopPhase": "breakeven",
+    "peakPremium": 1.33,
+    "currentStop": 1.2635,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": null,
     "recovered": true,
-    "bufferAnnounced": false
+    "bufferAnnounced": true
   },
   "AAPL": {
     "active": false,
