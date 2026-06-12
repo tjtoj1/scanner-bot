@@ -402,14 +402,14 @@
     "qty": 21,
     "orderId": null,
     "stopOrderId": null,
-    "peakPremium": 0.65,
-    "currentStop": 0.52,
-    "stopPhase": "breakeven",
+    "peakPremium": 0.79,
+    "currentStop": 0.7505,
+    "stopPhase": "trailing",
     "breakEvenAnnounced": true,
-    "trailingAnnounced": false,
+    "trailingAnnounced": true,
     "entryMessageId": null,
     "recovered": true,
-    "bufferAnnounced": false
+    "bufferAnnounced": true
   },
   "MSTR": {
     "active": false,
