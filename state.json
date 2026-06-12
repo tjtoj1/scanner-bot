@@ -242,6 +242,17 @@
       "pnlPct": -1.5151515151515098,
       "reason": "breakeven",
       "minutes": 18
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 0.94,
+      "exitPremium": 1.16,
+      "qty": 12,
+      "pnl": 263.99999999999994,
+      "pnlPct": 23.404255319148934,
+      "reason": "trailing",
+      "minutes": 36
     }
   ],
   "_reportSent": false,
@@ -277,30 +288,29 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781285956363,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 93,
+    "entryPrice": 401.63,
+    "entryTime": 1781286018827,
+    "optionSymbol": "TSLA260612C00402500",
+    "strike": "402.5",
+    "entryPremium": 2.17,
+    "qty": 5,
+    "orderId": "4dbbfb80-b883-4f8e-b68d-2eeee1dca427",
+    "stopOrderId": "97606e26-5d1c-48e7-8a95-a15d4ece94b9",
+    "peakPremium": 2.17,
+    "currentStop": 1.519,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 955
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 80,
-    "entryPrice": 0,
-    "entryTime": 1781283855815,
-    "optionSymbol": "META260612P00565000",
-    "strike": "565",
-    "entryPremium": 0.94,
-    "qty": 12,
-    "orderId": null,
-    "stopOrderId": null,
-    "peakPremium": 1.33,
-    "currentStop": 1.2635,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": null,
-    "recovered": true,
-    "bufferAnnounced": true
+    "active": false,
+    "cooldownUntil": 1781286145589,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": false,
