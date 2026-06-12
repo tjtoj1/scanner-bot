@@ -462,28 +462,35 @@
       "pnlPct": -40.90909090909091,
       "reason": "loss",
       "minutes": 1
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "entryPremium": 0.94,
+      "exitPremium": 0.66,
+      "qty": 12,
+      "pnl": -335.9999999999999,
+      "pnlPct": -29.787234042553184,
+      "reason": "loss",
+      "minutes": 7
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 0.11,
+      "exitPremium": 0.07,
+      "qty": 102,
+      "pnl": -407.99999999999994,
+      "pnlPct": -36.36363636363636,
+      "reason": "loss",
+      "minutes": 7
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 77,
-    "entryPrice": 740.59,
-    "entryTime": 1781288418301,
-    "optionSymbol": "SPY260612P00740000",
-    "strike": "740",
-    "entryPremium": 0.94,
-    "qty": 12,
-    "orderId": "ebfea89a-bd15-4d80-9ed6-3115167ebd5d",
-    "stopOrderId": "b4c9ea17-52f3-48ef-84a8-dec9e0e5054c",
-    "peakPremium": 0.94,
-    "currentStop": 0.6579999999999999,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1024
+    "active": false,
+    "cooldownUntil": 1781289495353,
+    "lastSignal": "PUT"
   },
   "QQQ": {
     "active": false,
@@ -491,24 +498,9 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 82,
-    "entryPrice": 204.47,
-    "entryTime": 1781288418301,
-    "optionSymbol": "NVDA260612P00202500",
-    "strike": "202.5",
-    "entryPremium": 0.11,
-    "qty": 102,
-    "orderId": "468d3263-aa7a-447a-8d07-ba0453fc2043",
-    "stopOrderId": null,
-    "peakPremium": 0.11,
-    "currentStop": 0.077,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1025
+    "active": false,
+    "cooldownUntil": 1781289495722,
+    "lastSignal": "PUT"
   },
   "TSLA": {
     "active": false,
@@ -516,9 +508,25 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1781288957254,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 80,
+    "entryPrice": 0,
+    "entryTime": 1781287094400,
+    "optionSymbol": "META260612P00565000",
+    "strike": "565",
+    "entryPremium": 0.94,
+    "qty": 12,
+    "orderId": null,
+    "stopOrderId": null,
+    "peakPremium": 1.08,
+    "currentStop": 0.94,
+    "stopPhase": "breakeven",
+    "breakEvenAnnounced": true,
+    "trailingAnnounced": false,
+    "entryMessageId": null,
+    "recovered": true,
+    "bufferAnnounced": false
   },
   "AAPL": {
     "active": false,
