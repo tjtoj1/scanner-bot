@@ -301,20 +301,45 @@ async function analyzeTicker(symbol) {
   if (setup) setupBonus = setup.quality === "excellent" ? 20 : setup.quality === "good" ? 12 : 5;
 
   let signal = "NEUTRAL", score = 0, reasons = [];
+  let absolutePoints = 0; // V16.16: Track absolute strength
 
   if (bull.score > bear.score && bull.score >= 25) {
     signal = "CALL";
     score = bull.score + (setup?.direction === "CALL" ? setupBonus : 0);
+    absolutePoints = bull.score;
     reasons = bull.reasons;
     if (setup?.direction === "CALL") reasons.push(`Setup: ${setup.name}`);
   } else if (bear.score > bull.score && bear.score >= 25) {
     signal = "PUT";
     score = bear.score + (setup?.direction === "PUT" ? setupBonus : 0);
+    absolutePoints = bear.score;
     reasons = bear.reasons;
     if (setup?.direction === "PUT") reasons.push(`Setup: ${setup.name}`);
   }
 
   score = Math.min(score, 95);
+
+  // V16.16: ABSOLUTE SCORE FILTER - require minimum raw points
+  // Prevents "high relative %" when actual evidence is weak
+  if (signal !== "NEUTRAL" && absolutePoints < 70) {
+    console.log(`  ${symbol}: ${signal} BLOCKED - absolute points too low (${absolutePoints} < 70)`);
+    signal = "NEUTRAL";
+    score = 0;
+    reasons = [`Absolute too low: ${absolutePoints}/70`];
+  }
+
+  // V16.16: SETUP QUALITY MULTIPLIER - reward strong setups
+  if (signal !== "NEUTRAL" && setup) {
+    const qualityMultiplier = setup.quality === "excellent" ? 1.10
+                            : setup.quality === "good" ? 1.00
+                            : 0.90; // fair
+    const originalScore = score;
+    score = Math.min(95, Math.round(score * qualityMultiplier));
+    if (score !== originalScore) {
+      reasons.push(`Setup quality ${setup.quality}: ${originalScore}→${score}`);
+    }
+  }
+
 
   // V16.10: TREND FILTER - Block signals against strong trend
   // Check 4 indicators on 5m: price vs SMA20, SMA50, VWAP, and SMA20 vs SMA50
@@ -339,7 +364,7 @@ async function analyzeTicker(symbol) {
   const adxValue = adx(bars5m);
   if (adxValue !== null && signal !== "NEUTRAL") {
     if (adxValue < 20) {
-      console.log(`  ${symbol}: ADX ${adxValue} < 20 â†’ Sideways market, blocking signal`);
+      console.log(`  ${symbol}: ADX ${adxValue} < 20 → Sideways market, blocking signal`);
       signal = "NEUTRAL";
       score = 0;
       reasons = [`ADX too low: ${adxValue} (sideways)`];
@@ -357,12 +382,12 @@ async function analyzeTicker(symbol) {
   if (atrAvg && atr5m && signal !== "NEUTRAL") {
     const atrRatio = atr5m / atrAvg;
     if (atrRatio < 0.5) {
-      console.log(`  ${symbol}: ATR ${atr5m} too low (${(atrRatio * 100).toFixed(0)}% of avg) â†’ dead market`);
+      console.log(`  ${symbol}: ATR ${atr5m} too low (${(atrRatio * 100).toFixed(0)}% of avg) → dead market`);
       score = Math.max(0, score - 20);
       reasons.push(`ATR very low (${(atrRatio * 100).toFixed(0)}%)`);
     } else if (atrRatio > 2.0) {
       // V16.12: Chaos = opportunity! Bonus instead of penalty
-      console.log(`  ${symbol}: ATR ${atr5m} high volatility (${(atrRatio * 100).toFixed(0)}% of avg) â†’ opportunity`);
+      console.log(`  ${symbol}: ATR ${atr5m} high volatility (${(atrRatio * 100).toFixed(0)}% of avg) → opportunity`);
       score = Math.min(95, score + 10);
       reasons.push(`High volatility ${(atrRatio * 100).toFixed(0)}% (+10)`);
     } else if (atrRatio >= 0.8 && atrRatio <= 1.5) {
@@ -371,11 +396,11 @@ async function analyzeTicker(symbol) {
     }
   }
 
-  const strengthAr = score >= 80 ? "Ù‚ÙˆÙŠØ© Ø¬Ø¯Ø§Ù‹"
-                   : score >= 65 ? "Ù‚ÙˆÙŠØ©"
-                   : score >= 50 ? "Ù…ØªÙˆØ³Ø·Ø©"
-                   : score >= 35 ? "Ø¶Ø¹ÙŠÙØ©"
-                   : "Ù…Ø­Ø§ÙŠØ¯";
+  const strengthAr = score >= 80 ? "قوية جداً"
+                   : score >= 65 ? "قوية"
+                   : score >= 50 ? "متوسطة"
+                   : score >= 35 ? "ضعيفة"
+                   : "محايد";
 
   const meta = META[symbol];
   const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
@@ -639,9 +664,9 @@ function getPhaseLabel(phase, config) {
 
 function getPhaseEmoji(phase) {
   switch (phase) {
-    case "trailing":  return "ðŸš€";
-    case "breakeven": return "ðŸ›¡ï¸";
-    default:          return "ðŸ›‘";
+    case "trailing":  return "🚀";
+    case "breakeven": return "🛡️";
+    default:          return "🛑";
   }
 }
 
@@ -666,11 +691,11 @@ async function sendTelegram(text, replyToMessageId = null) {
 function formatBuyAlert(r, pos) {
   const target = pos.entryPremium * 1.35;
   const stop = pos.entryPremium * 0.70;
-  return `âœ… <b>BUY ${r.symbol} ${r.signal} $${pos.strike} 0DTE</b>
-ðŸ’° Entry: $${pos.entryPremium.toFixed(2)} Ã— ${pos.qty}
-ðŸŽ¯ Target: $${target.toFixed(2)} (+35%)
-ðŸ›‘ Stop: $${stop.toFixed(2)} (-30%)
-ðŸ“Š ${r.score}% ${r.setup?.name || ""}`;
+  return `✅ <b>BUY ${r.symbol} ${r.signal} $${pos.strike} 0DTE</b>
+💰 Entry: $${pos.entryPremium.toFixed(2)} × ${pos.qty}
+🎯 Target: $${target.toFixed(2)} (+35%)
+🛑 Stop: $${stop.toFixed(2)} (-30%)
+📊 ${r.score}% ${r.setup?.name || ""}`;
 }
 
 function formatMonitor(pos, currentPremium, peakPremium, currentStop, minutesElapsed) {
@@ -679,31 +704,31 @@ function formatMonitor(pos, currentPremium, peakPremium, currentStop, minutesEla
   const phase = calculatePhase(pos.entryPremium, peakPremium, pos.stopConfig);
   const emoji = getPhaseEmoji(phase);
   const phaseLabel = getPhaseLabel(phase, pos.stopConfig);
-  return `ðŸ“Š <b>${pos.symbol || ""} - Ù…Ø±Ø§Ù‚Ø¨Ø©</b>
-ðŸ’° Premium: $${currentPremium.toFixed(2)} (${pctStr}%)
-ðŸŽ¯ Stop: $${currentStop.toFixed(2)} ${emoji} ${phaseLabel}
-ðŸ“ˆ Peak: $${peakPremium.toFixed(2)}
-â± ${minutesElapsed} Ø¯Ù‚ÙŠÙ‚Ø©`;
+  return `📊 <b>${pos.symbol || ""} - مراقبة</b>
+💰 Premium: $${currentPremium.toFixed(2)} (${pctStr}%)
+🎯 Stop: $${currentStop.toFixed(2)} ${emoji} ${phaseLabel}
+📈 Peak: $${peakPremium.toFixed(2)}
+⏱ ${minutesElapsed} دقيقة`;
 }
 
 function formatBreakEven(pos, currentPremium) {
-  return `ðŸ›¡ï¸ <b>BREAK-EVEN: ${pos.symbol || ""}</b>
-ðŸ’° $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-ðŸ”’ Stop: $${pos.entryPremium.toFixed(2)} (Ø³Ø¹Ø± Ø§Ù„Ø¯Ø®ÙˆÙ„)`;
+  return `🛡️ <b>BREAK-EVEN: ${pos.symbol || ""}</b>
+💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
+🔒 Stop: $${pos.entryPremium.toFixed(2)} (سعر الدخول)`;
 }
 
 function formatBuffer(pos, currentPremium, peakPremium, stop) {
-  return `ðŸ“ˆ <b>BUFFER: ${pos.symbol || ""}</b>
-ðŸ’° $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-ðŸŽ¯ Stop: $${stop.toFixed(2)} (Peak - 7%)`;
+  return `📈 <b>BUFFER: ${pos.symbol || ""}</b>
+💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
+🎯 Stop: $${stop.toFixed(2)} (Peak - 7%)`;
 }
 
 function formatTrailing(pos, currentPremium, peakPremium, stop) {
   const stopPct = ((stop - pos.entryPremium) / pos.entryPremium * 100).toFixed(1);
-  return `ðŸš€ <b>TRAILING ACTIVATED: ${pos.symbol || ""}</b>
-ðŸ’° $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-ðŸ”’ Stop: $${stop.toFixed(2)} (+${stopPct}% Ù…Ø¶Ù…ÙˆÙ†)
-ðŸ“ˆ Ø³ÙŠØ±ØªÙØ¹ Ù…Ø¹ Peak (-5%)`;
+  return `🚀 <b>TRAILING ACTIVATED: ${pos.symbol || ""}</b>
+💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
+🔒 Stop: $${stop.toFixed(2)} (+${stopPct}% مضمون)
+📈 سيرتفع مع Peak (-5%)`;
 }
 
 function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
@@ -711,26 +736,26 @@ function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  const emoji = pct >= 0 ? "âœ…" : "ðŸ›‘";
+  const emoji = pct >= 0 ? "✅" : "🛑";
   const reasonText = {
-    profit: "Ø®Ø±ÙˆØ¬ Ø¨Ø±Ø¨Ø­",
-    loss: "Ø®Ø±ÙˆØ¬ Ø¨Ø®Ø³Ø§Ø±Ø©",
+    profit: "خروج بربح",
+    loss: "خروج بخسارة",
     trailing: "Trailing Stop",
     breakeven: "Break-Even Stop",
-    force: "Ø¥ØºÙ„Ø§Ù‚ Ø¥Ø¬Ø¨Ø§Ø±ÙŠ (2:39 PM)",
-    reversal: "Ø§Ù†Ø¹ÙƒØ§Ø³",
+    force: "إغلاق إجباري (2:39 PM)",
+    reversal: "انعكاس",
   }[reason] || reason;
   return `${emoji} <b>EXIT: ${pos.symbol || ""} (${reasonText})</b>
-ðŸ’° $${pos.entryPremium.toFixed(2)} â†’ $${currentPremium.toFixed(2)}
-${pct >= 0 ? "ðŸ“ˆ" : "ðŸ“‰"} ${pctStr}% (${pnlStr}$)
-â± ${minutesElapsed} Ø¯Ù‚ÙŠÙ‚Ø©`;
+💰 $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)
+⏱ ${minutesElapsed} دقيقة`;
 }
 
 function formatStatusUpdate(label, pos, currentPremium) {
   const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  return `ðŸ“Š <b>${label}: Ù…Ø³ØªÙ…Ø±</b>
-ðŸ’° Premium: $${currentPremium.toFixed(2)} (${pctStr}%)`;
+  return `📊 <b>${label}: مستمر</b>
+💰 Premium: $${currentPremium.toFixed(2)} (${pctStr}%)`;
 }
 
 function formatExitProfit(pos, currentPremium, reason, minutesElapsed) {
@@ -738,10 +763,10 @@ function formatExitProfit(pos, currentPremium, reason, minutesElapsed) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `âœ… <b>EXIT: ${reason}</b>
-ðŸ’° Premium: $${pos.entryPremium.toFixed(2)} â†’ $${currentPremium.toFixed(2)}
-ðŸ“ˆ ${pctStr}% (${pnlStr}$)
-â± Ø§Ù„Ù…Ø¯Ø©: ${minutesElapsed} Ø¯Ù‚ÙŠÙ‚Ø©`;
+  return `✅ <b>EXIT: ${reason}</b>
+💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+📈 ${pctStr}% (${pnlStr}$)
+⏱ المدة: ${minutesElapsed} دقيقة`;
 }
 
 function formatExitLoss(pos, currentPremium, reason, minutesElapsed) {
@@ -749,10 +774,10 @@ function formatExitLoss(pos, currentPremium, reason, minutesElapsed) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = pct.toFixed(1);
   const pnlStr = pnl.toFixed(0);
-  return `ðŸ›‘ <b>EXIT: ${reason}</b>
-ðŸ’° Premium: $${pos.entryPremium.toFixed(2)} â†’ $${currentPremium.toFixed(2)}
-ðŸ“‰ ${pctStr}% (${pnlStr}$)
-â± Ø§Ù„Ù…Ø¯Ø©: ${minutesElapsed} Ø¯Ù‚ÙŠÙ‚Ø©`;
+  return `🛑 <b>EXIT: ${reason}</b>
+💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+📉 ${pctStr}% (${pnlStr}$)
+⏱ المدة: ${minutesElapsed} دقيقة`;
 }
 
 function formatExitTime(pos, currentPremium, minutesElapsed) {
@@ -760,10 +785,10 @@ function formatExitTime(pos, currentPremium, minutesElapsed) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  const emoji = pct >= 0 ? "ðŸ" : "ðŸ";
-  return `${emoji} <b>EXIT: Ø§Ù†ØªÙ‡Øª Ø§Ù„Ù…Ø¯Ø© (30 Ø¯Ù‚ÙŠÙ‚Ø©)</b>
-ðŸ’° Premium: $${pos.entryPremium.toFixed(2)} â†’ $${currentPremium.toFixed(2)}
-${pct >= 0 ? "ðŸ“ˆ" : "ðŸ“‰"} ${pctStr}% (${pnlStr}$)`;
+  const emoji = pct >= 0 ? "🏁" : "🏁";
+  return `${emoji} <b>EXIT: انتهت المدة (30 دقيقة)</b>
+💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 }
 
 function formatExitReversal(pos, currentPremium, newSignal) {
@@ -771,9 +796,9 @@ function formatExitReversal(pos, currentPremium, newSignal) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `ðŸ”„ <b>EXIT: Ø§Ù†Ø¹ÙƒØ§Ø³ â†’ ${newSignal}</b>
-ðŸ’° Premium: $${pos.entryPremium.toFixed(2)} â†’ $${currentPremium.toFixed(2)}
-${pct >= 0 ? "ðŸ“ˆ" : "ðŸ“‰"} ${pctStr}% (${pnlStr}$)`;
+  return `🔄 <b>EXIT: انعكاس → ${newSignal}</b>
+💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 }
 
 function formatExitForce(pos, currentPremium) {
@@ -781,9 +806,9 @@ function formatExitForce(pos, currentPremium) {
   const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
   const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
   const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `â° <b>EXIT: Ø¥ØºÙ„Ø§Ù‚ Ø¥Ø¬Ø¨Ø§Ø±ÙŠ (2:45 PM)</b>
-ðŸ’° Premium: $${pos.entryPremium.toFixed(2)} â†’ $${currentPremium.toFixed(2)}
-${pct >= 0 ? "ðŸ“ˆ" : "ðŸ“‰"} ${pctStr}% (${pnlStr}$)`;
+  return `⏰ <b>EXIT: إغلاق إجباري (2:45 PM)</b>
+💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
+${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
 }
 
 async function formatDailyReport(state) {
@@ -813,7 +838,7 @@ async function formatDailyReport(state) {
   }
 
   if (trades.length === 0) {
-    return `ðŸ“Š <b>Daily Report - ${dateHeader}</b>\n\nÙ„Ø§ ØªÙˆØ¬Ø¯ ØµÙÙ‚Ø§Øª Ø§Ù„ÙŠÙˆÙ…\n\nðŸ“ˆ Ø§Ù„Ø±ØµÙŠØ¯: $${portfolioValue.toFixed(0)}`;
+    return `📊 <b>Daily Report - ${dateHeader}</b>\n\nلا توجد صفقات اليوم\n\n📈 الرصيد: $${portfolioValue.toFixed(0)}`;
   }
 
   const wins = trades.filter(t => t.pnl > 0);
@@ -825,27 +850,27 @@ async function formatDailyReport(state) {
   const totalProfit = wins.reduce((s, t) => s + t.pnl, 0);
   const totalLoss = losses.reduce((s, t) => s + t.pnl, 0);
 
-  return `ðŸ“Š <b>Daily Report - ${dateHeader}</b>
+  return `📊 <b>Daily Report - ${dateHeader}</b>
 
-ðŸ’¼ Ø§Ù„ØµÙÙ‚Ø§Øª: ${trades.length}
-âœ… Ø±Ø¨Ø­Ø§Ù†Ø©: ${wins.length} (${winRate}%)
-âŒ Ø®Ø³Ø±Ø§Ù†Ø©: ${losses.length}
+💼 الصفقات: ${trades.length}
+✅ ربحانة: ${wins.length} (${winRate}%)
+❌ خسرانة: ${losses.length}
 
-ðŸ’° Ø±Ø¨Ø­: +$${totalProfit.toFixed(0)}
-ðŸ’¸ Ø®Ø³Ø§Ø±Ø©: $${totalLoss.toFixed(0)}
-ðŸ“Š ØµØ§ÙÙŠ: ${dailyChange >= 0 ? "+" : ""}$${dailyChange.toFixed(0)} (${dailyChangePct >= 0 ? "+" : ""}${dailyChangePct.toFixed(1)}%)
+💰 ربح: +$${totalProfit.toFixed(0)}
+💸 خسارة: $${totalLoss.toFixed(0)}
+📊 صافي: ${dailyChange >= 0 ? "+" : ""}$${dailyChange.toFixed(0)} (${dailyChangePct >= 0 ? "+" : ""}${dailyChangePct.toFixed(1)}%)
 
-ðŸ¥‡ Ø£ÙØ¶Ù„: ${best.symbol} ${best.signal} ${(best.pnlPct >= 0 ? "+" : "")}${best.pnlPct.toFixed(1)}%
-ðŸ¥‰ Ø£Ø³ÙˆØ£: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}%
+🥇 أفضل: ${best.symbol} ${best.signal} ${(best.pnlPct >= 0 ? "+" : "")}${best.pnlPct.toFixed(1)}%
+🥉 أسوأ: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}%
 
-ðŸ“ˆ Ø§Ù„Ø±ØµÙŠØ¯: $${portfolioValue.toFixed(0)}`;
+📈 الرصيد: $${portfolioValue.toFixed(0)}`;
 }
 
 // V16.14: STRATEGY ANALYZER - Comprehensive performance analysis
 async function analyzeStrategy(state) {
   const trades = state._dailyTrades || [];
   if (trades.length === 0) {
-    return "ðŸ“Š <b>ØªØ­Ù„ÙŠÙ„ Ø§Ù„Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ©</b>\n\nÙ„Ø§ ØªÙˆØ¬Ø¯ ØµÙÙ‚Ø§Øª Ø§Ù„ÙŠÙˆÙ… Ù„Ù„ØªØ­Ù„ÙŠÙ„.";
+    return "📊 <b>تحليل الاستراتيجية</b>\n\nلا توجد صفقات اليوم للتحليل.";
   }
 
   const wins = trades.filter(t => t.pnl > 0);
@@ -906,56 +931,56 @@ async function analyzeStrategy(state) {
 
   // Check 1: Win rate
   if (parseFloat(winRate) < 30) {
-    issues.push({ severity: "CRITICAL", text: `Win Rate Ø¶Ø¹ÙŠÙ Ø¬Ø¯Ø§Ù‹ (${winRate}%) - Ø§Ù„Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ© ØªØ­ØªØ§Ø¬ Ù…Ø±Ø§Ø¬Ø¹Ø© Ø´Ø§Ù…Ù„Ø©` });
+    issues.push({ severity: "CRITICAL", text: `Win Rate ضعيف جداً (${winRate}%) - الاستراتيجية تحتاج مراجعة شاملة` });
   } else if (parseFloat(winRate) < 40) {
-    issues.push({ severity: "MAJOR", text: `Win Rate ØªØ­Øª 40% (${winRate}%) - ÙŠØ­ØªØ§Ø¬ ØªØ­Ø³ÙŠÙ†` });
+    issues.push({ severity: "MAJOR", text: `Win Rate تحت 40% (${winRate}%) - يحتاج تحسين` });
   }
 
   // Check 2: Profit factor
   if (profitFactor !== "N/A" && parseFloat(profitFactor) < 1) {
-    issues.push({ severity: "CRITICAL", text: `Profit Factor < 1 (${profitFactor}) - Ù†Ø®Ø³Ø± Ø£ÙƒØ«Ø± Ù…Ù…Ø§ Ù†Ø±Ø¨Ø­` });
+    issues.push({ severity: "CRITICAL", text: `Profit Factor < 1 (${profitFactor}) - نخسر أكثر مما نربح` });
   } else if (profitFactor !== "N/A" && parseFloat(profitFactor) < 1.5) {
-    issues.push({ severity: "MAJOR", text: `Profit Factor Ù…Ù†Ø®ÙØ¶ (${profitFactor}) - Ø§Ù„Ø£Ø±Ø¨Ø§Ø­ ØµØºÙŠØ±Ø© Ù…Ù‚Ø§Ø±Ù†Ø© Ø¨Ø§Ù„Ø®Ø³Ø§Ø¦Ø±` });
+    issues.push({ severity: "MAJOR", text: `Profit Factor منخفض (${profitFactor}) - الأرباح صغيرة مقارنة بالخسائر` });
   }
 
   // Check 3: Avg loss > avg win
   if (avgLoss > avgWin * 1.5 && wins.length > 0) {
-    issues.push({ severity: "MAJOR", text: `Ù…ØªÙˆØ³Ø· Ø§Ù„Ø®Ø³Ø§Ø±Ø© ($${avgLoss.toFixed(0)}) Ø£ÙƒØ¨Ø± Ù…Ù† Ù…ØªÙˆØ³Ø· Ø§Ù„Ø±Ø¨Ø­ ($${avgWin.toFixed(0)}) - Stop Ø¶ÙŠÙ‚ Ø£Ùˆ Trailing Ù…Ø¨ÙƒØ±` });
+    issues.push({ severity: "MAJOR", text: `متوسط الخسارة ($${avgLoss.toFixed(0)}) أكبر من متوسط الربح ($${avgWin.toFixed(0)}) - Stop ضيق أو Trailing مبكر` });
   }
 
   // Check 4: Per-ticker losers
   Object.entries(byTicker).forEach(([symbol, stats]) => {
     if (stats.total >= 3 && stats.wins === 0) {
-      issues.push({ severity: "MAJOR", text: `${symbol}: ${stats.total} ØµÙÙ‚Ø§Øª ÙƒÙ„Ù‡Ø§ Ø®Ø³Ø±Ø§Ù†Ø© - ØªØ­Ù‚Ù‚ Ù…Ù† Ø§Ù„Ø¥Ø´Ø§Ø±Ø§Øª` });
+      issues.push({ severity: "MAJOR", text: `${symbol}: ${stats.total} صفقات كلها خسرانة - تحقق من الإشارات` });
     } else if (stats.total >= 5 && stats.wins / stats.total < 0.2) {
-      issues.push({ severity: "MINOR", text: `${symbol}: ${stats.wins}/${stats.total} Ø±Ø§Ø¨Ø­Ø© ÙÙ‚Ø· - Ø£Ø¯Ø§Ø¡ Ø¶Ø¹ÙŠÙ` });
+      issues.push({ severity: "MINOR", text: `${symbol}: ${stats.wins}/${stats.total} رابحة فقط - أداء ضعيف` });
     }
   });
 
   // Check 5: Quick losses (Stop hit too fast)
   if (parseFloat(quickPercent) > 50 && losses.length >= 4) {
-    issues.push({ severity: "MAJOR", text: `${quickPercent}% Ù…Ù† Ø§Ù„Ø®Ø³Ø§Ø¦Ø± Ø®Ù„Ø§Ù„ Ø¯Ù‚ÙŠÙ‚ØªÙŠÙ† - Stop Ø¶ÙŠÙ‚ Ø¬Ø¯Ø§Ù‹ Ø£Ùˆ Ø¥Ø´Ø§Ø±Ø§Øª Ø³ÙŠØ¦Ø©` });
+    issues.push({ severity: "MAJOR", text: `${quickPercent}% من الخسائر خلال دقيقتين - Stop ضيق جداً أو إشارات سيئة` });
   }
 
   // Check 6: CALL/PUT imbalance
   if (Math.abs(parseInt(callWR) - parseInt(putWR)) > 30 && calls.length >= 3 && puts.length >= 3) {
     if (parseInt(callWR) > parseInt(putWR)) {
-      issues.push({ severity: "MINOR", text: `CALL Win Rate (${callWR}%) Ø£Ø¹Ù„Ù‰ Ø¨ÙƒØ«ÙŠØ± Ù…Ù† PUT (${putWR}%) - Ø§Ù„Ø³ÙˆÙ‚ ØµØ§Ø¹Ø¯ØŒ PUT ÙŠÙØ´Ù„` });
+      issues.push({ severity: "MINOR", text: `CALL Win Rate (${callWR}%) أعلى بكثير من PUT (${putWR}%) - السوق صاعد، PUT يفشل` });
     } else {
-      issues.push({ severity: "MINOR", text: `PUT Win Rate (${putWR}%) Ø£Ø¹Ù„Ù‰ Ø¨ÙƒØ«ÙŠØ± Ù…Ù† CALL (${callWR}%) - Ø§Ù„Ø³ÙˆÙ‚ Ù‡Ø§Ø¨Ø·ØŒ CALL ÙŠÙØ´Ù„` });
+      issues.push({ severity: "MINOR", text: `PUT Win Rate (${putWR}%) أعلى بكثير من CALL (${callWR}%) - السوق هابط، CALL يفشل` });
     }
   }
 
   // Check 7: Stop Loss frequency
   const lossCount = byReason["loss"]?.count || 0;
   if (lossCount / trades.length > 0.5) {
-    issues.push({ severity: "MAJOR", text: `${lossCount} ØµÙÙ‚Ø© Ø®Ø±Ø¬Øª Ø¨Ù€ Stop Loss (${(lossCount/trades.length*100).toFixed(0)}%) - ÙÙ„Ø§ØªØ± Ø§Ù„Ø¬ÙˆØ¯Ø© Ø¶Ø¹ÙŠÙØ©` });
+    issues.push({ severity: "MAJOR", text: `${lossCount} صفقة خرجت بـ Stop Loss (${(lossCount/trades.length*100).toFixed(0)}%) - فلاتر الجودة ضعيفة` });
   }
 
   // Check 8: Trailing frequency  
   const trailCount = byReason["trailing"]?.count || 0;
   if (trades.length >= 10 && trailCount === 0) {
-    issues.push({ severity: "MAJOR", text: `Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙÙ‚Ø§Øª ÙˆØµÙ„Øª Trailing - Ø§Ù„Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ© Ù„Ø§ ØªÙ…Ø³Ùƒ Ø§Ù„Ø­Ø±ÙƒØ§Øª Ø§Ù„ÙƒØ¨ÙŠØ±Ø©` });
+    issues.push({ severity: "MAJOR", text: `لا توجد صفقات وصلت Trailing - الاستراتيجية لا تمسك الحركات الكبيرة` });
   } else if (trailCount > 0 && wins.length > 0) {
     const trailWinPct = (trailCount / wins.length * 100).toFixed(0);
     // This is informational, not necessarily an issue
@@ -965,46 +990,46 @@ async function analyzeStrategy(state) {
   const sortedTickers = Object.entries(byTicker).sort((a, b) => b[1].pnl - a[1].pnl);
   const sortedHours = Object.entries(byHour).sort((a, b) => b[1].pnl - a[1].pnl);
 
-  let report = `ðŸ“Š <b>ØªÙ‚Ø±ÙŠØ± ØªØ­Ù„ÙŠÙ„ Ø§Ù„Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ©</b>\n`;
-  report += `ðŸ“… ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}\n\n`;
+  let report = `📊 <b>تقرير تحليل الاستراتيجية</b>\n`;
+  report += `📅 ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}\n\n`;
 
   // Performance Summary
-  report += `<b>ðŸ“ˆ Ø§Ù„Ø£Ø¯Ø§Ø¡ Ø§Ù„Ø¹Ø§Ù…:</b>\n`;
-  report += `â€¢ Ø§Ù„ØµÙÙ‚Ø§Øª: ${trades.length}\n`;
-  report += `â€¢ Win Rate: ${winRate}% (${wins.length}/${trades.length})\n`;
-  report += `â€¢ Profit Factor: ${profitFactor}\n`;
-  report += `â€¢ Ù…ØªÙˆØ³Ø· Ø§Ù„Ø±Ø¨Ø­: +$${avgWin.toFixed(0)}\n`;
-  report += `â€¢ Ù…ØªÙˆØ³Ø· Ø§Ù„Ø®Ø³Ø§Ø±Ø©: -$${avgLoss.toFixed(0)}\n\n`;
+  report += `<b>📈 الأداء العام:</b>\n`;
+  report += `• الصفقات: ${trades.length}\n`;
+  report += `• Win Rate: ${winRate}% (${wins.length}/${trades.length})\n`;
+  report += `• Profit Factor: ${profitFactor}\n`;
+  report += `• متوسط الربح: +$${avgWin.toFixed(0)}\n`;
+  report += `• متوسط الخسارة: -$${avgLoss.toFixed(0)}\n\n`;
 
   // Per-Ticker
-  report += `<b>ðŸ“Š Ø£Ø¯Ø§Ø¡ Ø§Ù„Ø£Ø³Ù‡Ù…:</b>\n`;
+  report += `<b>📊 أداء الأسهم:</b>\n`;
   sortedTickers.forEach(([symbol, stats]) => {
     const wr = stats.total > 0 ? (stats.wins / stats.total * 100).toFixed(0) : 0;
-    const emoji = stats.pnl > 0 ? "âœ…" : stats.pnl < 0 ? "ðŸ”´" : "âšª";
+    const emoji = stats.pnl > 0 ? "✅" : stats.pnl < 0 ? "🔴" : "⚪";
     report += `${emoji} ${symbol}: ${stats.wins}/${stats.total} (${wr}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
   });
   report += `\n`;
 
   // Exit Reasons
-  report += `<b>ðŸšª Ø£Ø³Ø¨Ø§Ø¨ Ø§Ù„Ø®Ø±ÙˆØ¬:</b>\n`;
+  report += `<b>🚪 أسباب الخروج:</b>\n`;
   Object.entries(byReason).forEach(([reason, stats]) => {
     const pct = (stats.count / trades.length * 100).toFixed(0);
-    report += `â€¢ ${reason}: ${stats.count} (${pct}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
+    report += `• ${reason}: ${stats.count} (${pct}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
   });
   report += `\n`;
 
   // CALL vs PUT
-  report += `<b>ðŸŽ¯ CALL vs PUT:</b>\n`;
-  report += `â€¢ CALL: ${callWins}/${calls.length} (${callWR}%)\n`;
-  report += `â€¢ PUT: ${putWins}/${puts.length} (${putWR}%)\n\n`;
+  report += `<b>🎯 CALL vs PUT:</b>\n`;
+  report += `• CALL: ${callWins}/${calls.length} (${callWR}%)\n`;
+  report += `• PUT: ${putWins}/${puts.length} (${putWR}%)\n\n`;
 
   // Time analysis (if available)
   if (sortedHours.length > 0) {
-    report += `<b>â° Ø§Ù„ØªÙˆÙ‚ÙŠØª:</b>\n`;
+    report += `<b>⏰ التوقيت:</b>\n`;
     sortedHours.slice(0, 3).forEach(([hour, stats]) => {
       const total = stats.wins + stats.losses;
       const wr = total > 0 ? (stats.wins / total * 100).toFixed(0) : 0;
-      report += `â€¢ ${hour} (CDT): ${stats.wins}W/${stats.losses}L (${wr}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
+      report += `• ${hour} (CDT): ${stats.wins}W/${stats.losses}L (${wr}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
     });
     report += `\n`;
   }
@@ -1015,35 +1040,35 @@ async function analyzeStrategy(state) {
     const major = issues.filter(i => i.severity === "MAJOR");
     const minor = issues.filter(i => i.severity === "MINOR");
 
-    report += `<b>ðŸ” Ø§Ù„Ù…Ø´Ø§ÙƒÙ„ Ø§Ù„Ù…ÙƒØªØ´ÙØ©:</b>\n\n`;
+    report += `<b>🔍 المشاكل المكتشفة:</b>\n\n`;
 
     if (critical.length > 0) {
-      report += `ðŸ”´ <b>CRITICAL (ÙŠØµÙ„Ø­ ÙÙˆØ±Ø§Ù‹):</b>\n`;
-      critical.forEach(i => report += `â€¢ ${i.text}\n`);
+      report += `🔴 <b>CRITICAL (يصلح فوراً):</b>\n`;
+      critical.forEach(i => report += `• ${i.text}\n`);
       report += `\n`;
     }
     if (major.length > 0) {
-      report += `ðŸŸ¡ <b>MAJOR (Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹ Ø§Ù„Ù‚Ø§Ø¯Ù…):</b>\n`;
-      major.forEach(i => report += `â€¢ ${i.text}\n`);
+      report += `🟡 <b>MAJOR (الأسبوع القادم):</b>\n`;
+      major.forEach(i => report += `• ${i.text}\n`);
       report += `\n`;
     }
     if (minor.length > 0) {
-      report += `ðŸŸ¢ <b>MINOR (Ù„Ø§Ø­Ù‚Ø§Ù‹):</b>\n`;
-      minor.forEach(i => report += `â€¢ ${i.text}\n`);
+      report += `🟢 <b>MINOR (لاحقاً):</b>\n`;
+      minor.forEach(i => report += `• ${i.text}\n`);
       report += `\n`;
     }
   } else {
-    report += `<b>âœ… Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø´Ø§ÙƒÙ„ ÙˆØ§Ø¶Ø­Ø©</b>\n`;
-    report += `Ø§Ù„Ø£Ø¯Ø§Ø¡ Ø¶Ù…Ù† Ø§Ù„Ù…Ø¹Ø¯Ù„Ø§Øª Ø§Ù„Ù…Ù‚Ø¨ÙˆÙ„Ø©.\n\n`;
+    report += `<b>✅ لا توجد مشاكل واضحة</b>\n`;
+    report += `الأداء ضمن المعدلات المقبولة.\n\n`;
   }
 
   // Sample size warning
   if (trades.length < 30) {
-    report += `\nâš ï¸ <b>ØªØ­Ø°ÙŠØ±:</b> ${trades.length} ØµÙÙ‚Ø© Ù‚Ù„ÙŠÙ„Ø© Ù„Ù„Ø§Ø³ØªÙ†ØªØ§Ø¬ Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ.\n`;
-    report += `Ù†Ø­ØªØ§Ø¬ 30+ ØµÙÙ‚Ø© Ù„Ù„ØªØ£ÙƒÙŠØ¯ Ù‚Ø¨Ù„ ØªØ·Ø¨ÙŠÙ‚ Ø£ÙŠ ØªØ¹Ø¯ÙŠÙ„.\n`;
+    report += `\n⚠️ <b>تحذير:</b> ${trades.length} صفقة قليلة للاستنتاج النهائي.\n`;
+    report += `نحتاج 30+ صفقة للتأكيد قبل تطبيق أي تعديل.\n`;
   }
 
-  report += `\nðŸ“‹ Ø§Ù„Ø¥ØµØ¯Ø§Ø±: v16.14`;
+  report += `\n📋 الإصدار: v16.14`;
 
   return report;
 }
@@ -1059,7 +1084,7 @@ function isMarketOpen() {
 }
 
 function decideAction(current, previous, now) {
-  const isStrong = current.score >= MIN_SCORE && (current.strengthAr === "Ù‚ÙˆÙŠØ©" || current.strengthAr === "Ù‚ÙˆÙŠØ© Ø¬Ø¯Ø§Ù‹");
+  const isStrong = current.score >= MIN_SCORE && (current.strengthAr === "قوية" || current.strengthAr === "قوية جداً");
 
   // Force exit at 2:39 PM if position active
   if (previous && previous.active && isPastForceExitTime(now)) {
@@ -1071,7 +1096,7 @@ function decideAction(current, previous, now) {
     if (previous && previous.cooldownUntil && now < previous.cooldownUntil) {
       // V16.6: Allow reversal during cooldown if signal is opposite + strong
       if (isStrong && previous.lastSignal && current.signal !== "NEUTRAL" && current.signal !== previous.lastSignal) {
-        console.log(`  ${current.symbol}: Reversal allowed during cooldown (${previous.lastSignal} â†’ ${current.signal})`);
+        console.log(`  ${current.symbol}: Reversal allowed during cooldown (${previous.lastSignal} → ${current.signal})`);
         return { action: "new_entry" };
       }
       return { action: "cooldown" };
@@ -1140,7 +1165,7 @@ async function processActivePosition(symbol, r, previous, now, decision, mode = 
       // CRITICAL: Cannot fetch price - send emergency alert
       console.error(`  ${symbol}: CANNOT FETCH PRICE - Emergency alert sent`);
       await sendTelegram(
-        `ðŸš¨ <b>ØªÙ†Ø¨ÙŠÙ‡ Ø·ÙˆØ§Ø±Ø¦: ${symbol}</b>\nØ§Ù„Ø¨ÙˆØª Ù„Ø§ ÙŠÙ‚Ø¯Ø± ÙŠØ¬ÙŠØ¨ Ø§Ù„Ø³Ø¹Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ!\n\nØ§Ù„ØµÙÙ‚Ø©: ${pos.optionSymbol}\nØ§Ù„Ø¯Ø®ÙˆÙ„: $${pos.entryPremium}\nØ§Ù„ÙƒÙ…ÙŠØ©: ${pos.qty}\n\nâš ï¸ ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ ÙŠØ¯ÙˆÙŠØ§Ù‹ Ù…Ù† Alpaca`,
+        `🚨 <b>تنبيه طوارئ: ${symbol}</b>\nالبوت لا يقدر يجيب السعر الحالي!\n\nالصفقة: ${pos.optionSymbol}\nالدخول: $${pos.entryPremium}\nالكمية: ${pos.qty}\n\n⚠️ يرجى التحقق يدوياً من Alpaca`,
         pos.entryMessageId
       );
       return previous;
@@ -1194,7 +1219,7 @@ async function processActivePosition(symbol, r, previous, now, decision, mode = 
   let newStopOrderId = pos.stopOrderId;
   const stopDiff = Math.abs(currentStop - (previous.currentStop || 0));
   if (stopDiff > 0.01 && pos.stopOrderId) {
-    console.log(`  ${symbol}: Stop changed $${previous.currentStop?.toFixed(2)} â†’ $${currentStop.toFixed(2)}, updating Alpaca...`);
+    console.log(`  ${symbol}: Stop changed $${previous.currentStop?.toFixed(2)} → $${currentStop.toFixed(2)}, updating Alpaca...`);
     const newId = await updateStopLoss(pos, currentStop);
     if (newId) newStopOrderId = newId;
   } else if (currentPhase === "trailing" && peakPremium > (previous.peakPremium || 0)) {
@@ -1334,7 +1359,7 @@ async function executeEntry(symbol, r, account, now) {
     console.log(`  ${symbol}: BUY order placed - ${contract.symbol} x${qty} @ ~$${entryPremium}`);
   } catch (e) {
     console.error(`  ${symbol}: BUY failed: ${e.message}`);
-    await sendTelegram(`âš ï¸ <b>${symbol}: ÙØ´Ù„ ØªÙ†ÙÙŠØ° ${r.signal}</b>\n${e.message.substring(0, 100)}`);
+    await sendTelegram(`⚠️ <b>${symbol}: فشل تنفيذ ${r.signal}</b>\n${e.message.substring(0, 100)}`);
     return null;
   }
 
@@ -1416,7 +1441,7 @@ async function main() {
           const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
           const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
 
-          console.log(`ðŸ”„ RECOVERING ${symbol} from Alpaca: ${pos.symbol} (entry $${entryPremium}, qty ${qty})`);
+          console.log(`🔄 RECOVERING ${symbol} from Alpaca: ${pos.symbol} (entry $${entryPremium}, qty ${qty})`);
 
           state[symbol] = {
             active: true,
