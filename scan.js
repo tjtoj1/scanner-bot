@@ -1616,20 +1616,26 @@ async function main() {
 
     // V16.14: Strategy Analysis to PRIVATE chat (not channel)
     try {
-      const analysisMsg = await analyzeStrategy(newState);
+      let analysisMsg = await analyzeStrategy(newState);
+      // V16.17: Strip HTML tags to avoid parse errors
+      analysisMsg = analysisMsg.replace(/<\/?b>/g, "").replace(/<\/?i>/g, "");
       const personalChatId = "810642442"; // Personal chat, NOT channel
       const tgToken = process.env.TG_TOKEN;
       if (tgToken) {
-        await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+        const resp = await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_id: personalChatId,
             text: analysisMsg,
-            parse_mode: "HTML",
           }),
         });
-        console.log("Strategy analysis sent to private chat");
+        if (resp.ok) {
+          console.log("Strategy analysis sent to private chat");
+        } else {
+          const err = await resp.text();
+          console.error("Strategy analysis failed:", err);
+        }
       }
     } catch (e) {
       console.error("Failed to send strategy analysis:", e.message);
