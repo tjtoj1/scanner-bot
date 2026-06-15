@@ -163,14 +163,66 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781530580945,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 739.27,
+    "entryTime": 1781530847349,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260615C00740000",
+    "strike": "740",
+    "entryPremium": 2.28,
+    "qty": 4,
+    "orderId": "9dcb3fe4-cddd-472a-9539-d9dd0bb9b166",
+    "stopOrderId": "433ba90b-243e-4f58-aacc-cd1995102a4a",
+    "peakPremium": 2.28,
+    "currentStop": 1.8239999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1083
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781530761331,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 88,
+    "entryPrice": 209.54,
+    "entryTime": 1781530847349,
+    "setup": {
+      "name": "Overbought",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 25,
+      "bePct": 8,
+      "trailPct": 25,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "NVDA260615C00210000",
+    "strike": "210",
+    "entryPremium": 1.1,
+    "qty": 10,
+    "orderId": "dbb782d9-d600-4724-ac58-b6377e1cdb95",
+    "stopOrderId": "8831f5d5-cc40-4082-b157-3489a4230b96",
+    "peakPremium": 1.1,
+    "currentStop": 0.8250000000000001,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1084
   },
   "TSLA": {
     "active": false,
