@@ -66,6 +66,28 @@
       "strike": "210",
       "entryPrice": 209.86,
       "recovered": false
+    },
+    {
+      "symbol": "AMZN",
+      "signal": "CALL",
+      "entryPremium": 1.37,
+      "exitPremium": 1.07,
+      "qty": 8,
+      "pnl": -240.00000000000003,
+      "pnlPct": -21.897810218978105,
+      "reason": "loss",
+      "minutes": 1,
+      "entryTime": 1781530536318,
+      "exitTime": 1781530644628,
+      "entryScore": 95,
+      "setup": {
+        "name": "Order Flow",
+        "quality": "excellent",
+        "direction": "CALL"
+      },
+      "strike": "247.5",
+      "entryPrice": 247.11,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -168,13 +190,13 @@
     "entryPremium": 0.83,
     "qty": 13,
     "orderId": "5f126612-a9cb-4000-a84e-3baae78b3941",
-    "stopOrderId": "f9af985b-a07a-442e-8086-51368453d3dc",
-    "peakPremium": 0.83,
-    "currentStop": 0.664,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "stopOrderId": "1dc2563a-a9d9-4f6f-93fc-9946a0e5d2b8",
+    "peakPremium": 1.06,
+    "currentStop": 1.007,
+    "stopPhase": "trailing",
+    "breakEvenAnnounced": true,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 1076
   },
   "MSTR": {
@@ -183,34 +205,8 @@
     "lastSignal": "PUT"
   },
   "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 247.11,
-    "entryTime": 1781530536318,
-    "setup": {
-      "name": "Order Flow",
-      "quality": "excellent",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 21,
-      "bePct": 8,
-      "trailPct": 21,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "AMZN260615C00247500",
-    "strike": "247.5",
-    "entryPremium": 1.37,
-    "qty": 8,
-    "orderId": "7bdddb4d-b0a1-4ade-a7bb-9f62ea5030ce",
-    "stopOrderId": "67234a6d-ba67-4203-84dc-ab10c0551db3",
-    "peakPremium": 1.37,
-    "currentStop": 1.0823,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1077
+    "active": false,
+    "cooldownUntil": 1781531244628,
+    "lastSignal": "CALL"
   }
 }
