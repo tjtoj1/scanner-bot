@@ -217,9 +217,35 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781531298187,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 94,
+    "entryPrice": 413.5,
+    "entryTime": 1781531447623,
+    "setup": {
+      "name": "Momentum Up",
+      "quality": "fair",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 27,
+      "bePct": 9,
+      "trailPct": 27,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260615C00415000",
+    "strike": "415",
+    "entryPremium": 3.08,
+    "qty": 3,
+    "orderId": "38088c79-6918-43e4-b013-41e2d936e2bb",
+    "stopOrderId": "3a8b5eb0-5c41-45af-a646-8421c61c546d",
+    "peakPremium": 3.08,
+    "currentStop": 2.2484,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1088
   },
   "META": {
     "active": false,
@@ -227,9 +253,35 @@
     "lastSignal": "CALL"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781530879629,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 85,
+    "entryPrice": 295.5,
+    "entryTime": 1781531447623,
+    "setup": {
+      "name": "Breakout Up",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 22,
+      "bePct": 8,
+      "trailPct": 22,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260615C00297500",
+    "strike": "297.5",
+    "entryPremium": 0.44,
+    "qty": 25,
+    "orderId": "8104e8bd-3c70-4499-8c12-6fa0659b423f",
+    "stopOrderId": "ef7512a7-0399-4990-b83f-9cbe7aca74b8",
+    "peakPremium": 0.44,
+    "currentStop": 0.3432,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1089
   },
   "MSTR": {
     "active": false,
@@ -237,8 +289,34 @@
     "lastSignal": "PUT"
   },
   "AMZN": {
-    "active": false,
-    "cooldownUntil": 1781531244628,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 88,
+    "entryPrice": 246.98,
+    "entryTime": 1781531447623,
+    "setup": {
+      "name": "Overbought",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 25,
+      "bePct": 8,
+      "trailPct": 25,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AMZN260615C00247500",
+    "strike": "247.5",
+    "entryPremium": 1.02,
+    "qty": 10,
+    "orderId": "1afcdaf9-f59b-4c31-9016-28db0fa347d9",
+    "stopOrderId": "d1f28821-92c1-488c-9042-3fb4049ddadd",
+    "peakPremium": 1.02,
+    "currentStop": 0.765,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1090
   }
 }
