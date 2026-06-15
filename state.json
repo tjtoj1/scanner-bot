@@ -85,19 +85,97 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781288594177,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 88,
+    "entryPrice": 413.85,
+    "entryTime": 1781530536318,
+    "setup": {
+      "name": "Overbought",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 26,
+      "bePct": 9,
+      "trailPct": 26,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260615C00415000",
+    "strike": "415",
+    "entryPremium": 3.84,
+    "qty": 2,
+    "orderId": "f576eedd-0792-4f8e-a3d6-5b2581e77c28",
+    "stopOrderId": "fa32fab6-101d-4987-9422-75ada067c7eb",
+    "peakPremium": 3.84,
+    "currentStop": 2.8415999999999997,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1074
   },
   "META": {
-    "active": false,
-    "cooldownUntil": 1781290097335,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 587.47,
+    "entryTime": 1781530536318,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 22,
+      "bePct": 8,
+      "trailPct": 22,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "META260615C00590000",
+    "strike": "590",
+    "entryPremium": 3.38,
+    "qty": 3,
+    "orderId": "d1c13f61-495b-4b59-8190-843e6051a00a",
+    "stopOrderId": "e526838f-933e-4f07-a0f6-98a5e7753eca",
+    "peakPremium": 3.38,
+    "currentStop": 2.6364,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1075
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781290274530,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 293.81,
+    "entryTime": 1781530536318,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260615C00295000",
+    "strike": "295",
+    "entryPremium": 0.83,
+    "qty": 13,
+    "orderId": "5f126612-a9cb-4000-a84e-3baae78b3941",
+    "stopOrderId": "f9af985b-a07a-442e-8086-51368453d3dc",
+    "peakPremium": 0.83,
+    "currentStop": 0.664,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1076
   },
   "MSTR": {
     "active": false,
@@ -105,8 +183,34 @@
     "lastSignal": "PUT"
   },
   "AMZN": {
-    "active": false,
-    "cooldownUntil": 1781292019456,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 247.11,
+    "entryTime": 1781530536318,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 21,
+      "bePct": 8,
+      "trailPct": 21,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AMZN260615C00247500",
+    "strike": "247.5",
+    "entryPremium": 1.37,
+    "qty": 8,
+    "orderId": "7bdddb4d-b0a1-4ade-a7bb-9f62ea5030ce",
+    "stopOrderId": "67234a6d-ba67-4203-84dc-ab10c0551db3",
+    "peakPremium": 1.37,
+    "currentStop": 1.0823,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1077
   }
 }
