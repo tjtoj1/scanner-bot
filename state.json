@@ -300,9 +300,35 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781532980309,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 85,
+    "entryPrice": 209.09,
+    "entryTime": 1781533241849,
+    "setup": {
+      "name": "Momentum Up",
+      "quality": "fair",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 26,
+      "bePct": 9,
+      "trailPct": 26,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "NVDA260615C00210000",
+    "strike": "210",
+    "entryPremium": 0.69,
+    "qty": 15,
+    "orderId": "d1e74beb-687d-4c50-9ecb-7b8b5f7ae603",
+    "stopOrderId": "b3edf015-f333-4c34-9ea9-718b6c514485",
+    "peakPremium": 0.69,
+    "currentStop": 0.5105999999999999,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1102
   },
   "TSLA": {
     "active": false,
