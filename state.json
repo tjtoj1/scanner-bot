@@ -264,6 +264,28 @@
       "strike": "247.5",
       "entryPrice": 246.98,
       "recovered": false
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "entryPremium": 0.74,
+      "exitPremium": 0.58,
+      "qty": 14,
+      "pnl": -224.00000000000003,
+      "pnlPct": -21.621621621621625,
+      "reason": "loss",
+      "minutes": 10,
+      "entryTime": 1781531722093,
+      "exitTime": 1781532380309,
+      "entryScore": 85,
+      "setup": {
+        "name": "Momentum Up",
+        "quality": "fair",
+        "direction": "CALL"
+      },
+      "strike": "210",
+      "entryPrice": 209.13,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -278,35 +300,9 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 85,
-    "entryPrice": 209.13,
-    "entryTime": 1781531722093,
-    "setup": {
-      "name": "Momentum Up",
-      "quality": "fair",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 26,
-      "bePct": 9,
-      "trailPct": 26,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "NVDA260615C00210000",
-    "strike": "210",
-    "entryPremium": 0.74,
-    "qty": 14,
-    "orderId": "ec0b11b2-9af5-43e3-80f5-1ccd5d62929b",
-    "stopOrderId": "d9242889-1f61-447e-bcee-37409dab4333",
-    "peakPremium": 0.75,
-    "currentStop": 0.5476,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1092
+    "active": false,
+    "cooldownUntil": 1781532980309,
+    "lastSignal": "CALL"
   },
   "TSLA": {
     "active": false,
