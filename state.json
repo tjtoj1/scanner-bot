@@ -348,6 +348,28 @@
       "strike": "212.5",
       "entryPrice": 210.93,
       "recovered": false
+    },
+    {
+      "symbol": "META",
+      "signal": "CALL",
+      "entryPremium": 1.7,
+      "exitPremium": 1.31,
+      "qty": 6,
+      "pnl": -233.99999999999994,
+      "pnlPct": -22.941176470588232,
+      "reason": "loss",
+      "minutes": 4,
+      "entryTime": 1781537728194,
+      "exitTime": 1781538027146,
+      "entryScore": 95,
+      "setup": {
+        "name": "Breakout Up",
+        "quality": "excellent",
+        "direction": "CALL"
+      },
+      "strike": "600",
+      "entryPrice": 597.89,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -372,35 +394,9 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 597.89,
-    "entryTime": 1781537728194,
-    "setup": {
-      "name": "Breakout Up",
-      "quality": "excellent",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 20,
-      "bePct": 8,
-      "trailPct": 20,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "META260615C00600000",
-    "strike": "600",
-    "entryPremium": 1.7,
-    "qty": 6,
-    "orderId": "6825d126-cf11-47b4-abba-75e1f64fe0ac",
-    "stopOrderId": "71ec09ef-ac3d-4320-ae74-2dfaecf64eaf",
-    "peakPremium": 1.7,
-    "currentStop": 1.36,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1113
+    "active": false,
+    "cooldownUntil": 1781538627146,
+    "lastSignal": "CALL"
   },
   "AAPL": {
     "active": false,
