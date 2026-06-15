@@ -322,9 +322,31 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781533946150,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 210.71,
+    "entryTime": 1781535653950,
+    "setup": null,
+    "stopConfig": {
+      "stopPct": 27,
+      "bePct": 9,
+      "trailPct": 27,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "NVDA260615C00212500",
+    "strike": "212.5",
+    "entryPremium": 0.28,
+    "qty": 39,
+    "orderId": "b376c54a-9ab1-4e08-9a9e-6106e0d95f80",
+    "stopOrderId": "f1cc940c-3104-465c-9488-37054b94cfd9",
+    "peakPremium": 0.28,
+    "currentStop": 0.20440000000000003,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1104
   },
   "TSLA": {
     "active": false,
