@@ -439,9 +439,35 @@
     "lastSignal": "CALL"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781532080698,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 295.04,
+    "entryTime": 1781547944264,
+    "setup": {
+      "name": "VWAP Bounce Down",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260615P00295000",
+    "strike": "295",
+    "entryPremium": 0.42,
+    "qty": 26,
+    "orderId": "73df4d96-d8bb-4a4e-a252-de6cea66ed7f",
+    "stopOrderId": "e79e3e5b-0ed7-4ad1-99ca-010b760283b9",
+    "peakPremium": 0.42,
+    "currentStop": 0.336,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1122
   },
   "MSTR": {
     "active": false,
