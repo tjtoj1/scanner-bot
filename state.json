@@ -220,6 +220,28 @@
       "strike": "297.5",
       "entryPrice": 295.5,
       "recovered": false
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "entryPremium": 3.08,
+      "exitPremium": 2.24,
+      "qty": 3,
+      "pnl": -251.99999999999994,
+      "pnlPct": -27.272727272727266,
+      "reason": "loss",
+      "minutes": 4,
+      "entryTime": 1781531447623,
+      "exitTime": 1781531728020,
+      "entryScore": 94,
+      "setup": {
+        "name": "Momentum Up",
+        "quality": "fair",
+        "direction": "CALL"
+      },
+      "strike": "415",
+      "entryPrice": 413.5,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -234,40 +256,40 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781531657946,
-    "lastSignal": "CALL"
-  },
-  "TSLA": {
     "active": true,
     "signal": "CALL",
-    "entryScore": 94,
-    "entryPrice": 413.5,
-    "entryTime": 1781531447623,
+    "entryScore": 85,
+    "entryPrice": 209.13,
+    "entryTime": 1781531722093,
     "setup": {
       "name": "Momentum Up",
       "quality": "fair",
       "direction": "CALL"
     },
     "stopConfig": {
-      "stopPct": 27,
+      "stopPct": 26,
       "bePct": 9,
-      "trailPct": 27,
+      "trailPct": 26,
       "peakBufferPct": 5
     },
-    "optionSymbol": "TSLA260615C00415000",
-    "strike": "415",
-    "entryPremium": 3.08,
-    "qty": 3,
-    "orderId": "38088c79-6918-43e4-b013-41e2d936e2bb",
-    "stopOrderId": "3a8b5eb0-5c41-45af-a646-8421c61c546d",
-    "peakPremium": 3.08,
-    "currentStop": 2.2484,
+    "optionSymbol": "NVDA260615C00210000",
+    "strike": "210",
+    "entryPremium": 0.74,
+    "qty": 14,
+    "orderId": "ec0b11b2-9af5-43e3-80f5-1ccd5d62929b",
+    "stopOrderId": "d9242889-1f61-447e-bcee-37409dab4333",
+    "peakPremium": 0.74,
+    "currentStop": 0.5476,
     "stopPhase": "initial",
     "breakEvenAnnounced": false,
     "bufferAnnounced": false,
     "trailingAnnounced": false,
-    "entryMessageId": 1088
+    "entryMessageId": 1092
+  },
+  "TSLA": {
+    "active": false,
+    "cooldownUntil": 1781532328020,
+    "lastSignal": "CALL"
   },
   "META": {
     "active": false,
