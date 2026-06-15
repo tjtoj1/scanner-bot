@@ -431,8 +431,30 @@
     "lastSignal": "PUT"
   },
   "AMZN": {
-    "active": false,
-    "cooldownUntil": 1781532331277,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 83,
+    "entryPrice": 246.63,
+    "entryTime": 1781539241473,
+    "setup": null,
+    "stopConfig": {
+      "stopPct": 25,
+      "bePct": 8,
+      "trailPct": 25,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AMZN260615C00247500",
+    "strike": "247.5",
+    "entryPremium": 0.45,
+    "qty": 24,
+    "orderId": "fb047af9-2cba-46c0-8ab6-a466a5bc9c50",
+    "stopOrderId": "3903d040-b197-4830-b819-94f30b3ee5e2",
+    "peakPremium": 0.45,
+    "currentStop": 0.3375,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1120
   }
 }
