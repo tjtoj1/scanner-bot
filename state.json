@@ -384,9 +384,35 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781536639073,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 88,
+    "entryPrice": 212.43,
+    "entryTime": 1781538629446,
+    "setup": {
+      "name": "Overbought",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 23,
+      "bePct": 8,
+      "trailPct": 23,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "NVDA260615C00212500",
+    "strike": "212.5",
+    "entryPremium": 0.76,
+    "qty": 14,
+    "orderId": "33703392-340c-439f-a9a0-77b687069c69",
+    "stopOrderId": "20ba2c0d-a459-437b-9fa8-aed7cccac97d",
+    "peakPremium": 0.76,
+    "currentStop": 0.5852,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1116
   },
   "TSLA": {
     "active": false,
