@@ -308,6 +308,24 @@
       "strike": "210",
       "entryPrice": 209.09,
       "recovered": false
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "entryPremium": 0.28,
+      "exitPremium": 0.38,
+      "qty": 39,
+      "pnl": 389.9999999999999,
+      "pnlPct": 35.7142857142857,
+      "reason": "trailing",
+      "minutes": 6,
+      "entryTime": 1781535653950,
+      "exitTime": 1781536038344,
+      "entryScore": 83,
+      "setup": null,
+      "strike": "212.5",
+      "entryPrice": 210.71,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -322,31 +340,9 @@
     "lastSignal": "CALL"
   },
   "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 83,
-    "entryPrice": 210.71,
-    "entryTime": 1781535653950,
-    "setup": null,
-    "stopConfig": {
-      "stopPct": 27,
-      "bePct": 9,
-      "trailPct": 27,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "NVDA260615C00212500",
-    "strike": "212.5",
-    "entryPremium": 0.28,
-    "qty": 39,
-    "orderId": "b376c54a-9ab1-4e08-9a9e-6106e0d95f80",
-    "stopOrderId": "5c100eed-fe8d-489f-b8b5-830382d8f4e0",
-    "peakPremium": 0.4,
-    "currentStop": 0.38,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 1104
+    "active": false,
+    "cooldownUntil": 1781536158344,
+    "lastSignal": "CALL"
   },
   "TSLA": {
     "active": false,
