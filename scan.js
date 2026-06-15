@@ -340,6 +340,16 @@ async function analyzeTicker(symbol) {
     }
   }
 
+  // V16.18: SETUP-SIGNAL MISMATCH - block trades where setup direction contradicts signal
+  // Example: Overbought (PUT direction) but signal CALL → contradiction → block
+  if (signal !== "NEUTRAL" && setup && setup.direction && setup.direction !== signal) {
+    const originalSignal = signal;
+    console.log(`  ${symbol}: ${signal} BLOCKED - setup "${setup.name}" direction is ${setup.direction}, contradicts signal`);
+    signal = "NEUTRAL";
+    score = 0;
+    reasons = [`Setup mismatch: ${setup.name} → ${setup.direction} vs ${originalSignal}`];
+  }
+
 
   // V16.10: TREND FILTER - Block signals against strong trend
   // Check 4 indicators on 5m: price vs SMA20, SMA50, VWAP, and SMA20 vs SMA50
@@ -1547,6 +1557,10 @@ async function main() {
     console.log(`Using state count (Alpaca fetch failed): ${activeCount}`);
   }
 
+  // V16.18: Limit entries PER SCAN (prevents multi-loss from one bad market move)
+  let entriesThisScan = 0;
+  const MAX_ENTRIES_PER_SCAN = 2;
+
   // Process each ticker
   for (const r of results) {
     if (r.error) {
@@ -1566,10 +1580,19 @@ async function main() {
         if (previous) newState[r.symbol] = previous;
         continue;
       }
+
+      // V16.18: Max 2 entries per scan (unless score is 90%+)
+      if (entriesThisScan >= MAX_ENTRIES_PER_SCAN && r.score < 90) {
+        console.log(`  ${r.symbol}: Already ${entriesThisScan} entries this scan, score ${r.score}% < 90% - skipping`);
+        if (previous) newState[r.symbol] = previous;
+        continue;
+      }
+
       const newPos = await executeEntry(r.symbol, r, account, now);
       if (newPos) {
         newState[r.symbol] = newPos;
         activeCount++;
+        entriesThisScan++;
       } else if (previous) {
         newState[r.symbol] = previous;
       }
