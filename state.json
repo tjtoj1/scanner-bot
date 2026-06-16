@@ -518,7 +518,7 @@
       "recovered": false
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "SPY": {
     "active": false,
     "cooldownUntil": 1781638289129,
