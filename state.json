@@ -1,6 +1,29 @@
 {
   "_date": "2026-06-16",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "entryPremium": 2.39,
+      "exitPremium": 2.37,
+      "qty": 4,
+      "pnl": -8.000000000000007,
+      "pnlPct": -0.836820083682009,
+      "reason": "breakeven",
+      "minutes": 4,
+      "entryTime": 1781616649359,
+      "exitTime": 1781616924027,
+      "entryScore": 82,
+      "setup": {
+        "name": "VWAP Bounce Down",
+        "quality": "good",
+        "direction": "PUT"
+      },
+      "strike": "741",
+      "entryPrice": 742.28,
+      "recovered": false
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": false,
@@ -8,35 +31,9 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 82,
-    "entryPrice": 742.28,
-    "entryTime": 1781616649359,
-    "setup": {
-      "name": "VWAP Bounce Down",
-      "quality": "good",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 24,
-      "bePct": 8,
-      "trailPct": 24,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "QQQ260616P00741000",
-    "strike": "741",
-    "entryPremium": 2.39,
-    "qty": 4,
-    "orderId": "b8757b2f-0c30-4f7e-b646-a857e60aa389",
-    "stopOrderId": "c37c2031-a68d-4494-ab1e-e0fcdc88ffc2",
-    "peakPremium": 2.73,
-    "currentStop": 2.39,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1128
+    "active": false,
+    "cooldownUntil": 1781617224027,
+    "lastSignal": "PUT"
   },
   "NVDA": {
     "active": false,
