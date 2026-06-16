@@ -75,9 +75,35 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781619326125,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 94,
+    "entryPrice": 740.2,
+    "entryTime": 1781619648706,
+    "setup": {
+      "name": "Momentum Down",
+      "quality": "fair",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 21,
+      "bePct": 8,
+      "trailPct": 21,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260616P00739000",
+    "strike": "739",
+    "entryPremium": 1.59,
+    "qty": 6,
+    "orderId": "50829b79-b367-434d-b897-7dc9db43ce84",
+    "stopOrderId": "31a8d1ad-71f7-4702-a569-9686b896113a",
+    "peakPremium": 1.59,
+    "currentStop": 1.2561000000000002,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1137
   },
   "NVDA": {
     "active": false,
