@@ -406,39 +406,35 @@
       "strike": "751",
       "entryPrice": 751.99,
       "recovered": false
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "entryPremium": 0.39,
+      "exitPremium": 0.38,
+      "qty": 27,
+      "pnl": -27.000000000000025,
+      "pnlPct": -2.5641025641025665,
+      "reason": "breakeven",
+      "minutes": 1,
+      "entryTime": 1781631941764,
+      "exitTime": 1781632041372,
+      "entryScore": 92,
+      "setup": {
+        "name": "VWAP Bounce Down",
+        "quality": "good",
+        "direction": "PUT"
+      },
+      "strike": "751",
+      "entryPrice": 752.12,
+      "recovered": false
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 92,
-    "entryPrice": 752.12,
-    "entryTime": 1781631941764,
-    "setup": {
-      "name": "VWAP Bounce Down",
-      "quality": "good",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 20,
-      "bePct": 8,
-      "trailPct": 20,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "SPY260616P00751000",
-    "strike": "751",
-    "entryPremium": 0.39,
-    "qty": 27,
-    "orderId": "7834b33a-90c2-4fd5-8c0f-da89b4790c25",
-    "stopOrderId": "1f70062d-d280-4e13-9b77-5dcdfeeb3094",
-    "peakPremium": 0.46,
-    "currentStop": 0.39,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1192
+    "active": false,
+    "cooldownUntil": 1781632341372,
+    "lastSignal": "PUT"
   },
   "QQQ": {
     "active": false,
