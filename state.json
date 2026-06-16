@@ -366,9 +366,35 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781625685516,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 87,
+    "entryPrice": 752.18,
+    "entryTime": 1781630448517,
+    "setup": {
+      "name": "VWAP Bounce Down",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 21,
+      "bePct": 8,
+      "trailPct": 21,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "SPY260616P00751000",
+    "strike": "751",
+    "entryPremium": 0.42,
+    "qty": 25,
+    "orderId": "d017e12c-b3d4-4b93-9ac3-05d5e5af3c78",
+    "stopOrderId": "f9fa7846-9fe8-4140-b3b3-1ec9ca694339",
+    "peakPremium": 0.42,
+    "currentStop": 0.3318,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1183
   },
   "QQQ": {
     "active": false,
