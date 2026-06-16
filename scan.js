@@ -1433,8 +1433,8 @@ async function main() {
   const state = loadState();
   const now = Date.now();
 
-  // V16.13: POSITION RECOVERY - Sync state with Alpaca
-  // Any position in Alpaca but missing from state gets added so Monitor tracks it
+  // V16.20: FORCE CLOSE ORPHAN POSITIONS - Don't recover stale positions
+  // Positions in Alpaca but not in state are from previous days = force close immediately
   try {
     const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
     if (Array.isArray(alpacaPositions)) {
@@ -1445,39 +1445,18 @@ async function main() {
         if (!TICKERS.includes(symbol)) continue;
 
         if (!state[symbol] || !state[symbol].active) {
-          const isCall = pos.symbol.includes("C0");
-          const entryPremium = parseFloat(pos.avg_entry_price);
-          const qty = parseInt(pos.qty);
-          const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
-          const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
-
-          console.log(`🔄 RECOVERING ${symbol} from Alpaca: ${pos.symbol} (entry $${entryPremium}, qty ${qty})`);
-
-          state[symbol] = {
-            active: true,
-            signal: isCall ? "CALL" : "PUT",
-            entryScore: 80,
-            entryPrice: 0,
-            entryTime: Date.now() - (30 * 60 * 1000),
-            optionSymbol: pos.symbol,
-            strike: strike ? String(strike) : null,
-            entryPremium: entryPremium,
-            qty: qty,
-            orderId: null,
-            stopOrderId: null,
-            peakPremium: entryPremium,
-            currentStop: parseFloat((entryPremium * 0.7).toFixed(2)),
-            stopPhase: "initial",
-            breakEvenAnnounced: false,
-            trailingAnnounced: false,
-            entryMessageId: null,
-            recovered: true,
-          };
+          console.log(`🚨 ORPHAN ${symbol} detected: ${pos.symbol} - FORCE CLOSING (stale position)`);
+          try {
+            await closePosition(pos.symbol);
+            await sendTelegram(`⚠️ <b>${symbol}</b>: تم إغلاق صفقة يتيمة من اليوم السابق\n📋 ${pos.symbol}`);
+          } catch (e) {
+            console.error(`Failed to close orphan ${symbol}:`, e.message);
+          }
         }
       }
     }
   } catch (e) {
-    console.error("Position recovery failed:", e.message);
+    console.error("Orphan check failed:", e.message);
   }
 
   // MONITOR MODE: only check active positions, no scanning
@@ -1561,6 +1540,14 @@ async function main() {
   let entriesThisScan = 0;
   const MAX_ENTRIES_PER_SCAN = 2;
 
+  // V16.20: Correlated pairs - block second entry of same pair in same scan
+  // SPY+QQQ both broad tech ETFs (95% correlated), one move = both move
+  const CORRELATED_PAIRS = {
+    "SPY": "QQQ",
+    "QQQ": "SPY",
+  };
+  const enteredThisScan = new Set();
+
   // Process each ticker
   for (const r of results) {
     if (r.error) {
@@ -1588,11 +1575,20 @@ async function main() {
         continue;
       }
 
+      // V16.20: Correlated pair block - if pair already entered, skip
+      const pair = CORRELATED_PAIRS[r.symbol];
+      if (pair && enteredThisScan.has(pair)) {
+        console.log(`  ${r.symbol}: BLOCKED - correlated pair ${pair} already entered this scan`);
+        if (previous) newState[r.symbol] = previous;
+        continue;
+      }
+
       const newPos = await executeEntry(r.symbol, r, account, now);
       if (newPos) {
         newState[r.symbol] = newPos;
         activeCount++;
         entriesThisScan++;
+        enteredThisScan.add(r.symbol);
       } else if (previous) {
         newState[r.symbol] = previous;
       }
@@ -1659,6 +1655,29 @@ async function main() {
           const err = await resp.text();
           console.error("Strategy analysis failed:", err);
         }
+      }
+
+      // V16.19: Send state.json as document to private chat for deep AI analysis
+      try {
+        const stateJson = JSON.stringify(newState, null, 2);
+        const today = new Date().toISOString().split("T")[0];
+        const formData = new FormData();
+        formData.append("chat_id", personalChatId);
+        formData.append("caption", `📋 state.json - ${today}\nانسخه لـ Claude للتحليل العميق`);
+        formData.append("document", new Blob([stateJson], { type: "application/json" }), `state-${today}.json`);
+
+        const docResp = await fetch(`https://api.telegram.org/bot${tgToken}/sendDocument`, {
+          method: "POST",
+          body: formData,
+        });
+        if (docResp.ok) {
+          console.log("state.json sent to private chat");
+        } else {
+          const err = await docResp.text();
+          console.error("state.json send failed:", err);
+        }
+      } catch (e) {
+        console.error("Failed to send state.json:", e.message);
       }
     } catch (e) {
       console.error("Failed to send strategy analysis:", e.message);
