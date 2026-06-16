@@ -212,14 +212,66 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781622985203,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 92,
+    "entryPrice": 752.88,
+    "entryTime": 1781623248947,
+    "setup": {
+      "name": "VWAP Bounce Down",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "SPY260616P00752000",
+    "strike": "752",
+    "entryPremium": 0.78,
+    "qty": 13,
+    "orderId": "4863a272-3c7b-4510-beca-a25cf92b1e56",
+    "stopOrderId": "18959bcf-5edc-4392-94f7-7465ba066d35",
+    "peakPremium": 0.78,
+    "currentStop": 0.6240000000000001,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1163
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781623232383,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 85,
+    "entryPrice": 736.98,
+    "entryTime": 1781623248947,
+    "setup": {
+      "name": "Momentum Down",
+      "quality": "fair",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 22,
+      "bePct": 8,
+      "trailPct": 22,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260616P00736000",
+    "strike": "736",
+    "entryPremium": 1.61,
+    "qty": 6,
+    "orderId": "58c77ebc-7810-4a73-aabe-647357c7461b",
+    "stopOrderId": "5170c4c8-67ef-4424-8119-b218033097c3",
+    "peakPremium": 1.61,
+    "currentStop": 1.2558,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1164
   },
   "NVDA": {
     "active": false,
