@@ -476,14 +476,66 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781637571045,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 751.01,
+    "entryTime": 1781637639932,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "SPY260616P00750000",
+    "strike": "750",
+    "entryPremium": 0.29,
+    "qty": 37,
+    "orderId": "f81caa22-2dfc-46bc-adf1-9c645f4d71fc",
+    "stopOrderId": "365d71f0-6455-4bba-94a7-6f2477424c99",
+    "peakPremium": 0.29,
+    "currentStop": 0.23199999999999998,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1202
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781637571441,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 732.25,
+    "entryTime": 1781637639932,
+    "setup": {
+      "name": "Breakout Down",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260616P00731000",
+    "strike": "731",
+    "entryPremium": 0.35,
+    "qty": 31,
+    "orderId": "e3e72d83-15da-4636-9bbc-9e1bd5366658",
+    "stopOrderId": "9ea7b8a6-70c0-4b32-a9f3-fed3df561ca7",
+    "peakPremium": 0.35,
+    "currentStop": 0.27999999999999997,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1203
   },
   "NVDA": {
     "active": false,
