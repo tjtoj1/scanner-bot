@@ -53,9 +53,35 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781618006170,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 742.19,
+    "entryTime": 1781618454337,
+    "setup": {
+      "name": "VWAP Bounce Down",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260616P00741000",
+    "strike": "741",
+    "entryPremium": 1.64,
+    "qty": 6,
+    "orderId": "ed21f990-b2b6-4ff2-ac4c-e26c349e0ee0",
+    "stopOrderId": "7e45f9b6-bae0-43de-8f19-35b24e97d560",
+    "peakPremium": 1.64,
+    "currentStop": 1.312,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1134
   },
   "NVDA": {
     "active": false,
