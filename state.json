@@ -296,39 +296,35 @@
       "strike": "735",
       "entryPrice": 736.45,
       "recovered": false
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "entryPremium": 0.71,
+      "exitPremium": 0.56,
+      "qty": 15,
+      "pnl": -224.99999999999986,
+      "pnlPct": -21.12676056338027,
+      "reason": "loss",
+      "minutes": 0,
+      "entryTime": 1781625039742,
+      "exitTime": 1781625085516,
+      "entryScore": 85,
+      "setup": {
+        "name": "Momentum Down",
+        "quality": "fair",
+        "direction": "PUT"
+      },
+      "strike": "751",
+      "entryPrice": 752.21,
+      "recovered": false
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 85,
-    "entryPrice": 752.21,
-    "entryTime": 1781625039742,
-    "setup": {
-      "name": "Momentum Down",
-      "quality": "fair",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 21,
-      "bePct": 8,
-      "trailPct": 21,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "SPY260616P00751000",
-    "strike": "751",
-    "entryPremium": 0.71,
-    "qty": 15,
-    "orderId": "b7a6cf64-1d18-465e-be78-53c17cc7ff47",
-    "stopOrderId": "fc466b23-2655-40fc-80af-ed61175406d6",
-    "peakPremium": 0.71,
-    "currentStop": 0.5609,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1174
+    "active": false,
+    "cooldownUntil": 1781625685516,
+    "lastSignal": "PUT"
   },
   "QQQ": {
     "active": true,
