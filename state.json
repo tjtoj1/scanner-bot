@@ -264,6 +264,28 @@
       "strike": "748",
       "entryPrice": 749.43,
       "recovered": false
+    },
+    {
+      "symbol": "TSLA",
+      "signal": "PUT",
+      "entryPremium": 2.14,
+      "exitPremium": 2.09,
+      "qty": 5,
+      "pnl": -25.000000000000135,
+      "pnlPct": -2.3364485981308536,
+      "reason": "breakeven",
+      "minutes": 3,
+      "entryTime": 1781707838857,
+      "exitTime": 1781708069128,
+      "entryScore": 94,
+      "setup": {
+        "name": "Momentum Down",
+        "quality": "fair",
+        "direction": "PUT"
+      },
+      "strike": "397.5",
+      "entryPrice": 399.1,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -283,35 +305,9 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 94,
-    "entryPrice": 399.1,
-    "entryTime": 1781707838857,
-    "setup": {
-      "name": "Momentum Down",
-      "quality": "fair",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 24,
-      "bePct": 8,
-      "trailPct": 24,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "TSLA260617P00397500",
-    "strike": "397.5",
-    "entryPremium": 2.14,
-    "qty": 5,
-    "orderId": "d95f86ac-38da-48b4-8513-22f62414db26",
-    "stopOrderId": "4fb57811-c529-4f9a-a07d-3a52c4437767",
-    "peakPremium": 2.48,
-    "currentStop": 2.14,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1248
+    "active": false,
+    "cooldownUntil": 1781708369128,
+    "lastSignal": "PUT"
   },
   "META": {
     "active": false,
@@ -340,11 +336,11 @@
     "entryPremium": 0.52,
     "qty": 21,
     "orderId": "c30fb1e0-53fe-4eea-a8a9-1461d4c473d1",
-    "stopOrderId": "de53d6ca-453d-4536-9878-3d6eca09d689",
-    "peakPremium": 0.52,
-    "currentStop": 0.41080000000000005,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
+    "stopOrderId": "72e45b3a-662f-41e0-b280-3481292142e6",
+    "peakPremium": 0.58,
+    "currentStop": 0.52,
+    "stopPhase": "breakeven",
+    "breakEvenAnnounced": true,
     "bufferAnnounced": false,
     "trailingAnnounced": false,
     "entryMessageId": 1249
