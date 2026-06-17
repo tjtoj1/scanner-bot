@@ -107,9 +107,35 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781532328020,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 85,
+    "entryPrice": 402.22,
+    "entryTime": 1781703635666,
+    "setup": {
+      "name": "Momentum Down",
+      "quality": "fair",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 24,
+      "bePct": 8,
+      "trailPct": 24,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260617P00400000",
+    "strike": "400",
+    "entryPremium": 2.51,
+    "qty": 4,
+    "orderId": "db85f403-23ed-46a8-ad1f-172d4ebed5d9",
+    "stopOrderId": "2fdca0f4-80a9-4fd9-bc50-891834f6a36c",
+    "peakPremium": 2.51,
+    "currentStop": 1.9076,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1218
   },
   "META": {
     "active": false,
