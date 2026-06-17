@@ -440,6 +440,28 @@
       "strike": "295",
       "entryPrice": 297.3,
       "recovered": false
+    },
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 0.46,
+      "exitPremium": 0.44,
+      "qty": 23,
+      "pnl": -46.00000000000004,
+      "pnlPct": -4.347826086956525,
+      "reason": "breakeven",
+      "minutes": 20,
+      "entryTime": 1781710549330,
+      "exitTime": 1781711780827,
+      "entryScore": 85,
+      "setup": {
+        "name": "Momentum Down",
+        "quality": "fair",
+        "direction": "PUT"
+      },
+      "strike": "205",
+      "entryPrice": 206.4,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -480,35 +502,9 @@
     "entryMessageId": 1279
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 85,
-    "entryPrice": 206.4,
-    "entryTime": 1781710549330,
-    "setup": {
-      "name": "Momentum Down",
-      "quality": "fair",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 24,
-      "bePct": 8,
-      "trailPct": 24,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "NVDA260617P00205000",
-    "strike": "205",
-    "entryPremium": 0.46,
-    "qty": 23,
-    "orderId": "c6ad1dab-3dc9-4583-989a-a11aa973b797",
-    "stopOrderId": "4f1d17e2-1a6f-422d-9efc-0a6ef49898c2",
-    "peakPremium": 0.5,
-    "currentStop": 0.46,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1276
+    "active": false,
+    "cooldownUntil": 1781712080827,
+    "lastSignal": "PUT"
   },
   "TSLA": {
     "active": false,
