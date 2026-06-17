@@ -604,6 +604,21 @@ function isBeforeNoEntryTime(now) {
   return utcMin < 19 * 60 + 30;
 }
 
+// V16.21: FOMC / High-Impact Event Days - stop trading early
+function isFomcDay(now) {
+  const FOMC_DATES_2026 = ["2026-06-17", "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"];
+  const d = now ? new Date(now) : new Date();
+  const dateStr = d.toISOString().split("T")[0];
+  return FOMC_DATES_2026.includes(dateStr);
+}
+
+function isBeforeFomcCutoff(now) {
+  // On FOMC days, no new entries after 12:30 PM CDT = 17:30 UTC
+  const d = now ? new Date(now) : new Date();
+  const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
+  return utcMin < 17 * 60 + 30;
+}
+
 function isReportTime(now) {
   // 3:00 PM CDT = 20:00 UTC, fire once
   const d = now ? new Date(now) : new Date();
@@ -1111,6 +1126,9 @@ function decideAction(current, previous, now) {
       }
       return { action: "cooldown" };
     }
+    if (isFomcDay(now) && !isBeforeFomcCutoff(now)) {
+      return { action: "fomc_cutoff" };
+    }
     if (!isBeforeNoEntryTime(now)) {
       return { action: "no_entry_time" };
     }
@@ -1595,6 +1613,10 @@ async function main() {
     }
     else if (decision.action === "no_entry_time") {
       console.log(`  ${r.symbol}: No new entries after 2:30 PM`);
+      if (previous) newState[r.symbol] = previous;
+    }
+    else if (decision.action === "fomc_cutoff") {
+      console.log(`  ${r.symbol}: 🏦 FOMC DAY - No new entries after 12:30 PM CDT`);
       if (previous) newState[r.symbol] = previous;
     }
     else if (decision.action === "duplicate") {
