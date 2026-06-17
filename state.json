@@ -617,9 +617,35 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781708369128,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 403.61,
+    "entryTime": 1781715330602,
+    "setup": {
+      "name": "VWAP Bounce Up",
+      "quality": "good",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260617C00405000",
+    "strike": "405",
+    "entryPremium": 1.69,
+    "qty": 6,
+    "orderId": "36fc811f-1e88-41d7-ae97-a74b77f213af",
+    "stopOrderId": "3f53c259-56df-46de-8d73-98043e73a723",
+    "peakPremium": 1.69,
+    "currentStop": 1.352,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1318
   },
   "META": {
     "active": false,
