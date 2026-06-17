@@ -114,9 +114,35 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781638289129,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 750.04,
+    "entryTime": 1781704847087,
+    "setup": {
+      "name": "Breakout Down",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "SPY260617P00749000",
+    "strike": "749",
+    "entryPremium": 1.91,
+    "qty": 5,
+    "orderId": "69f72c4f-482e-4e32-9a09-2ada6afd269d",
+    "stopOrderId": "ed0e6b6d-58f9-465a-be72-44b0a67d90eb",
+    "peakPremium": 1.91,
+    "currentStop": 1.528,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1225
   },
   "QQQ": {
     "active": false,
@@ -129,9 +155,35 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781704829963,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 398.9,
+    "entryTime": 1781704847087,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 22,
+      "bePct": 8,
+      "trailPct": 22,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260617P00397500",
+    "strike": "397.5",
+    "entryPremium": 2.44,
+    "qty": 4,
+    "orderId": "5df9e222-2955-46eb-aaa8-52332886d39e",
+    "stopOrderId": "7add6937-9d52-48a8-92f6-0fda2497c9d9",
+    "peakPremium": 2.44,
+    "currentStop": 1.9032,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1226
   },
   "META": {
     "active": false,
