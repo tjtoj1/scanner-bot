@@ -22,6 +22,28 @@
       "strike": "207.5",
       "entryPrice": 208.19,
       "recovered": false
+    },
+    {
+      "symbol": "AMZN",
+      "signal": "PUT",
+      "entryPremium": 1.32,
+      "exitPremium": 1.7,
+      "qty": 8,
+      "pnl": 303.9999999999999,
+      "pnlPct": 28.78787878787878,
+      "reason": "trailing",
+      "minutes": 3,
+      "entryTime": 1781703044723,
+      "exitTime": 1781703259242,
+      "entryScore": 85,
+      "setup": {
+        "name": "Breakout Down",
+        "quality": "excellent",
+        "direction": "PUT"
+      },
+      "strike": "245",
+      "entryPrice": 245.72,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -61,34 +83,8 @@
     "lastSignal": "PUT"
   },
   "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 85,
-    "entryPrice": 245.72,
-    "entryTime": 1781703044723,
-    "setup": {
-      "name": "Breakout Down",
-      "quality": "excellent",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 22,
-      "bePct": 8,
-      "trailPct": 22,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "AMZN260617P00245000",
-    "strike": "245",
-    "entryPremium": 1.32,
-    "qty": 8,
-    "orderId": "1b46f2db-37a5-4f0f-ac7f-5d417e468661",
-    "stopOrderId": "2caccf6c-4372-48bb-9605-a8b1ecd5565e",
-    "peakPremium": 1.8,
-    "currentStop": 1.71,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 1208
+    "active": false,
+    "cooldownUntil": 1781703379242,
+    "lastSignal": "PUT"
   }
 }
