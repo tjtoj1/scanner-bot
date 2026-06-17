@@ -244,7 +244,7 @@
     "qty": 4,
     "orderId": "c6c68031-b161-4eb2-85fe-7f29e6e7cd84",
     "stopOrderId": "42f3d40f-10d6-4e4d-83bc-ffff43535bfe",
-    "peakPremium": 2.74,
+    "peakPremium": 2.82,
     "currentStop": 2.3,
     "stopPhase": "breakeven",
     "breakEvenAnnounced": true,
