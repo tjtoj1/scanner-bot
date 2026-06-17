@@ -110,6 +110,28 @@
       "strike": "400",
       "entryPrice": 402.22,
       "recovered": false
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 1.44,
+      "exitPremium": 1.09,
+      "qty": 7,
+      "pnl": -244.99999999999994,
+      "pnlPct": -24.305555555555546,
+      "reason": "loss",
+      "minutes": 6,
+      "entryTime": 1781704540027,
+      "exitTime": 1781704949999,
+      "entryScore": 85,
+      "setup": {
+        "name": "Momentum Up",
+        "quality": "fair",
+        "direction": "CALL"
+      },
+      "strike": "300",
+      "entryPrice": 300.47,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -135,11 +157,11 @@
     "entryPremium": 1.91,
     "qty": 5,
     "orderId": "69f72c4f-482e-4e32-9a09-2ada6afd269d",
-    "stopOrderId": "ed0e6b6d-58f9-465a-be72-44b0a67d90eb",
-    "peakPremium": 1.93,
-    "currentStop": 1.528,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
+    "stopOrderId": "ae96813e-0a6e-41cd-89ae-518ab48e8201",
+    "peakPremium": 2.07,
+    "currentStop": 1.91,
+    "stopPhase": "breakeven",
+    "breakEvenAnnounced": true,
     "bufferAnnounced": false,
     "trailingAnnounced": false,
     "entryMessageId": 1225
@@ -191,35 +213,9 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 85,
-    "entryPrice": 300.47,
-    "entryTime": 1781704540027,
-    "setup": {
-      "name": "Momentum Up",
-      "quality": "fair",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 23,
-      "bePct": 8,
-      "trailPct": 23,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "AAPL260617C00300000",
-    "strike": "300",
-    "entryPremium": 1.44,
-    "qty": 7,
-    "orderId": "f908f288-e6ba-46ff-ace9-c2224fc3eda1",
-    "stopOrderId": "1d9b92b9-e2bb-47b1-bd12-6739a892f30f",
-    "peakPremium": 1.48,
-    "currentStop": 1.1088,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1222
+    "active": false,
+    "cooldownUntil": 1781705549999,
+    "lastSignal": "CALL"
   },
   "MSTR": {
     "active": false,
