@@ -44,6 +44,28 @@
       "strike": "245",
       "entryPrice": 245.72,
       "recovered": false
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 3.03,
+      "exitPremium": 2.36,
+      "qty": 3,
+      "pnl": -200.99999999999997,
+      "pnlPct": -22.11221122112211,
+      "reason": "loss",
+      "minutes": 0,
+      "entryTime": 1781703328697,
+      "exitTime": 1781703382221,
+      "entryScore": 95,
+      "setup": {
+        "name": "Breakout Down",
+        "quality": "excellent",
+        "direction": "PUT"
+      },
+      "strike": "587.5",
+      "entryPrice": 590.06,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -68,35 +90,9 @@
     "lastSignal": "CALL"
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 590.06,
-    "entryTime": 1781703328697,
-    "setup": {
-      "name": "Breakout Down",
-      "quality": "excellent",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 21,
-      "bePct": 8,
-      "trailPct": 21,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "META260617P00587500",
-    "strike": "587.5",
-    "entryPremium": 3.03,
-    "qty": 3,
-    "orderId": "c283f34b-17b0-48d1-a298-80955fd0d57d",
-    "stopOrderId": "69c1d553-e0cf-4be5-9744-91bbbbca078a",
-    "peakPremium": 3.03,
-    "currentStop": 2.3937,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1213
+    "active": false,
+    "cooldownUntil": 1781703982221,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": true,
@@ -120,11 +116,11 @@
     "entryPremium": 1.51,
     "qty": 7,
     "orderId": "274ad24e-11f1-40c8-b389-4d9c4f991786",
-    "stopOrderId": "38b9cbbc-0f52-4edd-b5ed-bff9de49ed03",
-    "peakPremium": 1.51,
-    "currentStop": 1.2080000000000002,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
+    "stopOrderId": "408a3537-87e9-4628-803b-2fc32b9c48f0",
+    "peakPremium": 1.64,
+    "currentStop": 1.51,
+    "stopPhase": "breakeven",
+    "breakEvenAnnounced": true,
     "bufferAnnounced": false,
     "trailingAnnounced": false,
     "entryMessageId": 1214
