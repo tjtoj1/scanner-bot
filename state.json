@@ -541,9 +541,35 @@
     "entryMessageId": 1304
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781713039121,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 92,
+    "entryPrice": 733.44,
+    "entryTime": 1781713545465,
+    "setup": {
+      "name": "VWAP Bounce Up",
+      "quality": "good",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260617C00734000",
+    "strike": "734",
+    "entryPremium": 2.72,
+    "qty": 4,
+    "orderId": "78876656-480e-4bae-a5e9-a99e9440c8ae",
+    "stopOrderId": "15978a0e-d319-4638-bc44-7f8070382287",
+    "peakPremium": 2.72,
+    "currentStop": 2.176,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1306
   },
   "NVDA": {
     "active": false,
