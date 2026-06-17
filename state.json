@@ -249,9 +249,35 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781706446962,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 85,
+    "entryPrice": 300.34,
+    "entryTime": 1781706644576,
+    "setup": {
+      "name": "Momentum Up",
+      "quality": "fair",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 24,
+      "bePct": 8,
+      "trailPct": 24,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260617C00300000",
+    "strike": "300",
+    "entryPremium": 1.21,
+    "qty": 9,
+    "orderId": "36c34b47-b7c3-4a85-b156-b97d485ee30c",
+    "stopOrderId": "a5710494-443f-41f1-acac-7523e74bd796",
+    "peakPremium": 1.21,
+    "currentStop": 0.9196,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1245
   },
   "MSTR": {
     "active": false,
