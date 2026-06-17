@@ -1,6 +1,29 @@
 {
   "_date": "2026-06-17",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "entryPremium": 1.19,
+      "exitPremium": 1.16,
+      "qty": 9,
+      "pnl": -27.000000000000025,
+      "pnlPct": -2.521008403361347,
+      "reason": "breakeven",
+      "minutes": 1,
+      "entryTime": 1781703044723,
+      "exitTime": 1781703139770,
+      "entryScore": 85,
+      "setup": {
+        "name": "Momentum Down",
+        "quality": "fair",
+        "direction": "PUT"
+      },
+      "strike": "207.5",
+      "entryPrice": 208.19,
+      "recovered": false
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": false,
@@ -13,35 +36,9 @@
     "lastSignal": "PUT"
   },
   "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 85,
-    "entryPrice": 208.19,
-    "entryTime": 1781703044723,
-    "setup": {
-      "name": "Momentum Down",
-      "quality": "fair",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 23,
-      "bePct": 8,
-      "trailPct": 23,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "NVDA260617P00207500",
-    "strike": "207.5",
-    "entryPremium": 1.19,
-    "qty": 9,
-    "orderId": "4e5e3baa-3a3b-4068-97a0-7096c0df2917",
-    "stopOrderId": "e6a5fcd4-1925-462f-8a71-874ce136fa51",
-    "peakPremium": 1.3,
-    "currentStop": 1.19,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1207
+    "active": false,
+    "cooldownUntil": 1781703439770,
+    "lastSignal": "PUT"
   },
   "TSLA": {
     "active": false,
@@ -85,13 +82,13 @@
     "entryPremium": 1.32,
     "qty": 8,
     "orderId": "1b46f2db-37a5-4f0f-ac7f-5d417e468661",
-    "stopOrderId": "a15db321-8233-46f0-8b90-2970761bbbc6",
-    "peakPremium": 1.32,
-    "currentStop": 1.0296,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
+    "stopOrderId": "af873d99-67ad-4a90-b1c9-f3912b3c800b",
+    "peakPremium": 1.66,
+    "currentStop": 1.6104,
+    "stopPhase": "trailing",
+    "breakEvenAnnounced": true,
+    "bufferAnnounced": true,
+    "trailingAnnounced": true,
     "entryMessageId": 1208
   }
 }
