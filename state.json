@@ -312,9 +312,35 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781708601468,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 749.11,
+    "entryTime": 1781708747061,
+    "setup": {
+      "name": "VWAP Bounce Down",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "SPY260617P00748000",
+    "strike": "748",
+    "entryPremium": 1.96,
+    "qty": 5,
+    "orderId": "da0492c1-c939-49b5-9217-0373fd09b42a",
+    "stopOrderId": "513b0133-4a98-4a6c-a2dd-1d06fe727f84",
+    "peakPremium": 1.96,
+    "currentStop": 1.568,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1260
   },
   "QQQ": {
     "active": false,
@@ -337,9 +363,35 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781708666679,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 297.38,
+    "entryTime": 1781708747061,
+    "setup": {
+      "name": "Breakout Down",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260617P00295000",
+    "strike": "295",
+    "entryPremium": 0.37,
+    "qty": 29,
+    "orderId": "609e91bf-e799-4c2b-b0df-ccfadad143db",
+    "stopOrderId": "26e02ce2-c58e-404c-8f59-af28b63ebd50",
+    "peakPremium": 0.37,
+    "currentStop": 0.296,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1261
   },
   "MSTR": {
     "active": false,
