@@ -246,9 +246,35 @@
   ],
   "_reportSent": false,
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1781705300618,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 749.43,
+    "entryTime": 1781707838857,
+    "setup": {
+      "name": "Breakout Down",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "SPY260617P00748000",
+    "strike": "748",
+    "entryPremium": 1.95,
+    "qty": 5,
+    "orderId": "42af6a93-5c00-4036-88eb-8614ed0641ae",
+    "stopOrderId": "32a70123-3367-4fca-839d-036a1413bd9a",
+    "peakPremium": 1.95,
+    "currentStop": 1.56,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1247
   },
   "QQQ": {
     "active": false,
@@ -261,9 +287,35 @@
     "lastSignal": "PUT"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781705540272,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 94,
+    "entryPrice": 399.1,
+    "entryTime": 1781707838857,
+    "setup": {
+      "name": "Momentum Down",
+      "quality": "fair",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 24,
+      "bePct": 8,
+      "trailPct": 24,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260617P00397500",
+    "strike": "397.5",
+    "entryPremium": 2.14,
+    "qty": 5,
+    "orderId": "d95f86ac-38da-48b4-8513-22f62414db26",
+    "stopOrderId": "f7483c14-b314-4399-8eb0-e2bd90b5e445",
+    "peakPremium": 2.14,
+    "currentStop": 1.6264,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1248
   },
   "META": {
     "active": false,
@@ -271,9 +323,35 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781707400424,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 298.96,
+    "entryTime": 1781707838857,
+    "setup": {
+      "name": "VWAP Bounce Down",
+      "quality": "good",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 21,
+      "bePct": 8,
+      "trailPct": 21,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260617P00297500",
+    "strike": "297.5",
+    "entryPremium": 0.52,
+    "qty": 21,
+    "orderId": "c30fb1e0-53fe-4eea-a8a9-1461d4c473d1",
+    "stopOrderId": "de53d6ca-453d-4536-9878-3d6eca09d689",
+    "peakPremium": 0.52,
+    "currentStop": 0.41080000000000005,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1249
   },
   "MSTR": {
     "active": false,
