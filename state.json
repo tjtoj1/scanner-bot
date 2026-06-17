@@ -374,6 +374,28 @@
       "strike": "748",
       "entryPrice": 749.11,
       "recovered": false
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "PUT",
+      "entryPremium": 0.86,
+      "exitPremium": 1.02,
+      "qty": 12,
+      "pnl": 192.00000000000003,
+      "pnlPct": 18.6046511627907,
+      "reason": "trailing",
+      "minutes": 8,
+      "entryTime": 1781709643333,
+      "exitTime": 1781710169537,
+      "entryScore": 85,
+      "setup": {
+        "name": "Momentum Down",
+        "quality": "fair",
+        "direction": "PUT"
+      },
+      "strike": "297.5",
+      "entryPrice": 297.84,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -429,35 +451,9 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 85,
-    "entryPrice": 297.84,
-    "entryTime": 1781709643333,
-    "setup": {
-      "name": "Momentum Down",
-      "quality": "fair",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 23,
-      "bePct": 8,
-      "trailPct": 23,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "AAPL260617P00297500",
-    "strike": "297.5",
-    "entryPremium": 0.86,
-    "qty": 12,
-    "orderId": "f1849105-782b-4d04-bdd7-23149b34580e",
-    "stopOrderId": "ed333e9f-103a-4ed4-ace0-f07d22def450",
-    "peakPremium": 1.08,
-    "currentStop": 1.0578,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 1268
+    "active": false,
+    "cooldownUntil": 1781710289537,
+    "lastSignal": "PUT"
   },
   "MSTR": {
     "active": false,
