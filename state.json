@@ -286,6 +286,28 @@
       "strike": "397.5",
       "entryPrice": 399.1,
       "recovered": false
+    },
+    {
+      "symbol": "AAPL",
+      "signal": "PUT",
+      "entryPremium": 0.52,
+      "exitPremium": 0.7,
+      "qty": 21,
+      "pnl": 377.99999999999983,
+      "pnlPct": 34.615384615384606,
+      "reason": "trailing",
+      "minutes": 11,
+      "entryTime": 1781707838857,
+      "exitTime": 1781708546679,
+      "entryScore": 95,
+      "setup": {
+        "name": "VWAP Bounce Down",
+        "quality": "good",
+        "direction": "PUT"
+      },
+      "strike": "297.5",
+      "entryPrice": 298.96,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -315,35 +337,9 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 298.96,
-    "entryTime": 1781707838857,
-    "setup": {
-      "name": "VWAP Bounce Down",
-      "quality": "good",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 21,
-      "bePct": 8,
-      "trailPct": 21,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "AAPL260617P00297500",
-    "strike": "297.5",
-    "entryPremium": 0.52,
-    "qty": 21,
-    "orderId": "c30fb1e0-53fe-4eea-a8a9-1461d4c473d1",
-    "stopOrderId": "70ab5dfb-c97f-4849-b965-89fb47abb51e",
-    "peakPremium": 0.75,
-    "currentStop": 0.7124999999999999,
-    "stopPhase": "trailing",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": true,
-    "trailingAnnounced": true,
-    "entryMessageId": 1249
+    "active": false,
+    "cooldownUntil": 1781708666679,
+    "lastSignal": "PUT"
   },
   "MSTR": {
     "active": false,
