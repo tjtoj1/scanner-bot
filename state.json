@@ -330,6 +330,28 @@
       "strike": "295",
       "entryPrice": 297.38,
       "recovered": false
+    },
+    {
+      "symbol": "META",
+      "signal": "PUT",
+      "entryPremium": 1.88,
+      "exitPremium": 1.5,
+      "qty": 5,
+      "pnl": -189.99999999999994,
+      "pnlPct": -20.212765957446805,
+      "reason": "loss",
+      "minutes": 2,
+      "entryTime": 1781709036127,
+      "exitTime": 1781709206245,
+      "entryScore": 95,
+      "setup": {
+        "name": "Breakout Down",
+        "quality": "excellent",
+        "direction": "PUT"
+      },
+      "strike": "577.5",
+      "entryPrice": 579.81,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -380,35 +402,9 @@
     "lastSignal": "PUT"
   },
   "META": {
-    "active": true,
-    "signal": "PUT",
-    "entryScore": 95,
-    "entryPrice": 579.81,
-    "entryTime": 1781709036127,
-    "setup": {
-      "name": "Breakout Down",
-      "quality": "excellent",
-      "direction": "PUT"
-    },
-    "stopConfig": {
-      "stopPct": 20,
-      "bePct": 8,
-      "trailPct": 20,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "META260617P00577500",
-    "strike": "577.5",
-    "entryPremium": 1.88,
-    "qty": 5,
-    "orderId": "aa4ec760-b14d-42fc-b2d7-0a535e7bc248",
-    "stopOrderId": "ed8e0ccc-fa73-4f6b-bf1e-613b2af7692a",
-    "peakPremium": 1.88,
-    "currentStop": 1.504,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1264
+    "active": false,
+    "cooldownUntil": 1781709806245,
+    "lastSignal": "PUT"
   },
   "AAPL": {
     "active": false,
