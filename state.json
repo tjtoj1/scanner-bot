@@ -75,14 +75,66 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1781716276721,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 733.73,
+    "entryTime": 1781790333248,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 20,
+      "bePct": 8,
+      "trailPct": 20,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "QQQ260618C00735000",
+    "strike": "735",
+    "entryPremium": 2.56,
+    "qty": 4,
+    "orderId": "121372c9-ff51-476f-843a-88f3964b73fd",
+    "stopOrderId": "3251760f-2280-44ef-8ffa-8d8333a2ddb8",
+    "peakPremium": 2.56,
+    "currentStop": 2.048,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1350
   },
   "NVDA": {
-    "active": false,
-    "cooldownUntil": 1781790289581,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 207.55,
+    "entryTime": 1781790333248,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 22,
+      "bePct": 8,
+      "trailPct": 22,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "NVDA260618C00210000",
+    "strike": "210",
+    "entryPremium": 0.42,
+    "qty": 25,
+    "orderId": "2831a7c6-01d2-4717-8dc2-06fe92a4c7e0",
+    "stopOrderId": "2e2a65fd-b769-42fd-9c1f-6bb3590f175c",
+    "peakPremium": 0.42,
+    "currentStop": 0.3276,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1351
   },
   "TSLA": {
     "active": false,
