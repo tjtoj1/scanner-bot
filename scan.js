@@ -380,6 +380,61 @@ async function analyzeTicker(symbol) {
     reasons = [`Volume too low: ${volRatio}x (need 1.5x+)`];
   }
 
+  // V16.23: POSITION-IN-MOVE FILTERS - prevent buying climax/exhaustion tops/bottoms
+  
+  // Filter 1: RSI Extreme - don't buy at exhaustion levels
+  if (signal === "CALL" && rsi5m > 70) {
+    console.log(`  ${symbol}: CALL BLOCKED - RSI ${rsi5m.toFixed(1)} > 70 (overbought, top risk)`);
+    signal = "NEUTRAL";
+    score = 0;
+    reasons = [`RSI overbought: ${rsi5m.toFixed(1)}`];
+  }
+  if (signal === "PUT" && rsi5m < 30) {
+    console.log(`  ${symbol}: PUT BLOCKED - RSI ${rsi5m.toFixed(1)} < 30 (oversold, bounce risk)`);
+    signal = "NEUTRAL";
+    score = 0;
+    reasons = [`RSI oversold: ${rsi5m.toFixed(1)}`];
+  }
+
+  // Filter 2: Distance from VWAP - don't chase price extensions
+  if (signal !== "NEUTRAL") {
+    const vwapDist = (price - vwap5m) / vwap5m;
+    if (signal === "CALL" && vwapDist > 0.005) {
+      console.log(`  ${symbol}: CALL BLOCKED - ${(vwapDist*100).toFixed(2)}% above VWAP (extended)`);
+      signal = "NEUTRAL";
+      score = 0;
+      reasons = [`Too extended above VWAP: ${(vwapDist*100).toFixed(2)}%`];
+    }
+    if (signal === "PUT" && vwapDist < -0.005) {
+      console.log(`  ${symbol}: PUT BLOCKED - ${(vwapDist*100).toFixed(2)}% below VWAP (extended)`);
+      signal = "NEUTRAL";
+      score = 0;
+      reasons = [`Too extended below VWAP: ${(vwapDist*100).toFixed(2)}%`];
+    }
+  }
+
+  // Filter 3: Daily Range Position - don't buy near day high/low (exhaustion)
+  if (signal !== "NEUTRAL" && bars5m.length >= 10) {
+    const todayHigh = Math.max(...bars5m.map(b => b.h));
+    const todayLow = Math.min(...bars5m.map(b => b.l));
+    const dayRange = todayHigh - todayLow;
+    if (dayRange > 0) {
+      const rangePos = (price - todayLow) / dayRange;
+      if (signal === "CALL" && rangePos > 0.8) {
+        console.log(`  ${symbol}: CALL BLOCKED - near day high (${(rangePos*100).toFixed(0)}% of range)`);
+        signal = "NEUTRAL";
+        score = 0;
+        reasons = [`Near day high: ${(rangePos*100).toFixed(0)}%`];
+      }
+      if (signal === "PUT" && rangePos < 0.2) {
+        console.log(`  ${symbol}: PUT BLOCKED - near day low (${(rangePos*100).toFixed(0)}% of range)`);
+        signal = "NEUTRAL";
+        score = 0;
+        reasons = [`Near day low: ${(rangePos*100).toFixed(0)}%`];
+      }
+    }
+  }
+
 
   // V16.10: TREND FILTER - Block signals against strong trend
   // Check 4 indicators on 5m: price vs SMA20, SMA50, VWAP, and SMA20 vs SMA50
