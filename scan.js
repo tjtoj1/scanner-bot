@@ -678,17 +678,17 @@ function calculateQty(portfolioValue, premiumPerContract, pctOfPortfolio = 0.10)
 // Time helpers (CDT = UTC-5)
 // ============================================================
 function isPastForceExitTime(now) {
-  // 2:39 PM CDT = 19:39 UTC
+  // V16.25: Force exit at 2:58 PM CDT = 19:58 UTC
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin >= 19 * 60 + 39;
+  return utcMin >= 19 * 60 + 58;
 }
 
 function isBeforeNoEntryTime(now) {
-  // No new entries after 2:30 PM CDT = 19:30 UTC
+  // V16.25: No new entries after 2:50 PM CDT = 19:50 UTC
   const d = now ? new Date(now) : new Date();
   const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin < 19 * 60 + 30;
+  return utcMin < 19 * 60 + 50;
 }
 
 // V16.21: FOMC / High-Impact Event Days - stop trading early
@@ -855,7 +855,7 @@ function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
     loss: "خروج بخسارة",
     trailing: "Trailing Stop",
     breakeven: "Break-Even Stop",
-    force: "إغلاق إجباري (2:39 PM)",
+    force: "إغلاق إجباري (2:58 PM)",
     reversal: "انعكاس",
   }[reason] || reason;
   return `${emoji} <b>EXIT: ${pos.symbol || ""} (${reasonText})</b>
@@ -1700,7 +1700,7 @@ async function main() {
       }
     }
     else if (decision.action === "no_entry_time") {
-      console.log(`  ${r.symbol}: No new entries after 2:30 PM`);
+      console.log(`  ${r.symbol}: No new entries after 2:50 PM`);
       if (previous) newState[r.symbol] = previous;
     }
     else if (decision.action === "fomc_cutoff") {
