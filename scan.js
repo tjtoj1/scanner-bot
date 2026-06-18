@@ -218,8 +218,7 @@ function detectSetup(d) {
   if (vwapDist < 0.003 && d.macd5m.bias === "bearish" && d.rsi5m < 55 && d.rsi5m > 35) return { name: "VWAP Bounce Down", quality: "good", direction: "PUT" };
   if (d.rsi5m < 30) return { name: "Oversold", quality: "good", direction: "CALL" };
   if (d.rsi5m > 70) return { name: "Overbought", quality: "good", direction: "PUT" };
-  if (d.price > d.bollinger.middle && d.macd5m.bias === "bullish") return { name: "Momentum Up", quality: "fair", direction: "CALL" };
-  if (d.price < d.bollinger.middle && d.macd5m.bias === "bearish") return { name: "Momentum Down", quality: "fair", direction: "PUT" };
+  // V16.22: Momentum (fair) REMOVED - data shows 0-25% win rate, biggest loser
   return null;
 }
 
@@ -348,6 +347,37 @@ async function analyzeTicker(symbol) {
     signal = "NEUTRAL";
     score = 0;
     reasons = [`Setup mismatch: ${setup.name} → ${setup.direction} vs ${originalSignal}`];
+  }
+
+  // V16.22: MULTI-TIMEFRAME CONFIRMATION - both 5m AND 15m must agree
+  // Prevents entering against the bigger trend
+  if (signal !== "NEUTRAL") {
+    const tf5Bull = macd5m?.bias === "bullish";
+    const tf5Bear = macd5m?.bias === "bearish";
+    const tf15Bull = macd15m?.bias === "bullish";
+    const tf15Bear = macd15m?.bias === "bearish";
+    
+    if (signal === "CALL" && !(tf5Bull && tf15Bull)) {
+      console.log(`  ${symbol}: CALL BLOCKED - timeframes don't align (5m=${macd5m?.bias}, 15m=${macd15m?.bias})`);
+      signal = "NEUTRAL";
+      score = 0;
+      reasons = [`Multi-TF: need 5m AND 15m bullish (got 5m=${macd5m?.bias}, 15m=${macd15m?.bias})`];
+    }
+    if (signal === "PUT" && !(tf5Bear && tf15Bear)) {
+      console.log(`  ${symbol}: PUT BLOCKED - timeframes don't align (5m=${macd5m?.bias}, 15m=${macd15m?.bias})`);
+      signal = "NEUTRAL";
+      score = 0;
+      reasons = [`Multi-TF: need 5m AND 15m bearish (got 5m=${macd5m?.bias}, 15m=${macd15m?.bias})`];
+    }
+  }
+
+  // V16.22: VOLUME SPIKE REQUIREMENT - smart money confirmation
+  // Block entries without volume confirmation (1.5x+ avg)
+  if (signal !== "NEUTRAL" && volRatio < 1.5) {
+    console.log(`  ${symbol}: ${signal} BLOCKED - no volume spike (${volRatio}x < 1.5x)`);
+    signal = "NEUTRAL";
+    score = 0;
+    reasons = [`Volume too low: ${volRatio}x (need 1.5x+)`];
   }
 
 
