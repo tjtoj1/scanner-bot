@@ -22,39 +22,35 @@
       "strike": "297.5",
       "entryPrice": 297.21,
       "recovered": false
+    },
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "entryPremium": 1.58,
+      "exitPremium": 1.24,
+      "qty": 6,
+      "pnl": -204.00000000000006,
+      "pnlPct": -21.518987341772156,
+      "reason": "loss",
+      "minutes": 1,
+      "entryTime": 1781789723123,
+      "exitTime": 1781789837107,
+      "entryScore": 95,
+      "setup": {
+        "name": "Order Flow",
+        "quality": "excellent",
+        "direction": "CALL"
+      },
+      "strike": "747",
+      "entryPrice": 745.76,
+      "recovered": false
     }
   ],
   "_reportSent": false,
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 745.76,
-    "entryTime": 1781789723123,
-    "setup": {
-      "name": "Order Flow",
-      "quality": "excellent",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 20,
-      "bePct": 8,
-      "trailPct": 20,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "SPY260618C00747000",
-    "strike": "747",
-    "entryPremium": 1.58,
-    "qty": 6,
-    "orderId": "4d907b5b-06b9-4763-9576-d47ec6b865eb",
-    "stopOrderId": "2ebdf5c5-59dd-4b21-b0fe-ddff54ed166a",
-    "peakPremium": 1.58,
-    "currentStop": 1.2640000000000002,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1343
+    "active": false,
+    "cooldownUntil": 1781790437107,
+    "lastSignal": "CALL"
   },
   "QQQ": {
     "active": false,
@@ -83,11 +79,11 @@
     "entryPremium": 1.05,
     "qty": 10,
     "orderId": "890365bf-88a7-479c-b875-4f559ceb2db7",
-    "stopOrderId": "358b1860-d46b-44a7-898d-fddcf0d38424",
-    "peakPremium": 1.08,
-    "currentStop": 0.8190000000000001,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
+    "stopOrderId": "67ab55af-ab9d-4f15-9625-cda96df1bbf8",
+    "peakPremium": 1.22,
+    "currentStop": 1.05,
+    "stopPhase": "breakeven",
+    "breakEvenAnnounced": true,
     "bufferAnnounced": false,
     "trailingAnnounced": false,
     "entryMessageId": 1344
