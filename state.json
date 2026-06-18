@@ -151,9 +151,35 @@
     "lastSignal": "CALL"
   },
   "TSLA": {
-    "active": false,
-    "cooldownUntil": 1781717422307,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "PUT",
+    "entryScore": 95,
+    "entryPrice": 385.45,
+    "entryTime": 1781793040749,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "PUT"
+    },
+    "stopConfig": {
+      "stopPct": 25,
+      "bePct": 8,
+      "trailPct": 25,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "TSLA260618P00385000",
+    "strike": "385",
+    "entryPremium": 2.92,
+    "qty": 3,
+    "orderId": "dc435193-f0d5-42b5-bba4-837973f7111c",
+    "stopOrderId": "6ad4be56-27d5-4ab8-8f1b-868b99563e27",
+    "peakPremium": 2.92,
+    "currentStop": 2.19,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1361
   },
   "META": {
     "active": false,
