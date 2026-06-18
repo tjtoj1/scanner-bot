@@ -1,6 +1,29 @@
 {
   "_date": "2026-06-18",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "AAPL",
+      "signal": "CALL",
+      "entryPremium": 1.49,
+      "exitPremium": 1.15,
+      "qty": 7,
+      "pnl": -238.00000000000009,
+      "pnlPct": -22.818791946308732,
+      "reason": "loss",
+      "minutes": 0,
+      "entryTime": 1781789723123,
+      "exitTime": 1781789778183,
+      "entryScore": 95,
+      "setup": {
+        "name": "Order Flow",
+        "quality": "excellent",
+        "direction": "CALL"
+      },
+      "strike": "297.5",
+      "entryPrice": 297.21,
+      "recovered": false
+    }
+  ],
   "_reportSent": false,
   "SPY": {
     "active": true,
@@ -61,7 +84,7 @@
     "qty": 10,
     "orderId": "890365bf-88a7-479c-b875-4f559ceb2db7",
     "stopOrderId": "358b1860-d46b-44a7-898d-fddcf0d38424",
-    "peakPremium": 1.05,
+    "peakPremium": 1.08,
     "currentStop": 0.8190000000000001,
     "stopPhase": "initial",
     "breakEvenAnnounced": false,
@@ -80,35 +103,9 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 297.21,
-    "entryTime": 1781789723123,
-    "setup": {
-      "name": "Order Flow",
-      "quality": "excellent",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 20,
-      "bePct": 8,
-      "trailPct": 20,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "AAPL260618C00297500",
-    "strike": "297.5",
-    "entryPremium": 1.49,
-    "qty": 7,
-    "orderId": "138f063e-afb8-4c37-a94d-4c37f6c5ac86",
-    "stopOrderId": "1b1fa422-8796-4afc-bc90-fb1d4179278a",
-    "peakPremium": 1.49,
-    "currentStop": 1.192,
-    "stopPhase": "initial",
-    "breakEvenAnnounced": false,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1345
+    "active": false,
+    "cooldownUntil": 1781790378183,
+    "lastSignal": "CALL"
   },
   "MSTR": {
     "active": false,
