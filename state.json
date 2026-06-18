@@ -139,9 +139,35 @@
     "lastSignal": "PUT"
   },
   "AAPL": {
-    "active": false,
-    "cooldownUntil": 1781790378183,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "entryScore": 95,
+    "entryPrice": 298.99,
+    "entryTime": 1781792141130,
+    "setup": {
+      "name": "Order Flow",
+      "quality": "excellent",
+      "direction": "CALL"
+    },
+    "stopConfig": {
+      "stopPct": 21,
+      "bePct": 8,
+      "trailPct": 21,
+      "peakBufferPct": 5
+    },
+    "optionSymbol": "AAPL260618C00300000",
+    "strike": "300",
+    "entryPremium": 0.77,
+    "qty": 13,
+    "orderId": "a9393239-3ff3-466d-aec3-d500fa95c0d2",
+    "stopOrderId": "19571249-ae85-460a-ab78-ff3b0855b975",
+    "peakPremium": 0.77,
+    "currentStop": 0.6083000000000001,
+    "stopPhase": "initial",
+    "breakEvenAnnounced": false,
+    "bufferAnnounced": false,
+    "trailingAnnounced": false,
+    "entryMessageId": 1359
   },
   "MSTR": {
     "active": false,
