@@ -88,6 +88,28 @@
       "strike": "210",
       "entryPrice": 207.55,
       "recovered": false
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "entryPremium": 2.56,
+      "exitPremium": 2.5425,
+      "qty": 4,
+      "pnl": -7.000000000000028,
+      "pnlPct": -0.6835937500000028,
+      "reason": "breakeven",
+      "minutes": 9,
+      "entryTime": 1781790333248,
+      "exitTime": 1781790922117,
+      "entryScore": 95,
+      "setup": {
+        "name": "Order Flow",
+        "quality": "excellent",
+        "direction": "CALL"
+      },
+      "strike": "735",
+      "entryPrice": 733.73,
+      "recovered": false
     }
   ],
   "_reportSent": false,
@@ -97,35 +119,9 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "entryScore": 95,
-    "entryPrice": 733.73,
-    "entryTime": 1781790333248,
-    "setup": {
-      "name": "Order Flow",
-      "quality": "excellent",
-      "direction": "CALL"
-    },
-    "stopConfig": {
-      "stopPct": 20,
-      "bePct": 8,
-      "trailPct": 20,
-      "peakBufferPct": 5
-    },
-    "optionSymbol": "QQQ260618C00735000",
-    "strike": "735",
-    "entryPremium": 2.56,
-    "qty": 4,
-    "orderId": "121372c9-ff51-476f-843a-88f3964b73fd",
-    "stopOrderId": "587cd4ac-4ef1-46fa-8a34-208437bb2254",
-    "peakPremium": 3.07,
-    "currentStop": 2.56,
-    "stopPhase": "breakeven",
-    "breakEvenAnnounced": true,
-    "bufferAnnounced": false,
-    "trailingAnnounced": false,
-    "entryMessageId": 1350
+    "active": false,
+    "cooldownUntil": 1781791222117,
+    "lastSignal": "CALL"
   },
   "NVDA": {
     "active": false,
