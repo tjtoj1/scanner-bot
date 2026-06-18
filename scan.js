@@ -642,7 +642,9 @@ async function updateStopLoss(pos, newStopPrice) {
 // ============================================================
 async function pickOptionContract(symbol, signal, atmStrike, strikeStep) {
   const today = new Date().toISOString().split("T")[0];
-  const targetStrike = signal === "CALL" ? atmStrike + strikeStep : atmStrike - strikeStep;
+  // V16.24: Pick further OTM (2 strikes instead of 1) for less gamma noise
+  // 0.5-1% OTM = lower delta, less reactive to noise, more time for thesis
+  const targetStrike = signal === "CALL" ? atmStrike + strikeStep * 2 : atmStrike - strikeStep * 2;
   const min = targetStrike - strikeStep * 0.5;
   const max = targetStrike + strikeStep * 0.5;
 
@@ -716,29 +718,30 @@ function isReportTime(now) {
 // ============================================================
 // V16.15: Hybrid ATR + Score Stop Loss
 function calculateStopConfig(price, atr, score) {
+  // V16.24: Wider stops for 0DTE - prevent noise-driven stop hits
   // Default fallback (when no data)
   if (!atr || !price || atr <= 0 || price <= 0) {
-    return { stopPct: 30, bePct: 10, trailPct: 30, peakBufferPct: 5 };
+    return { stopPct: 35, bePct: 12, trailPct: 30, peakBufferPct: 5 };
   }
 
   // Calculate volatility as % of stock price
   const volatility = (atr / price) * 100;
 
-  // Base stop scales with volatility
-  // Low vol stocks: 20-25%, High vol stocks: 35-45%
-  let basePct = 20 + (volatility * 12);
+  // V16.24: Base stop is now WIDER for 0DTE
+  // Low vol stocks: 30-35%, High vol stocks: 40-50%
+  let basePct = 30 + (volatility * 10);
 
-  // Score adjustment: stronger signal = tighter stop
+  // Score adjustment: stronger signal = slightly tighter stop
   let scoreAdj = 0;
   if (score >= 95) scoreAdj = -3;       // Very strong: tighter
   else if (score >= 90) scoreAdj = -1;
   else if (score < 85) scoreAdj = +3;   // Weaker: wider
 
-  // Final stop %, clamped between 20% and 45%
-  const stopPct = Math.max(20, Math.min(45, Math.round(basePct + scoreAdj)));
+  // V16.24: Final stop %, now clamped between 30% and 50%
+  const stopPct = Math.max(30, Math.min(50, Math.round(basePct + scoreAdj)));
 
   // BE trigger ~ stop/3, Trailing trigger ~ stop
-  const bePct = Math.max(8, Math.round(stopPct / 3));
+  const bePct = Math.max(10, Math.round(stopPct / 3));
   const trailPct = stopPct;
   const peakBufferPct = 5; // peak buffer stays at 5%
 
