@@ -8,7 +8,7 @@ import fs from "fs";
 const ALPACA_KEY = process.env.ALPACA_KEY;
 const ALPACA_SECRET = process.env.ALPACA_SECRET;
 const TG_TOKEN = process.env.TG_TOKEN;
-const TG_CHAT = process.env.TG_CHAT;
+const TG_CHAT = process.env.TG_CHAT_ID;
 const PERSONAL_CHAT = "810642442";
 
 if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN || !TG_CHAT) {
