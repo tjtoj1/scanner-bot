@@ -1,602 +1,565 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
+// ============================================================
+// 0DTE SPY MASTER SYSTEM v17.0
+// Window-Based Strategy with Support/Resistance + Pullback Entry
+// ============================================================
 
-const ALPACA_KEY    = process.env.ALPACA_KEY;
+import fs from "fs";
+
+const ALPACA_KEY = process.env.ALPACA_KEY;
 const ALPACA_SECRET = process.env.ALPACA_SECRET;
-const TG_TOKEN      = process.env.TG_TOKEN;
-const TG_CHAT_ID    = process.env.TG_CHAT_ID;
-const MIN_SCORE     = parseInt(process.env.MIN_SCORE || "65");
-const SEND_SUMMARY  = process.env.SEND_SUMMARY === "true";
-const STATE_FILE    = "state.json";
+const TG_TOKEN = process.env.TG_TOKEN;
+const TG_CHAT = process.env.TG_CHAT;
+const PERSONAL_CHAT = "810642442";
 
-if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN || !TG_CHAT_ID) {
-  console.error("Missing env vars");
+if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN || !TG_CHAT) {
+  console.log("Missing env vars");
   process.exit(1);
 }
 
-const TICKERS = ["SPY", "QQQ", "NVDA", "TSLA", "META", "AAPL", "MSTR", "AMZN"];
+const DATA_BASE = "https://data.alpaca.markets/v2";
+const OPTIONS_BASE = "https://data.alpaca.markets/v1beta1/options";
+const TRADING_BASE = "https://paper-api.alpaca.markets/v2";
 
-const META = {
-  SPY:  { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.005 },
-  QQQ:  { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.006 },
-  NVDA: { strikeStep: 1,   posSize: "50% only", risk: "elevated", ivCategory: "high",    wallPct: 0.015 },
-  TSLA: { strikeStep: 1,   posSize: "50% only", risk: "elevated", ivCategory: "high",    wallPct: 0.018 },
-  META: { strikeStep: 2.5, posSize: "100%",     risk: "normal",   ivCategory: "medium",  wallPct: 0.010 },
-  AAPL: { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.007 },
-  MSTR: { strikeStep: 5,   posSize: "25% only", risk: "extreme",  ivCategory: "extreme", wallPct: 0.030 },
-  AMZN: { strikeStep: 1,   posSize: "100%",     risk: "normal",   ivCategory: "low",     wallPct: 0.008 },
+// ============================================================
+// CONFIG
+// ============================================================
+const TICKERS = ["SPY", "QQQ", "IWM", "GLD"];
+
+// Per-ticker config (strikeStep, position size factor)
+const TICKER_CONFIG = {
+  SPY: { strikeStep: 1, sizeFactor: 1.0 },
+  QQQ: { strikeStep: 1, sizeFactor: 1.0 },
+  IWM: { strikeStep: 1, sizeFactor: 0.8 },  // smaller size (higher volatility)
+  GLD: { strikeStep: 1, sizeFactor: 0.7 },  // smaller size (less liquid in 0DTE)
 };
 
-const ALPACA_HEADERS = {
-  "APCA-API-KEY-ID": ALPACA_KEY,
-  "APCA-API-SECRET-KEY": ALPACA_SECRET,
-};
+// Trading Windows (CDT timezone, in UTC for comparison)
+// Each window has: name, start time, end time, strategy type, risk params
+const WINDOWS = [
+  {
+    name: "ORB_Pullback",
+    startUTC: { h: 13, m: 35 },  // 8:35 AM CDT
+    endUTC: { h: 14, m: 30 },    // 9:30 AM CDT
+    strategy: "pullback",
+    targetPct: 75,
+    stopPct: 40,
+    timeExitMin: 25,             // exit after 25 min if open
+    riskPct: 0.5,                // 0.5% portfolio risk
+  },
+  {
+    name: "MidMorning_VWAP",
+    startUTC: { h: 15, m: 0 },   // 10:00 AM CDT
+    endUTC: { h: 16, m: 0 },     // 11:00 AM CDT
+    strategy: "vwap_touch",
+    targetPct: 60,
+    stopPct: 35,
+    timeExitMin: 25,
+    riskPct: 0.4,
+  },
+  // 11:00 AM - 12:30 PM CDT = LUNCH LULL = NO TRADES
+  {
+    name: "Afternoon_Resume",
+    startUTC: { h: 17, m: 30 },  // 12:30 PM CDT
+    endUTC: { h: 18, m: 30 },    // 1:30 PM CDT
+    strategy: "trend_resume",
+    targetPct: 60,
+    stopPct: 35,
+    timeExitMin: 25,
+    riskPct: 0.4,
+  },
+  {
+    name: "Late_Day_Fade",
+    startUTC: { h: 18, m: 30 },  // 1:30 PM CDT
+    endUTC: { h: 19, m: 30 },    // 2:30 PM CDT
+    strategy: "fade",
+    targetPct: 50,
+    stopPct: 30,
+    timeExitMin: 20,
+    riskPct: 0.3,
+  },
+  {
+    name: "MOC_Scalp",
+    startUTC: { h: 19, m: 30 },  // 2:30 PM CDT
+    endUTC: { h: 19, m: 50 },    // 2:50 PM CDT
+    strategy: "moc",
+    targetPct: 40,
+    stopPct: 25,
+    timeExitMin: 10,
+    riskPct: 0.3,
+  },
+];
 
+const FORCE_EXIT_TIME = { h: 19, m: 58 }; // 2:58 PM CDT
+const REPORT_TIME = { h: 20, m: 0 };       // 3:00 PM CDT
+
+// Risk Management Layer 2 - Trade Management
+const QUICK_EXIT_PCT = 30;    // -30% in first minute → exit
+const PROFIT_PARTIAL_1 = 30;  // +30% → sell 50%
+const PROFIT_BE_PCT = 50;     // +50% → move stop to entry (BE)
+const PROFIT_PARTIAL_2 = 75;  // +75% → sell 25% more
+const PROFIT_TRAIL_PCT = 100; // +100% → trailing stop on last 25%
+
+// FOMC dates 2026
+const FOMC_DATES = ["2026-06-17", "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"];
+
+// ============================================================
+// STATE
+// ============================================================
 function loadState() {
-  if (!existsSync(STATE_FILE)) return {};
   try {
-    return JSON.parse(readFileSync(STATE_FILE, "utf8"));
-  } catch {
+    return JSON.parse(fs.readFileSync("state.json", "utf8"));
+  } catch (e) {
     return {};
   }
 }
 
 function saveState(state) {
-  writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  fs.writeFileSync("state.json", JSON.stringify(state, null, 2));
 }
 
-async function getLatestTrade(symbol) {
-  const r = await fetch(`https://data.alpaca.markets/v2/stocks/${symbol}/trades/latest?feed=iex`, { headers: ALPACA_HEADERS });
-  if (!r.ok) throw new Error(`Trade ${symbol}: HTTP ${r.status}`);
-  return (await r.json()).trade;
+// ============================================================
+// TIME HELPERS
+// ============================================================
+function nowUTC() {
+  const d = new Date();
+  return { h: d.getUTCHours(), m: d.getUTCMinutes() };
 }
 
-async function getBars(symbol, timeframe, daysBack) {
-  const end = new Date(Date.now() - 60000).toISOString();
-  const start = new Date(Date.now() - daysBack * 86400000).toISOString();
-  const url = `https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=${timeframe}&start=${start}&end=${end}&feed=iex&limit=500&adjustment=raw`;
-  const r = await fetch(url, { headers: ALPACA_HEADERS });
-  if (!r.ok) throw new Error(`Bars ${symbol} ${timeframe}: HTTP ${r.status}`);
-  return (await r.json()).bars || [];
+function utcToMinutes(t) {
+  return t.h * 60 + t.m;
 }
 
-function rsi(closes, period = 14) {
-  if (closes.length < period + 1) return null;
-  let g = 0, l = 0;
-  for (let i = 1; i <= period; i++) {
-    const d = closes[i] - closes[i - 1];
-    d > 0 ? (g += d) : (l -= d);
+function isInWindow(now, window) {
+  const currentMin = utcToMinutes(now);
+  const startMin = utcToMinutes(window.startUTC);
+  const endMin = utcToMinutes(window.endUTC);
+  return currentMin >= startMin && currentMin < endMin;
+}
+
+function getCurrentWindow() {
+  const now = nowUTC();
+  for (const w of WINDOWS) {
+    if (isInWindow(now, w)) return w;
   }
-  let ag = g / period, al = l / period;
-  for (let i = period + 1; i < closes.length; i++) {
-    const d = closes[i] - closes[i - 1];
-    ag = (ag * (period - 1) + Math.max(d, 0)) / period;
-    al = (al * (period - 1) + Math.max(-d, 0)) / period;
-  }
-  if (al === 0) return 100;
-  return parseFloat((100 - 100 / (1 + ag / al)).toFixed(2));
-}
-
-function ema(arr, period) {
-  if (arr.length < period) return null;
-  const k = 2 / (period + 1);
-  let e = arr.slice(0, period).reduce((a, b) => a + b, 0) / period;
-  for (let i = period; i < arr.length; i++) e = arr[i] * k + e * (1 - k);
-  return e;
-}
-
-function macd(closes) {
-  if (closes.length < 35) return null;
-  const vals = [];
-  for (let i = 25; i < closes.length; i++) {
-    const e12 = ema(closes.slice(0, i + 1), 12);
-    const e26 = ema(closes.slice(0, i + 1), 26);
-    if (e12 && e26) vals.push(e12 - e26);
-  }
-  const line = vals[vals.length - 1];
-  const sig = vals.length >= 9 ? ema(vals, 9) : null;
-  const hist = sig !== null ? line - sig : null;
-  return {
-    histogram: hist ? parseFloat(hist.toFixed(4)) : null,
-    bias: hist > 0.01 ? "bullish" : hist < -0.01 ? "bearish" : "neutral",
-  };
-}
-
-function bollinger(closes, period = 20) {
-  if (closes.length < period) return null;
-  const slice = closes.slice(-period);
-  const mean = slice.reduce((a, b) => a + b, 0) / period;
-  const std = Math.sqrt(slice.reduce((a, b) => a + (b - mean) ** 2, 0) / period);
-  return {
-    upper: parseFloat((mean + 2 * std).toFixed(2)),
-    middle: parseFloat(mean.toFixed(2)),
-    lower: parseFloat((mean - 2 * std).toFixed(2)),
-  };
-}
-
-function vwap(bars) {
-  let tv = 0, v = 0;
-  for (const b of bars) {
-    const tp = (b.h + b.l + b.c) / 3;
-    tv += tp * b.v;
-    v += b.v;
-  }
-  return v > 0 ? parseFloat((tv / v).toFixed(2)) : null;
-}
-
-function sma(closes, period) {
-  if (closes.length < period) return null;
-  return parseFloat((closes.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(2));
-}
-
-function atr(bars, period = 14) {
-  if (bars.length < period + 1) return null;
-  const trs = bars.slice(1).map((c, i) =>
-    Math.max(c.h - c.l, Math.abs(c.h - bars[i].c), Math.abs(c.l - bars[i].c))
-  );
-  return parseFloat((trs.slice(-period).reduce((a, b) => a + b, 0) / period).toFixed(3));
-}
-
-// V16.11: ADX - Average Directional Index (trend strength)
-function adx(bars, period = 14) {
-  if (bars.length < period * 2 + 1) return null;
-  let plusDM = [], minusDM = [], trs = [];
-  for (let i = 1; i < bars.length; i++) {
-    const upMove = bars[i].h - bars[i - 1].h;
-    const downMove = bars[i - 1].l - bars[i].l;
-    plusDM.push(upMove > downMove && upMove > 0 ? upMove : 0);
-    minusDM.push(downMove > upMove && downMove > 0 ? downMove : 0);
-    trs.push(Math.max(
-      bars[i].h - bars[i].l,
-      Math.abs(bars[i].h - bars[i - 1].c),
-      Math.abs(bars[i].l - bars[i - 1].c)
-    ));
-  }
-  const sum = arr => arr.slice(-period).reduce((a, b) => a + b, 0);
-  const trSum = sum(trs);
-  if (trSum === 0) return null;
-  const plusDI = (sum(plusDM) / trSum) * 100;
-  const minusDI = (sum(minusDM) / trSum) * 100;
-  const dx = (Math.abs(plusDI - minusDI) / (plusDI + minusDI)) * 100;
-  return parseFloat(dx.toFixed(1));
-}
-
-// V16.11: Get historical ATR average for "market activity" comparison
-function atrAverage(bars, period = 14, lookback = 5) {
-  if (bars.length < period + lookback + 1) return null;
-  const atrs = [];
-  for (let i = 0; i < lookback; i++) {
-    const slice = bars.slice(0, bars.length - i);
-    const atrVal = atr(slice, period);
-    if (atrVal) atrs.push(atrVal);
-  }
-  if (!atrs.length) return null;
-  return parseFloat((atrs.reduce((a, b) => a + b, 0) / atrs.length).toFixed(3));
-}
-
-function estimateGamma(symbol, price, atr5m, vwap, sma20, bollinger) {
-  const meta = META[symbol];
-  const baseWallPct = meta.wallPct;
-  const atrPct = atr5m && price ? (atr5m / price) : 0.005;
-  const dynamicAdj = Math.min(atrPct * 2, baseWallPct * 0.5);
-  const wallDist = baseWallPct + dynamicAdj;
-
-  const callWallRaw = price * (1 + wallDist);
-  const putWallRaw = price * (1 - wallDist);
-  const callWall = Math.round(callWallRaw / meta.strikeStep) * meta.strikeStep;
-  const putWall = Math.round(putWallRaw / meta.strikeStep) * meta.strikeStep;
-  const gammaFlip = vwap && sma20 ? parseFloat(((vwap + sma20) / 2).toFixed(2)) : parseFloat(bollinger?.middle.toFixed(2)) || price;
-
-  let gammaRegime = "neutral";
-  if (price > gammaFlip * 1.002) gammaRegime = "positive";
-  else if (price < gammaFlip * 0.998) gammaRegime = "negative";
-
-  const callWallDist = ((callWall - price) / price * 100).toFixed(2);
-  const putWallDist = ((price - putWall) / price * 100).toFixed(2);
-
-  let proximityWarning = null;
-  if (Math.abs(price - callWall) / price < 0.003) proximityWarning = "near_call_wall";
-  else if (Math.abs(price - putWall) / price < 0.003) proximityWarning = "near_put_wall";
-
-  return {
-    callWall, putWall, gammaFlip, gammaRegime,
-    callWallDist: parseFloat(callWallDist),
-    putWallDist: parseFloat(putWallDist),
-    proximityWarning,
-    confidence: "estimated",
-  };
-}
-
-function detectSetup(d) {
-  if (d.volRatio > 2 && d.macd5m.bias === "bullish" && d.price > d.vwap) return { name: "Order Flow", quality: "excellent", direction: "CALL" };
-  if (d.volRatio > 2 && d.macd5m.bias === "bearish" && d.price < d.vwap) return { name: "Order Flow", quality: "excellent", direction: "PUT" };
-  if (d.price > d.bollinger.upper && d.volRatio > 1.3) return { name: "Breakout Up", quality: "excellent", direction: "CALL" };
-  if (d.price < d.bollinger.lower && d.volRatio > 1.3) return { name: "Breakout Down", quality: "excellent", direction: "PUT" };
-  if (d.gamma?.proximityWarning === "near_put_wall" && d.macd5m.bias === "bullish") return { name: "Put Wall Bounce", quality: "excellent", direction: "CALL" };
-  if (d.gamma?.proximityWarning === "near_call_wall" && d.macd5m.bias === "bearish") return { name: "Call Wall Rejection", quality: "excellent", direction: "PUT" };
-  const vwapDist = Math.abs(d.price - d.vwap) / d.vwap;
-  if (vwapDist < 0.003 && d.macd5m.bias === "bullish" && d.rsi5m > 45 && d.rsi5m < 65) return { name: "VWAP Bounce Up", quality: "good", direction: "CALL" };
-  if (vwapDist < 0.003 && d.macd5m.bias === "bearish" && d.rsi5m < 55 && d.rsi5m > 35) return { name: "VWAP Bounce Down", quality: "good", direction: "PUT" };
-  if (d.rsi5m < 30) return { name: "Oversold", quality: "good", direction: "CALL" };
-  if (d.rsi5m > 70) return { name: "Overbought", quality: "good", direction: "PUT" };
-  // V16.22: Momentum (fair) REMOVED - data shows 0-25% win rate, biggest loser
   return null;
 }
 
-function scoreBullish(d) {
-  let s = 0; const reasons = [];
-  if (d.macd5m?.bias === "bullish")  { s += 15; reasons.push("MACD 5m+"); }
-  if (d.macd15m?.bias === "bullish") { s += 15; reasons.push("MACD 15m+"); }
-  if (d.price > d.vwap)              { s += 15; reasons.push("Above VWAP"); }
-  if (d.sma20 && d.price > d.sma20)  { s += 10; reasons.push("Above SMA20"); }
-  if (d.sma50 && d.price > d.sma50)  { s += 5;  reasons.push("Above SMA50"); }
-  if (d.rsi5m > 50 && d.rsi5m < 70)  { s += 10; reasons.push("RSI healthy"); }
-  if (d.rsi5m < 30)                   { s += 15; reasons.push("RSI oversold"); }
-  if (d.volRatio > 1.5)              { s += 10; reasons.push(`Vol ${d.volRatio}x`); }
-  if (d.volRatio > 2.5)              { s += 5;  reasons.push("Vol spike"); }
-  if (d.price > d.bollinger.upper)   { s += 10; reasons.push("Above BB upper"); }
-  if (d.gamma?.gammaRegime === "positive") { s += 8; reasons.push("+Gamma regime"); }
-  if (d.gamma?.proximityWarning === "near_put_wall") { s += 12; reasons.push("Near Put Wall (support)"); }
-  return { score: s, reasons };
+function isPastForceExit() {
+  const now = nowUTC();
+  return utcToMinutes(now) >= utcToMinutes(FORCE_EXIT_TIME);
 }
 
-function scoreBearish(d) {
-  let s = 0; const reasons = [];
-  if (d.macd5m?.bias === "bearish")  { s += 15; reasons.push("MACD 5m-"); }
-  if (d.macd15m?.bias === "bearish") { s += 15; reasons.push("MACD 15m-"); }
-  if (d.price < d.vwap)              { s += 15; reasons.push("Below VWAP"); }
-  if (d.sma20 && d.price < d.sma20)  { s += 10; reasons.push("Below SMA20"); }
-  if (d.sma50 && d.price < d.sma50)  { s += 5;  reasons.push("Below SMA50"); }
-  if (d.rsi5m < 50 && d.rsi5m > 30)  { s += 10; reasons.push("RSI weak"); }
-  if (d.rsi5m > 70)                   { s += 15; reasons.push("RSI overbought"); }
-  if (d.volRatio > 1.5)              { s += 10; reasons.push(`Vol ${d.volRatio}x`); }
-  if (d.volRatio > 2.5)              { s += 5;  reasons.push("Vol spike"); }
-  if (d.price < d.bollinger.lower)   { s += 10; reasons.push("Below BB lower"); }
-  if (d.gamma?.gammaRegime === "negative") { s += 8; reasons.push("-Gamma regime"); }
-  if (d.gamma?.proximityWarning === "near_call_wall") { s += 12; reasons.push("Near Call Wall (resistance)"); }
-  return { score: s, reasons };
+function isReportTime() {
+  const now = nowUTC();
+  const cur = utcToMinutes(now);
+  const target = utcToMinutes(REPORT_TIME);
+  return cur >= target && cur < target + 10;
 }
 
-async function analyzeTicker(symbol) {
-  const [trade, bars5m, bars15m] = await Promise.all([
-    getLatestTrade(symbol),
-    getBars(symbol, "5Min", 3),
-    getBars(symbol, "15Min", 5),
-  ]);
+function isFomcDay() {
+  const today = new Date().toISOString().split("T")[0];
+  return FOMC_DATES.includes(today);
+}
 
-  if (!bars5m.length || !bars15m.length) return { symbol, error: "no bars" };
+function isFomcCutoff() {
+  if (!isFomcDay()) return false;
+  const now = nowUTC();
+  // On FOMC days, no entries after 12:30 PM CDT = 17:30 UTC
+  return utcToMinutes(now) >= 17 * 60 + 30;
+}
 
-  const price = trade.p;
-  const closes5m = bars5m.map(b => b.c);
-  const closes15m = bars15m.map(b => b.c);
+// ============================================================
+// INDICATORS
+// ============================================================
+function ema(arr, period) {
+  if (arr.length < period) return null;
+  const k = 2 / (period + 1);
+  let val = arr.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < arr.length; i++) {
+    val = arr[i] * k + val * (1 - k);
+  }
+  return val;
+}
 
-  const rsi5m = rsi(closes5m);
-  const rsi15m = rsi(closes15m);
-  const macd5m = macd(closes5m);
-  const macd15m = macd(closes15m);
-  const boll = bollinger(closes5m);
-  const vwap5m = vwap(bars5m.slice(-78));
-  const sma20 = sma(closes5m, 20);
-  const sma50 = sma(closes5m, 50);
-  const atr5m = atr(bars5m);
+function rsi(closes, period = 14) {
+  if (closes.length <= period) return 50;
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= period; i++) {
+    const diff = closes[i] - closes[i - 1];
+    if (diff > 0) gains += diff;
+    else losses += -diff;
+  }
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
+  for (let i = period + 1; i < closes.length; i++) {
+    const diff = closes[i] - closes[i - 1];
+    avgGain = (avgGain * (period - 1) + (diff > 0 ? diff : 0)) / period;
+    avgLoss = (avgLoss * (period - 1) + (diff < 0 ? -diff : 0)) / period;
+  }
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - 100 / (1 + rs);
+}
 
-  const lastBar = bars5m[bars5m.length - 1];
-  const avgVol = bars5m.slice(-10).reduce((a, b) => a + b.v, 0) / 10;
-  const volRatio = parseFloat((lastBar.v / avgVol).toFixed(2));
-  const prevClose = bars5m[Math.max(0, bars5m.length - 78)]?.c || price;
-  const pct = parseFloat(((price - prevClose) / prevClose * 100).toFixed(2));
+function vwap(bars) {
+  let cumPV = 0, cumVol = 0;
+  for (const b of bars) {
+    const typical = (b.h + b.l + b.c) / 3;
+    cumPV += typical * b.v;
+    cumVol += b.v;
+  }
+  return cumVol === 0 ? 0 : cumPV / cumVol;
+}
 
-  const gamma = estimateGamma(symbol, price, atr5m, vwap5m, sma20, boll);
+function atr(bars, period = 14) {
+  if (bars.length < period + 1) return 0;
+  const trs = [];
+  for (let i = 1; i < bars.length; i++) {
+    const high = bars[i].h, low = bars[i].l, prevClose = bars[i - 1].c;
+    trs.push(Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose)));
+  }
+  const recent = trs.slice(-period);
+  return recent.reduce((a, b) => a + b, 0) / recent.length;
+}
 
-  const indicators = {
-    price, rsi5m, rsi15m, macd5m, macd15m, bollinger: boll,
-    vwap: vwap5m, sma20, sma50, volRatio, gamma,
-  };
+// ============================================================
+// SUPPORT/RESISTANCE CALCULATOR (NEW in v17)
+// ============================================================
+async function calculateSupportResistance(symbol) {
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-  const bull = scoreBullish(indicators);
-  const bear = scoreBearish(indicators);
-
-  const setup = detectSetup(indicators);
-  let setupBonus = 0;
-  if (setup) setupBonus = setup.quality === "excellent" ? 20 : setup.quality === "good" ? 12 : 5;
-
-  let signal = "NEUTRAL", score = 0, reasons = [];
-  let absolutePoints = 0; // V16.16: Track absolute strength
-
-  if (bull.score > bear.score && bull.score >= 25) {
-    signal = "CALL";
-    score = bull.score + (setup?.direction === "CALL" ? setupBonus : 0);
-    absolutePoints = bull.score;
-    reasons = bull.reasons;
-    if (setup?.direction === "CALL") reasons.push(`Setup: ${setup.name}`);
-  } else if (bear.score > bull.score && bear.score >= 25) {
-    signal = "PUT";
-    score = bear.score + (setup?.direction === "PUT" ? setupBonus : 0);
-    absolutePoints = bear.score;
-    reasons = bear.reasons;
-    if (setup?.direction === "PUT") reasons.push(`Setup: ${setup.name}`);
+  // Get yesterday's full session for PDH/PDL/PDC
+  const yesterdayBars = await getBars(symbol, "1Day", 3);
+  let pdc = null, pdh = null, pdl = null;
+  if (yesterdayBars && yesterdayBars.length >= 2) {
+    const lastBar = yesterdayBars[yesterdayBars.length - 2]; // yesterday's daily bar
+    pdc = lastBar.c;
+    pdh = lastBar.h;
+    pdl = lastBar.l;
   }
 
-  score = Math.min(score, 95);
+  // Get pre-market bars (4 AM CDT - 8:30 AM CDT = 9-13:30 UTC)
+  // Alpaca extended hours returns these
+  const preMarketBars = await getBars(symbol, "5Min", 1, true);
+  let pmh = null, pml = null;
+  if (preMarketBars && preMarketBars.length > 0) {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0).toISOString();
+    const marketOpen = new Date();
+    marketOpen.setUTCHours(13, 30, 0, 0); // 8:30 AM CDT = 13:30 UTC
 
-  // V16.16: ABSOLUTE SCORE FILTER - require minimum raw points
-  // Prevents "high relative %" when actual evidence is weak
-  if (signal !== "NEUTRAL" && absolutePoints < 70) {
-    console.log(`  ${symbol}: ${signal} BLOCKED - absolute points too low (${absolutePoints} < 70)`);
-    signal = "NEUTRAL";
-    score = 0;
-    reasons = [`Absolute too low: ${absolutePoints}/70`];
-  }
+    const pmBars = preMarketBars.filter(b => {
+      const t = new Date(b.t);
+      return t < marketOpen && t.toISOString().split("T")[0] === today;
+    });
 
-  // V16.16: SETUP QUALITY MULTIPLIER - reward strong setups
-  if (signal !== "NEUTRAL" && setup) {
-    const qualityMultiplier = setup.quality === "excellent" ? 1.10
-                            : setup.quality === "good" ? 1.00
-                            : 0.90; // fair
-    const originalScore = score;
-    score = Math.min(95, Math.round(score * qualityMultiplier));
-    if (score !== originalScore) {
-      reasons.push(`Setup quality ${setup.quality}: ${originalScore}→${score}`);
+    if (pmBars.length > 0) {
+      pmh = Math.max(...pmBars.map(b => b.h));
+      pml = Math.min(...pmBars.map(b => b.l));
     }
   }
 
-  // V16.18: SETUP-SIGNAL MISMATCH - block trades where setup direction contradicts signal
-  // Example: Overbought (PUT direction) but signal CALL → contradiction → block
-  if (signal !== "NEUTRAL" && setup && setup.direction && setup.direction !== signal) {
-    const originalSignal = signal;
-    console.log(`  ${symbol}: ${signal} BLOCKED - setup "${setup.name}" direction is ${setup.direction}, contradicts signal`);
-    signal = "NEUTRAL";
-    score = 0;
-    reasons = [`Setup mismatch: ${setup.name} → ${setup.direction} vs ${originalSignal}`];
+  // Daily Pivot Points (from yesterday's H/L/C)
+  let pivot = null, r1 = null, s1 = null;
+  if (pdh && pdl && pdc) {
+    pivot = (pdh + pdl + pdc) / 3;
+    r1 = 2 * pivot - pdl;
+    s1 = 2 * pivot - pdh;
   }
-
-  // V16.22: MULTI-TIMEFRAME CONFIRMATION - both 5m AND 15m must agree
-  // Prevents entering against the bigger trend
-  if (signal !== "NEUTRAL") {
-    const tf5Bull = macd5m?.bias === "bullish";
-    const tf5Bear = macd5m?.bias === "bearish";
-    const tf15Bull = macd15m?.bias === "bullish";
-    const tf15Bear = macd15m?.bias === "bearish";
-    
-    if (signal === "CALL" && !(tf5Bull && tf15Bull)) {
-      console.log(`  ${symbol}: CALL BLOCKED - timeframes don't align (5m=${macd5m?.bias}, 15m=${macd15m?.bias})`);
-      signal = "NEUTRAL";
-      score = 0;
-      reasons = [`Multi-TF: need 5m AND 15m bullish (got 5m=${macd5m?.bias}, 15m=${macd15m?.bias})`];
-    }
-    if (signal === "PUT" && !(tf5Bear && tf15Bear)) {
-      console.log(`  ${symbol}: PUT BLOCKED - timeframes don't align (5m=${macd5m?.bias}, 15m=${macd15m?.bias})`);
-      signal = "NEUTRAL";
-      score = 0;
-      reasons = [`Multi-TF: need 5m AND 15m bearish (got 5m=${macd5m?.bias}, 15m=${macd15m?.bias})`];
-    }
-  }
-
-  // V16.22: VOLUME SPIKE REQUIREMENT - smart money confirmation
-  // Block entries without volume confirmation (1.5x+ avg)
-  if (signal !== "NEUTRAL" && volRatio < 1.5) {
-    console.log(`  ${symbol}: ${signal} BLOCKED - no volume spike (${volRatio}x < 1.5x)`);
-    signal = "NEUTRAL";
-    score = 0;
-    reasons = [`Volume too low: ${volRatio}x (need 1.5x+)`];
-  }
-
-  // V16.23: POSITION-IN-MOVE FILTERS - prevent buying climax/exhaustion tops/bottoms
-  
-  // Filter 1: RSI Extreme - don't buy at exhaustion levels
-  if (signal === "CALL" && rsi5m > 70) {
-    console.log(`  ${symbol}: CALL BLOCKED - RSI ${rsi5m.toFixed(1)} > 70 (overbought, top risk)`);
-    signal = "NEUTRAL";
-    score = 0;
-    reasons = [`RSI overbought: ${rsi5m.toFixed(1)}`];
-  }
-  if (signal === "PUT" && rsi5m < 30) {
-    console.log(`  ${symbol}: PUT BLOCKED - RSI ${rsi5m.toFixed(1)} < 30 (oversold, bounce risk)`);
-    signal = "NEUTRAL";
-    score = 0;
-    reasons = [`RSI oversold: ${rsi5m.toFixed(1)}`];
-  }
-
-  // Filter 2: Distance from VWAP - don't chase price extensions
-  if (signal !== "NEUTRAL") {
-    const vwapDist = (price - vwap5m) / vwap5m;
-    if (signal === "CALL" && vwapDist > 0.005) {
-      console.log(`  ${symbol}: CALL BLOCKED - ${(vwapDist*100).toFixed(2)}% above VWAP (extended)`);
-      signal = "NEUTRAL";
-      score = 0;
-      reasons = [`Too extended above VWAP: ${(vwapDist*100).toFixed(2)}%`];
-    }
-    if (signal === "PUT" && vwapDist < -0.005) {
-      console.log(`  ${symbol}: PUT BLOCKED - ${(vwapDist*100).toFixed(2)}% below VWAP (extended)`);
-      signal = "NEUTRAL";
-      score = 0;
-      reasons = [`Too extended below VWAP: ${(vwapDist*100).toFixed(2)}%`];
-    }
-  }
-
-  // Filter 3: Daily Range Position - don't buy near day high/low (exhaustion)
-  if (signal !== "NEUTRAL" && bars5m.length >= 10) {
-    const todayHigh = Math.max(...bars5m.map(b => b.h));
-    const todayLow = Math.min(...bars5m.map(b => b.l));
-    const dayRange = todayHigh - todayLow;
-    if (dayRange > 0) {
-      const rangePos = (price - todayLow) / dayRange;
-      if (signal === "CALL" && rangePos > 0.8) {
-        console.log(`  ${symbol}: CALL BLOCKED - near day high (${(rangePos*100).toFixed(0)}% of range)`);
-        signal = "NEUTRAL";
-        score = 0;
-        reasons = [`Near day high: ${(rangePos*100).toFixed(0)}%`];
-      }
-      if (signal === "PUT" && rangePos < 0.2) {
-        console.log(`  ${symbol}: PUT BLOCKED - near day low (${(rangePos*100).toFixed(0)}% of range)`);
-        signal = "NEUTRAL";
-        score = 0;
-        reasons = [`Near day low: ${(rangePos*100).toFixed(0)}%`];
-      }
-    }
-  }
-
-
-  // V16.10: TREND FILTER - Block signals against strong trend
-  // Check 4 indicators on 5m: price vs SMA20, SMA50, VWAP, and SMA20 vs SMA50
-  const above20 = price > sma20;
-  const above50 = price > sma50;
-  const aboveVwap = price > vwap5m;
-  const sma20AboveSma50 = sma20 > sma50;
-  const bullishCount = [above20, above50, aboveVwap, sma20AboveSma50].filter(Boolean).length;
-  const trend = bullishCount === 4 ? "strongly_bullish"
-              : bullishCount === 0 ? "strongly_bearish"
-              : "mixed";
-
-  if ((signal === "PUT" && trend === "strongly_bullish") ||
-      (signal === "CALL" && trend === "strongly_bearish")) {
-    console.log(`  ${symbol}: ${signal} BLOCKED by trend filter (trend: ${trend})`);
-    signal = "NEUTRAL";
-    score = 0;
-    reasons = [`Trend filter: ${trend}`];
-  }
-
-  // V16.11: ADX FILTER - Detect Sideways markets
-  const adxValue = adx(bars5m);
-  if (adxValue !== null && signal !== "NEUTRAL") {
-    if (adxValue < 20) {
-      console.log(`  ${symbol}: ADX ${adxValue} < 20 → Sideways market, blocking signal`);
-      signal = "NEUTRAL";
-      score = 0;
-      reasons = [`ADX too low: ${adxValue} (sideways)`];
-    } else if (adxValue < 25) {
-      score = Math.max(0, score - 15);
-      reasons.push(`ADX weak ${adxValue} (-15)`);
-    } else if (adxValue >= 30) {
-      score = Math.min(95, score + 5);
-      reasons.push(`Strong ADX ${adxValue} (+5)`);
-    }
-  }
-
-  // V16.11: ATR FILTER - Detect dead/chaotic markets
-  const atrAvg = atrAverage(bars5m);
-  if (atrAvg && atr5m && signal !== "NEUTRAL") {
-    const atrRatio = atr5m / atrAvg;
-    if (atrRatio < 0.5) {
-      console.log(`  ${symbol}: ATR ${atr5m} too low (${(atrRatio * 100).toFixed(0)}% of avg) → dead market`);
-      score = Math.max(0, score - 20);
-      reasons.push(`ATR very low (${(atrRatio * 100).toFixed(0)}%)`);
-    } else if (atrRatio > 2.0) {
-      // V16.12: Chaos = opportunity! Bonus instead of penalty
-      console.log(`  ${symbol}: ATR ${atr5m} high volatility (${(atrRatio * 100).toFixed(0)}% of avg) → opportunity`);
-      score = Math.min(95, score + 10);
-      reasons.push(`High volatility ${(atrRatio * 100).toFixed(0)}% (+10)`);
-    } else if (atrRatio >= 0.8 && atrRatio <= 1.5) {
-      score = Math.min(95, score + 5);
-      reasons.push(`ATR healthy (+5)`);
-    }
-  }
-
-  const strengthAr = score >= 80 ? "قوية جداً"
-                   : score >= 65 ? "قوية"
-                   : score >= 50 ? "متوسطة"
-                   : score >= 35 ? "ضعيفة"
-                   : "محايد";
-
-  const meta = META[symbol];
-  const atmStrike = Math.round(price / meta.strikeStep) * meta.strikeStep;
 
   return {
-    symbol, price: parseFloat(price.toFixed(2)), pct, volRatio,
-    rsi5m, rsi15m,
-    macd5m: macd5m?.bias, macd15m: macd15m?.bias,
-    vwap: vwap5m, vwapBias: price > vwap5m ? "above" : "below",
-    gamma, setup, signal, strengthAr, score, reasons,
-    suggestedStrike: atmStrike, riskNote: meta.risk, posSize: meta.posSize,
-    bullScore: bull.score, bearScore: bear.score,
-    atr5m, // V16.15: needed for hybrid stop calculation
+    pmh,    // Pre-Market High
+    pml,    // Pre-Market Low
+    pdc,    // Previous Day Close
+    pdh,    // Previous Day High
+    pdl,    // Previous Day Low
+    pivot,  // Daily Pivot
+    r1,     // Resistance 1
+    s1,     // Support 1
   };
 }
 
+// Check if price is near a key level (within tolerance)
+function isNearLevel(price, level, tolerancePct = 0.15) {
+  if (!level) return false;
+  const dist = Math.abs(price - level) / level * 100;
+  return dist <= tolerancePct;
+}
+
+// Find nearest support level below current price
+function findNearestSupport(price, sr) {
+  const levels = [sr.pml, sr.pdc, sr.pdl, sr.s1, sr.pivot].filter(l => l && l < price);
+  if (levels.length === 0) return null;
+  return Math.max(...levels); // closest support is the highest one below
+}
+
+// Find nearest resistance level above current price
+function findNearestResistance(price, sr) {
+  const levels = [sr.pmh, sr.pdc, sr.pdh, sr.r1, sr.pivot].filter(l => l && l > price);
+  if (levels.length === 0) return null;
+  return Math.min(...levels);
+}
+
 // ============================================================
-// ALPACA TRADING API (Paper Trading)
+// DATA HELPERS
 // ============================================================
-const TRADING_BASE = "https://paper-api.alpaca.markets/v2";
-const OPTIONS_BASE = "https://data.alpaca.markets/v1beta1/options";
-
-async function alpacaCall(url, method = "GET", body = null) {
-  const opts = {
-    method,
-    headers: { ...ALPACA_HEADERS, "Content-Type": "application/json" },
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const r = await fetch(url, opts);
-  if (!r.ok) {
-    const text = await r.text();
-    throw new Error(`Alpaca ${method} ${url.split("/").slice(-2).join("/")}: ${r.status} ${text}`);
-  }
-  return r.json();
-}
-
-async function getAccount() {
-  return alpacaCall(`${TRADING_BASE}/account`);
-}
-
-async function getOptionContracts(symbol, expirationDate, type, strikeMin, strikeMax) {
-  const params = new URLSearchParams({
-    underlying_symbols: symbol,
-    expiration_date: expirationDate,
-    type: type.toLowerCase(),
-    strike_price_gte: strikeMin.toFixed(2),
-    strike_price_lte: strikeMax.toFixed(2),
-    status: "active",
-    limit: "50",
-  });
-  const data = await alpacaCall(`${TRADING_BASE}/options/contracts?${params}`);
-  return data.option_contracts || [];
-}
-
-async function getOptionQuote(optionSymbol) {
+async function getBars(symbol, timeframe, daysBack = 1, includeExtended = false) {
+  const start = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+  const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${timeframe}&start=${start}&limit=1000${includeExtended ? "&adjustment=raw" : ""}`;
   try {
-    // Use the correct endpoint: /v1beta1/options/quotes/latest?symbols=...
-    const url = `https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${encodeURIComponent(optionSymbol)}`;
-    const data = await alpacaCall(url);
-    const quote = data.quotes?.[optionSymbol];
-    if (!quote) {
-      console.log(`  No quote data for ${optionSymbol}`);
-      return null;
-    }
-    const bid = quote.bp || 0;
-    const ask = quote.ap || 0;
-    const mid = bid > 0 && ask > 0 ? (bid + ask) / 2 : (ask || bid);
-    return { bid, ask, mid };
+    const res = await fetch(url, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET },
+    });
+    const data = await res.json();
+    return data.bars || [];
   } catch (e) {
-    console.log(`  Quote fetch error for ${optionSymbol}: ${e.message}`);
+    console.error(`getBars ${symbol} ${timeframe}: ${e.message}`);
+    return [];
+  }
+}
+
+async function getLatestPrice(symbol) {
+  try {
+    const res = await fetch(`${DATA_BASE}/stocks/${symbol}/trades/latest`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET },
+    });
+    const data = await res.json();
+    return data.trade?.p || null;
+  } catch (e) {
     return null;
   }
 }
 
-async function placeOptionOrder(optionSymbol, qty, side) {
-  return alpacaCall(`${TRADING_BASE}/orders`, "POST", {
-    symbol: optionSymbol,
-    qty: String(qty),
-    side, // "buy" or "sell"
-    type: "market",
-    time_in_force: "day",
-  });
+// ============================================================
+// VIX FETCHER
+// ============================================================
+async function getVIX() {
+  try {
+    const bars = await getBars("VIXY", "1Day", 2);
+    if (bars.length === 0) return null;
+    return bars[bars.length - 1].c;
+  } catch (e) {
+    return null;
+  }
+}
+
+// ============================================================
+// PULLBACK DETECTOR (Core of new strategy)
+// ============================================================
+function detectPullback(bars1m, bars5m, vwapVal, ema9Val) {
+  if (bars1m.length < 5 || bars5m.length < 5) return null;
+
+  const last1m = bars1m[bars1m.length - 1];
+  const prev1m = bars1m[bars1m.length - 2];
+  const beforePrev1m = bars1m[bars1m.length - 3];
+
+  const trend5m = bars5m.slice(-3);
+  const trendUp = trend5m[2].c > trend5m[0].c;
+  const trendDown = trend5m[2].c < trend5m[0].c;
+
+  // BULLISH PULLBACK PATTERN:
+  // 1. 5m trend is up
+  // 2. Recent 1m candles pulled back close to VWAP or EMA9
+  // 3. Last candle shows bounce (green close, lower wick rejection)
+  if (trendUp) {
+    const minLow = Math.min(prev1m.l, beforePrev1m.l);
+    const nearVWAP = minLow <= vwapVal * 1.001 && minLow >= vwapVal * 0.998;
+    const nearEMA = minLow <= ema9Val * 1.001 && minLow >= ema9Val * 0.998;
+    if (nearVWAP || nearEMA) {
+      // Check current bar is bouncing
+      const isBouncing = last1m.c > last1m.o && last1m.c > prev1m.c;
+      const wickRejection = (last1m.c - last1m.l) > (last1m.h - last1m.c) * 1.5;
+      if (isBouncing || wickRejection) {
+        return { direction: "CALL", level: nearVWAP ? "VWAP" : "EMA9", strength: wickRejection ? "strong" : "normal" };
+      }
+    }
+  }
+
+  // BEARISH PULLBACK PATTERN:
+  if (trendDown) {
+    const maxHigh = Math.max(prev1m.h, beforePrev1m.h);
+    const nearVWAP = maxHigh >= vwapVal * 0.999 && maxHigh <= vwapVal * 1.002;
+    const nearEMA = maxHigh >= ema9Val * 0.999 && maxHigh <= ema9Val * 1.002;
+    if (nearVWAP || nearEMA) {
+      const isFalling = last1m.c < last1m.o && last1m.c < prev1m.c;
+      const wickRejection = (last1m.h - last1m.c) > (last1m.c - last1m.l) * 1.5;
+      if (isFalling || wickRejection) {
+        return { direction: "PUT", level: nearVWAP ? "VWAP" : "EMA9", strength: wickRejection ? "strong" : "normal" };
+      }
+    }
+  }
+
+  return null;
+}
+
+// ============================================================
+// STRATEGY: Window-Specific Analysis
+// ============================================================
+async function analyzeStrategy(window, sr, indicators) {
+  const { price, bars1m, bars5m, vwap5m, ema9, rsi5m, atrVal, vix } = indicators;
+
+  // VIX filter (15-25 ideal)
+  if (vix && (vix < 12 || vix > 30)) {
+    return { signal: "NEUTRAL", reason: `VIX ${vix.toFixed(1)} outside 12-30 range` };
+  }
+
+  // FOMC cutoff
+  if (isFomcCutoff()) {
+    return { signal: "NEUTRAL", reason: "FOMC cutoff active" };
+  }
+
+  // Detect pullback
+  const pullback = detectPullback(bars1m, bars5m, vwap5m, ema9);
+  if (!pullback) {
+    return { signal: "NEUTRAL", reason: "No valid pullback detected" };
+  }
+
+  // Window-specific logic
+  switch (window.strategy) {
+    case "pullback":
+    case "vwap_touch":
+    case "trend_resume":
+      // Need S/R confluence
+      if (pullback.direction === "CALL") {
+        const support = findNearestSupport(price, sr);
+        if (!support) return { signal: "NEUTRAL", reason: "No support level identified" };
+        const distFromSupport = (price - support) / support * 100;
+        if (distFromSupport > 0.3) {
+          return { signal: "NEUTRAL", reason: `Too far from support ${support.toFixed(2)} (${distFromSupport.toFixed(2)}%)` };
+        }
+        // Check not at resistance
+        const resistance = findNearestResistance(price, sr);
+        if (resistance) {
+          const distToRes = (resistance - price) / price * 100;
+          if (distToRes < 0.1) {
+            return { signal: "NEUTRAL", reason: `Too close to resistance ${resistance.toFixed(2)}` };
+          }
+        }
+        // RSI check
+        if (rsi5m > 70) {
+          return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} > 70 (overbought)` };
+        }
+        return {
+          signal: "CALL",
+          reason: `Pullback bounce at ${pullback.level}, near support ${support.toFixed(2)}`,
+          support, resistance, pullback,
+        };
+      } else { // PUT
+        const resistance = findNearestResistance(price, sr);
+        if (!resistance) return { signal: "NEUTRAL", reason: "No resistance level identified" };
+        const distFromRes = (resistance - price) / price * 100;
+        if (distFromRes > 0.3) {
+          return { signal: "NEUTRAL", reason: `Too far from resistance ${resistance.toFixed(2)} (${distFromRes.toFixed(2)}%)` };
+        }
+        const support = findNearestSupport(price, sr);
+        if (support) {
+          const distToSup = (price - support) / price * 100;
+          if (distToSup < 0.1) {
+            return { signal: "NEUTRAL", reason: `Too close to support ${support.toFixed(2)}` };
+          }
+        }
+        if (rsi5m < 30) {
+          return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} < 30 (oversold)` };
+        }
+        return {
+          signal: "PUT",
+          reason: `Pullback rejection at ${pullback.level}, near resistance ${resistance.toFixed(2)}`,
+          resistance, support, pullback,
+        };
+      }
+
+    case "fade":
+      // Late-day reversal: go OPPOSITE of morning trend
+      // If morning trend was up, look for PUT setup near resistance
+      // If morning trend was down, look for CALL setup near support
+      // (logic similar but with reversed trend assumption)
+      if (pullback.direction === "PUT") {
+        const resistance = findNearestResistance(price, sr);
+        if (!resistance || (resistance - price) / price * 100 > 0.3) {
+          return { signal: "NEUTRAL", reason: "Fade: no nearby resistance" };
+        }
+        return { signal: "PUT", reason: `Late-day fade: rejection at resistance`, resistance, pullback };
+      }
+      if (pullback.direction === "CALL") {
+        const support = findNearestSupport(price, sr);
+        if (!support || (price - support) / support * 100 > 0.3) {
+          return { signal: "NEUTRAL", reason: "Fade: no nearby support" };
+        }
+        return { signal: "CALL", reason: `Late-day fade: bounce at support`, support, pullback };
+      }
+      break;
+
+    case "moc":
+      // Quick scalp - direction = strongest trend
+      // ATM strike, quick exit
+      if (pullback.strength === "strong") {
+        if (pullback.direction === "CALL") {
+          const support = findNearestSupport(price, sr);
+          return { signal: "CALL", reason: "MOC scalp: strong pullback bounce", support, pullback };
+        } else {
+          const resistance = findNearestResistance(price, sr);
+          return { signal: "PUT", reason: "MOC scalp: strong pullback rejection", resistance, pullback };
+        }
+      }
+      return { signal: "NEUTRAL", reason: "MOC: pullback not strong enough" };
+  }
+
+  return { signal: "NEUTRAL", reason: "No matching strategy logic" };
+}
+
+// ============================================================
+// ALPACA HELPERS
+// ============================================================
+async function alpacaCall(url, method = "GET", body = null) {
+  const opts = {
+    method,
+    headers: {
+      "APCA-API-KEY-ID": ALPACA_KEY,
+      "APCA-API-SECRET-KEY": ALPACA_SECRET,
+      "Content-Type": "application/json",
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Alpaca ${method} ${url.split("/").slice(-2).join("/")}: ${res.status} ${text}`);
+  return text ? JSON.parse(text) : null;
+}
+
+async function getAccount() {
+  return await alpacaCall(`${TRADING_BASE}/account`);
 }
 
 async function getPosition(optionSymbol) {
   try {
     return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`);
-  } catch {
+  } catch (e) {
     return null;
   }
 }
 
-async function closePosition(optionSymbol) {
-  return alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
+async function closePosition(optionSymbol, qty = null) {
+  if (qty) {
+    return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}?qty=${qty}`, "DELETE");
+  }
+  return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
-// V16.4: Stop Loss Order Management
-async function placeStopLossOrder(optionSymbol, qty, stopPrice) {
-  return alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+async function placeOptionOrder(optionSymbol, qty, side) {
+  return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
     symbol: optionSymbol,
-    qty: String(qty),
+    qty,
+    side,
+    type: "market",
+    time_in_force: "day",
+  });
+}
+
+async function placeStopLossOrder(optionSymbol, qty, stopPrice) {
+  return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+    symbol: optionSymbol,
+    qty,
     side: "sell",
     type: "stop",
     stop_price: stopPrice.toFixed(2),
@@ -608,1198 +571,548 @@ async function cancelOrder(orderId) {
   try {
     return await alpacaCall(`${TRADING_BASE}/orders/${orderId}`, "DELETE");
   } catch (e) {
-    console.error(`  Cancel order ${orderId} failed: ${e.message}`);
     return null;
   }
 }
 
-async function getOrder(orderId) {
+// ============================================================
+// OPTION HELPERS
+// ============================================================
+async function getOptionContracts(symbol, expirationDate, type, strikeMin, strikeMax) {
+  const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${expirationDate}&type=${type === "CALL" ? "call" : "put"}&strike_price_gte=${strikeMin}&strike_price_lte=${strikeMax}&status=active&limit=20`;
   try {
-    return await alpacaCall(`${TRADING_BASE}/orders/${orderId}`);
-  } catch {
-    return null;
-  }
-}
-
-async function updateStopLoss(pos, newStopPrice) {
-  // Cancel old, place new
-  if (pos.stopOrderId) {
-    await cancelOrder(pos.stopOrderId);
-    await new Promise(r => setTimeout(r, 500)); // Let Alpaca process
-  }
-  try {
-    const order = await placeStopLossOrder(pos.optionSymbol, pos.qty, newStopPrice);
-    console.log(`  ${pos.symbol}: Stop Loss updated to $${newStopPrice.toFixed(2)} (order ${order.id})`);
-    return order.id;
+    const data = await alpacaCall(url);
+    return data?.option_contracts || [];
   } catch (e) {
-    console.error(`  ${pos.symbol}: Failed to place new Stop Loss: ${e.message}`);
-    return null;
+    return [];
   }
 }
 
-// ============================================================
-// Pick best option contract for a signal
-// ============================================================
-async function pickOptionContract(symbol, signal, atmStrike, strikeStep) {
+async function pickOptionContract(symbol, signal, atmStrike) {
   const today = new Date().toISOString().split("T")[0];
-  // V16.24: Pick further OTM (2 strikes instead of 1) for less gamma noise
-  // 0.5-1% OTM = lower delta, less reactive to noise, more time for thesis
-  const targetStrike = signal === "CALL" ? atmStrike + strikeStep * 2 : atmStrike - strikeStep * 2;
-  const min = targetStrike - strikeStep * 0.5;
-  const max = targetStrike + strikeStep * 0.5;
-
+  // v17: Use ATM strike (highest gamma for quick moves)
+  // For SPY, strikeStep is $1, so just use atmStrike rounded
+  const min = atmStrike - 0.5;
+  const max = atmStrike + 0.5;
   const contracts = await getOptionContracts(symbol, today, signal, min, max);
   if (contracts.length === 0) {
-    // No 0DTE found, try wider range
-    const wideMin = targetStrike - strikeStep * 2;
-    const wideMax = targetStrike + strikeStep * 2;
-    const wider = await getOptionContracts(symbol, today, signal, wideMin, wideMax);
-    if (wider.length === 0) return null;
-    // Pick closest to target
-    wider.sort((a, b) => Math.abs(a.strike_price - targetStrike) - Math.abs(b.strike_price - targetStrike));
-    return wider[0];
+    // Try wider
+    const wideContracts = await getOptionContracts(symbol, today, signal, atmStrike - 2, atmStrike + 2);
+    if (wideContracts.length === 0) return null;
+    wideContracts.sort((a, b) => Math.abs(a.strike_price - atmStrike) - Math.abs(b.strike_price - atmStrike));
+    return wideContracts[0];
   }
-  // Pick exact match or closest
-  contracts.sort((a, b) => Math.abs(a.strike_price - targetStrike) - Math.abs(b.strike_price - targetStrike));
+  contracts.sort((a, b) => Math.abs(a.strike_price - atmStrike) - Math.abs(b.strike_price - atmStrike));
   return contracts[0];
 }
 
-// ============================================================
-// Calculate quantity based on portfolio %
-// ============================================================
-function calculateQty(portfolioValue, premiumPerContract, pctOfPortfolio = 0.10) {
-  const targetDollar = portfolioValue * pctOfPortfolio;
-  const contractCost = premiumPerContract * 100; // each contract = 100 shares
-  const qty = Math.floor(targetDollar / contractCost);
-  return Math.max(qty, 1); // at least 1 contract
-}
-
-// ============================================================
-// Time helpers (CDT = UTC-5)
-// ============================================================
-function isPastForceExitTime(now) {
-  // V16.25: Force exit at 2:58 PM CDT = 19:58 UTC
-  const d = now ? new Date(now) : new Date();
-  const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin >= 19 * 60 + 58;
-}
-
-function isBeforeNoEntryTime(now) {
-  // V16.25: No new entries after 2:50 PM CDT = 19:50 UTC
-  const d = now ? new Date(now) : new Date();
-  const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin < 19 * 60 + 50;
-}
-
-// V16.21: FOMC / High-Impact Event Days - stop trading early
-function isFomcDay(now) {
-  const FOMC_DATES_2026 = ["2026-06-17", "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"];
-  const d = now ? new Date(now) : new Date();
-  const dateStr = d.toISOString().split("T")[0];
-  return FOMC_DATES_2026.includes(dateStr);
-}
-
-function isBeforeFomcCutoff(now) {
-  // On FOMC days, no new entries after 12:30 PM CDT = 17:30 UTC
-  const d = now ? new Date(now) : new Date();
-  const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin < 17 * 60 + 30;
-}
-
-function isReportTime(now) {
-  // 3:00 PM CDT = 20:00 UTC, fire once
-  const d = now ? new Date(now) : new Date();
-  const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
-  return utcMin >= 20 * 60 && utcMin < 20 * 60 + 10;
-}
-
-// ============================================================
-// V16: PHASED TRAILING STOP SYSTEM
-// ============================================================
-// V16.15: Hybrid ATR + Score Stop Loss
-function calculateStopConfig(price, atr, score) {
-  // V16.24: Wider stops for 0DTE - prevent noise-driven stop hits
-  // Default fallback (when no data)
-  if (!atr || !price || atr <= 0 || price <= 0) {
-    return { stopPct: 35, bePct: 12, trailPct: 30, peakBufferPct: 5 };
-  }
-
-  // Calculate volatility as % of stock price
-  const volatility = (atr / price) * 100;
-
-  // V16.24: Base stop is now WIDER for 0DTE
-  // Low vol stocks: 30-35%, High vol stocks: 40-50%
-  let basePct = 30 + (volatility * 10);
-
-  // Score adjustment: stronger signal = slightly tighter stop
-  let scoreAdj = 0;
-  if (score >= 95) scoreAdj = -3;       // Very strong: tighter
-  else if (score >= 90) scoreAdj = -1;
-  else if (score < 85) scoreAdj = +3;   // Weaker: wider
-
-  // V16.24: Final stop %, now clamped between 30% and 50%
-  const stopPct = Math.max(30, Math.min(50, Math.round(basePct + scoreAdj)));
-
-  // BE trigger ~ stop/3, Trailing trigger ~ stop
-  const bePct = Math.max(10, Math.round(stopPct / 3));
-  const trailPct = stopPct;
-  const peakBufferPct = 5; // peak buffer stays at 5%
-
-  return { stopPct, bePct, trailPct, peakBufferPct };
-}
-
-function calculatePhase(entryPremium, peakPremium, config) {
-  const cfg = config || { stopPct: 30, bePct: 10, trailPct: 30, peakBufferPct: 5 };
-  const peakPct = ((peakPremium - entryPremium) / entryPremium) * 100;
-  if (peakPct >= cfg.trailPct) return "trailing";
-  if (peakPct >= cfg.bePct) return "breakeven";
-  return "initial";
-}
-
-function calculateStop(entryPremium, peakPremium, config) {
-  const cfg = config || { stopPct: 30, bePct: 10, trailPct: 30, peakBufferPct: 5 };
-  const phase = calculatePhase(entryPremium, peakPremium, cfg);
-  switch (phase) {
-    case "trailing":  return Math.max(entryPremium * (1 + cfg.trailPct / 100), peakPremium * (1 - cfg.peakBufferPct / 100));
-    case "breakeven": return entryPremium;
-    default:          return entryPremium * (1 - cfg.stopPct / 100);
-  }
-}
-
-function getPhaseLabel(phase, config) {
-  const cfg = config || { stopPct: 30, bePct: 10, trailPct: 30, peakBufferPct: 5 };
-  switch (phase) {
-    case "trailing":  return `Trailing (+${cfg.trailPct}% Min / Peak -${cfg.peakBufferPct}%)`;
-    case "breakeven": return "Break-Even";
-    default:          return `Initial (-${cfg.stopPct}%)`;
-  }
-}
-
-function getPhaseEmoji(phase) {
-  switch (phase) {
-    case "trailing":  return "🚀";
-    case "breakeven": return "🛡️";
-    default:          return "🛑";
-  }
-}
-
-async function sendTelegram(text, replyToMessageId = null) {
-  const body = { chat_id: TG_CHAT_ID, text, parse_mode: "HTML", disable_web_page_preview: true };
-  if (replyToMessageId) {
-    body.reply_parameters = { message_id: replyToMessageId, allow_sending_without_reply: true };
-  }
-  const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) {
-    console.error(`Telegram error: ${await r.text()}`);
+async function getOptionQuote(optionSymbol) {
+  try {
+    const res = await fetch(`${OPTIONS_BASE}/quotes/latest?symbols=${optionSymbol}`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET },
+    });
+    const data = await res.json();
+    const q = data.quotes?.[optionSymbol];
+    if (!q) return null;
+    return (q.ap + q.bp) / 2;
+  } catch (e) {
     return null;
   }
-  const data = await r.json();
-  return data.result?.message_id || null;
 }
 
-function formatBuyAlert(r, pos) {
-  const target = pos.entryPremium * 1.35;
-  const stop = pos.entryPremium * 0.70;
-  return `✅ <b>BUY ${r.symbol} ${r.signal} $${pos.strike} 0DTE</b>
-💰 Entry: $${pos.entryPremium.toFixed(2)} × ${pos.qty}
-🎯 Target: $${target.toFixed(2)} (+35%)
-🛑 Stop: $${stop.toFixed(2)} (-30%)
-📊 ${r.score}% ${r.setup?.name || ""}`;
+function calculateQty(portfolioValue, premium, riskPct, stopPct) {
+  // Risk-based position sizing
+  // Max loss per contract = premium * (stopPct/100) * 100
+  // We want total loss to equal portfolio * riskPct
+  const targetLoss = portfolioValue * (riskPct / 100);
+  const lossPerContract = premium * (stopPct / 100) * 100;
+  const qty = Math.floor(targetLoss / lossPerContract);
+  return Math.max(qty, 1);
 }
 
-function formatMonitor(pos, currentPremium, peakPremium, currentStop, minutesElapsed) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  const phase = calculatePhase(pos.entryPremium, peakPremium, pos.stopConfig);
-  const emoji = getPhaseEmoji(phase);
-  const phaseLabel = getPhaseLabel(phase, pos.stopConfig);
-  return `📊 <b>${pos.symbol || ""} - مراقبة</b>
-💰 Premium: $${currentPremium.toFixed(2)} (${pctStr}%)
-🎯 Stop: $${currentStop.toFixed(2)} ${emoji} ${phaseLabel}
-📈 Peak: $${peakPremium.toFixed(2)}
-⏱ ${minutesElapsed} دقيقة`;
-}
-
-function formatBreakEven(pos, currentPremium) {
-  return `🛡️ <b>BREAK-EVEN: ${pos.symbol || ""}</b>
-💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-🔒 Stop: $${pos.entryPremium.toFixed(2)} (سعر الدخول)`;
-}
-
-function formatBuffer(pos, currentPremium, peakPremium, stop) {
-  return `📈 <b>BUFFER: ${pos.symbol || ""}</b>
-💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-🎯 Stop: $${stop.toFixed(2)} (Peak - 7%)`;
-}
-
-function formatTrailing(pos, currentPremium, peakPremium, stop) {
-  const stopPct = ((stop - pos.entryPremium) / pos.entryPremium * 100).toFixed(1);
-  return `🚀 <b>TRAILING ACTIVATED: ${pos.symbol || ""}</b>
-💰 $${currentPremium.toFixed(2)} (+${(((currentPremium - pos.entryPremium) / pos.entryPremium) * 100).toFixed(1)}%)
-🔒 Stop: $${stop.toFixed(2)} (+${stopPct}% مضمون)
-📈 سيرتفع مع Peak (-5%)`;
-}
-
-function formatV16Exit(pos, currentPremium, reason, minutesElapsed) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium) * 100;
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  const emoji = pct >= 0 ? "✅" : "🛑";
-  const reasonText = {
-    profit: "خروج بربح",
-    loss: "خروج بخسارة",
-    trailing: "Trailing Stop",
-    breakeven: "Break-Even Stop",
-    force: "إغلاق إجباري (2:58 PM)",
-    reversal: "انعكاس",
-  }[reason] || reason;
-  return `${emoji} <b>EXIT: ${pos.symbol || ""} (${reasonText})</b>
-💰 $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
-${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)
-⏱ ${minutesElapsed} دقيقة`;
-}
-
-function formatStatusUpdate(label, pos, currentPremium) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  return `📊 <b>${label}: مستمر</b>
-💰 Premium: $${currentPremium.toFixed(2)} (${pctStr}%)`;
-}
-
-function formatExitProfit(pos, currentPremium, reason, minutesElapsed) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `✅ <b>EXIT: ${reason}</b>
-💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
-📈 ${pctStr}% (${pnlStr}$)
-⏱ المدة: ${minutesElapsed} دقيقة`;
-}
-
-function formatExitLoss(pos, currentPremium, reason, minutesElapsed) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pctStr = pct.toFixed(1);
-  const pnlStr = pnl.toFixed(0);
-  return `🛑 <b>EXIT: ${reason}</b>
-💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
-📉 ${pctStr}% (${pnlStr}$)
-⏱ المدة: ${minutesElapsed} دقيقة`;
-}
-
-function formatExitTime(pos, currentPremium, minutesElapsed) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  const emoji = pct >= 0 ? "🏁" : "🏁";
-  return `${emoji} <b>EXIT: انتهت المدة (30 دقيقة)</b>
-💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
-${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
-}
-
-function formatExitReversal(pos, currentPremium, newSignal) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `🔄 <b>EXIT: انعكاس → ${newSignal}</b>
-💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
-${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
-}
-
-function formatExitForce(pos, currentPremium) {
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium * 100);
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pctStr = (pct >= 0 ? "+" : "") + pct.toFixed(1);
-  const pnlStr = (pnl >= 0 ? "+" : "") + pnl.toFixed(0);
-  return `⏰ <b>EXIT: إغلاق إجباري (2:45 PM)</b>
-💰 Premium: $${pos.entryPremium.toFixed(2)} → $${currentPremium.toFixed(2)}
-${pct >= 0 ? "📈" : "📉"} ${pctStr}% (${pnlStr}$)`;
-}
-
-async function formatDailyReport(state) {
-  const trades = state._dailyTrades || [];
-
-  // Get today in CDT timezone
-  const now = new Date();
-  const cdtDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Chicago" }));
-  const dayName = cdtDate.toLocaleDateString("en-US", { weekday: "long" });
-  const monthName = cdtDate.toLocaleDateString("en-US", { month: "long" });
-  const day = cdtDate.getDate();
-  const year = cdtDate.getFullYear();
-  const dateHeader = `${dayName} ${monthName} ${day}, ${year}`;
-
-  // V16.5: Get real values from Alpaca
-  let portfolioValue = 0;
-  let dailyChange = 0;
-  let dailyChangePct = 0;
+// ============================================================
+// TELEGRAM
+// ============================================================
+async function sendTelegram(text, chatId = null) {
+  const chat = chatId || TG_CHAT;
   try {
-    const account = await getAccount();
-    portfolioValue = parseFloat(account.portfolio_value);
-    const lastEquity = parseFloat(account.last_equity || portfolioValue);
-    dailyChange = portfolioValue - lastEquity;
-    dailyChangePct = lastEquity > 0 ? (dailyChange / lastEquity * 100) : 0;
+    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chat, text, parse_mode: "HTML" }),
+    });
+    const data = await res.json();
+    return data.result?.message_id || null;
   } catch (e) {
-    console.error("Failed to fetch account for report:", e.message);
+    console.error("Telegram error:", e.message);
+    return null;
   }
-
-  if (trades.length === 0) {
-    return `📊 <b>Daily Report - ${dateHeader}</b>\n\nلا توجد صفقات اليوم\n\n📈 الرصيد: $${portfolioValue.toFixed(0)}`;
-  }
-
-  const wins = trades.filter(t => t.pnl > 0);
-  const losses = trades.filter(t => t.pnl <= 0);
-  const winRate = (wins.length / trades.length * 100).toFixed(1);
-  const best = trades.reduce((b, t) => t.pnl > b.pnl ? t : b, trades[0]);
-  const worst = trades.reduce((w, t) => t.pnl < w.pnl ? t : w, trades[0]);
-  // V16.9: Total profit and loss separately
-  const totalProfit = wins.reduce((s, t) => s + t.pnl, 0);
-  const totalLoss = losses.reduce((s, t) => s + t.pnl, 0);
-
-  return `📊 <b>Daily Report - ${dateHeader}</b>
-
-💼 الصفقات: ${trades.length}
-✅ ربحانة: ${wins.length} (${winRate}%)
-❌ خسرانة: ${losses.length}
-
-💰 ربح: +$${totalProfit.toFixed(0)}
-💸 خسارة: $${totalLoss.toFixed(0)}
-📊 صافي: ${dailyChange >= 0 ? "+" : ""}$${dailyChange.toFixed(0)} (${dailyChangePct >= 0 ? "+" : ""}${dailyChangePct.toFixed(1)}%)
-
-🥇 أفضل: ${best.symbol} ${best.signal} ${(best.pnlPct >= 0 ? "+" : "")}${best.pnlPct.toFixed(1)}%
-🥉 أسوأ: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}%
-
-📈 الرصيد: $${portfolioValue.toFixed(0)}`;
 }
 
-// V16.14: STRATEGY ANALYZER - Comprehensive performance analysis
-async function analyzeStrategy(state) {
-  const trades = state._dailyTrades || [];
-  if (trades.length === 0) {
-    return "📊 <b>تحليل الاستراتيجية</b>\n\nلا توجد صفقات اليوم للتحليل.";
+// ============================================================
+// MAIN: SCAN MODE
+// ============================================================
+async function runScan() {
+  console.log(`=== Scan v17 started ${new Date().toISOString()} ===`);
+
+  const state = loadState();
+  const today = new Date().toISOString().split("T")[0];
+
+  // Reset daily state on new day
+  if (state._date !== today) {
+    state._date = today;
+    state._dailyTrades = [];
+    state._reportSent = false;
+    state._dailyLosses = 0;
+    state._dailyTrades_count = 0;
+    state._consecLosses = 0;
+    saveState(state);
   }
 
+  // Account check
+  let account;
+  try {
+    account = await getAccount();
+    console.log(`Account: Cash $${parseFloat(account.cash).toFixed(2)}, Portfolio $${parseFloat(account.portfolio_value).toFixed(2)}`);
+  } catch (e) {
+    console.log("Account fetch failed, skipping");
+    return;
+  }
+  const portfolio = parseFloat(account.portfolio_value);
+
+  // Daily risk limits (Layer 3 — but we're testing Layer 2 only per user request)
+  // Just inform, don't block yet
+  if (state._dailyLosses && state._dailyLosses >= portfolio * 0.02) {
+    console.log(`Daily loss limit reached: $${state._dailyLosses.toFixed(2)} >= 2%`);
+    // We'd block here in Layer 3, but skip per user choice
+  }
+
+  // Check current window
+  const window = getCurrentWindow();
+  if (!window) {
+    console.log("Not in a trading window, processing active positions only");
+    for (const symbol of TICKERS) {
+      if (state[symbol]?.active) {
+        await processActivePosition(state, account, symbol);
+      }
+    }
+    saveState(state);
+    return;
+  }
+  console.log(`Current window: ${window.name}`);
+
+  // First, monitor existing positions
+  for (const symbol of TICKERS) {
+    if (state[symbol]?.active) {
+      console.log(`${symbol}: monitoring active position`);
+      await processActivePosition(state, account, symbol);
+    }
+  }
+  saveState(state);
+
+  // Count active positions
+  const activeCount = TICKERS.filter(s => state[s]?.active).length;
+  if (activeCount >= 2) {
+    console.log(`Max 2 active positions (${activeCount} open), skipping new entries`);
+    return;
+  }
+
+  // Get VIX once
+  const vix = await getVIX();
+
+  // Loop over tickers for new entries
+  for (const symbol of TICKERS) {
+    if (state[symbol]?.active) continue;
+
+    // Cooldown check
+    if (state[symbol]?.cooldownUntil && Date.now() < state[symbol].cooldownUntil) {
+      const remaining = Math.round((state[symbol].cooldownUntil - Date.now()) / 60000);
+      console.log(`${symbol}: cooldown active (${remaining} min remaining)`);
+      continue;
+    }
+
+    console.log(`\n--- Analyzing ${symbol} ---`);
+
+    // Fetch market data
+    const price = await getLatestPrice(symbol);
+    if (!price) {
+      console.log(`${symbol}: cannot fetch price`);
+      continue;
+    }
+
+    const bars1m = await getBars(symbol, "1Min", 1);
+    const bars5m = await getBars(symbol, "5Min", 2);
+    if (bars1m.length < 20 || bars5m.length < 20) {
+      console.log(`${symbol}: insufficient bar data`);
+      continue;
+    }
+
+    const todayBars1m = bars1m.filter(b => b.t.startsWith(today));
+    const todayBars5m = bars5m.filter(b => b.t.startsWith(today));
+
+    const closes1m = todayBars1m.map(b => b.c);
+    const closes5m = todayBars5m.map(b => b.c);
+    const vwap5m = vwap(todayBars5m);
+    const ema9 = ema(closes1m, 9);
+    const rsi5m = rsi(closes5m, 14);
+    const atrVal = atr(bars5m, 14);
+
+    console.log(`${symbol}: $${price.toFixed(2)} | VWAP: $${vwap5m?.toFixed(2)} | EMA9: $${ema9?.toFixed(2)} | RSI: ${rsi5m.toFixed(1)}`);
+
+    // S/R
+    const sr = await calculateSupportResistance(symbol);
+    console.log(`${symbol} S/R: PMH=${sr.pmh?.toFixed(2)} PML=${sr.pml?.toFixed(2)} PDC=${sr.pdc?.toFixed(2)} PDH=${sr.pdh?.toFixed(2)} PDL=${sr.pdl?.toFixed(2)}`);
+
+    // Analyze
+    const indicators = { price, bars1m: todayBars1m, bars5m: todayBars5m, vwap5m, ema9, rsi5m, atrVal, vix };
+    const result = await analyzeStrategy(window, sr, indicators);
+    console.log(`${symbol}: ${result.signal} | ${result.reason}`);
+
+    if (result.signal === "NEUTRAL") continue;
+
+    // ENTRY
+    const cfg = TICKER_CONFIG[symbol] || { strikeStep: 1, sizeFactor: 1.0 };
+    const atmStrike = Math.round(price);
+    const contract = await pickOptionContract(symbol, result.signal, atmStrike);
+    if (!contract) {
+      console.log(`${symbol}: no suitable option contract`);
+      continue;
+    }
+
+    const premium = await getOptionQuote(contract.symbol);
+    if (!premium || premium < 0.10) {
+      console.log(`${symbol}: premium too low (${premium})`);
+      continue;
+    }
+
+    const baseQty = calculateQty(portfolio, premium, window.riskPct, window.stopPct);
+    const qty = Math.max(1, Math.floor(baseQty * cfg.sizeFactor));
+
+    console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)}`);
+
+    try {
+      const order = await placeOptionOrder(contract.symbol, qty, "buy");
+      const stopPrice = premium * (1 - window.stopPct / 100);
+      let stopOrderId = null;
+      try {
+        const stopOrder = await placeStopLossOrder(contract.symbol, qty, stopPrice);
+        stopOrderId = stopOrder.id;
+      } catch (e) {
+        console.error(`${symbol}: stop loss order failed: ${e.message}`);
+      }
+
+      const msg = `✅ <b>BUY ${symbol} ${result.signal} $${contract.strike_price} 0DTE</b>
+💰 Entry: $${premium.toFixed(2)} × ${qty}
+🎯 Target: +${window.targetPct}% ($${(premium * (1 + window.targetPct / 100)).toFixed(2)})
+🛑 Stop: -${window.stopPct}% ($${stopPrice.toFixed(2)})
+🪟 Window: ${window.name}
+📍 ${result.reason}`;
+      const msgId = await sendTelegram(msg);
+
+      state[symbol] = {
+        active: true,
+        signal: result.signal,
+        window: window.name,
+        optionSymbol: contract.symbol,
+        strike: contract.strike_price,
+        entryPremium: premium,
+        qty,
+        entryTime: Date.now(),
+        orderId: order.id,
+        stopOrderId,
+        currentStop: stopPrice,
+        peakPremium: premium,
+        targetPct: window.targetPct,
+        stopPct: window.stopPct,
+        timeExitMin: window.timeExitMin,
+        entryMessageId: msgId,
+        reason: result.reason,
+        partial1Done: false,
+        bePromoted: false,
+        partial2Done: false,
+        trailing: false,
+        remainingQty: qty,
+        quickExitWindow: true,
+      };
+      state._dailyTrades_count = (state._dailyTrades_count || 0) + 1;
+      saveState(state);
+
+      // Break after 1 entry per scan (avoid burst entries)
+      break;
+    } catch (e) {
+      console.error(`${symbol}: entry failed: ${e.message}`);
+    }
+  }
+
+  saveState(state);
+}
+
+// ============================================================
+// MONITOR MODE: Process active position
+// ============================================================
+async function processActivePosition(state, account, symbol) {
+  const pos = state[symbol];
+  if (!pos || !pos.active) return;
+
+  // Force exit time
+  if (isPastForceExit()) {
+    console.log(`${symbol}: Past force exit time, closing position`);
+    await exitPosition(state, pos, symbol, "force_exit", "إغلاق إجباري (2:58 PM)");
+    return;
+  }
+
+  // Get current premium
+  const alpacaPos = await getPosition(pos.optionSymbol);
+  if (!alpacaPos) {
+    console.log(`${symbol}: Position not in Alpaca, marking closed`);
+    state[symbol].active = false;
+    return;
+  }
+
+  const currentPremium = parseFloat(alpacaPos.current_price);
+  const pnlPct = (currentPremium - pos.entryPremium) / pos.entryPremium * 100;
+  const elapsedMin = (Date.now() - pos.entryTime) / 60000;
+
+  console.log(`${symbol}: Premium $${currentPremium.toFixed(2)} (${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}%), Elapsed ${elapsedMin.toFixed(1)} min`);
+
+  // Update peak
+  if (currentPremium > pos.peakPremium) {
+    pos.peakPremium = currentPremium;
+  }
+
+  // ===========================================
+  // LAYER 2: TRADE MANAGEMENT
+  // ===========================================
+
+  // Quick Exit: -30% in first minute
+  if (pos.quickExitWindow && elapsedMin <= 1 && pnlPct <= -QUICK_EXIT_PCT) {
+    console.log(`${symbol}: Quick exit triggered: ${pnlPct.toFixed(1)}% in ${elapsedMin.toFixed(1)} min`);
+    await exitPosition(state, pos, symbol, "quick_exit", "خروج سريع (دقيقة 1)");
+    return;
+  }
+
+  // Disable quick exit window after 1 minute
+  if (elapsedMin > 1 && pos.quickExitWindow) {
+    pos.quickExitWindow = false;
+  }
+
+  // Profit Partial 1: +30% → sell 50%
+  if (!pos.partial1Done && pnlPct >= PROFIT_PARTIAL_1) {
+    const sellQty = Math.floor(pos.remainingQty / 2);
+    if (sellQty >= 1) {
+      console.log(`${symbol}: Profit partial 1 (+30%): selling ${sellQty} of ${pos.remainingQty}`);
+      try {
+        await closePosition(pos.optionSymbol, sellQty);
+        pos.remainingQty -= sellQty;
+        pos.partial1Done = true;
+        await sendTelegram(`💰 <b>${symbol}</b> +30% Partial Profit
+بعنا ${sellQty} عقود (نص الصفقة)
+السعر: $${currentPremium.toFixed(2)}
+الباقي: ${pos.remainingQty} عقود`);
+      } catch (e) {
+        console.error(`${symbol}: partial sell failed: ${e.message}`);
+      }
+    }
+  }
+
+  // Profit BE Stop: +50% → move stop to entry
+  if (!pos.bePromoted && pnlPct >= PROFIT_BE_PCT) {
+    console.log(`${symbol}: Promoting to BE stop`);
+    try {
+      if (pos.stopOrderId) await cancelOrder(pos.stopOrderId);
+      const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, pos.entryPremium);
+      pos.stopOrderId = newStop.id;
+      pos.currentStop = pos.entryPremium;
+      pos.bePromoted = true;
+      await sendTelegram(`🛡 <b>${symbol}</b> +50% Break-Even Activated
+Stop → $${pos.entryPremium.toFixed(2)} (entry)
+P&L: +${pnlPct.toFixed(1)}%`);
+    } catch (e) {
+      console.error(`${symbol}: BE promotion failed: ${e.message}`);
+    }
+  }
+
+  // Profit Partial 2: +75%
+  if (pos.partial1Done && !pos.partial2Done && pnlPct >= PROFIT_PARTIAL_2) {
+    const sellQty = Math.max(1, Math.floor(pos.remainingQty / 2));
+    if (sellQty < pos.remainingQty) {
+      console.log(`${symbol}: Profit partial 2 (+75%): selling ${sellQty}`);
+      try {
+        await closePosition(pos.optionSymbol, sellQty);
+        pos.remainingQty -= sellQty;
+        pos.partial2Done = true;
+        await sendTelegram(`💰 <b>${symbol}</b> +75% Partial Profit
+بعنا ${sellQty} إضافية
+الباقي: ${pos.remainingQty} للتريلينج`);
+      } catch (e) {
+        console.error(`${symbol}: partial 2 sell failed: ${e.message}`);
+      }
+    }
+  }
+
+  // Trailing at +100%
+  if (pnlPct >= PROFIT_TRAIL_PCT && !pos.trailing) {
+    pos.trailing = true;
+    console.log(`${symbol}: Trailing stop activated`);
+  }
+  if (pos.trailing) {
+    const trailStop = pos.peakPremium * 0.85;
+    if (trailStop > pos.currentStop) {
+      try {
+        if (pos.stopOrderId) await cancelOrder(pos.stopOrderId);
+        const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, trailStop);
+        pos.stopOrderId = newStop.id;
+        pos.currentStop = trailStop;
+        console.log(`${symbol}: Trailing stop updated to $${trailStop.toFixed(2)}`);
+      } catch (e) {
+        console.error(`${symbol}: trail update failed: ${e.message}`);
+      }
+    }
+  }
+
+  // Time exit
+  if (elapsedMin >= pos.timeExitMin) {
+    console.log(`${symbol}: Time exit triggered (${elapsedMin.toFixed(1)} min >= ${pos.timeExitMin})`);
+    await exitPosition(state, pos, symbol, "time_exit", `خروج وقتي (${pos.timeExitMin} دقيقة)`);
+    return;
+  }
+
+  state[symbol] = pos;
+}
+
+async function exitPosition(state, pos, symbol, reason, reasonAr) {
+  try {
+    if (pos.stopOrderId) {
+      await cancelOrder(pos.stopOrderId);
+    }
+    if (pos.remainingQty > 0) {
+      await closePosition(pos.optionSymbol);
+    }
+  } catch (e) {
+    console.error(`${symbol}: exit close failed: ${e.message}`);
+  }
+
+  const exitPremium = await getOptionQuote(pos.optionSymbol) || pos.currentStop || pos.entryPremium * 0.7;
+  const pnl = (exitPremium - pos.entryPremium) * pos.qty * 100;
+  const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
+  const minutes = Math.round((Date.now() - pos.entryTime) / 60000);
+
+  state._dailyTrades = state._dailyTrades || [];
+  state._dailyTrades.push({
+    symbol,
+    signal: pos.signal,
+    window: pos.window,
+    entryPremium: pos.entryPremium,
+    exitPremium,
+    qty: pos.qty,
+    pnl,
+    pnlPct,
+    reason,
+    minutes,
+    entryTime: pos.entryTime,
+    exitTime: Date.now(),
+    strike: pos.strike,
+    setup: pos.reason,
+  });
+
+  if (pnl < 0) {
+    state._dailyLosses = (state._dailyLosses || 0) + Math.abs(pnl);
+    state._consecLosses = (state._consecLosses || 0) + 1;
+  } else {
+    state._consecLosses = 0;
+  }
+
+  const icon = pnl > 0 ? "✅" : pnl < 0 ? "🛑" : "⏸";
+  await sendTelegram(`${icon} <b>EXIT ${symbol}</b> (${reasonAr})
+💰 $${pos.entryPremium.toFixed(2)} → $${exitPremium.toFixed(2)}
+📊 ${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}% (${pnl >= 0 ? "+" : ""}$${pnl.toFixed(0)})
+⏱ ${minutes} دقيقة | 🪟 ${pos.window}`);
+
+  state[symbol] = {
+    active: false,
+    cooldownUntil: Date.now() + 10 * 60 * 1000,
+    lastSignal: pos.signal,
+  };
+}
+
+// ============================================================
+// DAILY REPORT
+// ============================================================
+async function sendDailyReport(state, portfolio) {
+  if (state._reportSent) return;
+  if (!isReportTime()) return;
+
+  const trades = state._dailyTrades || [];
   const wins = trades.filter(t => t.pnl > 0);
   const losses = trades.filter(t => t.pnl < 0);
   const breakevens = trades.filter(t => t.pnl === 0);
   const totalProfit = wins.reduce((s, t) => s + t.pnl, 0);
-  const totalLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0));
-  const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss).toFixed(2) : "N/A";
-  const avgWin = wins.length > 0 ? totalProfit / wins.length : 0;
-  const avgLoss = losses.length > 0 ? totalLoss / losses.length : 0;
-  const winRate = (wins.length / trades.length * 100).toFixed(1);
+  const totalLoss = losses.reduce((s, t) => s + t.pnl, 0);
+  const net = totalProfit + totalLoss;
+  const wr = trades.length > 0 ? (wins.length / trades.length * 100) : 0;
 
-  // Per-ticker analysis
-  const byTicker = {};
-  trades.forEach(t => {
-    if (!byTicker[t.symbol]) byTicker[t.symbol] = { wins: 0, losses: 0, total: 0, pnl: 0 };
-    byTicker[t.symbol].total++;
-    byTicker[t.symbol].pnl += t.pnl;
-    if (t.pnl > 0) byTicker[t.symbol].wins++;
-    else if (t.pnl < 0) byTicker[t.symbol].losses++;
-  });
+  const best = trades.length > 0 ? trades.reduce((a, b) => a.pnlPct > b.pnlPct ? a : b) : null;
+  const worst = trades.length > 0 ? trades.reduce((a, b) => a.pnlPct < b.pnlPct ? a : b) : null;
 
-  // Per-reason analysis
-  const byReason = {};
-  trades.forEach(t => {
-    if (!byReason[t.reason]) byReason[t.reason] = { count: 0, pnl: 0 };
-    byReason[t.reason].count++;
-    byReason[t.reason].pnl += t.pnl;
-  });
+  const dateStr = new Date().toDateString();
+  let msg = `📊 <b>Daily Report - ${dateStr}</b>
 
-  // Per-signal analysis (CALL vs PUT)
-  const calls = trades.filter(t => t.signal === "CALL");
-  const puts = trades.filter(t => t.signal === "PUT");
-  const callWins = calls.filter(t => t.pnl > 0).length;
-  const putWins = puts.filter(t => t.pnl > 0).length;
-  const callWR = calls.length > 0 ? (callWins / calls.length * 100).toFixed(0) : 0;
-  const putWR = puts.length > 0 ? (putWins / puts.length * 100).toFixed(0) : 0;
+💼 الصفقات: ${trades.length}
+✅ ربحانة: ${wins.length} (${wr.toFixed(1)}%)
+❌ خسرانة: ${losses.length}
+⏸ تعادل: ${breakevens.length}
 
-  // Duration analysis
-  const quickLosses = losses.filter(t => t.minutes <= 2).length;
-  const quickPercent = losses.length > 0 ? (quickLosses / losses.length * 100).toFixed(0) : 0;
+💰 ربح: +$${totalProfit.toFixed(0)}
+💸 خسارة: $${totalLoss.toFixed(0)}
+📊 صافي: ${net >= 0 ? "+" : ""}$${net.toFixed(0)} (${(net/portfolio*100).toFixed(2)}%)`;
 
-  // Time analysis (if entryTime available)
-  const byHour = {};
-  trades.forEach(t => {
-    if (t.entryTime) {
-      const hour = new Date(t.entryTime).getUTCHours() - 5; // CDT
-      const hourKey = `${hour}:00`;
-      if (!byHour[hourKey]) byHour[hourKey] = { wins: 0, losses: 0, pnl: 0 };
-      if (t.pnl > 0) byHour[hourKey].wins++;
-      else if (t.pnl < 0) byHour[hourKey].losses++;
-      byHour[hourKey].pnl += t.pnl;
-    }
-  });
+  if (best) msg += `\n\n🥇 أفضل: ${best.signal} ${best.pnlPct >= 0 ? "+" : ""}${best.pnlPct.toFixed(1)}% (${best.window})`;
+  if (worst) msg += `\n🥉 أسوأ: ${worst.signal} ${worst.pnlPct.toFixed(1)}% (${worst.window})`;
 
-  // Build issues list
-  const issues = [];
+  msg += `\n\n📈 الرصيد: $${portfolio.toFixed(0)}`;
 
-  // Check 1: Win rate
-  if (parseFloat(winRate) < 30) {
-    issues.push({ severity: "CRITICAL", text: `Win Rate ضعيف جداً (${winRate}%) - الاستراتيجية تحتاج مراجعة شاملة` });
-  } else if (parseFloat(winRate) < 40) {
-    issues.push({ severity: "MAJOR", text: `Win Rate تحت 40% (${winRate}%) - يحتاج تحسين` });
-  }
-
-  // Check 2: Profit factor
-  if (profitFactor !== "N/A" && parseFloat(profitFactor) < 1) {
-    issues.push({ severity: "CRITICAL", text: `Profit Factor < 1 (${profitFactor}) - نخسر أكثر مما نربح` });
-  } else if (profitFactor !== "N/A" && parseFloat(profitFactor) < 1.5) {
-    issues.push({ severity: "MAJOR", text: `Profit Factor منخفض (${profitFactor}) - الأرباح صغيرة مقارنة بالخسائر` });
-  }
-
-  // Check 3: Avg loss > avg win
-  if (avgLoss > avgWin * 1.5 && wins.length > 0) {
-    issues.push({ severity: "MAJOR", text: `متوسط الخسارة ($${avgLoss.toFixed(0)}) أكبر من متوسط الربح ($${avgWin.toFixed(0)}) - Stop ضيق أو Trailing مبكر` });
-  }
-
-  // Check 4: Per-ticker losers
-  Object.entries(byTicker).forEach(([symbol, stats]) => {
-    if (stats.total >= 3 && stats.wins === 0) {
-      issues.push({ severity: "MAJOR", text: `${symbol}: ${stats.total} صفقات كلها خسرانة - تحقق من الإشارات` });
-    } else if (stats.total >= 5 && stats.wins / stats.total < 0.2) {
-      issues.push({ severity: "MINOR", text: `${symbol}: ${stats.wins}/${stats.total} رابحة فقط - أداء ضعيف` });
-    }
-  });
-
-  // Check 5: Quick losses (Stop hit too fast)
-  if (parseFloat(quickPercent) > 50 && losses.length >= 4) {
-    issues.push({ severity: "MAJOR", text: `${quickPercent}% من الخسائر خلال دقيقتين - Stop ضيق جداً أو إشارات سيئة` });
-  }
-
-  // Check 6: CALL/PUT imbalance
-  if (Math.abs(parseInt(callWR) - parseInt(putWR)) > 30 && calls.length >= 3 && puts.length >= 3) {
-    if (parseInt(callWR) > parseInt(putWR)) {
-      issues.push({ severity: "MINOR", text: `CALL Win Rate (${callWR}%) أعلى بكثير من PUT (${putWR}%) - السوق صاعد، PUT يفشل` });
-    } else {
-      issues.push({ severity: "MINOR", text: `PUT Win Rate (${putWR}%) أعلى بكثير من CALL (${callWR}%) - السوق هابط، CALL يفشل` });
-    }
-  }
-
-  // Check 7: Stop Loss frequency
-  const lossCount = byReason["loss"]?.count || 0;
-  if (lossCount / trades.length > 0.5) {
-    issues.push({ severity: "MAJOR", text: `${lossCount} صفقة خرجت بـ Stop Loss (${(lossCount/trades.length*100).toFixed(0)}%) - فلاتر الجودة ضعيفة` });
-  }
-
-  // Check 8: Trailing frequency  
-  const trailCount = byReason["trailing"]?.count || 0;
-  if (trades.length >= 10 && trailCount === 0) {
-    issues.push({ severity: "MAJOR", text: `لا توجد صفقات وصلت Trailing - الاستراتيجية لا تمسك الحركات الكبيرة` });
-  } else if (trailCount > 0 && wins.length > 0) {
-    const trailWinPct = (trailCount / wins.length * 100).toFixed(0);
-    // This is informational, not necessarily an issue
-  }
-
-  // Format output
-  const sortedTickers = Object.entries(byTicker).sort((a, b) => b[1].pnl - a[1].pnl);
-  const sortedHours = Object.entries(byHour).sort((a, b) => b[1].pnl - a[1].pnl);
-
-  let report = `📊 <b>تقرير تحليل الاستراتيجية</b>\n`;
-  report += `📅 ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}\n\n`;
-
-  // Performance Summary
-  report += `<b>📈 الأداء العام:</b>\n`;
-  report += `• الصفقات: ${trades.length}\n`;
-  report += `• Win Rate: ${winRate}% (${wins.length}/${trades.length})\n`;
-  report += `• Profit Factor: ${profitFactor}\n`;
-  report += `• متوسط الربح: +$${avgWin.toFixed(0)}\n`;
-  report += `• متوسط الخسارة: -$${avgLoss.toFixed(0)}\n\n`;
-
-  // Per-Ticker
-  report += `<b>📊 أداء الأسهم:</b>\n`;
-  sortedTickers.forEach(([symbol, stats]) => {
-    const wr = stats.total > 0 ? (stats.wins / stats.total * 100).toFixed(0) : 0;
-    const emoji = stats.pnl > 0 ? "✅" : stats.pnl < 0 ? "🔴" : "⚪";
-    report += `${emoji} ${symbol}: ${stats.wins}/${stats.total} (${wr}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
-  });
-  report += `\n`;
-
-  // Exit Reasons
-  report += `<b>🚪 أسباب الخروج:</b>\n`;
-  Object.entries(byReason).forEach(([reason, stats]) => {
-    const pct = (stats.count / trades.length * 100).toFixed(0);
-    report += `• ${reason}: ${stats.count} (${pct}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
-  });
-  report += `\n`;
-
-  // CALL vs PUT
-  report += `<b>🎯 CALL vs PUT:</b>\n`;
-  report += `• CALL: ${callWins}/${calls.length} (${callWR}%)\n`;
-  report += `• PUT: ${putWins}/${puts.length} (${putWR}%)\n\n`;
-
-  // Time analysis (if available)
-  if (sortedHours.length > 0) {
-    report += `<b>⏰ التوقيت:</b>\n`;
-    sortedHours.slice(0, 3).forEach(([hour, stats]) => {
-      const total = stats.wins + stats.losses;
-      const wr = total > 0 ? (stats.wins / total * 100).toFixed(0) : 0;
-      report += `• ${hour} (CDT): ${stats.wins}W/${stats.losses}L (${wr}%) | ${stats.pnl >= 0 ? "+" : ""}$${stats.pnl.toFixed(0)}\n`;
-    });
-    report += `\n`;
-  }
-
-  // Issues
-  if (issues.length > 0) {
-    const critical = issues.filter(i => i.severity === "CRITICAL");
-    const major = issues.filter(i => i.severity === "MAJOR");
-    const minor = issues.filter(i => i.severity === "MINOR");
-
-    report += `<b>🔍 المشاكل المكتشفة:</b>\n\n`;
-
-    if (critical.length > 0) {
-      report += `🔴 <b>CRITICAL (يصلح فوراً):</b>\n`;
-      critical.forEach(i => report += `• ${i.text}\n`);
-      report += `\n`;
-    }
-    if (major.length > 0) {
-      report += `🟡 <b>MAJOR (الأسبوع القادم):</b>\n`;
-      major.forEach(i => report += `• ${i.text}\n`);
-      report += `\n`;
-    }
-    if (minor.length > 0) {
-      report += `🟢 <b>MINOR (لاحقاً):</b>\n`;
-      minor.forEach(i => report += `• ${i.text}\n`);
-      report += `\n`;
-    }
-  } else {
-    report += `<b>✅ لا توجد مشاكل واضحة</b>\n`;
-    report += `الأداء ضمن المعدلات المقبولة.\n\n`;
-  }
-
-  // Sample size warning
-  if (trades.length < 30) {
-    report += `\n⚠️ <b>تحذير:</b> ${trades.length} صفقة قليلة للاستنتاج النهائي.\n`;
-    report += `نحتاج 30+ صفقة للتأكيد قبل تطبيق أي تعديل.\n`;
-  }
-
-  report += `\n📋 الإصدار: v16.14`;
-
-  return report;
-}
-
-
-
-function isMarketOpen() {
-  const now = new Date();
-  const day = now.getUTCDay();
-  if (day === 0 || day === 6) return false;
-  const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-  return utcMin >= 13 * 60 + 30 && utcMin <= 20 * 60;
-}
-
-function decideAction(current, previous, now) {
-  const isStrong = current.score >= MIN_SCORE && (current.strengthAr === "قوية" || current.strengthAr === "قوية جداً");
-
-  // Force exit at 2:39 PM if position active
-  if (previous && previous.active && isPastForceExitTime(now)) {
-    return { action: "force_exit" };
-  }
-
-  // No active position
-  if (!previous || !previous.active) {
-    if (previous && previous.cooldownUntil && now < previous.cooldownUntil) {
-      // V16.6: Allow reversal during cooldown if signal is opposite + strong
-      if (isStrong && previous.lastSignal && current.signal !== "NEUTRAL" && current.signal !== previous.lastSignal) {
-        console.log(`  ${current.symbol}: Reversal allowed during cooldown (${previous.lastSignal} → ${current.signal})`);
-        return { action: "new_entry" };
-      }
-      return { action: "cooldown" };
-    }
-    if (isFomcDay(now) && !isBeforeFomcCutoff(now)) {
-      return { action: "fomc_cutoff" };
-    }
-    if (!isBeforeNoEntryTime(now)) {
-      return { action: "no_entry_time" };
-    }
-    return isStrong ? { action: "new_entry" } : { action: "none" };
-  }
-
-  // V16.2: Block duplicate entry on same symbol + same direction
-  if (isStrong && current.signal === previous.signal) {
-    return { action: "duplicate" };
-  }
-
-  // Active position - check reversal only (stop logic is in processActivePosition)
-  if (current.signal !== "NEUTRAL" && current.signal !== previous.signal && isStrong) {
-    return { action: "exit_reversal", newSignal: current.signal };
-  }
-
-  return { action: "monitor" };
+  await sendTelegram(msg);
+  state._reportSent = true;
 }
 
 // ============================================================
-// MAIN ORCHESTRATION (v15 - Auto Trading)
+// MODE DISPATCH
 // ============================================================
-async function processActivePosition(symbol, r, previous, now, decision, mode = "scan") {
-  const pos = { ...previous, symbol };
-  const minutesElapsed = decision.minutesElapsed || Math.floor((now - pos.entryTime) / 60000);
+const mode = process.env.MODE || "scan";
 
-  // V16.1: Use Position API (reliable for open positions, no options data subscription needed)
-  let currentPremium;
-  let position;
+(async () => {
   try {
-    position = await getPosition(pos.optionSymbol);
-  } catch (e) {
-    console.error(`  ${symbol}: getPosition error: ${e.message}`);
-    position = null;
-  }
-
-  if (position) {
-    currentPremium = parseFloat(position.current_price);
-    console.log(`  ${symbol}: Position found - Current: $${currentPremium}, P&L: ${(parseFloat(position.unrealized_plpc) * 100).toFixed(1)}%`);
-  } else {
-    // V16.4: Position gone - likely Stop Loss in Alpaca was executed!
-    if (pos.stopOrderId) {
-      console.log(`  ${symbol}: Position closed - checking if Stop Loss was executed`);
-      const stopOrder = await getOrder(pos.stopOrderId);
-      if (stopOrder && stopOrder.status === "filled") {
-        const exitPrice = parseFloat(stopOrder.filled_avg_price || pos.currentStop);
-        console.log(`  ${symbol}: Stop Loss filled @ $${exitPrice}`);
-        // Determine reason based on phase
-        const currentPhase = calculatePhase(pos.entryPremium, previous.peakPremium || previous.entryPremium, pos.stopConfig);
-        const exitReason = currentPhase === "trailing" ? "trailing"
-                         : currentPhase === "breakeven" ? "breakeven"
-                         : "loss";
-        return await executeV16Exit(symbol, pos, exitPrice, exitReason, minutesElapsed, true); // skipClose=true
+    if (mode === "monitor") {
+      const state = loadState();
+      const account = await getAccount();
+      let hasActive = false;
+      for (const symbol of TICKERS) {
+        if (state[symbol]?.active) {
+          hasActive = true;
+          await processActivePosition(state, account, symbol);
+        }
       }
-    }
-    // Fallback to getOptionQuote
-    const quote = await getOptionQuote(pos.optionSymbol);
-    if (quote && quote.mid > 0) {
-      currentPremium = quote.mid;
-      console.log(`  ${symbol}: Using quote fallback - Premium: $${currentPremium}`);
+      if (!hasActive) {
+        console.log("No active positions to monitor");
+      }
+      saveState(state);
+      // Also check daily report
+      if (isReportTime() && !state._reportSent) {
+        await sendDailyReport(state, parseFloat(account.portfolio_value));
+        saveState(state);
+      }
     } else {
-      // CRITICAL: Cannot fetch price - send emergency alert
-      console.error(`  ${symbol}: CANNOT FETCH PRICE - Emergency alert sent`);
-      await sendTelegram(
-        `🚨 <b>تنبيه طوارئ: ${symbol}</b>\nالبوت لا يقدر يجيب السعر الحالي!\n\nالصفقة: ${pos.optionSymbol}\nالدخول: $${pos.entryPremium}\nالكمية: ${pos.qty}\n\n⚠️ يرجى التحقق يدوياً من Alpaca`,
-        pos.entryMessageId
-      );
-      return previous;
-    }
-  }
-
-  // Update peak
-  const peakPremium = Math.max(previous.peakPremium || previous.entryPremium, currentPremium);
-
-  // Calculate phase and stop (V16.15: use position's stopConfig)
-  const previousPhase = calculatePhase(pos.entryPremium, previous.peakPremium || previous.entryPremium, pos.stopConfig);
-  const currentPhase = calculatePhase(pos.entryPremium, peakPremium, pos.stopConfig);
-  const currentStop = calculateStop(pos.entryPremium, peakPremium, pos.stopConfig);
-
-  const pct = ((currentPremium - pos.entryPremium) / pos.entryPremium) * 100;
-  console.log(`  ${symbol}: Premium $${currentPremium.toFixed(2)} (${pct.toFixed(1)}%), Peak $${peakPremium.toFixed(2)}, Stop $${currentStop.toFixed(2)}, Phase: ${currentPhase}, Min: ${minutesElapsed}`);
-
-  // FORCE EXIT (2:39 PM)
-  if (decision.action === "force_exit") {
-    return await executeV16Exit(symbol, pos, currentPremium, "force", minutesElapsed);
-  }
-
-  // REVERSAL - only in initial phase
-  if (decision.action === "exit_reversal" && currentPhase === "initial") {
-    return await executeV16Exit(symbol, pos, currentPremium, "reversal", minutesElapsed);
-  }
-
-  // STOP HIT (based on phase)
-  if (currentPremium <= currentStop) {
-    const exitReason = currentPhase === "trailing" ? "trailing"
-                     : currentPhase === "breakeven" ? "breakeven"
-                     : "loss";
-    return await executeV16Exit(symbol, pos, currentPremium, exitReason, minutesElapsed);
-  }
-
-  // PHASE CHANGE - announce + update Stop Loss in Alpaca
-  if (currentPhase !== previousPhase) {
-    let msg = null;
-    if (currentPhase === "breakeven" && !previous.breakEvenAnnounced) {
-      msg = formatBreakEven(pos, currentPremium);
-    } else if (currentPhase === "trailing" && !previous.trailingAnnounced) {
-      msg = formatTrailing(pos, currentPremium, peakPremium, currentStop);
-    }
-    if (msg) {
-      await sendTelegram(msg, pos.entryMessageId);
-      console.log(`  ${symbol}: Phase change to ${currentPhase}`);
-    }
-  }
-
-  // V16.4: Update Stop Loss in Alpaca if stop value changed
-  let newStopOrderId = pos.stopOrderId;
-  const stopDiff = Math.abs(currentStop - (previous.currentStop || 0));
-  if (stopDiff > 0.01 && pos.stopOrderId) {
-    console.log(`  ${symbol}: Stop changed $${previous.currentStop?.toFixed(2)} → $${currentStop.toFixed(2)}, updating Alpaca...`);
-    const newId = await updateStopLoss(pos, currentStop);
-    if (newId) newStopOrderId = newId;
-  } else if (currentPhase === "trailing" && peakPremium > (previous.peakPremium || 0)) {
-    // In Trailing phase, update stop if Peak rose (even small changes)
-    const trailingStop = peakPremium * 0.95;
-    const lockedStop = pos.entryPremium * 1.30;
-    if (trailingStop > lockedStop && Math.abs(trailingStop - (previous.currentStop || 0)) > 0.01) {
-      console.log(`  ${symbol}: Trailing stop rising with peak, updating Alpaca...`);
-      const newId = await updateStopLoss(pos, currentStop);
-      if (newId) newStopOrderId = newId;
-    }
-  }
-
-  // MONITORING MESSAGE - only in scan mode (every 5 min)
-  if (mode === "scan") {
-    const monMsg = formatMonitor(pos, currentPremium, peakPremium, currentStop, minutesElapsed);
-    await sendTelegram(monMsg, pos.entryMessageId);
-  }
-
-  // Update state
-  return {
-    ...previous,
-    peakPremium,
-    currentStop,
-    stopPhase: currentPhase,
-    stopOrderId: newStopOrderId,
-    breakEvenAnnounced: previous.breakEvenAnnounced || currentPhase !== "initial",
-    bufferAnnounced: previous.bufferAnnounced || (currentPhase === "buffer" || currentPhase === "trailing"),
-    trailingAnnounced: previous.trailingAnnounced || currentPhase === "trailing",
-  };
-}
-
-async function executeV16Exit(symbol, pos, currentPremium, reason, minutesElapsed, skipClose = false) {
-  // V16.4: Cancel Stop Loss order if it exists (avoid double-sell)
-  if (pos.stopOrderId && !skipClose) {
-    await cancelOrder(pos.stopOrderId);
-    await new Promise(r => setTimeout(r, 300));
-  }
-
-  // Close position via Market Order (unless Alpaca already did it)
-  if (!skipClose) {
-    try {
-      await closePosition(pos.optionSymbol);
-      console.log(`  ${symbol}: Closed position ${pos.optionSymbol}`);
-    } catch (e) {
-      console.error(`  ${symbol}: Failed to close: ${e.message}`);
-    }
-  } else {
-    console.log(`  ${symbol}: Position already closed by Alpaca Stop Loss`);
-  }
-
-  const msg = formatV16Exit(pos, currentPremium, reason, minutesElapsed);
-  await sendTelegram(msg, pos.entryMessageId);
-
-  const pnl = pos.qty * (currentPremium - pos.entryPremium) * 100;
-  const pnlPct = ((currentPremium - pos.entryPremium) / pos.entryPremium) * 100;
-
-  return {
-    active: false,
-    // V16.9: Smart cooldown based on exit reason
-    cooldownUntil: Date.now() + (
-      reason === "trailing" || reason === "profit" ? 2 * 60 * 1000 :    // profit: 2 min
-      reason === "breakeven" || reason === "reversal" ? 5 * 60 * 1000 : // BE/reversal: 5 min
-      10 * 60 * 1000                                                     // loss/force: 10 min
-    ),
-    lastSignal: pos.signal,
-    _lastTrade: {
-      symbol,
-      signal: pos.signal,
-      entryPremium: pos.entryPremium,
-      exitPremium: currentPremium,
-      qty: pos.qty,
-      pnl,
-      pnlPct,
-      reason,
-      minutes: minutesElapsed,
-      // V16.14: Enhanced data for strategy analysis
-      entryTime: pos.entryTime || null,
-      exitTime: Date.now(),
-      entryScore: pos.entryScore || null,
-      setup: pos.setup || null,
-      strike: pos.strike || null,
-      entryPrice: pos.entryPrice || null,
-      recovered: pos.recovered || false,
-    },
-  };
-}
-
-// Old executeExit kept for backward compatibility (not used in v16)
-async function executeExit_unused(symbol, pos, currentPremium, reason, minutesElapsed) {
-  return await executeV16Exit(symbol, pos, currentPremium, reason, minutesElapsed);
-}
-
-async function executeEntry(symbol, r, account, now) {
-  const meta = META[symbol];
-
-  // V16.7: Check Alpaca for existing positions (prevent duplicates after state reset)
-  try {
-    const positions = await alpacaCall(`${TRADING_BASE}/positions`);
-    const hasExisting = Array.isArray(positions) && positions.some(p =>
-      p.symbol && p.symbol.startsWith(symbol)
-    );
-    if (hasExisting) {
-      console.log(`  ${symbol}: Alpaca already has a position - skipping`);
-      return null;
-    }
-  } catch (e) {
-    console.error(`  ${symbol}: Failed to check positions: ${e.message}`);
-  }
-
-  const contract = await pickOptionContract(symbol, r.signal, r.suggestedStrike, meta.strikeStep);
-  if (!contract) {
-    console.log(`  ${symbol}: No suitable 0DTE contract found`);
-    return null;
-  }
-
-  const quote = await getOptionQuote(contract.symbol);
-  if (!quote || quote.ask === 0) {
-    console.log(`  ${symbol}: No quote for ${contract.symbol}`);
-    return null;
-  }
-
-  const entryPremium = quote.ask; // use ask for buying
-  const portfolioValue = parseFloat(account.portfolio_value); // V16.5: real from Alpaca
-  // V16.7: Use 1% since Alpaca portfolio is ~$100K (simulates 10% of $10K budget)
-  const qty = calculateQty(portfolioValue, entryPremium, 0.01);
-
-  if (qty < 1) {
-    console.log(`  ${symbol}: Not enough buying power`);
-    return null;
-  }
-
-  // Place market order
-  let orderResult;
-  try {
-    orderResult = await placeOptionOrder(contract.symbol, qty, "buy");
-    console.log(`  ${symbol}: BUY order placed - ${contract.symbol} x${qty} @ ~$${entryPremium}`);
-  } catch (e) {
-    console.error(`  ${symbol}: BUY failed: ${e.message}`);
-    await sendTelegram(`⚠️ <b>${symbol}: فشل تنفيذ ${r.signal}</b>\n${e.message.substring(0, 100)}`);
-    return null;
-  }
-
-  // V16.15: Calculate Hybrid ATR+Score stop config
-  const stopConfig = calculateStopConfig(r.price, r.atr5m, r.score);
-  console.log(`  ${symbol}: Stop config - Initial -${stopConfig.stopPct}%, BE +${stopConfig.bePct}%, Trail +${stopConfig.trailPct}%`);
-
-  // V16.4: Place Stop Loss in Alpaca for instant protection
-  const initialStop = entryPremium * (1 - stopConfig.stopPct / 100);
-  let stopOrderId = null;
-  await new Promise(r => setTimeout(r, 1500)); // Wait for buy to settle
-  try {
-    const stopOrder = await placeStopLossOrder(contract.symbol, qty, initialStop);
-    stopOrderId = stopOrder.id;
-    console.log(`  ${symbol}: Stop Loss placed @ $${initialStop.toFixed(2)} (order ${stopOrderId})`);
-  } catch (e) {
-    console.error(`  ${symbol}: Stop Loss placement failed: ${e.message}`);
-    // Continue without Stop Loss - bot monitoring is backup
-  }
-
-  const pos = {
-    active: true,
-    signal: r.signal,
-    entryScore: r.score,
-    entryPrice: r.price,
-    entryTime: now,
-    setup: r.setup || null, // V16.14: store setup name for analysis
-    stopConfig, // V16.15: Hybrid ATR+Score stop thresholds
-    optionSymbol: contract.symbol,
-    strike: contract.strike_price,
-    entryPremium,
-    qty,
-    orderId: orderResult.id,
-    stopOrderId, // V16.4: track Stop Loss order
-    // v16 fields
-    peakPremium: entryPremium,
-    currentStop: initialStop,
-    stopPhase: "initial",
-    breakEvenAnnounced: false,
-    bufferAnnounced: false,
-    trailingAnnounced: false,
-  };
-
-  const msg = formatBuyAlert(r, pos);
-  const messageId = await sendTelegram(msg);
-  pos.entryMessageId = messageId;
-
-  return pos;
-}
-
-async function main() {
-  const MODE = process.env.MODE || "scan"; // "scan" or "monitor"
-  console.log(`\n=== ${MODE === "monitor" ? "Monitor" : "Scan"} v16 started ${new Date().toISOString()} ===`);
-  console.log(`MIN_SCORE = ${MIN_SCORE}`);
-
-  if (!isMarketOpen()) {
-    console.log("Market closed, skipping");
-    return;
-  }
-
-  const state = loadState();
-  const now = Date.now();
-
-  // V16.20: FORCE CLOSE ORPHAN POSITIONS - Don't recover stale positions
-  // Positions in Alpaca but not in state are from previous days = force close immediately
-  try {
-    const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
-    if (Array.isArray(alpacaPositions)) {
-      for (const pos of alpacaPositions) {
-        const match = pos.symbol && pos.symbol.match(/^([A-Z]+)\d/);
-        if (!match) continue;
-        const symbol = match[1];
-        if (!TICKERS.includes(symbol)) continue;
-
-        if (!state[symbol] || !state[symbol].active) {
-          console.log(`🚨 ORPHAN ${symbol} detected: ${pos.symbol} - FORCE CLOSING (stale position)`);
-          try {
-            await closePosition(pos.symbol);
-            await sendTelegram(`⚠️ <b>${symbol}</b>: تم إغلاق صفقة يتيمة من اليوم السابق\n📋 ${pos.symbol}`);
-          } catch (e) {
-            console.error(`Failed to close orphan ${symbol}:`, e.message);
-          }
-        }
+      await runScan();
+      // Send report if time
+      const state = loadState();
+      const account = await getAccount();
+      if (isReportTime() && !state._reportSent) {
+        await sendDailyReport(state, parseFloat(account.portfolio_value));
+        saveState(state);
       }
     }
   } catch (e) {
-    console.error("Orphan check failed:", e.message);
+    console.error("Fatal error:", e.message);
+    process.exit(1);
   }
-
-  // MONITOR MODE: only check active positions, no scanning
-  if (MODE === "monitor") {
-    const activeSymbols = Object.keys(state).filter(s => state[s]?.active === true);
-    if (activeSymbols.length === 0) {
-      console.log("No active positions, exiting");
-      return;
-    }
-    console.log(`Monitoring ${activeSymbols.length} position(s): ${activeSymbols.join(", ")}`);
-
-    const newState = { ...state };
-    for (const symbol of activeSymbols) {
-      const previous = state[symbol];
-      const decision = isPastForceExitTime(now)
-        ? { action: "force_exit" }
-        : { action: "monitor" };
-      const result = await processActivePosition(symbol, null, previous, now, decision, "monitor");
-      if (result._lastTrade) {
-        newState._dailyTrades = newState._dailyTrades || [];
-        newState._dailyTrades.push(result._lastTrade);
-        delete result._lastTrade;
-      }
-      newState[symbol] = result;
-    }
-    saveState(newState);
-    console.log(`=== Monitor Done ===\n`);
-    return;
-  }
-
-  // SCAN MODE: full scan
-  const newState = {};
-  const results = [];
-
-  // Get account info first
-  let account;
-  try {
-    account = await getAccount();
-    console.log(`Account: Cash $${account.cash}, Portfolio $${account.portfolio_value}`);
-  } catch (e) {
-    console.error(`Account fetch failed: ${e.message}`);
-    return;
-  }
-
-  // Analyze all tickers
-  for (const symbol of TICKERS) {
-    try {
-      const r = await analyzeTicker(symbol);
-      results.push(r);
-      console.log(`OK ${symbol}: $${r.price} | ${r.signal} ${r.score}% | ${r.setup?.name || "-"}`);
-    } catch (e) {
-      console.error(`FAIL ${symbol}: ${e.message}`);
-      results.push({ symbol, error: e.message });
-    }
-    await new Promise(r => setTimeout(r, 300));
-  }
-
-  // Initialize daily trades log
-  const today = new Date().toISOString().split("T")[0];
-  if (state._date !== today) {
-    state._dailyTrades = [];
-    state._date = today;
-    state._reportSent = false;
-  }
-  newState._date = today;
-  newState._dailyTrades = state._dailyTrades || [];
-  newState._reportSent = state._reportSent || false;
-
-  // V16.8: Count current open positions for position limit
-  let activeCount = 0;
-  try {
-    const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
-    activeCount = Array.isArray(alpacaPositions) ? alpacaPositions.length : 0;
-    console.log(`Current open positions in Alpaca: ${activeCount}`);
-  } catch (e) {
-    activeCount = Object.keys(state).filter(s => state[s]?.active === true).length;
-    console.log(`Using state count (Alpaca fetch failed): ${activeCount}`);
-  }
-
-  // V16.18: Limit entries PER SCAN (prevents multi-loss from one bad market move)
-  let entriesThisScan = 0;
-  const MAX_ENTRIES_PER_SCAN = 2;
-
-  // V16.20: Correlated pairs - block second entry of same pair in same scan
-  // SPY+QQQ both broad tech ETFs (95% correlated), one move = both move
-  const CORRELATED_PAIRS = {
-    "SPY": "QQQ",
-    "QQQ": "SPY",
-  };
-  const enteredThisScan = new Set();
-
-  // Process each ticker
-  for (const r of results) {
-    if (r.error) {
-      const prev = state[r.symbol];
-      if (prev) newState[r.symbol] = prev;
-      continue;
-    }
-
-    const previous = state[r.symbol];
-    const decision = decideAction(r, previous, now);
-    console.log(`  ${r.symbol}: decision = ${decision.action}`);
-
-    if (decision.action === "new_entry") {
-      // V16.8: Max 3 positions unless score is 90%+
-      if (activeCount >= 3 && r.score < 90) {
-        console.log(`  ${r.symbol}: Max positions limit (${activeCount}/3), score ${r.score}% < 90% - skipping`);
-        if (previous) newState[r.symbol] = previous;
-        continue;
-      }
-
-      // V16.18: Max 2 entries per scan (unless score is 90%+)
-      if (entriesThisScan >= MAX_ENTRIES_PER_SCAN && r.score < 90) {
-        console.log(`  ${r.symbol}: Already ${entriesThisScan} entries this scan, score ${r.score}% < 90% - skipping`);
-        if (previous) newState[r.symbol] = previous;
-        continue;
-      }
-
-      // V16.20: Correlated pair block - if pair already entered, skip
-      const pair = CORRELATED_PAIRS[r.symbol];
-      if (pair && enteredThisScan.has(pair)) {
-        console.log(`  ${r.symbol}: BLOCKED - correlated pair ${pair} already entered this scan`);
-        if (previous) newState[r.symbol] = previous;
-        continue;
-      }
-
-      const newPos = await executeEntry(r.symbol, r, account, now);
-      if (newPos) {
-        newState[r.symbol] = newPos;
-        activeCount++;
-        entriesThisScan++;
-        enteredThisScan.add(r.symbol);
-      } else if (previous) {
-        newState[r.symbol] = previous;
-      }
-    }
-    else if (decision.action === "no_entry_time") {
-      console.log(`  ${r.symbol}: No new entries after 2:50 PM`);
-      if (previous) newState[r.symbol] = previous;
-    }
-    else if (decision.action === "fomc_cutoff") {
-      console.log(`  ${r.symbol}: 🏦 FOMC DAY - No new entries after 12:30 PM CDT`);
-      if (previous) newState[r.symbol] = previous;
-    }
-    else if (decision.action === "duplicate") {
-      console.log(`  ${r.symbol}: Duplicate signal blocked (already have ${previous.signal} position)`);
-      if (previous && previous.active) {
-        const result = await processActivePosition(r.symbol, r, previous, now, { action: "monitor" }, "scan");
-        if (result._lastTrade) {
-          newState._dailyTrades.push(result._lastTrade);
-          delete result._lastTrade;
-        }
-        newState[r.symbol] = result;
-      } else {
-        newState[r.symbol] = previous;
-      }
-    }
-    else if (previous && previous.active) {
-      const result = await processActivePosition(r.symbol, r, previous, now, decision, "scan");
-      if (result._lastTrade) {
-        newState._dailyTrades.push(result._lastTrade);
-        delete result._lastTrade;
-      }
-      newState[r.symbol] = result;
-    }
-    else if (decision.action === "cooldown") {
-      newState[r.symbol] = previous;
-    }
-    else {
-      if (previous) newState[r.symbol] = previous;
-    }
-  }
-
-  // Daily report at 3:00 PM (sent to channel)
-  if (isReportTime(now) && !newState._reportSent) {
-    const reportMsg = await formatDailyReport(newState);
-    await sendTelegram(reportMsg);
-    newState._reportSent = true;
-    console.log("Daily report sent");
-
-    // V16.14: Strategy Analysis to PRIVATE chat (not channel)
-    try {
-      let analysisMsg = await analyzeStrategy(newState);
-      // V16.17: Strip HTML tags to avoid parse errors
-      analysisMsg = analysisMsg.replace(/<\/?b>/g, "").replace(/<\/?i>/g, "");
-      const personalChatId = "810642442"; // Personal chat, NOT channel
-      const tgToken = process.env.TG_TOKEN;
-      if (tgToken) {
-        const resp = await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: personalChatId,
-            text: analysisMsg,
-          }),
-        });
-        if (resp.ok) {
-          console.log("Strategy analysis sent to private chat");
-        } else {
-          const err = await resp.text();
-          console.error("Strategy analysis failed:", err);
-        }
-      }
-
-      // V16.19: Send state.json as document to private chat for deep AI analysis
-      try {
-        const stateJson = JSON.stringify(newState, null, 2);
-        const today = new Date().toISOString().split("T")[0];
-        const formData = new FormData();
-        formData.append("chat_id", personalChatId);
-        formData.append("caption", `📋 state.json - ${today}\nانسخه لـ Claude للتحليل العميق`);
-        formData.append("document", new Blob([stateJson], { type: "application/json" }), `state-${today}.json`);
-
-        const docResp = await fetch(`https://api.telegram.org/bot${tgToken}/sendDocument`, {
-          method: "POST",
-          body: formData,
-        });
-        if (docResp.ok) {
-          console.log("state.json sent to private chat");
-        } else {
-          const err = await docResp.text();
-          console.error("state.json send failed:", err);
-        }
-      } catch (e) {
-        console.error("Failed to send state.json:", e.message);
-      }
-    } catch (e) {
-      console.error("Failed to send strategy analysis:", e.message);
-    }
-  }
-
-  saveState(newState);
-  console.log(`=== Scan Done ===\n`);
-}
-
-main().catch(e => {
-  console.error("Fatal error:", e);
-  sendTelegram(`Bot error: ${e.message}`).catch(() => {});
-  process.exit(1);
-});
+})();
