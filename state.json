@@ -108,17 +108,17 @@
     "orderId": "b46a4d66-de74-4dfb-beb6-c3c0ec786ed8",
     "stopOrderId": null,
     "currentStop": 0.86775,
-    "peakPremium": 1.65,
+    "peakPremium": 1.78,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
     "entryMessageId": 1403,
     "reason": "Pullback bounce at EMA9, near support 735.00",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 9,
+    "remainingQty": 5,
     "quickExitWindow": false
   }
 }
