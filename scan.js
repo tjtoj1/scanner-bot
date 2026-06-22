@@ -887,6 +887,14 @@ async function processActivePosition(state, account, symbol) {
     pos.peakPremium = currentPremium;
   }
 
+  // V17.4: SOFTWARE STOP LOSS - Backup in case Alpaca stop order fails
+  // This ensures we always exit if premium drops below stop, regardless of order status
+  if (currentPremium <= pos.currentStop) {
+    console.log(`${symbol}: Software stop triggered: $${currentPremium.toFixed(2)} <= $${pos.currentStop.toFixed(2)}`);
+    await exitPosition(state, pos, symbol, "stop_hit", `وقف الخسارة (-${pos.stopPct}%)`);
+    return;
+  }
+
   // ===========================================
   // LAYER 2: TRADE MANAGEMENT
   // ===========================================
