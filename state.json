@@ -44,7 +44,7 @@
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": true,
+    "active": false,
     "signal": "CALL",
     "window": "MidMorning_VWAP",
     "optionSymbol": "SPY260622C00745000",
