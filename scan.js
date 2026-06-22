@@ -870,8 +870,9 @@ async function processActivePosition(state, account, symbol) {
   // Get current premium
   const alpacaPos = await getPosition(pos.optionSymbol);
   if (!alpacaPos) {
-    console.log(`${symbol}: Position not in Alpaca, marking closed`);
-    state[symbol].active = false;
+    console.log(`${symbol}: Position closed in Alpaca - recording exit`);
+    // V17.3: When Alpaca closes position (stop hit, etc), still record trade and notify
+    await exitPosition(state, pos, symbol, "stop_hit", "Stop ضرب (Alpaca)");
     return;
   }
 
