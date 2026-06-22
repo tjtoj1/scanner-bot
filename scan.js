@@ -230,13 +230,19 @@ async function calculateSupportResistance(symbol) {
   const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
   // Get yesterday's full session for PDH/PDL/PDC
-  const yesterdayBars = await getBars(symbol, "1Day", 3);
+  // V17.2: Fetch 7 days to handle holidays/weekends
+  const yesterdayBars = await getBars(symbol, "1Day", 7);
   let pdc = null, pdh = null, pdl = null;
-  if (yesterdayBars && yesterdayBars.length >= 2) {
-    const lastBar = yesterdayBars[yesterdayBars.length - 2]; // yesterday's daily bar
-    pdc = lastBar.c;
-    pdh = lastBar.h;
-    pdl = lastBar.l;
+  if (yesterdayBars && yesterdayBars.length >= 1) {
+    // Find the most recent COMPLETED trading day (not today)
+    const todayStr = new Date().toISOString().split("T")[0];
+    const previousDays = yesterdayBars.filter(b => !b.t.startsWith(todayStr));
+    if (previousDays.length >= 1) {
+      const lastTradingDay = previousDays[previousDays.length - 1];
+      pdc = lastTradingDay.c;
+      pdh = lastTradingDay.h;
+      pdl = lastTradingDay.l;
+    }
   }
 
   // Get pre-market bars (4 AM CDT - 8:30 AM CDT = 9-13:30 UTC)
