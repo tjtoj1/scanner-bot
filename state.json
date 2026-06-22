@@ -98,7 +98,7 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 18,
-    "quickExitWindow": true
+    "quickExitWindow": false
   },
   "QQQ": {
     "active": false,
