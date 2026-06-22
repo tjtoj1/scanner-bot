@@ -68,7 +68,7 @@
   ],
   "_reportSent": false,
   "_dailyLosses": 1281,
-  "_dailyTrades_count": 7,
+  "_dailyTrades_count": 8,
   "_consecLosses": 2,
   "GLD": {
     "active": false,
@@ -76,9 +76,29 @@
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1782144802898,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "window": "Afternoon_Resume",
+    "optionSymbol": "SPY260622C00745000",
+    "strike": "745",
+    "entryPremium": 0.675,
+    "qty": 18,
+    "entryTime": 1782149445803,
+    "orderId": "d05a8d19-d9ad-4919-a908-204c6dcc1ec5",
+    "stopOrderId": "e4af297c-358b-4744-8e30-8db6c4ade794",
+    "currentStop": 0.43875000000000003,
+    "peakPremium": 0.675,
+    "targetPct": 60,
+    "stopPct": 35,
+    "timeExitMin": 25,
+    "entryMessageId": 1402,
+    "reason": "Pullback bounce at EMA9, near support 744.32",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 18,
+    "quickExitWindow": true
   },
   "QQQ": {
     "active": false,
