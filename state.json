@@ -31,7 +31,7 @@
     "quickExitWindow": false
   },
   "SPY": {
-    "active": true,
+    "active": false,
     "signal": "PUT",
     "window": "ORB_Pullback",
     "optionSymbol": "SPY260622P00748000",
