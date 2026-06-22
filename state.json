@@ -68,7 +68,7 @@
   ],
   "_reportSent": false,
   "_dailyLosses": 1281,
-  "_dailyTrades_count": 8,
+  "_dailyTrades_count": 9,
   "_consecLosses": 2,
   "GLD": {
     "active": false,
@@ -101,8 +101,28 @@
     "quickExitWindow": false
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1782144803448,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "window": "Afternoon_Resume",
+    "optionSymbol": "QQQ260622C00736000",
+    "strike": "736",
+    "entryPremium": 1.335,
+    "qty": 9,
+    "entryTime": 1782149738078,
+    "orderId": "b46a4d66-de74-4dfb-beb6-c3c0ec786ed8",
+    "stopOrderId": null,
+    "currentStop": 0.86775,
+    "peakPremium": 1.335,
+    "targetPct": 60,
+    "stopPct": 35,
+    "timeExitMin": 25,
+    "entryMessageId": 1403,
+    "reason": "Pullback bounce at EMA9, near support 735.00",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 9,
+    "quickExitWindow": true
   }
 }
