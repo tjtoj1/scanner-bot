@@ -6,7 +6,7 @@
   "_dailyTrades_count": 2,
   "_consecLosses": 0,
   "GLD": {
-    "active": true,
+    "active": false,
     "signal": "PUT",
     "window": "ORB_Pullback",
     "optionSymbol": "GLD260622P00386000",
