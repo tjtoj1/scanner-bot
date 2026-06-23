@@ -108,6 +108,6 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 16,
-    "quickExitWindow": true
+    "quickExitWindow": false
   }
 }
