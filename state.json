@@ -1,6 +1,23 @@
 {
   "_date": "2026-06-23",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 4.285,
+      "exitPremium": 5.975,
+      "qty": 3,
+      "pnl": 506.99999999999983,
+      "pnlPct": 39.4399066511085,
+      "reason": "time_exit",
+      "minutes": 25,
+      "entryTime": 1782221731958,
+      "exitTime": 1782223245860,
+      "strike": "717",
+      "setup": "Pullback bounce at EMA9, near support 715.15"
+    }
+  ],
   "_reportSent": false,
   "_dailyLosses": 0,
   "_dailyTrades_count": 1,
@@ -16,28 +33,8 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "window": "ORB_Pullback",
-    "optionSymbol": "QQQ260623C00717000",
-    "strike": "717",
-    "entryPremium": 4.285,
-    "qty": 3,
-    "entryTime": 1782221731958,
-    "orderId": "253f4d2e-baac-4ec3-98f1-21527bfb2d57",
-    "stopOrderId": null,
-    "currentStop": 2.571,
-    "peakPremium": 5.47,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 1426,
-    "reason": "Pullback bounce at EMA9, near support 715.15",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 3,
-    "quickExitWindow": false
+    "active": false,
+    "cooldownUntil": 1782223846042,
+    "lastSignal": "CALL"
   }
 }
