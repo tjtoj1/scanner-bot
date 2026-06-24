@@ -176,6 +176,22 @@
       "exitTime": 1782328536987,
       "strike": "732",
       "setup": "Late-day fade: rejection at resistance"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "CALL",
+      "window": "Late_Day_Fade",
+      "entryPremium": 0.575,
+      "exitPremium": 0.89,
+      "qty": 14,
+      "pnl": 441.0000000000001,
+      "pnlPct": 54.78260869565219,
+      "reason": "time_exit",
+      "minutes": 20,
+      "entryTime": 1782328235953,
+      "exitTime": 1782329444064,
+      "strike": "295",
+      "setup": "Late-day fade: bounce at support"
     }
   ],
   "_reportSent": false,
@@ -198,28 +214,8 @@
     "lastSignal": "CALL"
   },
   "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "window": "Late_Day_Fade",
-    "optionSymbol": "IWM260624C00295000",
-    "strike": "295",
-    "entryPremium": 0.575,
-    "qty": 14,
-    "entryTime": 1782328235953,
-    "orderId": "f8287683-aa12-411e-b841-08e4f94db8fa",
-    "stopOrderId": "5fecd443-7c0e-4a08-bda1-4a73ef2cfa87",
-    "currentStop": 0.575,
-    "peakPremium": 0.91,
-    "targetPct": 50,
-    "stopPct": 30,
-    "timeExitMin": 20,
-    "entryMessageId": 1476,
-    "reason": "Late-day fade: bounce at support",
-    "partial1Done": false,
-    "bePromoted": true,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 14,
-    "quickExitWindow": false
+    "active": false,
+    "cooldownUntil": 1782330044663,
+    "lastSignal": "CALL"
   }
 }
