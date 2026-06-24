@@ -1,44 +1,61 @@
 {
   "_date": "2026-06-24",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 4.04,
+      "exitPremium": 2.395,
+      "qty": 3,
+      "pnl": -493.50000000000006,
+      "pnlPct": -40.71782178217821,
+      "reason": "stop_hit",
+      "minutes": 5,
+      "entryTime": 1782308136200,
+      "exitTime": 1782308436597,
+      "strike": "718",
+      "setup": "Pullback bounce at EMA9, near support 716.46"
+    }
+  ],
   "_reportSent": false,
-  "_dailyLosses": 0,
-  "_dailyTrades_count": 1,
-  "_consecLosses": 0,
+  "_dailyLosses": 493.50000000000006,
+  "_dailyTrades_count": 2,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782154876313,
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1782243043995,
-    "lastSignal": "CALL"
-  },
-  "QQQ": {
     "active": true,
     "signal": "CALL",
     "window": "ORB_Pullback",
-    "optionSymbol": "QQQ260624C00718000",
-    "strike": "718",
-    "entryPremium": 4.04,
-    "qty": 3,
-    "entryTime": 1782308136200,
-    "orderId": "a31a55cd-a88e-43e3-adb6-909d093208e7",
+    "optionSymbol": "SPY260624C00736000",
+    "strike": "736",
+    "entryPremium": 2.115,
+    "qty": 6,
+    "entryTime": 1782308437621,
+    "orderId": "e76efee4-2ca2-4d18-9ef4-fef180c0de2b",
     "stopOrderId": null,
-    "currentStop": 2.424,
-    "peakPremium": 4.04,
+    "currentStop": 1.2690000000000001,
+    "peakPremium": 2.115,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
-    "entryMessageId": 1446,
-    "reason": "Pullback bounce at EMA9, near support 716.46",
+    "entryMessageId": 1448,
+    "reason": "Pullback bounce at VWAP, near support 735.17",
     "partial1Done": false,
     "bePromoted": false,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 3,
-    "quickExitWindow": false
+    "remainingQty": 6,
+    "quickExitWindow": true
+  },
+  "QQQ": {
+    "active": false,
+    "cooldownUntil": 1782309036961,
+    "lastSignal": "CALL"
   },
   "IWM": {
     "active": false,
