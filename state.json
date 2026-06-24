@@ -183,7 +183,7 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 4,
-    "quickExitWindow": true
+    "quickExitWindow": false
   },
   "IWM": {
     "active": false,
