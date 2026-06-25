@@ -192,6 +192,22 @@
       "exitTime": 1782414976329,
       "strike": "734",
       "setup": "Late-day fade: rejection at resistance"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "window": "Late_Day_Fade",
+      "entryPremium": 1.6949999999999998,
+      "exitPremium": 3.2199999999999998,
+      "qty": 6,
+      "pnl": 914.9999999999999,
+      "pnlPct": 89.97050147492625,
+      "reason": "stop_hit",
+      "minutes": 20,
+      "entryTime": 1782414039656,
+      "exitTime": 1782415221551,
+      "strike": "717",
+      "setup": "Late-day fade: rejection at resistance"
     }
   ],
   "_reportSent": false,
@@ -209,29 +225,9 @@
     "lastSignal": "PUT"
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "window": "Late_Day_Fade",
-    "optionSymbol": "QQQ260625P00717000",
-    "strike": "717",
-    "entryPremium": 1.6949999999999998,
-    "qty": 6,
-    "entryTime": 1782414039656,
-    "orderId": "ebcd3df8-e048-4580-99de-0041a00b9cbd",
-    "stopOrderId": "245e83bf-cf41-4ba0-970e-a45669729cff",
-    "currentStop": 3.264,
-    "peakPremium": 3.84,
-    "targetPct": 50,
-    "stopPct": 30,
-    "timeExitMin": 20,
-    "entryMessageId": 1517,
-    "reason": "Late-day fade: rejection at resistance",
-    "partial1Done": false,
-    "bePromoted": true,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 6,
-    "quickExitWindow": false
+    "active": false,
+    "cooldownUntil": 1782415822219,
+    "lastSignal": "PUT"
   },
   "IWM": {
     "active": false,
