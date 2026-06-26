@@ -3,7 +3,7 @@
   "_dailyTrades": [],
   "_reportSent": false,
   "_dailyLosses": 0,
-  "_dailyTrades_count": 0,
+  "_dailyTrades_count": 1,
   "_consecLosses": 0,
   "GLD": {
     "active": false,
@@ -11,9 +11,29 @@
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1782415576833,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "window": "ORB_Pullback",
+    "optionSymbol": "SPY260626C00729000",
+    "strike": "729",
+    "entryPremium": 2.46,
+    "qty": 5,
+    "entryTime": 1782480930099,
+    "orderId": "3661eea3-5af0-429b-8139-3a21ab943f10",
+    "stopOrderId": null,
+    "currentStop": 1.476,
+    "peakPremium": 2.46,
+    "targetPct": 75,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": 1528,
+    "reason": "Pullback bounce at EMA9, near support 727.40",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 5,
+    "quickExitWindow": true
   },
   "QQQ": {
     "active": false,
