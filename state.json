@@ -108,18 +108,18 @@
     "orderId": "8f143fee-f537-4c63-82ee-797f0977b9d9",
     "stopOrderId": null,
     "currentStop": 0.8580000000000001,
-    "peakPremium": 1.5,
+    "peakPremium": 1.87,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
     "entryMessageId": 1546,
     "reason": "Pullback rejection at EMA9, near resistance 715.84",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 9,
-    "quickExitWindow": true
+    "remainingQty": 5,
+    "quickExitWindow": false
   },
   "IWM": {
     "active": false,
