@@ -686,37 +686,89 @@ async function runScan() {
   }
   const portfolio = parseFloat(account.portfolio_value);
 
-  // Daily risk limits (Layer 3 — but we're testing Layer 2 only per user request)
-  // Just inform, don't block yet
-  if (state._dailyLosses && state._dailyLosses >= portfolio * 0.02) {
-    console.log(`Daily loss limit reached: $${state._dailyLosses.toFixed(2)} >= 2%`);
-    // We'd block here in Layer 3, but skip per user choice
+  // V17.5: ALPACA-STATE RECONCILIATION (Source of Truth = Alpaca)
+  // Prevents orphan positions caused by state.json race conditions
+  try {
+    const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
+    const alpacaSymbols = new Set();
+
+    if (Array.isArray(alpacaPositions)) {
+      for (const pos of alpacaPositions) {
+        // Extract underlying ticker from option symbol (e.g. SPY260626C00750000 → SPY)
+        const match = pos.symbol && pos.symbol.match(/^([A-Z]+)\d/);
+        if (!match) continue;
+        const ticker = match[1];
+        if (!TICKERS.includes(ticker)) continue;
+        alpacaSymbols.add(ticker);
+
+        // Case 1: Alpaca has position, state doesn't know → ADOPT
+        if (!state[ticker]?.active) {
+          console.log(`🔄 RECONCILE: Adopting orphan ${ticker} position ${pos.symbol}`);
+          const isCall = pos.symbol.includes("C0");
+          const entryPremium = parseFloat(pos.avg_entry_price);
+          const qty = parseInt(pos.qty);
+          const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
+          const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
+
+          state[ticker] = {
+            active: true,
+            signal: isCall ? "CALL" : "PUT",
+            window: "RECOVERED",
+            optionSymbol: pos.symbol,
+            strike: strike ? String(strike) : null,
+            entryPremium,
+            qty,
+            entryTime: Date.now() - (5 * 60 * 1000), // assume 5 min ago
+            orderId: null,
+            stopOrderId: null,
+            currentStop: entryPremium * 0.6, // 40% stop
+            peakPremium: entryPremium,
+            targetPct: 60,
+            stopPct: 40,
+            timeExitMin: 25,
+            entryMessageId: null,
+            reason: "Recovered from Alpaca",
+            partial1Done: false,
+            bePromoted: false,
+            partial2Done: false,
+            trailing: false,
+            remainingQty: qty,
+            quickExitWindow: false,
+            recovered: true,
+          };
+          await sendTelegram(`🔄 <b>${ticker}</b> Position Recovered\nFound orphan in Alpaca, now tracking.\nEntry: $${entryPremium.toFixed(2)} × ${qty}`);
+        }
+      }
+    }
+
+    // Case 2: State says active, Alpaca doesn't have it → MARK CLOSED
+    for (const ticker of TICKERS) {
+      if (state[ticker]?.active && !alpacaSymbols.has(ticker)) {
+        console.log(`🔄 RECONCILE: ${ticker} closed in Alpaca but state was active`);
+        // Will be handled by processActivePosition - it detects missing position
+      }
+    }
+  } catch (e) {
+    console.error("Reconciliation failed:", e.message);
   }
+
+  // Daily risk limits
 
   // Check current window
   const window = getCurrentWindow();
   if (!window) {
-    console.log("Not in a trading window, processing active positions only");
-    for (const symbol of TICKERS) {
-      if (state[symbol]?.active) {
-        await processActivePosition(state, account, symbol);
-      }
-    }
+    console.log("Not in a trading window, Scan does nothing (Monitor handles positions)");
     saveState(state);
     return;
   }
   console.log(`Current window: ${window.name}`);
 
-  // First, monitor existing positions
-  for (const symbol of TICKERS) {
-    if (state[symbol]?.active) {
-      console.log(`${symbol}: monitoring active position`);
-      await processActivePosition(state, account, symbol);
-    }
-  }
+  // V17.5: Scan does NOT monitor positions - Monitor workflow handles that exclusively
+  // This prevents duplicate Telegram messages from Scan+Monitor running together
+  // Scan only handles: New entries + Daily report
   saveState(state);
 
-  // Count active positions
+  // Count active positions (from current state, just adopted from Alpaca)
   const activeCount = TICKERS.filter(s => state[s]?.active).length;
   if (activeCount >= 2) {
     console.log(`Max 2 active positions (${activeCount} open), skipping new entries`);
@@ -792,7 +844,10 @@ async function runScan() {
     }
 
     const baseQty = calculateQty(portfolio, premium, window.riskPct, window.stopPct);
-    const qty = Math.max(1, Math.floor(baseQty * cfg.sizeFactor));
+    const tickerQty = Math.max(1, Math.floor(baseQty * cfg.sizeFactor));
+    // V17.5: Force even quantity so Partial Sell (50%) works correctly
+    // If qty is odd (e.g. 5), round down to nearest even (4) so 50% sell = exactly 2
+    const qty = tickerQty >= 2 ? Math.max(2, tickerQty - (tickerQty % 2)) : 1;
 
     console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)}`);
 
@@ -887,13 +942,22 @@ async function processActivePosition(state, account, symbol) {
     pos.peakPremium = currentPremium;
   }
 
-  // V17.4: SOFTWARE STOP LOSS - Backup in case Alpaca stop order fails
-  // This ensures we always exit if premium drops below stop, regardless of order status
+  // V17.5: SOFTWARE STOP LOSS - Faster + Danger Zone
+  // Triggers stop earlier if price approaches stop level (within 5%)
+  // This protects against slippage where actual fill is worse than stop price
+  const dangerZone = pos.currentStop * 1.05; // 5% above stop = warning zone
   if (currentPremium <= pos.currentStop) {
     console.log(`${symbol}: Software stop triggered: $${currentPremium.toFixed(2)} <= $${pos.currentStop.toFixed(2)}`);
     await exitPosition(state, pos, symbol, "stop_hit", `وقف الخسارة (-${pos.stopPct}%)`);
     return;
   }
+  // Pre-emptive exit if in danger zone AND price is falling fast
+  if (currentPremium <= dangerZone && pos.lastPremium && currentPremium < pos.lastPremium * 0.95) {
+    console.log(`${symbol}: Danger zone exit - price dropping fast near stop`);
+    await exitPosition(state, pos, symbol, "stop_hit", `وقف الخسارة (هبوط سريع)`);
+    return;
+  }
+  pos.lastPremium = currentPremium;
 
   // ===========================================
   // LAYER 2: TRADE MANAGEMENT
@@ -1066,6 +1130,18 @@ async function sendDailyReport(state, portfolio) {
   const net = totalProfit + totalLoss;
   const wr = trades.length > 0 ? (wins.length / trades.length * 100) : 0;
 
+  // V17.5: Fetch REAL PnL from Alpaca portfolio history (truth source)
+  let realDailyPnL = null;
+  let realPortfolio = portfolio;
+  try {
+    const account = await getAccount();
+    realPortfolio = parseFloat(account.portfolio_value);
+    const lastEquity = parseFloat(account.last_equity || account.equity || portfolio);
+    realDailyPnL = realPortfolio - lastEquity;
+  } catch (e) {
+    console.error("Could not fetch Alpaca real PnL:", e.message);
+  }
+
   const best = trades.length > 0 ? trades.reduce((a, b) => a.pnlPct > b.pnlPct ? a : b) : null;
   const worst = trades.length > 0 ? trades.reduce((a, b) => a.pnlPct < b.pnlPct ? a : b) : null;
 
@@ -1077,14 +1153,20 @@ async function sendDailyReport(state, portfolio) {
 ❌ خسرانة: ${losses.length}
 ⏸ تعادل: ${breakevens.length}
 
-💰 ربح: +$${totalProfit.toFixed(0)}
-💸 خسارة: $${totalLoss.toFixed(0)}
-📊 صافي: ${net >= 0 ? "+" : ""}$${net.toFixed(0)} (${(net/portfolio*100).toFixed(2)}%)`;
+💰 ربح (تقدير): +$${totalProfit.toFixed(0)}
+💸 خسارة (تقدير): $${totalLoss.toFixed(0)}
+📊 صافي (تقدير): ${net >= 0 ? "+" : ""}$${net.toFixed(0)}`;
+
+  // V17.5: Show ACTUAL Alpaca PnL if available
+  if (realDailyPnL !== null) {
+    msg += `\n\n💎 <b>الواقع من Alpaca:</b>
+${realDailyPnL >= 0 ? "✅ +" : "❌ "}$${realDailyPnL.toFixed(0)} (${(realDailyPnL/realPortfolio*100).toFixed(2)}%)`;
+  }
 
   if (best) msg += `\n\n🥇 أفضل: ${best.signal} ${best.pnlPct >= 0 ? "+" : ""}${best.pnlPct.toFixed(1)}% (${best.window})`;
   if (worst) msg += `\n🥉 أسوأ: ${worst.signal} ${worst.pnlPct.toFixed(1)}% (${worst.window})`;
 
-  msg += `\n\n📈 الرصيد: $${portfolio.toFixed(0)}`;
+  msg += `\n\n📈 الرصيد: $${realPortfolio.toFixed(0)}`;
 
   await sendTelegram(msg);
   state._reportSent = true;
