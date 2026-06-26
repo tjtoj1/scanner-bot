@@ -130,7 +130,7 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 9,
-    "quickExitWindow": true
+    "quickExitWindow": false
   },
   "QQQ": {
     "active": false,
