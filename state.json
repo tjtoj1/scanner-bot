@@ -92,6 +92,6 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 11,
-    "quickExitWindow": true
+    "quickExitWindow": false
   }
 }
