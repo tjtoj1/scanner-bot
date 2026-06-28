@@ -1121,7 +1121,22 @@ async function sendDailyReport(state, portfolio) {
   if (state._reportSent) return;
   if (!isReportTime()) return;
 
+  // V17.5: Skip on weekends (market closed)
+  const dayOfWeek = new Date().getUTCDay(); // 0=Sunday, 6=Saturday
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    state._reportSent = true; // mark as sent to skip
+    return;
+  }
+
   const trades = state._dailyTrades || [];
+
+  // V17.5: Skip if no trades today
+  if (trades.length === 0) {
+    state._reportSent = true;
+    console.log("Daily report skipped: no trades today");
+    return;
+  }
+
   const wins = trades.filter(t => t.pnl > 0);
   const losses = trades.filter(t => t.pnl < 0);
   const breakevens = trades.filter(t => t.pnl === 0);
