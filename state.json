@@ -116,7 +116,7 @@
   ],
   "_reportSent": false,
   "_dailyLosses": 1346,
-  "_dailyTrades_count": 6,
+  "_dailyTrades_count": 7,
   "_consecLosses": 0,
   "GLD": {
     "active": false,
@@ -134,8 +134,28 @@
     "lastSignal": "PUT"
   },
   "IWM": {
-    "active": false,
-    "cooldownUntil": 1782756376966,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "window": "Afternoon_Resume",
+    "optionSymbol": "IWM260629C00298000",
+    "strike": "298",
+    "entryPremium": 0.275,
+    "qty": 36,
+    "entryTime": 1782757236163,
+    "orderId": "4a93db8d-1fb2-40b6-be73-c53a2bb5b156",
+    "stopOrderId": "30babaf9-9c3e-42b9-8e94-120b597c5a67",
+    "currentStop": 0.17875000000000002,
+    "peakPremium": 0.275,
+    "targetPct": 60,
+    "stopPct": 35,
+    "timeExitMin": 25,
+    "entryMessageId": 1591,
+    "reason": "Pullback bounce at EMA9, near support 297.03",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 36,
+    "quickExitWindow": true
   }
 }
