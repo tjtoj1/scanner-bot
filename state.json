@@ -143,9 +143,9 @@
     "qty": 36,
     "entryTime": 1782757236163,
     "orderId": "4a93db8d-1fb2-40b6-be73-c53a2bb5b156",
-    "stopOrderId": "ed77135b-8a9e-49ac-95fa-e534e78d4cda",
+    "stopOrderId": "98fcdf38-3cde-43d8-8ae0-ec42ad550871",
     "currentStop": 0.275,
-    "peakPremium": 0.43,
+    "peakPremium": 0.49,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -153,10 +153,10 @@
     "reason": "Pullback bounce at EMA9, near support 297.03",
     "partial1Done": true,
     "bePromoted": true,
-    "partial2Done": false,
+    "partial2Done": true,
     "trailing": false,
-    "remainingQty": 18,
+    "remainingQty": 9,
     "quickExitWindow": false,
-    "lastPremium": 0.43
+    "lastPremium": 0.49
   }
 }
