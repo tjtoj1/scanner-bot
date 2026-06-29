@@ -119,12 +119,12 @@
     "timeExitMin": 25,
     "entryMessageId": 1583,
     "reason": "Pullback bounce at EMA9, near support 295.73",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": true,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 10,
+    "remainingQty": 5,
     "quickExitWindow": false,
-    "lastPremium": 1.33
+    "lastPremium": 1.34
   }
 }
