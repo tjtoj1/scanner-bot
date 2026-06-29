@@ -648,13 +648,18 @@ function calculateQty(portfolioValue, premium, riskPct, stopPct) {
 // ============================================================
 // TELEGRAM
 // ============================================================
-async function sendTelegram(text, chatId = null) {
+async function sendTelegram(text, chatId = null, replyTo = null) {
   const chat = chatId || TG_CHAT;
   try {
+    const body = { chat_id: chat, text, parse_mode: "HTML" };
+    if (replyTo) {
+      body.reply_to_message_id = replyTo;
+      body.allow_sending_without_reply = true; // don't fail if original was deleted
+    }
     const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chat, text, parse_mode: "HTML" }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     return data.result?.message_id || null;
@@ -1011,7 +1016,7 @@ async function processActivePosition(state, account, symbol) {
         await sendTelegram(`💰 <b>${symbol}</b> +30% Partial Profit
 بعنا ${sellQty} عقود (نص الصفقة)
 السعر: $${currentPremium.toFixed(2)}
-الباقي: ${pos.remainingQty} عقود`);
+الباقي: ${pos.remainingQty} عقود`, null, pos.entryMessageId);
       } catch (e) {
         console.error(`${symbol}: partial sell failed: ${e.message}`);
       }
@@ -1029,7 +1034,7 @@ async function processActivePosition(state, account, symbol) {
       pos.bePromoted = true;
       await sendTelegram(`🛡 <b>${symbol}</b> +50% Break-Even Activated
 Stop → $${pos.entryPremium.toFixed(2)} (entry)
-P&L: +${pnlPct.toFixed(1)}%`);
+P&L: +${pnlPct.toFixed(1)}%`, null, pos.entryMessageId);
     } catch (e) {
       console.error(`${symbol}: BE promotion failed: ${e.message}`);
     }
@@ -1060,7 +1065,7 @@ P&L: +${pnlPct.toFixed(1)}%`);
         }
         await sendTelegram(`💰 <b>${symbol}</b> +75% Partial Profit
 بعنا ${sellQty} إضافية
-الباقي: ${pos.remainingQty} للتريلينج`);
+الباقي: ${pos.remainingQty} للتريلينج`, null, pos.entryMessageId);
       } catch (e) {
         console.error(`${symbol}: partial 2 sell failed: ${e.message}`);
       }
@@ -1143,7 +1148,7 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
   await sendTelegram(`${icon} <b>EXIT ${symbol}</b> (${reasonAr})
 💰 $${pos.entryPremium.toFixed(2)} → $${exitPremium.toFixed(2)}
 📊 ${pnlPct >= 0 ? "+" : ""}${pnlPct.toFixed(1)}% (${pnl >= 0 ? "+" : ""}$${pnl.toFixed(0)})
-⏱ ${minutes} دقيقة | 🪟 ${pos.window}`);
+⏱ ${minutes} دقيقة | 🪟 ${pos.window}`, null, pos.entryMessageId);
 
   state[symbol] = {
     active: false,
