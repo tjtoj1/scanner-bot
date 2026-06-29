@@ -547,8 +547,17 @@ async function getPosition(optionSymbol) {
 
 async function closePosition(optionSymbol, qty = null) {
   if (qty) {
-    return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}?qty=${qty}`, "DELETE");
+    // V17.6: Use POST /orders for partial close (DELETE position rejects uncovered)
+    // First cancel any pending stop orders, then sell
+    return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+      symbol: optionSymbol,
+      qty: qty,
+      side: "sell",
+      type: "market",
+      time_in_force: "day",
+    });
   }
+  // Full close still uses DELETE positions
   return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
@@ -981,9 +990,24 @@ async function processActivePosition(state, account, symbol) {
     if (sellQty >= 1) {
       console.log(`${symbol}: Profit partial 1 (+30%): selling ${sellQty} of ${pos.remainingQty}`);
       try {
+        // V17.6: Cancel stop order first to free up contracts for sale
+        if (pos.stopOrderId) {
+          try { await cancelOrder(pos.stopOrderId); } catch (e) { /* ignore */ }
+          pos.stopOrderId = null;
+        }
+        // Sell partial using POST orders (works for long calls/puts)
         await closePosition(pos.optionSymbol, sellQty);
         pos.remainingQty -= sellQty;
         pos.partial1Done = true;
+        // Re-place stop order for remaining quantity
+        if (pos.remainingQty > 0) {
+          try {
+            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, pos.currentStop);
+            pos.stopOrderId = newStop.id;
+          } catch (e) {
+            console.error(`${symbol}: re-stop failed: ${e.message}`);
+          }
+        }
         await sendTelegram(`💰 <b>${symbol}</b> +30% Partial Profit
 بعنا ${sellQty} عقود (نص الصفقة)
 السعر: $${currentPremium.toFixed(2)}
@@ -1017,9 +1041,23 @@ P&L: +${pnlPct.toFixed(1)}%`);
     if (sellQty < pos.remainingQty) {
       console.log(`${symbol}: Profit partial 2 (+75%): selling ${sellQty}`);
       try {
+        // V17.6: Cancel stop before partial sell
+        if (pos.stopOrderId) {
+          try { await cancelOrder(pos.stopOrderId); } catch (e) { /* ignore */ }
+          pos.stopOrderId = null;
+        }
         await closePosition(pos.optionSymbol, sellQty);
         pos.remainingQty -= sellQty;
         pos.partial2Done = true;
+        // Re-place stop for remaining
+        if (pos.remainingQty > 0) {
+          try {
+            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, pos.currentStop);
+            pos.stopOrderId = newStop.id;
+          } catch (e) {
+            console.error(`${symbol}: re-stop after partial 2 failed: ${e.message}`);
+          }
+        }
         await sendTelegram(`💰 <b>${symbol}</b> +75% Partial Profit
 بعنا ${sellQty} إضافية
 الباقي: ${pos.remainingQty} للتريلينج`);
