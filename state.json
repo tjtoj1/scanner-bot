@@ -65,9 +65,30 @@
     "lastSignal": "PUT"
   },
   "QQQ": {
-    "active": false,
-    "cooldownUntil": 1782741677767,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "PUT",
+    "window": "RECOVERED",
+    "optionSymbol": "QQQ260629P00705000",
+    "strike": "705",
+    "entryPremium": 3.92,
+    "qty": 2,
+    "entryTime": 1782742828758,
+    "orderId": null,
+    "stopOrderId": null,
+    "currentStop": 2.352,
+    "peakPremium": 3.92,
+    "targetPct": 60,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": null,
+    "reason": "Recovered from Alpaca",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 2,
+    "quickExitWindow": false,
+    "recovered": true
   },
   "IWM": {
     "active": false,
