@@ -717,6 +717,22 @@ async function runScan() {
 
         // Case 1: Alpaca has position, state doesn't know → ADOPT
         if (!state[ticker]?.active) {
+          // V17.9: Skip recovery for recently-opened positions (last 30 min)
+          // 30 min covers: race conditions + active bot management (Time Exit = 25 min)
+          // Only adopt truly orphaned positions (e.g. from previous session)
+          if (pos.created_at) {
+            const positionAge = Date.now() - new Date(pos.created_at).getTime();
+            if (positionAge < 30 * 60 * 1000) {
+              console.log(`⏭ Skipping ${ticker} recovery - position opened ${Math.round(positionAge/60000)}m ago (still actively managed)`);
+              continue;
+            }
+          }
+          // V17.9: Skip if ticker has recent cooldown (was just closed by this bot)
+          if (state[ticker]?.cooldownUntil && (Date.now() - state[ticker].cooldownUntil) < 60 * 60 * 1000) {
+            console.log(`⏭ Skipping ${ticker} recovery - recent cooldown indicates bot activity`);
+            continue;
+          }
+
           console.log(`🔄 RECONCILE: Adopting orphan ${ticker} position ${pos.symbol}`);
           const isCall = pos.symbol.includes("C0");
           const entryPremium = parseFloat(pos.avg_entry_price);
@@ -732,7 +748,7 @@ async function runScan() {
             strike: strike ? String(strike) : null,
             entryPremium,
             qty,
-            entryTime: Date.now() - (5 * 60 * 1000), // assume 5 min ago
+            entryTime: pos.created_at ? new Date(pos.created_at).getTime() : Date.now() - (5 * 60 * 1000),
             orderId: null,
             stopOrderId: null,
             currentStop: entryPremium * 0.6, // 40% stop
