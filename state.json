@@ -44,9 +44,30 @@
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1782829876017,
-    "lastSignal": "CALL"
+    "active": true,
+    "signal": "CALL",
+    "window": "RECOVERED",
+    "optionSymbol": "SPY260630C00742000",
+    "strike": "742",
+    "entryPremium": 1.79,
+    "qty": 6,
+    "entryTime": 1782829231557,
+    "orderId": null,
+    "stopOrderId": null,
+    "currentStop": 1.074,
+    "peakPremium": 1.79,
+    "targetPct": 60,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": null,
+    "reason": "Recovered from Alpaca",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 6,
+    "quickExitWindow": false,
+    "recovered": true
   },
   "QQQ": {
     "active": false,
@@ -54,8 +75,29 @@
     "lastSignal": "PUT"
   },
   "IWM": {
-    "active": false,
-    "cooldownUntil": 1782761424488,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "window": "RECOVERED",
+    "optionSymbol": "IWM260630C00299000",
+    "strike": "299",
+    "entryPremium": 1.12,
+    "qty": 8,
+    "entryTime": 1782829231137,
+    "orderId": null,
+    "stopOrderId": null,
+    "currentStop": 0.672,
+    "peakPremium": 1.12,
+    "targetPct": 60,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": null,
+    "reason": "Recovered from Alpaca",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 8,
+    "quickExitWindow": false,
+    "recovered": true
   }
 }
