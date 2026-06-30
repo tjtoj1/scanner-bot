@@ -110,7 +110,7 @@
     "trailing": false,
     "remainingQty": 5,
     "quickExitWindow": false,
-    "lastPremium": 0.95
+    "lastPremium": 0.84
   },
   "SPY": {
     "active": false,
