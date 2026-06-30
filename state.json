@@ -48,12 +48,28 @@
       "exitTime": 1782830654613,
       "strike": "742",
       "setup": "Recovered from Alpaca"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "CALL",
+      "window": "RECOVERED",
+      "entryPremium": 1.12,
+      "exitPremium": 1.04,
+      "qty": 8,
+      "pnl": -64.00000000000006,
+      "pnlPct": -7.142857142857148,
+      "reason": "time_exit",
+      "minutes": 26,
+      "entryTime": 1782829231137,
+      "exitTime": 1782830775235,
+      "strike": "299",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 244.99999999999994,
+  "_dailyLosses": 309,
   "_dailyTrades_count": 1,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782154876313,
@@ -70,30 +86,8 @@
     "lastSignal": "PUT"
   },
   "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "window": "RECOVERED",
-    "optionSymbol": "IWM260630C00299000",
-    "strike": "299",
-    "entryPremium": 1.12,
-    "qty": 8,
-    "entryTime": 1782829231137,
-    "orderId": null,
-    "stopOrderId": "8a11bcf7-71f3-4534-b4e0-4a088fd54d7d",
-    "currentStop": 0.672,
-    "peakPremium": 1.49,
-    "targetPct": 60,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": null,
-    "reason": "Recovered from Alpaca",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "recovered": true,
-    "lastPremium": 1.1
+    "active": false,
+    "cooldownUntil": 1782831375575,
+    "lastSignal": "CALL"
   }
 }
