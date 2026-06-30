@@ -547,17 +547,16 @@ async function getPosition(optionSymbol) {
 
 async function closePosition(optionSymbol, qty = null) {
   if (qty) {
-    // V17.6: Use POST /orders for partial close (DELETE position rejects uncovered)
-    // First cancel any pending stop orders, then sell
+    // V17.8: Add position_intent=sell_to_close to avoid uncovered short interpretation
     return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
       symbol: optionSymbol,
       qty: qty,
       side: "sell",
       type: "market",
       time_in_force: "day",
+      position_intent: "sell_to_close",
     });
   }
-  // Full close still uses DELETE positions
   return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
@@ -579,6 +578,7 @@ async function placeStopLossOrder(optionSymbol, qty, stopPrice) {
     type: "stop",
     stop_price: stopPrice.toFixed(2),
     time_in_force: "day",
+    position_intent: "sell_to_close",
   });
 }
 
