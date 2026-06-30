@@ -144,12 +144,28 @@
       "exitTime": 1782843976591,
       "strike": "370",
       "setup": "Pullback bounce at VWAP, near support 368.91"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 0.25,
+      "exitPremium": 0.255,
+      "qty": 44,
+      "pnl": 22.00000000000002,
+      "pnlPct": 2.0000000000000018,
+      "reason": "stop_hit",
+      "minutes": 26,
+      "entryTime": 1782843321321,
+      "exitTime": 1782844878091,
+      "strike": "300",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 872.9999999999999,
   "_dailyTrades_count": 7,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "GLD": {
     "active": true,
     "signal": "PUT",
@@ -173,7 +189,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 14,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 0.44
   },
   "SPY": {
     "active": false,
@@ -186,30 +203,8 @@
     "lastSignal": "PUT"
   },
   "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "window": "RECOVERED",
-    "optionSymbol": "IWM260630P00300000",
-    "strike": "300",
-    "entryPremium": 0.25,
-    "qty": 44,
-    "entryTime": 1782843321321,
-    "orderId": null,
-    "stopOrderId": null,
-    "currentStop": 0.15,
-    "peakPremium": 0.29,
-    "targetPct": 60,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": null,
-    "reason": "Recovered from Alpaca",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 44,
-    "quickExitWindow": false,
-    "recovered": true,
-    "lastPremium": 0.29
+    "active": false,
+    "cooldownUntil": 1782845478697,
+    "lastSignal": "PUT"
   }
 }
