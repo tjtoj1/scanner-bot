@@ -28,9 +28,30 @@
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": false,
-    "cooldownUntil": 1782747374605,
-    "lastSignal": "PUT"
+    "active": true,
+    "signal": "CALL",
+    "window": "RECOVERED",
+    "optionSymbol": "SPY260630C00742000",
+    "strike": "742",
+    "entryPremium": 1.79,
+    "qty": 6,
+    "entryTime": 1782827741949,
+    "orderId": null,
+    "stopOrderId": null,
+    "currentStop": 1.074,
+    "peakPremium": 1.79,
+    "targetPct": 60,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": null,
+    "reason": "Recovered from Alpaca",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 6,
+    "quickExitWindow": false,
+    "recovered": true
   },
   "QQQ": {
     "active": false,
