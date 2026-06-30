@@ -68,7 +68,7 @@
     "remainingQty": 6,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 3.3
+    "lastPremium": 3.04
   },
   "QQQ": {
     "active": false,
@@ -100,6 +100,6 @@
     "remainingQty": 4,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 1.1
+    "lastPremium": 0.99
   }
 }
