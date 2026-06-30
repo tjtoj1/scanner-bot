@@ -55,7 +55,7 @@
     "orderId": null,
     "stopOrderId": null,
     "currentStop": 1.074,
-    "peakPremium": 3.4,
+    "peakPremium": 3.47,
     "targetPct": 60,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -68,7 +68,7 @@
     "remainingQty": 6,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 3.4
+    "lastPremium": 3.47
   },
   "QQQ": {
     "active": false,
@@ -100,6 +100,6 @@
     "remainingQty": 4,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 1.49
+    "lastPremium": 1.48
   }
 }
