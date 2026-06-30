@@ -732,6 +732,15 @@ async function runScan() {
             console.log(`⏭ Skipping ${ticker} recovery - recent cooldown indicates bot activity`);
             continue;
           }
+          // V17.10: Skip if this exact option symbol was already recovered/traded today
+          // Prevents double-recovery of same position due to Alpaca settlement delays
+          const alreadyTradedToday = (state._dailyTrades || []).some(
+            t => t.symbol === ticker && (t.window === "RECOVERED" || t.setup === "Recovered from Alpaca")
+          );
+          if (alreadyTradedToday) {
+            console.log(`⏭ Skipping ${ticker} recovery - already recovered/traded today`);
+            continue;
+          }
 
           console.log(`🔄 RECONCILE: Adopting orphan ${ticker} position ${pos.symbol}`);
           const isCall = pos.symbol.includes("C0");
