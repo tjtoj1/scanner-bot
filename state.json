@@ -1,10 +1,27 @@
 {
   "_date": "2026-07-01",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "IWM",
+      "signal": "PUT",
+      "window": "ORB_Pullback",
+      "entryPremium": 1.02,
+      "exitPremium": 0.625,
+      "qty": 10,
+      "pnl": -395,
+      "pnlPct": -38.72549019607843,
+      "reason": "stop_hit",
+      "minutes": 3,
+      "entryTime": 1782913826353,
+      "exitTime": 1782913997840,
+      "strike": "300",
+      "setup": "Pullback rejection at VWAP, near resistance 300.45"
+    }
+  ],
   "_reportSent": false,
-  "_dailyLosses": 0,
+  "_dailyLosses": 395,
   "_dailyTrades_count": 2,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782847036522,
@@ -20,21 +37,21 @@
     "qty": 6,
     "entryTime": 1782912920103,
     "orderId": "cd53ddd9-9005-4c92-8862-44cf680dcb09",
-    "stopOrderId": "546f3f75-3ba1-4291-9097-2587e8c26066",
+    "stopOrderId": "a9fbe765-64c4-4e1d-bd00-56b07423e1ab",
     "currentStop": 1.2086999999999999,
-    "peakPremium": 2.46,
+    "peakPremium": 2.64,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
     "entryMessageId": 1638,
     "reason": "Pullback bounce at VWAP, near support 742.43",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 6,
+    "remainingQty": 3,
     "quickExitWindow": false,
-    "lastPremium": 2.46
+    "lastPremium": 2.64
   },
   "QQQ": {
     "active": false,
@@ -42,29 +59,8 @@
     "lastSignal": "PUT"
   },
   "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "window": "ORB_Pullback",
-    "optionSymbol": "IWM260701P00300000",
-    "strike": "300",
-    "entryPremium": 1.02,
-    "qty": 10,
-    "entryTime": 1782913826353,
-    "orderId": "57728dd1-736b-4133-aced-f33d0e9d0b88",
-    "stopOrderId": "729cda6c-0dd0-420a-822d-bcd37a70ed8a",
-    "currentStop": 0.612,
-    "peakPremium": 1.02,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 1639,
-    "reason": "Pullback rejection at VWAP, near resistance 300.45",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 10,
-    "quickExitWindow": false,
-    "lastPremium": 0.77
+    "active": false,
+    "cooldownUntil": 1782914598099,
+    "lastSignal": "PUT"
   }
 }
