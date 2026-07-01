@@ -195,20 +195,20 @@
     "qty": 34,
     "entryTime": 1782931222948,
     "orderId": "b4713aa3-0bc8-48c2-8959-ca7651a6e00a",
-    "stopOrderId": null,
+    "stopOrderId": "d39045b2-a80a-4df4-94f1-0364c7054b0d",
     "currentStop": 0.17149999999999999,
-    "peakPremium": 0.26,
+    "peakPremium": 0.33,
     "targetPct": 50,
     "stopPct": 30,
     "timeExitMin": 20,
     "entryMessageId": 1664,
     "reason": "Late-day fade: rejection at resistance",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 34,
+    "remainingQty": 17,
     "quickExitWindow": false,
-    "lastPremium": 0.25
+    "lastPremium": 0.33
   }
 }
