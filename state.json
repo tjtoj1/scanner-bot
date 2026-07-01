@@ -32,6 +32,22 @@
       "exitTime": 1782914477390,
       "strike": "743",
       "setup": "Pullback bounce at VWAP, near support 742.43"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "window": "RECOVERED",
+      "entryPremium": 2.69,
+      "exitPremium": 2.93,
+      "qty": 4,
+      "pnl": 96.00000000000009,
+      "pnlPct": 8.921933085501866,
+      "reason": "time_exit",
+      "minutes": 25,
+      "entryTime": 1782914131351,
+      "exitTime": 1782915639857,
+      "strike": "729",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
@@ -49,31 +65,9 @@
     "lastSignal": "CALL"
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "window": "RECOVERED",
-    "optionSymbol": "QQQ260701C00729000",
-    "strike": "729",
-    "entryPremium": 2.69,
-    "qty": 4,
-    "entryTime": 1782914131351,
-    "orderId": null,
-    "stopOrderId": null,
-    "currentStop": 1.6139999999999999,
-    "peakPremium": 3.53,
-    "targetPct": 60,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": null,
-    "reason": "Recovered from Alpaca",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "recovered": true,
-    "lastPremium": 3.02
+    "active": false,
+    "cooldownUntil": 1782916240416,
+    "lastSignal": "CALL"
   },
   "IWM": {
     "active": false,
