@@ -126,7 +126,7 @@
     "orderId": "8d75d1ea-d454-4efc-a076-4577f95dd4ce",
     "stopOrderId": "9e839c4e-f87f-45fe-b788-5ca1b801b6cb",
     "currentStop": 0.7507499999999999,
-    "peakPremium": 1.25,
+    "peakPremium": 1.28,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -138,7 +138,7 @@
     "trailing": false,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 1.25
+    "lastPremium": 1.28
   },
   "IWM": {
     "active": false,
