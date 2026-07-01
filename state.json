@@ -112,42 +112,39 @@
       "exitTime": 1782928753493,
       "strike": "728",
       "setup": "Pullback bounce at VWAP, near support 727.67"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "Afternoon_Resume",
+      "entryPremium": 0.775,
+      "exitPremium": 0.95,
+      "qty": 16,
+      "pnl": 279.9999999999999,
+      "pnlPct": 22.580645161290313,
+      "reason": "time_exit",
+      "minutes": 26,
+      "entryTime": 1782927626137,
+      "exitTime": 1782929174156,
+      "strike": "748",
+      "setup": "Pullback rejection at EMA9, near resistance 748.02"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 1052.9999999999998,
   "_dailyTrades_count": 8,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782847036522,
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "Afternoon_Resume",
-    "optionSymbol": "SPY260701P00748000",
-    "strike": "748",
-    "entryPremium": 0.775,
-    "qty": 16,
-    "entryTime": 1782927626137,
-    "orderId": "e3b5ba5e-3c95-4bf7-8261-19ed4e51a284",
-    "stopOrderId": "d36bc364-2260-4985-b4aa-e1bbe77815da",
-    "currentStop": 0.50375,
-    "peakPremium": 1.14,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 1655,
-    "reason": "Pullback rejection at EMA9, near resistance 748.02",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 8,
-    "quickExitWindow": false,
-    "lastPremium": 0.92
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1782929774538,
+    "lastSignal": "PUT",
+    "lastExitTime": 1782929174538
   },
   "QQQ": {
     "active": false,
@@ -180,6 +177,6 @@
     "trailing": false,
     "remainingQty": 20,
     "quickExitWindow": false,
-    "lastPremium": 0.38
+    "lastPremium": 0.39
   }
 }
