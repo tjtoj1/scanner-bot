@@ -1128,6 +1128,13 @@ P&L: +${pnlPct.toFixed(1)}%`, null, pos.entryMessageId);
 }
 
 async function exitPosition(state, pos, symbol, reason, reasonAr) {
+  // V17.11: Prevent duplicate exits - if already being exited, skip
+  if (pos.exiting || pos.exited) {
+    console.log(`${symbol}: Exit already in progress or done, skipping duplicate`);
+    return;
+  }
+  pos.exiting = true;
+
   try {
     if (pos.stopOrderId) {
       await cancelOrder(pos.stopOrderId);
@@ -1177,9 +1184,13 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
 
   state[symbol] = {
     active: false,
+    exited: true, // V17.11: mark as exited to prevent duplicate
     cooldownUntil: Date.now() + 10 * 60 * 1000,
     lastSignal: pos.signal,
+    lastExitTime: Date.now(),
   };
+  // V17.11: Save immediately after exit to reduce race condition window
+  saveState(state);
 }
 
 // ============================================================
