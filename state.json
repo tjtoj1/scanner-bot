@@ -192,12 +192,28 @@
       "exitTime": 1782933045459,
       "strike": "747",
       "setup": "Late-day fade: bounce at support"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "CALL",
+      "window": "Late_Day_Fade",
+      "entryPremium": 0.115,
+      "exitPremium": 0.095,
+      "qty": 76,
+      "pnl": -152.00000000000003,
+      "pnlPct": -17.39130434782609,
+      "reason": "stop_hit",
+      "minutes": 6,
+      "entryTime": 1782933623148,
+      "exitTime": 1782933975631,
+      "strike": "301",
+      "setup": "Late-day fade: bounce at support"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 1308.9999999999998,
+  "_dailyLosses": 1460.9999999999998,
   "_dailyTrades_count": 13,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782847036522,
@@ -234,32 +250,13 @@
     "trailing": false,
     "remainingQty": 16,
     "quickExitWindow": false,
-    "lastPremium": 0.77
+    "lastPremium": 0.54
   },
   "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "window": "Late_Day_Fade",
-    "optionSymbol": "IWM260701C00301000",
-    "strike": "301",
-    "entryPremium": 0.115,
-    "qty": 76,
-    "entryTime": 1782933623148,
-    "orderId": "bbc0d081-a55a-4993-aeb3-f3dad4ba5b0d",
-    "stopOrderId": null,
-    "currentStop": 0.0805,
-    "peakPremium": 0.13,
-    "targetPct": 50,
-    "stopPct": 30,
-    "timeExitMin": 20,
-    "entryMessageId": 1672,
-    "reason": "Late-day fade: bounce at support",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 76,
-    "quickExitWindow": false,
-    "lastPremium": 0.09
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1782934576169,
+    "lastSignal": "CALL",
+    "lastExitTime": 1782933976169
   }
 }
