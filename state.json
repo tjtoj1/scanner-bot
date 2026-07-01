@@ -16,42 +16,37 @@
       "exitTime": 1782913997840,
       "strike": "300",
       "setup": "Pullback rejection at VWAP, near resistance 300.45"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 2.0145,
+      "exitPremium": 3.13,
+      "qty": 6,
+      "pnl": 669.3,
+      "pnlPct": 55.373541821792,
+      "reason": "stop_hit",
+      "minutes": 26,
+      "entryTime": 1782912920103,
+      "exitTime": 1782914477390,
+      "strike": "743",
+      "setup": "Pullback bounce at VWAP, near support 742.43"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 395,
   "_dailyTrades_count": 2,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782847036522,
     "lastSignal": "CALL"
   },
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "window": "ORB_Pullback",
-    "optionSymbol": "SPY260701C00743000",
-    "strike": "743",
-    "entryPremium": 2.0145,
-    "qty": 6,
-    "entryTime": 1782912920103,
-    "orderId": "cd53ddd9-9005-4c92-8862-44cf680dcb09",
-    "stopOrderId": "a9fbe765-64c4-4e1d-bd00-56b07423e1ab",
-    "currentStop": 1.2086999999999999,
-    "peakPremium": 2.74,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 1638,
-    "reason": "Pullback bounce at VWAP, near support 742.43",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 3,
-    "quickExitWindow": false,
-    "lastPremium": 2.74
+    "active": false,
+    "cooldownUntil": 1782915077985,
+    "lastSignal": "CALL"
   },
   "QQQ": {
     "active": true,
@@ -65,7 +60,7 @@
     "orderId": null,
     "stopOrderId": null,
     "currentStop": 1.6139999999999999,
-    "peakPremium": 2.69,
+    "peakPremium": 3.28,
     "targetPct": 60,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -77,7 +72,8 @@
     "trailing": false,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "recovered": true
+    "recovered": true,
+    "lastPremium": 3.28
   },
   "IWM": {
     "active": false,
