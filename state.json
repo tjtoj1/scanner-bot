@@ -32,12 +32,28 @@
       "exitTime": 1783000831154,
       "strike": "301",
       "setup": "Pullback bounce at VWAP, near support 300.32"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 2.3449999999999998,
+      "exitPremium": 1.29,
+      "qty": 4,
+      "pnl": -421.9999999999999,
+      "pnlPct": -44.98933901918976,
+      "reason": "stop_hit",
+      "minutes": 15,
+      "entryTime": 1783001425535,
+      "exitTime": 1783002321325,
+      "strike": "728",
+      "setup": "Pullback bounce at EMA9, near support 727.23"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 442,
+  "_dailyLosses": 863.9999999999999,
   "_dailyTrades_count": 4,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "cooldownUntil": 1782847036522,
@@ -51,30 +67,11 @@
     "lastExitTime": 1782933045819
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "window": "ORB_Pullback",
-    "optionSymbol": "QQQ260702C00728000",
-    "strike": "728",
-    "entryPremium": 2.3449999999999998,
-    "qty": 4,
-    "entryTime": 1783001425535,
-    "orderId": "aefb8f8b-f43f-4711-9307-5656bd056834",
-    "stopOrderId": "d458f271-20b1-49f3-ad58-6d886213a580",
-    "currentStop": 1.4069999999999998,
-    "peakPremium": 3.14,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 1686,
-    "reason": "Pullback bounce at EMA9, near support 727.23",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 2,
-    "quickExitWindow": false,
-    "lastPremium": 1.82
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1783002921855,
+    "lastSignal": "CALL",
+    "lastExitTime": 1783002321855
   },
   "IWM": {
     "active": true,
@@ -86,9 +83,9 @@
     "qty": 16,
     "entryTime": 1783001726385,
     "orderId": "cfd3f470-bf9e-4509-aff2-6cd0736f99d0",
-    "stopOrderId": "2632467d-c7ab-4b81-afbf-eda4df3e03fb",
-    "currentStop": 1.0454999999999999,
-    "peakPremium": 1.23,
+    "stopOrderId": "140703f3-78a5-4aa2-833c-141d6036b4fa",
+    "currentStop": 1.2495,
+    "peakPremium": 1.47,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -100,6 +97,6 @@
     "trailing": true,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 1.23
+    "lastPremium": 1.47
   }
 }
