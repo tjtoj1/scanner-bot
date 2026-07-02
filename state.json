@@ -41,7 +41,7 @@
     "trailing": false,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 2.02
+    "lastPremium": 2.49
   },
   "IWM": {
     "active": true,
@@ -55,7 +55,7 @@
     "orderId": "390c38cc-c7cb-4bf0-9909-6434ebd52ec1",
     "stopOrderId": "63b581a8-ac2e-454f-8e69-a659a53b9412",
     "currentStop": 0.49499999999999994,
-    "peakPremium": 1.1,
+    "peakPremium": 1.23,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -67,6 +67,6 @@
     "trailing": false,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 1.1
+    "lastPremium": 1.23
   }
 }
