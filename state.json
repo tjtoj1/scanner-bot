@@ -143,10 +143,29 @@
     "lastExitTime": 1783002321855
   },
   "IWM": {
-    "active": false,
-    "exited": true,
-    "cooldownUntil": 1783003230150,
-    "lastSignal": "PUT",
-    "lastExitTime": 1783002630150
+    "active": true,
+    "signal": "CALL",
+    "window": "RECOVERED",
+    "optionSymbol": "IWM260702C00298000",
+    "strike": "298",
+    "entryPremium": 0.93,
+    "qty": 10,
+    "entryTime": 1783006818949,
+    "orderId": null,
+    "stopOrderId": null,
+    "currentStop": 0.558,
+    "peakPremium": 0.93,
+    "targetPct": 60,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": null,
+    "reason": "Recovered from Alpaca",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 10,
+    "quickExitWindow": false,
+    "recovered": true
   }
 }
