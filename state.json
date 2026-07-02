@@ -41,7 +41,7 @@
     "trailing": false,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 2.35
+    "lastPremium": 2.02
   },
   "IWM": {
     "active": true,
@@ -53,20 +53,20 @@
     "qty": 12,
     "entryTime": 1782999329249,
     "orderId": "390c38cc-c7cb-4bf0-9909-6434ebd52ec1",
-    "stopOrderId": "8929a393-56b7-4371-bad6-5133b3083d36",
+    "stopOrderId": "63b581a8-ac2e-454f-8e69-a659a53b9412",
     "currentStop": 0.49499999999999994,
-    "peakPremium": 0.92,
+    "peakPremium": 1.1,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
     "entryMessageId": 1679,
     "reason": "Pullback bounce at VWAP, near support 300.32",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
     "trailing": false,
-    "remainingQty": 12,
+    "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 0.92
+    "lastPremium": 1.1
   }
 }
