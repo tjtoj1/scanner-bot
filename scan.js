@@ -29,8 +29,8 @@ const TICKERS = ["SPY", "QQQ", "IWM", "GLD"];
 const TICKER_CONFIG = {
   SPY: { strikeStep: 1, sizeFactor: 1.0 },
   QQQ: { strikeStep: 1, sizeFactor: 1.0 },
-  IWM: { strikeStep: 1, sizeFactor: 0.8 },  // smaller size (higher volatility)
-  GLD: { strikeStep: 1, sizeFactor: 0.7 },  // smaller size (less liquid in 0DTE)
+  IWM: { strikeStep: 1, sizeFactor: 0.5 },  // V18: Reduced from 0.8 due to weak performance
+  GLD: { strikeStep: 1, sizeFactor: 0.7 },
 };
 
 // Trading Windows (CDT timezone, in UTC for comparison)
@@ -89,8 +89,19 @@ const WINDOWS = [
   },
 ];
 
-const FORCE_EXIT_TIME = { h: 19, m: 58 }; // 2:58 PM CDT
+const FORCE_EXIT_TIME = { h: 19, m: 58 }; // 2:58 PM CDT normal
 const REPORT_TIME = { h: 20, m: 0 };       // 3:00 PM CDT
+
+// V18: Early close days (12:00 PM CDT = 17:00 UTC)
+// Force exit 15 min before early close
+const EARLY_CLOSE_DAYS = ["2026-11-27", "2026-12-24"]; // Black Friday, Christmas Eve
+const EARLY_CLOSE_FORCE_EXIT = { h: 16, m: 45 }; // 11:45 AM CDT
+const EARLY_CLOSE_NO_ENTRY = { h: 16, m: 0 };    // 11:00 AM CDT
+
+function isEarlyCloseDay() {
+  const today = new Date().toISOString().split("T")[0];
+  return EARLY_CLOSE_DAYS.includes(today);
+}
 
 // Risk Management Layer 2 - Trade Management
 const QUICK_EXIT_PCT = 30;    // -30% in first minute → exit
@@ -146,7 +157,15 @@ function getCurrentWindow() {
 
 function isPastForceExit() {
   const now = nowUTC();
-  return utcToMinutes(now) >= utcToMinutes(FORCE_EXIT_TIME);
+  const exitTime = isEarlyCloseDay() ? EARLY_CLOSE_FORCE_EXIT : FORCE_EXIT_TIME;
+  return utcToMinutes(now) >= utcToMinutes(exitTime);
+}
+
+// V18: No new entries after this time on early close days
+function isEarlyCloseNoEntry() {
+  if (!isEarlyCloseDay()) return false;
+  const now = nowUTC();
+  return utcToMinutes(now) >= utcToMinutes(EARLY_CLOSE_NO_ENTRY);
 }
 
 function isReportTime() {
@@ -547,7 +566,22 @@ async function getPosition(optionSymbol) {
 
 async function closePosition(optionSymbol, qty = null) {
   if (qty) {
-    // V17.8: Add position_intent=sell_to_close to avoid uncovered short interpretation
+    // V18: Use marketable limit for partial closes to reduce slippage
+    const quote = await getOptionBidAsk(optionSymbol);
+    if (quote && quote.bid > 0.01) {
+      const limitPrice = Math.max(0.01, quote.bid - 0.02);
+      console.log(`${optionSymbol}: Partial sell limit @ $${limitPrice.toFixed(2)} (bid $${quote.bid})`);
+      return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+        symbol: optionSymbol,
+        qty: qty,
+        side: "sell",
+        type: "limit",
+        limit_price: limitPrice.toFixed(2),
+        time_in_force: "day",
+        position_intent: "sell_to_close",
+      });
+    }
+    // Fallback market
     return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
       symbol: optionSymbol,
       qty: qty,
@@ -557,10 +591,44 @@ async function closePosition(optionSymbol, qty = null) {
       position_intent: "sell_to_close",
     });
   }
+  // Full close uses DELETE positions (Alpaca handles market close automatically)
   return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
+// V18: Get bid/ask spread for smart limit orders
+async function getOptionBidAsk(optionSymbol) {
+  try {
+    const res = await fetch(`${OPTIONS_BASE}/quotes/latest?symbols=${optionSymbol}`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET },
+    });
+    const data = await res.json();
+    const q = data.quotes?.[optionSymbol];
+    if (!q) return null;
+    return { bid: q.bp, ask: q.ap, mid: (q.ap + q.bp) / 2, spread: q.ap - q.bp };
+  } catch (e) {
+    return null;
+  }
+}
+
 async function placeOptionOrder(optionSymbol, qty, side) {
+  // V18: Use marketable limit for reduced slippage
+  // For BUY: limit at ask + 1 cent (fills immediately at ask or better)
+  // For SELL: limit at bid - 1 cent (fills at bid or better)
+  const quote = await getOptionBidAsk(optionSymbol);
+  if (quote && quote.bid > 0 && quote.ask > 0) {
+    const limitPrice = side === "buy" ? quote.ask + 0.02 : Math.max(0.01, quote.bid - 0.02);
+    console.log(`${optionSymbol}: Limit ${side} @ $${limitPrice.toFixed(2)} (bid $${quote.bid}, ask $${quote.ask}, spread $${quote.spread.toFixed(2)})`);
+    return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+      symbol: optionSymbol,
+      qty,
+      side,
+      type: "limit",
+      limit_price: limitPrice.toFixed(2),
+      time_in_force: "day",
+    });
+  }
+  // Fallback to market if quote unavailable
+  console.log(`${optionSymbol}: quote unavailable, using market order`);
   return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
     symbol: optionSymbol,
     qty,
@@ -800,6 +868,12 @@ async function runScan() {
     saveState(state);
     return;
   }
+  // V18: Skip new entries on early close days after cutoff
+  if (isEarlyCloseNoEntry()) {
+    console.log("Early close day: no new entries after cutoff, monitoring only");
+    saveState(state);
+    return;
+  }
   console.log(`Current window: ${window.name}`);
 
   // V17.5: Scan does NOT monitor positions - Monitor workflow handles that exclusively
@@ -880,6 +954,16 @@ async function runScan() {
     if (!premium || premium < 0.10) {
       console.log(`${symbol}: premium too low (${premium})`);
       continue;
+    }
+
+    // V18: Filter out wide bid-ask spreads (slippage protection)
+    const quote = await getOptionBidAsk(contract.symbol);
+    if (quote && quote.spread > 0) {
+      const spreadPct = (quote.spread / quote.mid) * 100;
+      if (spreadPct > 10) {
+        console.log(`${symbol}: spread too wide ${spreadPct.toFixed(1)}% (bid $${quote.bid}, ask $${quote.ask}) - skipping`);
+        continue;
+      }
     }
 
     const baseQty = calculateQty(portfolio, premium, window.riskPct, window.stopPct);
