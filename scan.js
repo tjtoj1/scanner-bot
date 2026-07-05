@@ -1098,7 +1098,7 @@ async function processActivePosition(state, account, symbol) {
     pos.quickExitWindow = false;
   }
 
-  // Profit Partial 1: +30% → sell 50%
+  // Profit Partial 1: +30% → sell 50% + LOCK IN +10% PROFIT
   if (!pos.partial1Done && pnlPct >= PROFIT_PARTIAL_1) {
     const sellQty = Math.floor(pos.remainingQty / 2);
     if (sellQty >= 1) {
@@ -1113,39 +1113,49 @@ async function processActivePosition(state, account, symbol) {
         await closePosition(pos.optionSymbol, sellQty);
         pos.remainingQty -= sellQty;
         pos.partial1Done = true;
-        // Re-place stop order for remaining quantity
+        // V18: Lock in +10% profit on remaining (was: keep original stop)
+        // This addresses trades that reach +30% then reverse
+        const profitLockStop = pos.entryPremium * 1.10; // +10%
+        pos.currentStop = profitLockStop;
+        // Re-place stop order for remaining quantity at +10% profit level
         if (pos.remainingQty > 0) {
           try {
-            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, pos.currentStop);
+            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, profitLockStop);
             pos.stopOrderId = newStop.id;
           } catch (e) {
             console.error(`${symbol}: re-stop failed: ${e.message}`);
           }
         }
-        await sendTelegram(`💰 <b>${symbol}</b> +30% Partial Profit
+        await sendTelegram(`💰 <b>${symbol}</b> +30% Partial + Lock
 بعنا ${sellQty} عقود (نص الصفقة)
 السعر: $${currentPremium.toFixed(2)}
-الباقي: ${pos.remainingQty} عقود`, null, pos.entryMessageId);
+الباقي: ${pos.remainingQty} عقود
+🔒 Stop مضمون: +10% ($${profitLockStop.toFixed(2)})`, null, pos.entryMessageId);
       } catch (e) {
         console.error(`${symbol}: partial sell failed: ${e.message}`);
       }
     }
   }
 
-  // Profit BE Stop: +50% → move stop to entry
+  // V18: +50% → Activate Trailing Stop (15% from peak) instead of BE
   if (!pos.bePromoted && pnlPct >= PROFIT_BE_PCT) {
-    console.log(`${symbol}: Promoting to BE stop`);
+    console.log(`${symbol}: Activating Trailing Stop at +50%`);
     try {
+      pos.trailing = true;
+      pos.bePromoted = true; // reuse flag as "trailing activated"
+      // Set trailing stop based on current peak (15% below)
+      const trailStop = Math.max(pos.entryPremium * 1.10, pos.peakPremium * 0.85);
       if (pos.stopOrderId) await cancelOrder(pos.stopOrderId);
-      const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, pos.entryPremium);
+      const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, trailStop);
       pos.stopOrderId = newStop.id;
-      pos.currentStop = pos.entryPremium;
-      pos.bePromoted = true;
-      await sendTelegram(`🛡 <b>${symbol}</b> +50% Break-Even Activated
-Stop → $${pos.entryPremium.toFixed(2)} (entry)
+      pos.currentStop = trailStop;
+      await sendTelegram(`📈 <b>${symbol}</b> +50% Trailing Activated
+Trailing 15% من القمة
+Peak: $${pos.peakPremium.toFixed(2)}
+Stop: $${trailStop.toFixed(2)}
 P&L: +${pnlPct.toFixed(1)}%`, null, pos.entryMessageId);
     } catch (e) {
-      console.error(`${symbol}: BE promotion failed: ${e.message}`);
+      console.error(`${symbol}: Trailing activation failed: ${e.message}`);
     }
   }
 
@@ -1201,11 +1211,17 @@ P&L: +${pnlPct.toFixed(1)}%`, null, pos.entryMessageId);
     }
   }
 
-  // Time exit
+  // V18: Time exit ONLY if position is not profitable yet
+  // If +30% Partial done → let Trailing/Stop manage it (no time exit)
   if (elapsedMin >= pos.timeExitMin) {
-    console.log(`${symbol}: Time exit triggered (${elapsedMin.toFixed(1)} min >= ${pos.timeExitMin})`);
-    await exitPosition(state, pos, symbol, "time_exit", `خروج وقتي (${pos.timeExitMin} دقيقة)`);
-    return;
+    if (pos.partial1Done) {
+      console.log(`${symbol}: Time exit SKIPPED - profit locked (+10%+), letting Trailing manage`);
+      // Don't exit; let trailing/stop handle it
+    } else {
+      console.log(`${symbol}: Time exit triggered (${elapsedMin.toFixed(1)} min >= ${pos.timeExitMin})`);
+      await exitPosition(state, pos, symbol, "time_exit", `خروج وقتي (${pos.timeExitMin} دقيقة)`);
+      return;
+    }
   }
 
   state[symbol] = pos;
