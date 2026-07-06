@@ -114,7 +114,7 @@
       "setup": "Recovered from Alpaca"
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "_dailyLosses": 881.9999999999998,
   "_dailyTrades_count": 4,
   "_consecLosses": 1,
