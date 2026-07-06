@@ -1363,27 +1363,96 @@ const mode = process.env.MODE || "scan";
 (async () => {
   try {
     if (mode === "monitor") {
-      const state = loadState();
-      const account = await getAccount();
-      let hasActive = false;
-      for (const symbol of TICKERS) {
-        if (state[symbol]?.active) {
-          hasActive = true;
-          await processActivePosition(state, account, symbol);
+      // V18.3: Run monitor twice per invocation (0s + 30s) for effective 30-sec frequency
+      for (let iteration = 0; iteration < 2; iteration++) {
+        const state = loadState();
+        const account = await getAccount();
+
+        // Reconciliation: adopt any orphan positions from Alpaca
+        try {
+          const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
+          if (Array.isArray(alpacaPositions)) {
+            for (const pos of alpacaPositions) {
+              const match = pos.symbol && pos.symbol.match(/^([A-Z]+)\d/);
+              if (!match) continue;
+              const ticker = match[1];
+              if (!TICKERS.includes(ticker)) continue;
+              if (state[ticker]?.active) continue;
+
+              const isCall = pos.symbol.includes("C0");
+              const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
+              const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
+
+              const sameOptionAlreadyTraded = (state._dailyTrades || []).some(
+                t => t.symbol === ticker && 
+                     t.strike === String(strike) &&
+                     t.signal === (isCall ? "CALL" : "PUT")
+              );
+              if (sameOptionAlreadyTraded) continue;
+
+              const entryPremium = parseFloat(pos.avg_entry_price);
+              const qty = parseInt(pos.qty);
+              console.log(`🔄 Monitor RECONCILE: Adopting ${ticker} ${pos.symbol}`);
+
+              state[ticker] = {
+                active: true,
+                signal: isCall ? "CALL" : "PUT",
+                window: "RECOVERED",
+                optionSymbol: pos.symbol,
+                strike: strike ? String(strike) : null,
+                entryPremium,
+                qty,
+                entryTime: pos.created_at ? new Date(pos.created_at).getTime() : Date.now() - (5 * 60 * 1000),
+                orderId: null,
+                stopOrderId: null,
+                currentStop: entryPremium * 0.6,
+                peakPremium: entryPremium,
+                targetPct: 60,
+                stopPct: 40,
+                timeExitMin: 25,
+                entryMessageId: null,
+                reason: "Recovered from Alpaca",
+                partial1Done: false,
+                bePromoted: false,
+                partial2Done: false,
+                trailing: false,
+                remainingQty: qty,
+                quickExitWindow: false,
+                recovered: true,
+              };
+              await sendTelegram(`🔄 <b>${ticker}</b> Position Recovered\nFound orphan in Alpaca, now tracking.\nEntry: $${entryPremium.toFixed(2)} × ${qty}`);
+            }
+          }
+        } catch (e) {
+          console.error("Monitor reconciliation failed:", e.message);
         }
-      }
-      if (!hasActive) {
-        console.log("No active positions to monitor");
-      }
-      saveState(state);
-      // Also check daily report
-      if (isReportTime() && !state._reportSent) {
-        await sendDailyReport(state, parseFloat(account.portfolio_value));
+
+        let hasActive = false;
+        for (const symbol of TICKERS) {
+          if (state[symbol]?.active) {
+            hasActive = true;
+            await processActivePosition(state, account, symbol);
+          }
+        }
+        if (!hasActive && iteration === 0) {
+          console.log("No active positions to monitor");
+        }
         saveState(state);
+
+        // Only do daily report on first iteration
+        if (iteration === 0 && isReportTime() && !state._reportSent) {
+          await sendDailyReport(state, parseFloat(account.portfolio_value));
+          saveState(state);
+        }
+
+        // Wait 30 seconds before second iteration
+        if (iteration === 0) {
+          console.log("--- Waiting 30 seconds for second check ---");
+          await new Promise(resolve => setTimeout(resolve, 30000));
+        }
       }
     } else {
       await runScan();
-      // Send report if time
       const state = loadState();
       const account = await getAccount();
       if (isReportTime() && !state._reportSent) {
