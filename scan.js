@@ -785,37 +785,26 @@ async function runScan() {
 
         // Case 1: Alpaca has position, state doesn't know → ADOPT
         if (!state[ticker]?.active) {
-          // V17.9: Skip recovery for recently-opened positions (last 30 min)
-          // 30 min covers: race conditions + active bot management (Time Exit = 25 min)
-          // Only adopt truly orphaned positions (e.g. from previous session)
-          if (pos.created_at) {
-            const positionAge = Date.now() - new Date(pos.created_at).getTime();
-            if (positionAge < 30 * 60 * 1000) {
-              console.log(`⏭ Skipping ${ticker} recovery - position opened ${Math.round(positionAge/60000)}m ago (still actively managed)`);
-              continue;
-            }
-          }
-          // V17.9: Skip if ticker has recent cooldown (was just closed by this bot)
-          if (state[ticker]?.cooldownUntil && (Date.now() - state[ticker].cooldownUntil) < 60 * 60 * 1000) {
-            console.log(`⏭ Skipping ${ticker} recovery - recent cooldown indicates bot activity`);
-            continue;
-          }
-          // V17.10: Skip if this exact option symbol was already recovered/traded today
-          // Prevents double-recovery of same position due to Alpaca settlement delays
-          const alreadyTradedToday = (state._dailyTrades || []).some(
-            t => t.symbol === ticker && (t.window === "RECOVERED" || t.setup === "Recovered from Alpaca")
+          // V18.2: Only skip if EXACT same option symbol already handled today
+          // (prevents settlement-delay duplicate)
+          // Otherwise, adopt any orphan - that's the whole point of Reconciliation
+          const isCall = pos.symbol.includes("C0");
+          const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
+          const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
+
+          const sameOptionAlreadyTraded = (state._dailyTrades || []).some(
+            t => t.symbol === ticker && 
+                 t.strike === String(strike) &&
+                 t.signal === (isCall ? "CALL" : "PUT")
           );
-          if (alreadyTradedToday) {
-            console.log(`⏭ Skipping ${ticker} recovery - already recovered/traded today`);
+          if (sameOptionAlreadyTraded) {
+            console.log(`⏭ Skipping ${ticker} ${pos.symbol} - same option already traded today`);
             continue;
           }
 
           console.log(`🔄 RECONCILE: Adopting orphan ${ticker} position ${pos.symbol}`);
-          const isCall = pos.symbol.includes("C0");
           const entryPremium = parseFloat(pos.avg_entry_price);
           const qty = parseInt(pos.qty);
-          const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
-          const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
 
           state[ticker] = {
             active: true,
