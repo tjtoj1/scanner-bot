@@ -663,6 +663,30 @@ async function cancelOrder(orderId) {
   }
 }
 
+// V18.7: Cancel ALL open orders for a specific option symbol
+// Critical for recovered positions where a stop order holds the entire qty
+async function cancelAllOrdersForSymbol(optionSymbol) {
+  try {
+    const orders = await alpacaCall(`${TRADING_BASE}/orders?status=open&symbols=${optionSymbol}`);
+    if (Array.isArray(orders)) {
+      for (const order of orders) {
+        if (order.symbol === optionSymbol) {
+          console.log(`  Cancelling order ${order.id} (${order.side} ${order.qty} ${order.type})`);
+          await cancelOrder(order.id);
+        }
+      }
+      // Small delay for cancellations to process
+      if (orders.length > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      return orders.length;
+    }
+  } catch (e) {
+    console.error(`cancelAllOrdersForSymbol failed: ${e.message}`);
+  }
+  return 0;
+}
+
 // ============================================================
 // OPTION HELPERS
 // ============================================================
@@ -1102,12 +1126,11 @@ async function processActivePosition(state, account, symbol) {
     if (sellQty >= 1) {
       console.log(`${symbol}: Profit partial 1 (+30%): selling ${sellQty} of ${pos.remainingQty}`);
       try {
-        // V17.6: Cancel stop order first to free up contracts for sale
-        if (pos.stopOrderId) {
-          try { await cancelOrder(pos.stopOrderId); } catch (e) { /* ignore */ }
-          pos.stopOrderId = null;
-        }
-        // Sell partial using POST orders (works for long calls/puts)
+        // V18.7: Cancel ALL open orders for this symbol (frees held qty)
+        // Critical for recovered positions with pre-existing stop orders
+        await cancelAllOrdersForSymbol(pos.optionSymbol);
+        pos.stopOrderId = null;
+        // Sell partial using DELETE positions (works for long calls/puts)
         await closePosition(pos.optionSymbol, sellQty);
         pos.remainingQty -= sellQty;
         pos.partial1Done = true;
@@ -1143,7 +1166,8 @@ async function processActivePosition(state, account, symbol) {
       pos.bePromoted = true; // reuse flag as "trailing activated"
       // Set trailing stop based on current peak (15% below)
       const trailStop = Math.max(pos.entryPremium * 1.10, pos.peakPremium * 0.85);
-      if (pos.stopOrderId) await cancelOrder(pos.stopOrderId);
+      // V18.7: Cancel ALL orders for symbol before placing new stop
+      await cancelAllOrdersForSymbol(pos.optionSymbol);
       const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, trailStop);
       pos.stopOrderId = newStop.id;
       pos.currentStop = trailStop;
@@ -1163,11 +1187,9 @@ P&L: +${pnlPct.toFixed(1)}%`, null, pos.entryMessageId);
     if (sellQty < pos.remainingQty) {
       console.log(`${symbol}: Profit partial 2 (+75%): selling ${sellQty}`);
       try {
-        // V17.6: Cancel stop before partial sell
-        if (pos.stopOrderId) {
-          try { await cancelOrder(pos.stopOrderId); } catch (e) { /* ignore */ }
-          pos.stopOrderId = null;
-        }
+        // V18.7: Cancel ALL orders for symbol before partial sell
+        await cancelAllOrdersForSymbol(pos.optionSymbol);
+        pos.stopOrderId = null;
         await closePosition(pos.optionSymbol, sellQty);
         pos.remainingQty -= sellQty;
         pos.partial2Done = true;
@@ -1234,9 +1256,8 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
   pos.exiting = true;
 
   try {
-    if (pos.stopOrderId) {
-      await cancelOrder(pos.stopOrderId);
-    }
+    // V18.7: Cancel ALL open orders for symbol (frees held qty for close)
+    await cancelAllOrdersForSymbol(pos.optionSymbol);
     if (pos.remainingQty > 0) {
       await closePosition(pos.optionSymbol);
     }
