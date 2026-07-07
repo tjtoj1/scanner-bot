@@ -87,19 +87,19 @@
     "orderId": null,
     "stopOrderId": null,
     "currentStop": 0.672,
-    "peakPremium": 1.66,
+    "peakPremium": 1.72,
     "targetPct": 60,
     "stopPct": 40,
     "timeExitMin": 25,
     "entryMessageId": null,
     "reason": "Recovered from Alpaca",
     "partial1Done": false,
-    "bePromoted": false,
+    "bePromoted": true,
     "partial2Done": false,
-    "trailing": false,
+    "trailing": true,
     "remainingQty": 3,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 1.66
+    "lastPremium": 1.72
   }
 }
