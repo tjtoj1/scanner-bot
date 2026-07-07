@@ -566,32 +566,38 @@ async function getPosition(optionSymbol) {
 
 async function closePosition(optionSymbol, qty = null) {
   if (qty) {
-    // V18: Use marketable limit for partial closes to reduce slippage
-    const quote = await getOptionBidAsk(optionSymbol);
-    if (quote && quote.bid > 0.01) {
-      const limitPrice = Math.max(0.01, quote.bid - 0.02);
-      console.log(`${optionSymbol}: Partial sell limit @ $${limitPrice.toFixed(2)} (bid $${quote.bid})`);
+    // V18.4: Use DELETE /positions/{symbol}?qty=X (this is what Alpaca UI uses for partial close)
+    // If it fails, fall back to POST /orders
+    try {
+      console.log(`${optionSymbol}: Attempting DELETE partial close qty=${qty}`);
+      return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}?qty=${qty}`, "DELETE");
+    } catch (deleteErr) {
+      console.log(`${optionSymbol}: DELETE failed (${deleteErr.message}), trying POST orders`);
+      // Fallback: POST orders with market sell
+      const quote = await getOptionBidAsk(optionSymbol);
+      if (quote && quote.bid > 0.01) {
+        const limitPrice = Math.max(0.01, quote.bid - 0.02);
+        console.log(`${optionSymbol}: Partial sell limit @ $${limitPrice.toFixed(2)} (bid $${quote.bid})`);
+        return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+          symbol: optionSymbol,
+          qty: qty,
+          side: "sell",
+          type: "limit",
+          limit_price: limitPrice.toFixed(2),
+          time_in_force: "day",
+        });
+      }
+      // Last fallback: market
       return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
         symbol: optionSymbol,
         qty: qty,
         side: "sell",
-        type: "limit",
-        limit_price: limitPrice.toFixed(2),
+        type: "market",
         time_in_force: "day",
-        position_intent: "sell_to_close",
       });
     }
-    // Fallback market
-    return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
-      symbol: optionSymbol,
-      qty: qty,
-      side: "sell",
-      type: "market",
-      time_in_force: "day",
-      position_intent: "sell_to_close",
-    });
   }
-  // Full close uses DELETE positions (Alpaca handles market close automatically)
+  // Full close
   return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
@@ -646,7 +652,6 @@ async function placeStopLossOrder(optionSymbol, qty, stopPrice) {
     type: "stop",
     stop_price: stopPrice.toFixed(2),
     time_in_force: "day",
-    position_intent: "sell_to_close",
   });
 }
 
@@ -1364,6 +1369,8 @@ const mode = process.env.MODE || "scan";
   try {
     if (mode === "monitor") {
       // V18.3: Run monitor twice per invocation (0s + 30s) for effective 30-sec frequency
+      // V18.5: Track tickers exited during this run to prevent re-adoption in 2nd iteration
+      const exitedThisRun = new Set();
       for (let iteration = 0; iteration < 2; iteration++) {
         const state = loadState();
         const account = await getAccount();
@@ -1378,6 +1385,11 @@ const mode = process.env.MODE || "scan";
               const ticker = match[1];
               if (!TICKERS.includes(ticker)) continue;
               if (state[ticker]?.active) continue;
+              // V18.5: Don't re-adopt if we just exited this ticker this run
+              if (exitedThisRun.has(ticker)) {
+                console.log(`⏭ Skipping ${ticker} - exited earlier this run`);
+                continue;
+              }
 
               const isCall = pos.symbol.includes("C0");
               const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
@@ -1431,7 +1443,12 @@ const mode = process.env.MODE || "scan";
         for (const symbol of TICKERS) {
           if (state[symbol]?.active) {
             hasActive = true;
+            const wasActive = state[symbol].active;
             await processActivePosition(state, account, symbol);
+            // V18.5: If position became inactive (exited), track it
+            if (wasActive && !state[symbol]?.active) {
+              exitedThisRun.add(symbol);
+            }
           }
         }
         if (!hasActive && iteration === 0) {
