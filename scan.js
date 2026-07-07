@@ -797,13 +797,17 @@ async function runScan() {
           const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
           const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
 
-          const sameOptionAlreadyTraded = (state._dailyTrades || []).some(
-            t => t.symbol === ticker && 
+          // V18.6: Only skip if we exited THIS EXACT option in the last 2 minutes
+          // (Alpaca settlement delay). A live position that traded earlier and reopened
+          // must still be managed - don't block it just because strike matched earlier today.
+          const recentlyExitedSameOption = (state._dailyTrades || []).some(
+            t => t.symbol === ticker &&
                  t.strike === String(strike) &&
-                 t.signal === (isCall ? "CALL" : "PUT")
+                 t.signal === (isCall ? "CALL" : "PUT") &&
+                 t.exitTime && (Date.now() - t.exitTime) < 2 * 60 * 1000
           );
-          if (sameOptionAlreadyTraded) {
-            console.log(`⏭ Skipping ${ticker} ${pos.symbol} - same option already traded today`);
+          if (recentlyExitedSameOption) {
+            console.log(`⏭ Skipping ${ticker} ${pos.symbol} - exited same option <2min ago (settlement delay)`);
             continue;
           }
 
@@ -1395,12 +1399,16 @@ const mode = process.env.MODE || "scan";
               const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
               const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
 
-              const sameOptionAlreadyTraded = (state._dailyTrades || []).some(
-                t => t.symbol === ticker && 
+              // V18.6: Only skip if exited same option <2min ago (settlement delay)
+              const recentlyExitedSameOption = (state._dailyTrades || []).some(
+                t => t.symbol === ticker &&
                      t.strike === String(strike) &&
-                     t.signal === (isCall ? "CALL" : "PUT")
+                     t.signal === (isCall ? "CALL" : "PUT") &&
+                     t.exitTime && (Date.now() - t.exitTime) < 2 * 60 * 1000
               );
-              if (sameOptionAlreadyTraded) continue;
+              if (recentlyExitedSameOption) continue;
+              // Also skip if we exited this ticker earlier this same run
+              if (exitedThisRun.has(ticker)) continue;
 
               const entryPremium = parseFloat(pos.avg_entry_price);
               const qty = parseInt(pos.qty);
