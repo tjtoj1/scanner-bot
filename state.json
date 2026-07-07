@@ -85,21 +85,21 @@
     "qty": 3,
     "entryTime": 1783447048051,
     "orderId": null,
-    "stopOrderId": null,
-    "currentStop": 0.672,
+    "stopOrderId": "ffb3db35-22a2-48f6-b248-b4801e267d74",
+    "currentStop": 1.5215,
     "peakPremium": 1.79,
     "targetPct": 60,
     "stopPct": 40,
     "timeExitMin": 25,
     "entryMessageId": null,
     "reason": "Recovered from Alpaca",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": true,
     "partial2Done": false,
     "trailing": true,
-    "remainingQty": 3,
+    "remainingQty": 2,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 1.68
+    "lastPremium": 1.64
   }
 }
