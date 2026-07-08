@@ -29,7 +29,7 @@ const TICKERS = ["SPY", "QQQ", "IWM", "GLD"];
 const TICKER_CONFIG = {
   SPY: { strikeStep: 1, sizeFactor: 1.0 },
   QQQ: { strikeStep: 1, sizeFactor: 1.0 },
-  IWM: { strikeStep: 1, sizeFactor: 0.5 },  // v19: reduced (weak performance)
+  IWM: { strikeStep: 1, sizeFactor: 0.5 },  // V18: Reduced from 0.8 due to weak performance
   GLD: { strikeStep: 1, sizeFactor: 0.7 },
 };
 
@@ -89,8 +89,19 @@ const WINDOWS = [
   },
 ];
 
-const FORCE_EXIT_TIME = { h: 19, m: 58 }; // 2:58 PM CDT
+const FORCE_EXIT_TIME = { h: 19, m: 58 }; // 2:58 PM CDT normal
 const REPORT_TIME = { h: 20, m: 0 };       // 3:00 PM CDT
+
+// V18: Early close days (12:00 PM CDT = 17:00 UTC)
+// Force exit 15 min before early close
+const EARLY_CLOSE_DAYS = ["2026-11-27", "2026-12-24"]; // Black Friday, Christmas Eve
+const EARLY_CLOSE_FORCE_EXIT = { h: 16, m: 45 }; // 11:45 AM CDT
+const EARLY_CLOSE_NO_ENTRY = { h: 16, m: 0 };    // 11:00 AM CDT
+
+function isEarlyCloseDay() {
+  const today = new Date().toISOString().split("T")[0];
+  return EARLY_CLOSE_DAYS.includes(today);
+}
 
 // Risk Management Layer 2 - Trade Management
 const QUICK_EXIT_PCT = 30;    // -30% in first minute → exit
@@ -146,7 +157,15 @@ function getCurrentWindow() {
 
 function isPastForceExit() {
   const now = nowUTC();
-  return utcToMinutes(now) >= utcToMinutes(FORCE_EXIT_TIME);
+  const exitTime = isEarlyCloseDay() ? EARLY_CLOSE_FORCE_EXIT : FORCE_EXIT_TIME;
+  return utcToMinutes(now) >= utcToMinutes(exitTime);
+}
+
+// V18: No new entries after this time on early close days
+function isEarlyCloseNoEntry() {
+  if (!isEarlyCloseDay()) return false;
+  const now = nowUTC();
+  return utcToMinutes(now) >= utcToMinutes(EARLY_CLOSE_NO_ENTRY);
 }
 
 function isReportTime() {
@@ -545,16 +564,77 @@ async function getPosition(optionSymbol) {
   }
 }
 
-// v19: Partial close via DELETE positions (like Alpaca UI). Full close via DELETE.
-// Market orders throughout for guaranteed execution (no limit order non-fills).
 async function closePosition(optionSymbol, qty = null) {
   if (qty) {
-    return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}?qty=${qty}`, "DELETE");
+    // V18.4: Use DELETE /positions/{symbol}?qty=X (this is what Alpaca UI uses for partial close)
+    // If it fails, fall back to POST /orders
+    try {
+      console.log(`${optionSymbol}: Attempting DELETE partial close qty=${qty}`);
+      return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}?qty=${qty}`, "DELETE");
+    } catch (deleteErr) {
+      console.log(`${optionSymbol}: DELETE failed (${deleteErr.message}), trying POST orders`);
+      // Fallback: POST orders with market sell
+      const quote = await getOptionBidAsk(optionSymbol);
+      if (quote && quote.bid > 0.01) {
+        const limitPrice = Math.max(0.01, quote.bid - 0.02);
+        console.log(`${optionSymbol}: Partial sell limit @ $${limitPrice.toFixed(2)} (bid $${quote.bid})`);
+        return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+          symbol: optionSymbol,
+          qty: qty,
+          side: "sell",
+          type: "limit",
+          limit_price: limitPrice.toFixed(2),
+          time_in_force: "day",
+        });
+      }
+      // Last fallback: market
+      return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+        symbol: optionSymbol,
+        qty: qty,
+        side: "sell",
+        type: "market",
+        time_in_force: "day",
+      });
+    }
   }
+  // Full close
   return await alpacaCall(`${TRADING_BASE}/positions/${optionSymbol}`, "DELETE");
 }
 
+// V18: Get bid/ask spread for smart limit orders
+async function getOptionBidAsk(optionSymbol) {
+  try {
+    const res = await fetch(`${OPTIONS_BASE}/quotes/latest?symbols=${optionSymbol}`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET },
+    });
+    const data = await res.json();
+    const q = data.quotes?.[optionSymbol];
+    if (!q) return null;
+    return { bid: q.bp, ask: q.ap, mid: (q.ap + q.bp) / 2, spread: q.ap - q.bp };
+  } catch (e) {
+    return null;
+  }
+}
+
 async function placeOptionOrder(optionSymbol, qty, side) {
+  // V18: Use marketable limit for reduced slippage
+  // For BUY: limit at ask + 1 cent (fills immediately at ask or better)
+  // For SELL: limit at bid - 1 cent (fills at bid or better)
+  const quote = await getOptionBidAsk(optionSymbol);
+  if (quote && quote.bid > 0 && quote.ask > 0) {
+    const limitPrice = side === "buy" ? quote.ask + 0.02 : Math.max(0.01, quote.bid - 0.02);
+    console.log(`${optionSymbol}: Limit ${side} @ $${limitPrice.toFixed(2)} (bid $${quote.bid}, ask $${quote.ask}, spread $${quote.spread.toFixed(2)})`);
+    return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
+      symbol: optionSymbol,
+      qty,
+      side,
+      type: "limit",
+      limit_price: limitPrice.toFixed(2),
+      time_in_force: "day",
+    });
+  }
+  // Fallback to market if quote unavailable
+  console.log(`${optionSymbol}: quote unavailable, using market order`);
   return await alpacaCall(`${TRADING_BASE}/orders`, "POST", {
     symbol: optionSymbol,
     qty,
@@ -583,37 +663,26 @@ async function cancelOrder(orderId) {
   }
 }
 
-// v19: Get bid/ask for accurate exit pricing (bid = real sellable price)
-async function getOptionBidAsk(optionSymbol) {
-  try {
-    const res = await fetch(`${OPTIONS_BASE}/quotes/latest?symbols=${optionSymbol}`, {
-      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET },
-    });
-    const data = await res.json();
-    const q = data.quotes?.[optionSymbol];
-    if (!q) return null;
-    return { bid: q.bp, ask: q.ap, mid: (q.ap + q.bp) / 2 };
-  } catch (e) {
-    return null;
-  }
-}
-
-// v19: Cancel ALL open orders for a symbol (frees held_for_orders qty)
-// Essential before any partial sell or stop replacement
+// V18.7: Cancel ALL open orders for a specific option symbol
+// Critical for recovered positions where a stop order holds the entire qty
 async function cancelAllOrdersForSymbol(optionSymbol) {
   try {
     const orders = await alpacaCall(`${TRADING_BASE}/orders?status=open&symbols=${optionSymbol}`);
-    if (Array.isArray(orders) && orders.length > 0) {
+    if (Array.isArray(orders)) {
       for (const order of orders) {
         if (order.symbol === optionSymbol) {
+          console.log(`  Cancelling order ${order.id} (${order.side} ${order.qty} ${order.type})`);
           await cancelOrder(order.id);
         }
       }
-      await new Promise(resolve => setTimeout(resolve, 1000)); // let cancellations settle
+      // Small delay for cancellations to process
+      if (orders.length > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
       return orders.length;
     }
   } catch (e) {
-    console.error(`cancelAll ${optionSymbol}: ${e.message}`);
+    console.error(`cancelAllOrdersForSymbol failed: ${e.message}`);
   }
   return 0;
 }
@@ -745,20 +814,24 @@ async function runScan() {
 
         // Case 1: Alpaca has position, state doesn't know → ADOPT
         if (!state[ticker]?.active) {
-          // v19: Adopt ANY live position. Only skip if we exited THIS exact option
-          // in the last 2 minutes (Alpaca settlement delay).
+          // V18.2: Only skip if EXACT same option symbol already handled today
+          // (prevents settlement-delay duplicate)
+          // Otherwise, adopt any orphan - that's the whole point of Reconciliation
           const isCall = pos.symbol.includes("C0");
           const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
           const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
 
-          const recentlyExited = (state._dailyTrades || []).some(
+          // V18.6: Only skip if we exited THIS EXACT option in the last 2 minutes
+          // (Alpaca settlement delay). A live position that traded earlier and reopened
+          // must still be managed - don't block it just because strike matched earlier today.
+          const recentlyExitedSameOption = (state._dailyTrades || []).some(
             t => t.symbol === ticker &&
                  t.strike === String(strike) &&
                  t.signal === (isCall ? "CALL" : "PUT") &&
                  t.exitTime && (Date.now() - t.exitTime) < 2 * 60 * 1000
           );
-          if (recentlyExited) {
-            console.log(`⏭ Skipping ${ticker} ${pos.symbol} - exited <2min ago (settlement)`);
+          if (recentlyExitedSameOption) {
+            console.log(`⏭ Skipping ${ticker} ${pos.symbol} - exited same option <2min ago (settlement delay)`);
             continue;
           }
 
@@ -814,6 +887,12 @@ async function runScan() {
   const window = getCurrentWindow();
   if (!window) {
     console.log("Not in a trading window, Scan does nothing (Monitor handles positions)");
+    saveState(state);
+    return;
+  }
+  // V18: Skip new entries on early close days after cutoff
+  if (isEarlyCloseNoEntry()) {
+    console.log("Early close day: no new entries after cutoff, monitoring only");
     saveState(state);
     return;
   }
@@ -897,6 +976,16 @@ async function runScan() {
     if (!premium || premium < 0.10) {
       console.log(`${symbol}: premium too low (${premium})`);
       continue;
+    }
+
+    // V18: Filter out wide bid-ask spreads (slippage protection)
+    const quote = await getOptionBidAsk(contract.symbol);
+    if (quote && quote.spread > 0) {
+      const spreadPct = (quote.spread / quote.mid) * 100;
+      if (spreadPct > 10) {
+        console.log(`${symbol}: spread too wide ${spreadPct.toFixed(1)}% (bid $${quote.bid}, ask $${quote.ask}) - skipping`);
+        continue;
+      }
     }
 
     const baseQty = calculateQty(portfolio, premium, window.riskPct, window.stopPct);
@@ -1031,96 +1120,128 @@ async function processActivePosition(state, account, symbol) {
     pos.quickExitWindow = false;
   }
 
-  // ============================================================
-  // v19 SIMPLIFIED PROFIT MANAGEMENT
-  // ============================================================
-
-  // RECOVERED positions: full-close only (no partial - avoids Alpaca API issues)
-  if (pos.recovered) {
-    // Track peak for trailing
-    if (pnlPct >= 50 && !pos.trailing) {
-      pos.trailing = true;
-      pos.peakPremium = currentPremium;
-      await sendTelegram(`📈 <b>${symbol}</b> RECOVERED +50% Trailing\nPeak: $${currentPremium.toFixed(2)}`, null, pos.entryMessageId);
-    }
-    if (pos.trailing) {
-      const trailStop = pos.peakPremium * 0.85;
-      if (currentPremium <= trailStop) {
-        await exitPosition(state, pos, symbol, "recovered_trail", `ريكفري تريلينج (قمة $${pos.peakPremium.toFixed(2)})`);
-        return;
-      }
-    } else if (pnlPct >= 30) {
-      // +30% but not yet +50%: take full profit
-      await exitPosition(state, pos, symbol, "recovered_profit", `ريكفري +${pnlPct.toFixed(0)}%`);
-      return;
-    }
-    if (pnlPct <= -30) {
-      await exitPosition(state, pos, symbol, "recovered_stop", `ريكفري -30%`);
-      return;
-    }
-    if (elapsedMin >= pos.timeExitMin) {
-      await exitPosition(state, pos, symbol, "recovered_time", `ريكفري وقتي`);
-      return;
-    }
-    state[symbol] = pos;
-    return;
-  }
-
-  // REGULAR positions:
-  // +30%: sell half, then trailing 15% on the rest (no time exit after this)
+  // Profit Partial 1: +30% → sell 50% + LOCK IN +10% PROFIT
   if (!pos.partial1Done && pnlPct >= PROFIT_PARTIAL_1) {
     const sellQty = Math.floor(pos.remainingQty / 2);
     if (sellQty >= 1) {
-      console.log(`${symbol}: +30% partial: selling ${sellQty} of ${pos.remainingQty}`);
+      console.log(`${symbol}: Profit partial 1 (+30%): selling ${sellQty} of ${pos.remainingQty}`);
       try {
+        // V18.7: Cancel ALL open orders for this symbol (frees held qty)
+        // Critical for recovered positions with pre-existing stop orders
         await cancelAllOrdersForSymbol(pos.optionSymbol);
         pos.stopOrderId = null;
+        // Sell partial using DELETE positions (works for long calls/puts)
         await closePosition(pos.optionSymbol, sellQty);
         pos.remainingQty -= sellQty;
         pos.partial1Done = true;
-        pos.trailing = true; // v19: trailing starts immediately after +30%
-        // Place trailing stop 15% below peak on remaining
-        const trailStop = pos.peakPremium * 0.85;
-        pos.currentStop = trailStop;
+        // V18: Lock in +10% profit on remaining (was: keep original stop)
+        // This addresses trades that reach +30% then reverse
+        const profitLockStop = pos.entryPremium * 1.10; // +10%
+        pos.currentStop = profitLockStop;
+        // Re-place stop order for remaining quantity at +10% profit level
         if (pos.remainingQty > 0) {
           try {
-            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, trailStop);
+            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, profitLockStop);
             pos.stopOrderId = newStop.id;
           } catch (e) {
-            console.error(`${symbol}: trail stop failed: ${e.message}`);
+            console.error(`${symbol}: re-stop failed: ${e.message}`);
           }
         }
-        await sendTelegram(`💰 <b>${symbol}</b> +30% Partial + Trailing
-بعنا ${sellQty} عقود (نص)
+        await sendTelegram(`💰 <b>${symbol}</b> +30% Partial + Lock
+بعنا ${sellQty} عقود (نص الصفقة)
 السعر: $${currentPremium.toFixed(2)}
-الباقي: ${pos.remainingQty} مع تريلينج 15%`, null, pos.entryMessageId);
+الباقي: ${pos.remainingQty} عقود
+🔒 Stop مضمون: +10% ($${profitLockStop.toFixed(2)})`, null, pos.entryMessageId);
       } catch (e) {
         console.error(`${symbol}: partial sell failed: ${e.message}`);
       }
     }
   }
 
-  // Trailing management: keep raising the stop as peak rises
-  if (pos.trailing && pos.remainingQty > 0) {
-    const trailStop = pos.peakPremium * 0.85;
-    if (trailStop > pos.currentStop + 0.01) {
+  // V18: +50% → Activate Trailing Stop (15% from peak) instead of BE
+  if (!pos.bePromoted && pnlPct >= PROFIT_BE_PCT) {
+    console.log(`${symbol}: Activating Trailing Stop at +50%`);
+    try {
+      pos.trailing = true;
+      pos.bePromoted = true; // reuse flag as "trailing activated"
+      // Set trailing stop based on current peak (15% below)
+      const trailStop = Math.max(pos.entryPremium * 1.10, pos.peakPremium * 0.85);
+      // V18.7: Cancel ALL orders for symbol before placing new stop
+      await cancelAllOrdersForSymbol(pos.optionSymbol);
+      const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, trailStop);
+      pos.stopOrderId = newStop.id;
+      pos.currentStop = trailStop;
+      await sendTelegram(`📈 <b>${symbol}</b> +50% Trailing Activated
+Trailing 15% من القمة
+Peak: $${pos.peakPremium.toFixed(2)}
+Stop: $${trailStop.toFixed(2)}
+P&L: +${pnlPct.toFixed(1)}%`, null, pos.entryMessageId);
+    } catch (e) {
+      console.error(`${symbol}: Trailing activation failed: ${e.message}`);
+    }
+  }
+
+  // Profit Partial 2: +75%
+  if (pos.partial1Done && !pos.partial2Done && pnlPct >= PROFIT_PARTIAL_2) {
+    const sellQty = Math.max(1, Math.floor(pos.remainingQty / 2));
+    if (sellQty < pos.remainingQty) {
+      console.log(`${symbol}: Profit partial 2 (+75%): selling ${sellQty}`);
       try {
+        // V18.7: Cancel ALL orders for symbol before partial sell
         await cancelAllOrdersForSymbol(pos.optionSymbol);
+        pos.stopOrderId = null;
+        await closePosition(pos.optionSymbol, sellQty);
+        pos.remainingQty -= sellQty;
+        pos.partial2Done = true;
+        // Re-place stop for remaining
+        if (pos.remainingQty > 0) {
+          try {
+            const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, pos.currentStop);
+            pos.stopOrderId = newStop.id;
+          } catch (e) {
+            console.error(`${symbol}: re-stop after partial 2 failed: ${e.message}`);
+          }
+        }
+        await sendTelegram(`💰 <b>${symbol}</b> +75% Partial Profit
+بعنا ${sellQty} إضافية
+الباقي: ${pos.remainingQty} للتريلينج`, null, pos.entryMessageId);
+      } catch (e) {
+        console.error(`${symbol}: partial 2 sell failed: ${e.message}`);
+      }
+    }
+  }
+
+  // Trailing at +100%
+  if (pnlPct >= PROFIT_TRAIL_PCT && !pos.trailing) {
+    pos.trailing = true;
+    console.log(`${symbol}: Trailing stop activated`);
+  }
+  if (pos.trailing) {
+    const trailStop = pos.peakPremium * 0.85;
+    if (trailStop > pos.currentStop) {
+      try {
+        if (pos.stopOrderId) await cancelOrder(pos.stopOrderId);
         const newStop = await placeStopLossOrder(pos.optionSymbol, pos.remainingQty, trailStop);
         pos.stopOrderId = newStop.id;
         pos.currentStop = trailStop;
-        console.log(`${symbol}: Trailing raised to $${trailStop.toFixed(2)} (peak $${pos.peakPremium.toFixed(2)})`);
+        console.log(`${symbol}: Trailing stop updated to $${trailStop.toFixed(2)}`);
       } catch (e) {
         console.error(`${symbol}: trail update failed: ${e.message}`);
       }
     }
   }
 
-  // Time exit: ONLY if not yet profitable (no partial done)
-  if (elapsedMin >= pos.timeExitMin && !pos.partial1Done) {
-    console.log(`${symbol}: Time exit (${elapsedMin.toFixed(1)} min, not profitable)`);
-    await exitPosition(state, pos, symbol, "time_exit", `خروج وقتي (${pos.timeExitMin} دقيقة)`);
-    return;
+  // V18: Time exit ONLY if position is not profitable yet
+  // If +30% Partial done → let Trailing/Stop manage it (no time exit)
+  if (elapsedMin >= pos.timeExitMin) {
+    if (pos.partial1Done) {
+      console.log(`${symbol}: Time exit SKIPPED - profit locked (+10%+), letting Trailing manage`);
+      // Don't exit; let trailing/stop handle it
+    } else {
+      console.log(`${symbol}: Time exit triggered (${elapsedMin.toFixed(1)} min >= ${pos.timeExitMin})`);
+      await exitPosition(state, pos, symbol, "time_exit", `خروج وقتي (${pos.timeExitMin} دقيقة)`);
+      return;
+    }
   }
 
   state[symbol] = pos;
@@ -1135,7 +1256,7 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
   pos.exiting = true;
 
   try {
-    // v19: Cancel ALL orders for symbol (frees held qty), then full close
+    // V18.7: Cancel ALL open orders for symbol (frees held qty for close)
     await cancelAllOrdersForSymbol(pos.optionSymbol);
     if (pos.remainingQty > 0) {
       await closePosition(pos.optionSymbol);
@@ -1144,10 +1265,7 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
     console.error(`${symbol}: exit close failed: ${e.message}`);
   }
 
-  // v19: Use bid (real sellable price) not mid, for accurate PnL estimate
-  const bidAsk = await getOptionBidAsk(pos.optionSymbol);
-  const exitPremium = (bidAsk && bidAsk.bid > 0 ? bidAsk.bid : null)
-    || await getOptionQuote(pos.optionSymbol) || pos.currentStop || pos.entryPremium * 0.7;
+  const exitPremium = await getOptionQuote(pos.optionSymbol) || pos.currentStop || pos.entryPremium * 0.7;
   const pnl = (exitPremium - pos.entryPremium) * pos.qty * 100;
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
   const minutes = Math.round((Date.now() - pos.entryTime) / 60000);
@@ -1275,72 +1393,112 @@ const mode = process.env.MODE || "scan";
 (async () => {
   try {
     if (mode === "monitor") {
-      const state = loadState();
-      const account = await getAccount();
+      // V18.3: Run monitor twice per invocation (0s + 30s) for effective 30-sec frequency
+      // V18.5: Track tickers exited during this run to prevent re-adoption in 2nd iteration
+      const exitedThisRun = new Set();
+      for (let iteration = 0; iteration < 2; iteration++) {
+        const state = loadState();
+        const account = await getAccount();
 
-      // v19: Reconciliation in monitor - adopt orphans every minute
-      try {
-        const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
-        if (Array.isArray(alpacaPositions)) {
-          for (const pos of alpacaPositions) {
-            const match = pos.symbol && pos.symbol.match(/^([A-Z]+)\d/);
-            if (!match) continue;
-            const ticker = match[1];
-            if (!TICKERS.includes(ticker)) continue;
-            if (state[ticker]?.active) continue;
+        // Reconciliation: adopt any orphan positions from Alpaca
+        try {
+          const alpacaPositions = await alpacaCall(`${TRADING_BASE}/positions`);
+          if (Array.isArray(alpacaPositions)) {
+            for (const pos of alpacaPositions) {
+              const match = pos.symbol && pos.symbol.match(/^([A-Z]+)\d/);
+              if (!match) continue;
+              const ticker = match[1];
+              if (!TICKERS.includes(ticker)) continue;
+              if (state[ticker]?.active) continue;
+              // V18.5: Don't re-adopt if we just exited this ticker this run
+              if (exitedThisRun.has(ticker)) {
+                console.log(`⏭ Skipping ${ticker} - exited earlier this run`);
+                continue;
+              }
 
-            const isCall = pos.symbol.includes("C0");
-            const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
-            const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
+              const isCall = pos.symbol.includes("C0");
+              const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
+              const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
 
-            const recentlyExited = (state._dailyTrades || []).some(
-              t => t.symbol === ticker &&
-                   t.strike === String(strike) &&
-                   t.signal === (isCall ? "CALL" : "PUT") &&
-                   t.exitTime && (Date.now() - t.exitTime) < 2 * 60 * 1000
-            );
-            if (recentlyExited) continue;
+              // V18.6: Only skip if exited same option <2min ago (settlement delay)
+              const recentlyExitedSameOption = (state._dailyTrades || []).some(
+                t => t.symbol === ticker &&
+                     t.strike === String(strike) &&
+                     t.signal === (isCall ? "CALL" : "PUT") &&
+                     t.exitTime && (Date.now() - t.exitTime) < 2 * 60 * 1000
+              );
+              if (recentlyExitedSameOption) continue;
+              // Also skip if we exited this ticker earlier this same run
+              if (exitedThisRun.has(ticker)) continue;
 
-            const entryPremium = parseFloat(pos.avg_entry_price);
-            const qty = parseInt(pos.qty);
-            console.log(`🔄 Monitor RECONCILE: Adopting ${ticker} ${pos.symbol}`);
-            state[ticker] = {
-              active: true, signal: isCall ? "CALL" : "PUT", window: "RECOVERED",
-              optionSymbol: pos.symbol, strike: strike ? String(strike) : null,
-              entryPremium, qty,
-              entryTime: pos.created_at ? new Date(pos.created_at).getTime() : Date.now() - (5 * 60 * 1000),
-              orderId: null, stopOrderId: null, currentStop: entryPremium * 0.6,
-              peakPremium: entryPremium, targetPct: 60, stopPct: 40, timeExitMin: 25,
-              entryMessageId: null, reason: "Recovered from Alpaca",
-              partial1Done: false, bePromoted: false, partial2Done: false,
-              trailing: false, remainingQty: qty, quickExitWindow: false, recovered: true,
-            };
-            await sendTelegram(`🔄 <b>${ticker}</b> Position Recovered\nFound orphan in Alpaca, now tracking.\nEntry: $${entryPremium.toFixed(2)} × ${qty}`);
+              const entryPremium = parseFloat(pos.avg_entry_price);
+              const qty = parseInt(pos.qty);
+              console.log(`🔄 Monitor RECONCILE: Adopting ${ticker} ${pos.symbol}`);
+
+              state[ticker] = {
+                active: true,
+                signal: isCall ? "CALL" : "PUT",
+                window: "RECOVERED",
+                optionSymbol: pos.symbol,
+                strike: strike ? String(strike) : null,
+                entryPremium,
+                qty,
+                entryTime: pos.created_at ? new Date(pos.created_at).getTime() : Date.now() - (5 * 60 * 1000),
+                orderId: null,
+                stopOrderId: null,
+                currentStop: entryPremium * 0.6,
+                peakPremium: entryPremium,
+                targetPct: 60,
+                stopPct: 40,
+                timeExitMin: 25,
+                entryMessageId: null,
+                reason: "Recovered from Alpaca",
+                partial1Done: false,
+                bePromoted: false,
+                partial2Done: false,
+                trailing: false,
+                remainingQty: qty,
+                quickExitWindow: false,
+                recovered: true,
+              };
+              await sendTelegram(`🔄 <b>${ticker}</b> Position Recovered\nFound orphan in Alpaca, now tracking.\nEntry: $${entryPremium.toFixed(2)} × ${qty}`);
+            }
+          }
+        } catch (e) {
+          console.error("Monitor reconciliation failed:", e.message);
+        }
+
+        let hasActive = false;
+        for (const symbol of TICKERS) {
+          if (state[symbol]?.active) {
+            hasActive = true;
+            const wasActive = state[symbol].active;
+            await processActivePosition(state, account, symbol);
+            // V18.5: If position became inactive (exited), track it
+            if (wasActive && !state[symbol]?.active) {
+              exitedThisRun.add(symbol);
+            }
           }
         }
-      } catch (e) {
-        console.error("Monitor reconciliation failed:", e.message);
-      }
-
-      let hasActive = false;
-      for (const symbol of TICKERS) {
-        if (state[symbol]?.active) {
-          hasActive = true;
-          await processActivePosition(state, account, symbol);
+        if (!hasActive && iteration === 0) {
+          console.log("No active positions to monitor");
         }
-      }
-      if (!hasActive) {
-        console.log("No active positions to monitor");
-      }
-      saveState(state);
-      // Also check daily report
-      if (isReportTime() && !state._reportSent) {
-        await sendDailyReport(state, parseFloat(account.portfolio_value));
         saveState(state);
+
+        // Only do daily report on first iteration
+        if (iteration === 0 && isReportTime() && !state._reportSent) {
+          await sendDailyReport(state, parseFloat(account.portfolio_value));
+          saveState(state);
+        }
+
+        // Wait 30 seconds before second iteration
+        if (iteration === 0) {
+          console.log("--- Waiting 30 seconds for second check ---");
+          await new Promise(resolve => setTimeout(resolve, 30000));
+        }
       }
     } else {
       await runScan();
-      // Send report if time
       const state = loadState();
       const account = await getAccount();
       if (isReportTime() && !state._reportSent) {
