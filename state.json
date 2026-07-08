@@ -144,6 +144,22 @@
       "exitTime": 1783536797985,
       "strike": "710",
       "setup": "Late-day fade: bounce at support"
+    },
+    {
+      "symbol": "GLD",
+      "signal": "CALL",
+      "window": "Late_Day_Fade",
+      "entryPremium": 0.44,
+      "exitPremium": 0.49,
+      "qty": 16,
+      "pnl": 79.99999999999999,
+      "pnlPct": 11.36363636363636,
+      "reason": "stop_hit",
+      "minutes": 7,
+      "entryTime": 1783536933389,
+      "exitTime": 1783537335410,
+      "strike": "375",
+      "setup": "Late-day fade: bounce at support"
     }
   ],
   "_reportSent": false,
@@ -151,30 +167,11 @@
   "_dailyTrades_count": 10,
   "_consecLosses": 0,
   "GLD": {
-    "active": true,
-    "signal": "CALL",
-    "window": "Late_Day_Fade",
-    "optionSymbol": "GLD260708C00375000",
-    "strike": "375",
-    "entryPremium": 0.44,
-    "qty": 16,
-    "entryTime": 1783536933389,
-    "orderId": "e9fd801f-8dda-4068-9734-05bccee69a64",
-    "stopOrderId": "944d293c-bab5-48da-9568-6ec9619d207a",
-    "currentStop": 0.5695,
-    "peakPremium": 0.67,
-    "targetPct": 50,
-    "stopPct": 30,
-    "timeExitMin": 20,
-    "entryMessageId": 1785,
-    "reason": "Late-day fade: bounce at support",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 8,
-    "quickExitWindow": false,
-    "lastPremium": 0.63
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1783537935822,
+    "lastSignal": "CALL",
+    "lastExitTime": 1783537335822
   },
   "SPY": {
     "active": true,
@@ -201,7 +198,7 @@
     "remainingQty": 20,
     "quickExitWindow": false,
     "recovered": true,
-    "lastPremium": 0.47
+    "lastPremium": 0.39
   },
   "QQQ": {
     "active": false,
