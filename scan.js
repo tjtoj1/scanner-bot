@@ -743,10 +743,11 @@ async function runScan() {
         if (!TICKERS.includes(ticker)) continue;
         alpacaSymbols.add(ticker);
 
-        // Case 1: Alpaca has position, state doesn't know → ADOPT
-        if (!state[ticker]?.active) {
-          // v19: Adopt ANY live position. Only skip if we exited THIS exact option
-          // in the last 2 minutes (Alpaca settlement delay).
+        // Case 1: Alpaca has position, state doesn't know → maybe ADOPT
+        // v19.2: Two-layer protection:
+        //   1. If state already tracks this exact option → skip (bot knows it)
+        //   2. Only adopt if there's a MISSED ACTION (≤-30% or ≥+30%)
+        if (state[ticker]?.optionSymbol !== pos.symbol) {
           const isCall = pos.symbol.includes("C0");
           const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
           const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
@@ -759,10 +760,23 @@ async function runScan() {
           );
           if (recentlyExited) {
             console.log(`⏭ Skipping ${ticker} ${pos.symbol} - exited <2min ago (settlement)`);
+            alpacaSymbols.add(ticker);
             continue;
           }
 
-          console.log(`🔄 RECONCILE: Adopting orphan ${ticker} position ${pos.symbol}`);
+          // v19.2: Check if there's a missed action (bot is unaware of urgent state)
+          const entryPx = parseFloat(pos.avg_entry_price);
+          const curPx = parseFloat(pos.current_price || pos.avg_entry_price);
+          const posPnlPct = entryPx > 0 ? ((curPx - entryPx) / entryPx * 100) : 0;
+          const needsAction = posPnlPct <= -30 || posPnlPct >= 30;
+
+          if (!needsAction) {
+            console.log(`⏭ ${ticker} ${pos.symbol} at ${posPnlPct.toFixed(1)}% - no missed action, skip (Scan/bot handles it)`);
+            alpacaSymbols.add(ticker);
+            continue;
+          }
+
+          console.log(`🔄 RECONCILE: ${ticker} at ${posPnlPct.toFixed(1)}% has MISSED ACTION - adopting`);
           const entryPremium = parseFloat(pos.avg_entry_price);
           const qty = parseInt(pos.qty);
 
@@ -793,6 +807,10 @@ async function runScan() {
             recovered: true,
           };
           await sendTelegram(`🔄 <b>${ticker}</b> Position Recovered\nFound orphan in Alpaca, now tracking.\nEntry: $${entryPremium.toFixed(2)} × ${qty}`);
+          alpacaSymbols.add(ticker);
+        } else {
+          // Bot already tracks this exact option
+          alpacaSymbols.add(ticker);
         }
       }
     }
@@ -1289,6 +1307,9 @@ const mode = process.env.MODE || "scan";
             if (!TICKERS.includes(ticker)) continue;
             if (state[ticker]?.active) continue;
 
+            // v19.2: Skip if bot already tracks this exact option
+            if (state[ticker]?.optionSymbol === pos.symbol) continue;
+
             const isCall = pos.symbol.includes("C0");
             const strikeMatch = pos.symbol.match(/[CP](\d{8})$/);
             const strike = strikeMatch ? parseInt(strikeMatch[1]) / 1000 : null;
@@ -1301,9 +1322,20 @@ const mode = process.env.MODE || "scan";
             );
             if (recentlyExited) continue;
 
+            // v19.2: Only adopt if there's a MISSED ACTION (≤-30% or ≥+30%)
+            // Otherwise the bot/Scan is handling it normally - don't send Recovery spam
+            const entryPx = parseFloat(pos.avg_entry_price);
+            const curPx = parseFloat(pos.current_price || pos.avg_entry_price);
+            const posPnlPct = entryPx > 0 ? ((curPx - entryPx) / entryPx * 100) : 0;
+            const needsAction = posPnlPct <= -30 || posPnlPct >= 30;
+            if (!needsAction) {
+              console.log(`⏭ Monitor: ${ticker} at ${posPnlPct.toFixed(1)}% - no missed action, skip`);
+              continue;
+            }
+
             const entryPremium = parseFloat(pos.avg_entry_price);
             const qty = parseInt(pos.qty);
-            console.log(`🔄 Monitor RECONCILE: Adopting ${ticker} ${pos.symbol}`);
+            console.log(`🔄 Monitor RECONCILE: ${ticker} at ${posPnlPct.toFixed(1)}% MISSED ACTION - adopting`);
             state[ticker] = {
               active: true, signal: isCall ? "CALL" : "PUT", window: "RECOVERED",
               optionSymbol: pos.symbol, strike: strike ? String(strike) : null,
