@@ -176,18 +176,34 @@
       "exitTime": 1783537397761,
       "strike": "746",
       "setup": "Recovered from Alpaca"
+    },
+    {
+      "symbol": "GLD",
+      "signal": "CALL",
+      "window": "RECOVERED",
+      "entryPremium": 0.59,
+      "exitPremium": 0.38,
+      "qty": 14,
+      "pnl": -293.99999999999994,
+      "pnlPct": -35.593220338983045,
+      "reason": "recovered_stop",
+      "minutes": 5,
+      "entryTime": 1783537876461,
+      "exitTime": 1783538178231,
+      "strike": "375",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 2237,
+  "_dailyLosses": 2531,
   "_dailyTrades_count": 11,
-  "_consecLosses": 1,
+  "_consecLosses": 2,
   "GLD": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1783537935822,
+    "cooldownUntil": 1783538778500,
     "lastSignal": "CALL",
-    "lastExitTime": 1783537335822
+    "lastExitTime": 1783538178500
   },
   "SPY": {
     "active": false,
@@ -220,7 +236,7 @@
     "trailing": false,
     "remainingQty": 12,
     "quickExitWindow": false,
-    "lastPremium": 0.77
+    "lastPremium": 0.66
   },
   "IWM": {
     "active": false,
