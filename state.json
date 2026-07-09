@@ -18,7 +18,7 @@
       "setup": "Pullback rejection at VWAP, near resistance 747.86"
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "_dailyLosses": 548,
   "_dailyTrades_count": 1,
   "_consecLosses": 1,
