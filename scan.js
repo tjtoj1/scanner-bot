@@ -1381,7 +1381,13 @@ const mode = process.env.MODE || "scan";
       }
     }
   } catch (e) {
-    console.error("Fatal error:", e.message);
+    console.error("Error:", e.message);
+    // v19.3: Transient network errors (fetch failed) shouldn't fail the whole run
+    // Exit 0 so GitHub Actions doesn't mark it red for a temporary glitch
+    if (e.message && (e.message.includes("fetch failed") || e.message.includes("ETIMEDOUT") || e.message.includes("ECONNRESET"))) {
+      console.log("Transient network error - exiting cleanly (will retry next run)");
+      process.exit(0);
+    }
     process.exit(1);
   }
 })();
