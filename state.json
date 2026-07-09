@@ -35,8 +35,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true,
-    "lastPremium": 1.64
+    "quickExitWindow": false,
+    "lastPremium": 1.41
   },
   "QQQ": {
     "active": false,
