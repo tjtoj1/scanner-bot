@@ -188,7 +188,7 @@
     "trailing": false,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 1
+    "lastPremium": 1.09
   },
   "IWM": {
     "active": true,
