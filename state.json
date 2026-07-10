@@ -16,12 +16,28 @@
       "exitTime": 1783691538738,
       "strike": "722",
       "setup": "Recovered from Alpaca"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 1.185,
+      "exitPremium": 1.18,
+      "qty": 10,
+      "pnl": -5.0000000000001155,
+      "pnlPct": -0.421940928270052,
+      "reason": "stop_hit",
+      "minutes": 26,
+      "entryTime": 1783690534082,
+      "exitTime": 1783692078208,
+      "strike": "753",
+      "setup": "Pullback bounce at VWAP, near support 751.71"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 0,
+  "_dailyLosses": 5.0000000000001155,
   "_dailyTrades_count": 2,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "exited": true,
@@ -30,30 +46,11 @@
     "lastExitTime": 1783538178500
   },
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "window": "ORB_Pullback",
-    "optionSymbol": "SPY260710C00753000",
-    "strike": "753",
-    "entryPremium": 1.185,
-    "qty": 10,
-    "entryTime": 1783690534082,
-    "orderId": "bab14439-6702-4a59-a117-2a7b9a164f0a",
-    "stopOrderId": "7ac399e3-5ef6-43fc-9393-065019ad7306",
-    "currentStop": 0.711,
-    "peakPremium": 1.38,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 1802,
-    "reason": "Pullback bounce at VWAP, near support 751.71",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 10,
-    "quickExitWindow": false,
-    "lastPremium": 1.24
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1783692678698,
+    "lastSignal": "CALL",
+    "lastExitTime": 1783692078698
   },
   "QQQ": {
     "active": false,
@@ -74,7 +71,7 @@
     "orderId": "e1ac5f6c-7f2a-44c6-9a76-d2c08cbbe622",
     "stopOrderId": "dfde750e-deac-4219-9c53-d6549e61aed5",
     "currentStop": 0.46499999999999997,
-    "peakPremium": 0.775,
+    "peakPremium": 0.85,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -85,6 +82,7 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 0.85
   }
 }
