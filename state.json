@@ -219,7 +219,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 20,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 0.46
   },
   "IWM": {
     "active": true,
@@ -231,9 +232,9 @@
     "qty": 20,
     "entryTime": 1783708837219,
     "orderId": "c2a5fd34-6f5e-4862-80a2-b523d3dd46af",
-    "stopOrderId": "f7f1092c-cd74-4773-b6f7-627a69d0be0d",
-    "currentStop": 0.306,
-    "peakPremium": 0.36,
+    "stopOrderId": "8b374459-b9d4-4697-99f1-03d18cb3ad0a",
+    "currentStop": 0.323,
+    "peakPremium": 0.38,
     "targetPct": 50,
     "stopPct": 30,
     "timeExitMin": 20,
@@ -245,6 +246,6 @@
     "trailing": true,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 0.36
+    "lastPremium": 0.38
   }
 }
