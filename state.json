@@ -1,6 +1,23 @@
 {
   "_date": "2026-07-10",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "window": "RECOVERED",
+      "entryPremium": 2.37,
+      "exitPremium": 3.25,
+      "qty": 4,
+      "pnl": 351.99999999999994,
+      "pnlPct": 37.13080168776371,
+      "reason": "recovered_profit",
+      "minutes": 5,
+      "entryTime": 1783691236948,
+      "exitTime": 1783691538738,
+      "strike": "722",
+      "setup": "Recovered from Alpaca"
+    }
+  ],
   "_reportSent": false,
   "_dailyLosses": 0,
   "_dailyTrades_count": 1,
@@ -36,14 +53,14 @@
     "trailing": false,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 1.2
+    "lastPremium": 1.24
   },
   "QQQ": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1783538834338,
+    "cooldownUntil": 1783692138952,
     "lastSignal": "CALL",
-    "lastExitTime": 1783538234338
+    "lastExitTime": 1783691538952
   },
   "IWM": {
     "active": false,
