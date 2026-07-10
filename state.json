@@ -1,27 +1,10 @@
 {
-  "_date": "2026-07-09",
-  "_dailyTrades": [
-    {
-      "symbol": "SPY",
-      "signal": "PUT",
-      "window": "ORB_Pullback",
-      "entryPremium": 1.545,
-      "exitPremium": 0.86,
-      "qty": 8,
-      "pnl": -548,
-      "pnlPct": -44.336569579288025,
-      "reason": "stop_hit",
-      "minutes": 15,
-      "entryTime": 1783607130677,
-      "exitTime": 1783608033117,
-      "strike": "747",
-      "setup": "Pullback rejection at VWAP, near resistance 747.86"
-    }
-  ],
-  "_reportSent": true,
-  "_dailyLosses": 548,
-  "_dailyTrades_count": 1,
-  "_consecLosses": 1,
+  "_date": "2026-07-10",
+  "_dailyTrades": [],
+  "_reportSent": false,
+  "_dailyLosses": 0,
+  "_dailyTrades_count": 0,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
