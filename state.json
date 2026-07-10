@@ -240,12 +240,28 @@
       "exitTime": 1783711155404,
       "strike": "296",
       "setup": "Late-day fade: bounce at support"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 0.2,
+      "exitPremium": 0.3,
+      "qty": 30,
+      "pnl": 299.9999999999999,
+      "pnlPct": 49.999999999999986,
+      "reason": "recovered_profit",
+      "minutes": 5,
+      "entryTime": 1783710975372,
+      "exitTime": 1783711277519,
+      "strike": "296",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 2520,
   "_dailyTrades_count": 13,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -270,8 +286,8 @@
   "IWM": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1783711755842,
-    "lastSignal": "CALL",
-    "lastExitTime": 1783711155842
+    "cooldownUntil": 1783711877733,
+    "lastSignal": "PUT",
+    "lastExitTime": 1783711277733
   }
 }
