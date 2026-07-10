@@ -70,26 +70,18 @@ const WINDOWS = [
   {
     name: "Late_Day_Fade",
     startUTC: { h: 18, m: 30 },  // 1:30 PM CDT
-    endUTC: { h: 19, m: 30 },    // 2:30 PM CDT
+    endUTC: { h: 19, m: 40 },    // 2:40 PM CDT (v19.4: extended, last entry)
     strategy: "fade",
     targetPct: 50,
     stopPct: 30,
     timeExitMin: 20,
     riskPct: 0.3,
   },
-  {
-    name: "MOC_Scalp",
-    startUTC: { h: 19, m: 30 },  // 2:30 PM CDT
-    endUTC: { h: 19, m: 50 },    // 2:50 PM CDT
-    strategy: "moc",
-    targetPct: 40,
-    stopPct: 25,
-    timeExitMin: 10,
-    riskPct: 0.3,
-  },
+  // v19.4: MOC_Scalp REMOVED - Alpaca rejects 0DTE entries near close ("expires soon")
 ];
 
-const FORCE_EXIT_TIME = { h: 19, m: 58 }; // 2:58 PM CDT
+const FORCE_EXIT_TIME = { h: 19, m: 55 }; // 2:55 PM CDT (v19.4)
+const LAST_ENTRY_TIME = { h: 19, m: 40 };  // 2:40 PM CDT - no new entries after
 const REPORT_TIME = { h: 20, m: 0 };       // 3:00 PM CDT
 
 // Risk Management Layer 2 - Trade Management
@@ -166,6 +158,12 @@ function isFomcCutoff() {
   const now = nowUTC();
   // On FOMC days, no entries after 12:30 PM CDT = 17:30 UTC
   return utcToMinutes(now) >= 17 * 60 + 30;
+}
+
+// v19.4: No new entries after 2:40 PM CDT (avoids Alpaca "expires soon" rejection)
+function isPastLastEntry() {
+  const now = nowUTC();
+  return utcToMinutes(now) >= utcToMinutes(LAST_ENTRY_TIME);
 }
 
 // ============================================================
@@ -835,6 +833,12 @@ async function runScan() {
     saveState(state);
     return;
   }
+  // v19.4: No new entries after 2:40 PM CDT (Alpaca rejects near-expiry entries)
+  if (isPastLastEntry()) {
+    console.log("Past last entry time (2:40 PM CDT), no new entries");
+    saveState(state);
+    return;
+  }
   console.log(`Current window: ${window.name}`);
 
   // V17.5: Scan does NOT monitor positions - Monitor workflow handles that exclusively
@@ -855,6 +859,15 @@ async function runScan() {
   // Loop over tickers for new entries
   for (const symbol of TICKERS) {
     if (state[symbol]?.active) continue;
+
+    // v19.4: GLD only has 0DTE on Mon/Wed/Fri - skip Tue/Thu to avoid wasted scans
+    if (symbol === "GLD") {
+      const dow = new Date().getUTCDay(); // 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri
+      if (dow === 2 || dow === 4) {
+        console.log("GLD: no 0DTE on Tue/Thu, skipping");
+        continue;
+      }
+    }
 
     // Cooldown check
     if (state[symbol]?.cooldownUntil && Date.now() < state[symbol].cooldownUntil) {
