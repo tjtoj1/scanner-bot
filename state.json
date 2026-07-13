@@ -1,10 +1,27 @@
 {
   "_date": "2026-07-13",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 1.44,
+      "exitPremium": 0.91,
+      "qty": 8,
+      "pnl": -423.99999999999994,
+      "pnlPct": -36.80555555555555,
+      "reason": "recovered_stop",
+      "minutes": 5,
+      "entryTime": 1783950855402,
+      "exitTime": 1783951157233,
+      "strike": "753",
+      "setup": "Recovered from Alpaca"
+    }
+  ],
   "_reportSent": false,
-  "_dailyLosses": 0,
+  "_dailyLosses": 423.99999999999994,
   "_dailyTrades_count": 1,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "exited": true,
@@ -15,9 +32,9 @@
   "SPY": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1783700719640,
+    "cooldownUntil": 1783951757419,
     "lastSignal": "PUT",
-    "lastExitTime": 1783700119640
+    "lastExitTime": 1783951157419
   },
   "QQQ": {
     "active": true,
@@ -31,7 +48,7 @@
     "orderId": "84fd505b-eda3-4a77-b5c1-6506b55e50ce",
     "stopOrderId": null,
     "currentStop": 1.503,
-    "peakPremium": 2.505,
+    "peakPremium": 2.64,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -43,7 +60,7 @@
     "trailing": false,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 2.08
+    "lastPremium": 2.64
   },
   "IWM": {
     "active": false,
