@@ -112,12 +112,28 @@
       "exitTime": 1783959053124,
       "strike": "294",
       "setup": "Pullback bounce at VWAP, near support 293.67"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 1.14,
+      "exitPremium": 1.54,
+      "qty": 10,
+      "pnl": 400.00000000000017,
+      "pnlPct": 35.08771929824563,
+      "reason": "recovered_profit",
+      "minutes": 5,
+      "entryTime": 1783959134727,
+      "exitTime": 1783959435299,
+      "strike": "752",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 1871.9999999999998,
   "_dailyTrades_count": 5,
-  "_consecLosses": 7,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -128,9 +144,9 @@
   "SPY": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1783958478742,
-    "lastSignal": "CALL",
-    "lastExitTime": 1783957878742
+    "cooldownUntil": 1783960035492,
+    "lastSignal": "PUT",
+    "lastExitTime": 1783959435492
   },
   "QQQ": {
     "active": false,
