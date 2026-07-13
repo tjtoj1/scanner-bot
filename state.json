@@ -96,12 +96,28 @@
       "exitTime": 1783957878365,
       "strike": "752",
       "setup": "Recovered from Alpaca"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "CALL",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 0.73,
+      "exitPremium": 0.68,
+      "qty": 8,
+      "pnl": -39.99999999999994,
+      "pnlPct": -6.849315068493142,
+      "reason": "time_exit",
+      "minutes": 26,
+      "entryTime": 1783957476168,
+      "exitTime": 1783959053124,
+      "strike": "294",
+      "setup": "Pullback bounce at VWAP, near support 293.67"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 1831.9999999999998,
+  "_dailyLosses": 1871.9999999999998,
   "_dailyTrades_count": 5,
-  "_consecLosses": 6,
+  "_consecLosses": 7,
   "GLD": {
     "active": false,
     "exited": true,
@@ -124,29 +140,10 @@
     "lastExitTime": 1783956938327
   },
   "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "IWM260713C00294000",
-    "strike": "294",
-    "entryPremium": 0.73,
-    "qty": 8,
-    "entryTime": 1783957476168,
-    "orderId": "684081fc-1619-4605-b203-14360c9e219c",
-    "stopOrderId": "fdbc4ba0-8c40-4d4c-a95a-04e5dc841250",
-    "currentStop": 0.4745,
-    "peakPremium": 0.73,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 1862,
-    "reason": "Pullback bounce at VWAP, near support 293.67",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 8,
-    "quickExitWindow": false,
-    "lastPremium": 0.61
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1783959653632,
+    "lastSignal": "CALL",
+    "lastExitTime": 1783959053632
   }
 }
