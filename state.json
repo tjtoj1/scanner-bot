@@ -48,12 +48,28 @@
       "exitTime": 1783952905001,
       "strike": "752",
       "setup": "Pullback rejection at VWAP, near resistance 752.82"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "CALL",
+      "window": "RECOVERED",
+      "entryPremium": 1.09,
+      "exitPremium": 0.7,
+      "qty": 6,
+      "pnl": -234.00000000000009,
+      "pnlPct": -35.779816513761475,
+      "reason": "recovered_stop",
+      "minutes": 5,
+      "entryTime": 1783955779282,
+      "exitTime": 1783956081398,
+      "strike": "294",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 1105.9999999999998,
+  "_dailyLosses": 1339.9999999999998,
   "_dailyTrades_count": 3,
-  "_consecLosses": 3,
+  "_consecLosses": 4,
   "GLD": {
     "active": false,
     "exited": true,
@@ -92,13 +108,13 @@
     "trailing": false,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 1.78
+    "lastPremium": 1.84
   },
   "IWM": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1783711877733,
-    "lastSignal": "PUT",
-    "lastExitTime": 1783711277733
+    "cooldownUntil": 1783956681616,
+    "lastSignal": "CALL",
+    "lastExitTime": 1783956081616
   }
 }
