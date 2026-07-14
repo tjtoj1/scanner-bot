@@ -80,6 +80,22 @@
       "exitTime": 1784043197029,
       "strike": "752",
       "setup": "Pullback bounce at VWAP, near support 750.36"
+    },
+    {
+      "symbol": "IWM",
+      "signal": "PUT",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 0.605,
+      "exitPremium": 0.83,
+      "qty": 8,
+      "pnl": 179.99999999999997,
+      "pnlPct": 37.1900826446281,
+      "reason": "stop_hit",
+      "minutes": 14,
+      "entryTime": 1784043045902,
+      "exitTime": 1784043857160,
+      "strike": "295",
+      "setup": "Pullback rejection at VWAP, near resistance 295.31"
     }
   ],
   "_reportSent": false,
@@ -108,29 +124,10 @@
     "lastExitTime": 1784039536222
   },
   "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "IWM260714P00295000",
-    "strike": "295",
-    "entryPremium": 0.605,
-    "qty": 8,
-    "entryTime": 1784043045902,
-    "orderId": "3b7f5a62-e0d0-4280-adc4-228b2316f91e",
-    "stopOrderId": "5726a5b4-3056-4067-ab64-49ff734a8b68",
-    "currentStop": 1.0114999999999998,
-    "peakPremium": 1.19,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 1891,
-    "reason": "Pullback rejection at VWAP, near resistance 295.31",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "lastPremium": 1.07
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784044457609,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784043857609
   }
 }
