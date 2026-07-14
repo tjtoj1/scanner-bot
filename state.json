@@ -192,6 +192,22 @@
       "exitTime": 1784054723405,
       "strike": "295",
       "setup": "Late-day fade: rejection at resistance"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "Late_Day_Fade",
+      "entryPremium": 0.365,
+      "exitPremium": 0.49,
+      "qty": 28,
+      "pnl": 350,
+      "pnlPct": 34.24657534246575,
+      "reason": "stop_hit",
+      "minutes": 9,
+      "entryTime": 1784055333978,
+      "exitTime": 1784055856609,
+      "strike": "752",
+      "setup": "Late-day fade: rejection at resistance"
     }
   ],
   "_reportSent": false,
@@ -206,30 +222,11 @@
     "lastExitTime": 1783538178500
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "Late_Day_Fade",
-    "optionSymbol": "SPY260714P00752000",
-    "strike": "752",
-    "entryPremium": 0.365,
-    "qty": 28,
-    "entryTime": 1784055333978,
-    "orderId": "351d6ebf-924d-4f37-a647-6c15b11780e6",
-    "stopOrderId": "aa4e69bb-fdd3-4935-8ea8-e57f98f3704a",
-    "currentStop": 0.425,
-    "peakPremium": 0.5,
-    "targetPct": 50,
-    "stopPct": 30,
-    "timeExitMin": 20,
-    "entryMessageId": 1913,
-    "reason": "Late-day fade: rejection at resistance",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 14,
-    "quickExitWindow": false,
-    "lastPremium": 0.47
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784056457097,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784055857097
   },
   "QQQ": {
     "active": true,
@@ -241,9 +238,9 @@
     "qty": 12,
     "entryTime": 1784055645181,
     "orderId": "c7849d41-1306-4e68-ab2c-23e4e97342d6",
-    "stopOrderId": "fae63a6c-62e1-4629-90f8-e71e3773ebe1",
-    "currentStop": 1.0625,
-    "peakPremium": 1.25,
+    "stopOrderId": "c6e68bd9-385b-4c67-bc2d-fe8326d16612",
+    "currentStop": 1.0795,
+    "peakPremium": 1.27,
     "targetPct": 50,
     "stopPct": 30,
     "timeExitMin": 20,
@@ -255,7 +252,7 @@
     "trailing": true,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 1.25
+    "lastPremium": 1.27
   },
   "IWM": {
     "active": false,
