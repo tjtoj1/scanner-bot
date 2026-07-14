@@ -64,12 +64,28 @@
       "exitTime": 1784042357684,
       "strike": "295",
       "setup": "Pullback bounce at EMA9, near support 293.95"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 1.0750000000000002,
+      "exitPremium": 1.16,
+      "qty": 10,
+      "pnl": 84.99999999999974,
+      "pnlPct": 7.9069767441860215,
+      "reason": "stop_hit",
+      "minutes": 13,
+      "entryTime": 1784042440030,
+      "exitTime": 1784043197029,
+      "strike": "752",
+      "setup": "Pullback bounce at VWAP, near support 750.36"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 582,
   "_dailyTrades_count": 6,
-  "_consecLosses": 2,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -78,30 +94,11 @@
     "lastExitTime": 1783538178500
   },
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "SPY260714C00752000",
-    "strike": "752",
-    "entryPremium": 1.0750000000000002,
-    "qty": 10,
-    "entryTime": 1784042440030,
-    "orderId": "577839b2-de48-4403-9b76-11e916112a27",
-    "stopOrderId": "5afb5fb1-9cb3-4b0c-8bc0-79e453be5429",
-    "currentStop": 0.6987500000000001,
-    "peakPremium": 1.38,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 1890,
-    "reason": "Pullback bounce at VWAP, near support 750.36",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 10,
-    "quickExitWindow": false,
-    "lastPremium": 1.24
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784043797640,
+    "lastSignal": "CALL",
+    "lastExitTime": 1784043197640
   },
   "QQQ": {
     "active": false,
@@ -122,7 +119,7 @@
     "orderId": "3b7f5a62-e0d0-4280-adc4-228b2316f91e",
     "stopOrderId": "bb770752-47ae-4baf-bfcb-bbdfba2fccd2",
     "currentStop": 0.39325,
-    "peakPremium": 0.67,
+    "peakPremium": 0.73,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -134,6 +131,6 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 0.67
+    "lastPremium": 0.73
   }
 }
