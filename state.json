@@ -112,37 +112,34 @@
       "exitTime": 1784130049734,
       "strike": "371",
       "setup": "Pullback bounce at VWAP, near support 370.92"
+    },
+    {
+      "symbol": "GLD",
+      "signal": "CALL",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 0.42500000000000004,
+      "exitPremium": 0.3,
+      "qty": 18,
+      "pnl": -225.00000000000009,
+      "pnlPct": -29.411764705882366,
+      "reason": "stop_hit",
+      "minutes": 6,
+      "entryTime": 1784130920439,
+      "exitTime": 1784131284432,
+      "strike": "372",
+      "setup": "Pullback bounce at EMA9, near support 370.92"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 1470,
+  "_dailyLosses": 1695,
   "_dailyTrades_count": 9,
-  "_consecLosses": 1,
+  "_consecLosses": 2,
   "GLD": {
-    "active": true,
-    "signal": "CALL",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "GLD260715C00372000",
-    "strike": "372",
-    "entryPremium": 0.42500000000000004,
-    "qty": 18,
-    "entryTime": 1784130920439,
-    "orderId": "51304032-1851-476c-aa5d-33524f7f6006",
-    "stopOrderId": "493627b4-1f0f-422a-8953-5c6829485896",
-    "currentStop": 0.27625000000000005,
-    "peakPremium": 0.42500000000000004,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 1939,
-    "reason": "Pullback bounce at EMA9, near support 370.92",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 18,
-    "quickExitWindow": false,
-    "lastPremium": 0.3
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784131884958,
+    "lastSignal": "CALL",
+    "lastExitTime": 1784131284958
   },
   "SPY": {
     "active": false,
@@ -170,7 +167,7 @@
     "orderId": "c84e298f-a0bb-4734-b273-6268f506d5ff",
     "stopOrderId": "3af252f2-d986-48d4-89c5-0265c7a95d73",
     "currentStop": 0.46475,
-    "peakPremium": 0.78,
+    "peakPremium": 0.83,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -182,6 +179,6 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 0.68
+    "lastPremium": 0.83
   }
 }
