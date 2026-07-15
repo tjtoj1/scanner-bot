@@ -318,21 +318,21 @@
     "qty": 12,
     "entryTime": 1784143239024,
     "orderId": "8ca229bc-b07c-46b1-a397-cb6e3277917c",
-    "stopOrderId": null,
-    "currentStop": 0.6194999999999999,
-    "peakPremium": 0.93,
+    "stopOrderId": "8328cf4d-9994-4d27-ade1-0347a09edf04",
+    "currentStop": 1.0114999999999998,
+    "peakPremium": 1.19,
     "targetPct": 50,
     "stopPct": 30,
     "timeExitMin": 20,
     "entryMessageId": 1973,
     "reason": "Late-day fade: bounce at support",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 12,
+    "trailing": true,
+    "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 0.74
+    "lastPremium": 1.19
   },
   "IWM": {
     "active": true,
@@ -358,6 +358,6 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 0.51
+    "lastPremium": 0.46
   }
 }
