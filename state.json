@@ -80,12 +80,28 @@
       "exitTime": 1784128160210,
       "strike": "753",
       "setup": "Pullback rejection at VWAP, near resistance 753.34"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 1.7850000000000001,
+      "exitPremium": 2.18,
+      "qty": 6,
+      "pnl": 237,
+      "pnlPct": 22.128851540616246,
+      "reason": "stop_hit",
+      "minutes": 15,
+      "entryTime": 1784128840149,
+      "exitTime": 1784129718324,
+      "strike": "715",
+      "setup": "Pullback bounce at EMA9, near support 714.34"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 1466,
   "_dailyTrades_count": 7,
-  "_consecLosses": 5,
+  "_consecLosses": 0,
   "GLD": {
     "active": true,
     "signal": "CALL",
@@ -110,7 +126,7 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 0.84
+    "lastPremium": 0.75
   },
   "SPY": {
     "active": false,
@@ -120,30 +136,11 @@
     "lastExitTime": 1784128160794
   },
   "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "QQQ260715C00715000",
-    "strike": "715",
-    "entryPremium": 1.7850000000000001,
-    "qty": 6,
-    "entryTime": 1784128840149,
-    "orderId": "7170f936-6f42-45da-8b3b-794f0c2e40db",
-    "stopOrderId": "cfc7c548-b83c-4158-b333-70af6cf45de1",
-    "currentStop": 2.159,
-    "peakPremium": 2.54,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 1934,
-    "reason": "Pullback bounce at EMA9, near support 714.34",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 3,
-    "quickExitWindow": false,
-    "lastPremium": 2.42
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784130318833,
+    "lastSignal": "CALL",
+    "lastExitTime": 1784129718833
   },
   "IWM": {
     "active": false,
