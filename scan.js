@@ -712,6 +712,9 @@ async function runScan() {
     state._dailyLosses = 0;
     state._dailyTrades_count = 0;
     state._consecLosses = 0;
+    state._dailyPeakProfit = 0;      // v19.5: track highest daily profit
+    state._profitProtected = false;  // v19.5: guard activated flag
+    state._profitGuardNotified = false; // v19.5: block-notification sent flag
     saveState(state);
   }
 
@@ -851,6 +854,53 @@ async function runScan() {
   if (activeCount >= 2) {
     console.log(`Max 2 active positions (${activeCount} open), skipping new entries`);
     return;
+  }
+
+  // ============================================================
+  // v19.5: DAILY PROFIT GUARD (protection layer, does NOT touch signal)
+  // Daily profit = current equity - start-of-day equity (last_equity)
+  // Once profit reaches +$1,000, activate protection.
+  // If profit then drops $300 from its peak, block NEW entries for the rest
+  // of the day. Open positions are NOT closed - they keep running normally.
+  // ============================================================
+  const PROFIT_GUARD_ACTIVATE = 1000; // activate protection at +$1,000
+  const PROFIT_GUARD_DRAWDOWN = 300;  // block new entries if profit drops $300 from peak
+  try {
+    const lastEquity = parseFloat(account.last_equity || account.equity || portfolio);
+    const dailyProfit = portfolio - lastEquity;
+
+    // Track peak daily profit
+    if (dailyProfit > (state._dailyPeakProfit || 0)) {
+      state._dailyPeakProfit = dailyProfit;
+    }
+    // Activate protection once we've hit +$1,000 at any point today
+    if ((state._dailyPeakProfit || 0) >= PROFIT_GUARD_ACTIVATE && !state._profitProtected) {
+      state._profitProtected = true;
+      console.log(`🛡 Profit guard ACTIVATED - peak +$${state._dailyPeakProfit.toFixed(0)}`);
+      await sendTelegram(`🛡 <b>حماية المكسب مفعّلة</b>
+الربح اليومي تجاوز +$1,000 (قمة +$${state._dailyPeakProfit.toFixed(0)})
+لو نزل الربح $300 من القمة → يوقف فتح صفقات جديدة
+الصفقات المفتوحة تكمل طبيعي`);
+      saveState(state);
+    }
+    // If protected and profit has dropped $300+ from peak → block new entries
+    if (state._profitProtected) {
+      const dropFromPeak = state._dailyPeakProfit - dailyProfit;
+      if (dropFromPeak >= PROFIT_GUARD_DRAWDOWN) {
+        console.log(`🛑 Profit guard: dropped $${dropFromPeak.toFixed(0)} from peak (+$${state._dailyPeakProfit.toFixed(0)} → +$${dailyProfit.toFixed(0)}), no new entries`);
+        if (!state._profitGuardNotified) {
+          state._profitGuardNotified = true;
+          await sendTelegram(`🛑 <b>توقف فتح صفقات جديدة</b>
+الربح نزل $${dropFromPeak.toFixed(0)} من القمة
+القمة: +$${state._dailyPeakProfit.toFixed(0)} | الحالي: +$${dailyProfit.toFixed(0)}
+مسكنا المكسب ✅ الصفقات المفتوحة تكمل`);
+        }
+        saveState(state);
+        return; // skip new entries, but open positions still managed by Monitor
+      }
+    }
+  } catch (e) {
+    console.error("Profit guard check failed:", e.message);
   }
 
   // Get VIX once
