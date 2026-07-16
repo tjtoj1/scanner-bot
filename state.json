@@ -149,20 +149,20 @@
     "qty": 6,
     "entryTime": 1784217335138,
     "orderId": "ba0e789a-fa86-4d16-8b86-98efe687536c",
-    "stopOrderId": "d034304f-52c4-4232-8aae-58ee1645a75a",
-    "currentStop": 0.5265000000000001,
-    "peakPremium": 1.04,
+    "stopOrderId": "f3cad8cd-443b-4b97-ae2d-0463935d9f12",
+    "currentStop": 0.9944999999999999,
+    "peakPremium": 1.17,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
     "entryMessageId": 1995,
     "reason": "Pullback rejection at EMA9, near resistance 297.14",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 6,
+    "trailing": true,
+    "remainingQty": 3,
     "quickExitWindow": false,
-    "lastPremium": 1.04
+    "lastPremium": 1.17
   }
 }
