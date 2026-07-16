@@ -32,12 +32,28 @@
       "exitTime": 1784209699607,
       "strike": "296",
       "setup": "Pullback bounce at VWAP, near support 295.77"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "ORB_Pullback",
+      "entryPremium": 1.275,
+      "exitPremium": 0.79,
+      "qty": 10,
+      "pnl": -484.9999999999999,
+      "pnlPct": -38.0392156862745,
+      "reason": "stop_hit",
+      "minutes": 10,
+      "entryTime": 1784210453686,
+      "exitTime": 1784211077976,
+      "strike": "752",
+      "setup": "Pullback rejection at VWAP, near resistance 753.53"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 441.9999999999999,
+  "_dailyLosses": 926.9999999999998,
   "_dailyTrades_count": 4,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "exited": true,
@@ -46,30 +62,11 @@
     "lastExitTime": 1784142378548
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "ORB_Pullback",
-    "optionSymbol": "SPY260716P00752000",
-    "strike": "752",
-    "entryPremium": 1.275,
-    "qty": 10,
-    "entryTime": 1784210453686,
-    "orderId": "30d0b454-5671-40b9-88f1-0da48de80407",
-    "stopOrderId": "cee52e63-5c38-4ecd-9d9e-11e942709170",
-    "currentStop": 0.7649999999999999,
-    "peakPremium": 1.275,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 1984,
-    "reason": "Pullback rejection at VWAP, near resistance 753.53",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 10,
-    "quickExitWindow": false,
-    "lastPremium": 0.87
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784211678487,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784211078487
   },
   "QQQ": {
     "active": true,
@@ -94,7 +91,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 4,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 2.32
   },
   "IWM": {
     "active": false,
