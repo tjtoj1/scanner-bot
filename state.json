@@ -165,9 +165,9 @@
     "qty": 6,
     "entryTime": 1784223335987,
     "orderId": "1ce4706a-c7b6-45fc-a75d-da8ad813b21e",
-    "stopOrderId": "75bd36b2-1635-45cc-835f-57ed3ac2d4ab",
-    "currentStop": 0.918,
-    "peakPremium": 1.08,
+    "stopOrderId": "d4242e9f-73e9-493b-8c18-6fb7191260f6",
+    "currentStop": 0.9435,
+    "peakPremium": 1.11,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -179,6 +179,6 @@
     "trailing": true,
     "remainingQty": 3,
     "quickExitWindow": false,
-    "lastPremium": 1.06
+    "lastPremium": 1.11
   }
 }
