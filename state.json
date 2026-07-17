@@ -150,7 +150,8 @@
     "trailing": false,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "recovered": true
+    "recovered": true,
+    "lastPremium": 0.63
   },
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
