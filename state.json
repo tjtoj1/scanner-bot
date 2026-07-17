@@ -176,6 +176,22 @@
       "exitTime": 1784312474252,
       "strike": "699",
       "setup": "Recovered from Alpaca"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 1.43,
+      "exitPremium": 1.83,
+      "qty": 4,
+      "pnl": 160.00000000000006,
+      "pnlPct": 27.972027972027984,
+      "reason": "recovered_profit",
+      "minutes": 5,
+      "entryTime": 1784312236085,
+      "exitTime": 1784312538496,
+      "strike": "698",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
@@ -199,9 +215,9 @@
   "QQQ": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1784313074751,
+    "cooldownUntil": 1784313138705,
     "lastSignal": "PUT",
-    "lastExitTime": 1784312474751
+    "lastExitTime": 1784312538705
   },
   "IWM": {
     "active": true,
@@ -226,8 +242,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true,
-    "lastPremium": 0.62
+    "quickExitWindow": false,
+    "lastPremium": 0.61
   },
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
