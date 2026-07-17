@@ -66,8 +66,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 6,
-    "quickExitWindow": true,
-    "lastPremium": 0.91
+    "quickExitWindow": false,
+    "lastPremium": 0.93
   },
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
