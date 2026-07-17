@@ -94,7 +94,7 @@
     "trailing": false,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 0.65
+    "lastPremium": 0.67
   },
   "SPY": {
     "active": false,
@@ -134,7 +134,7 @@
     "trailing": false,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 0.47
+    "lastPremium": 0.43
   },
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
