@@ -696,6 +696,66 @@ async function sendTelegram(text, chatId = null, replyTo = null) {
 }
 
 // ============================================================
+// RESEARCH LOGGER (v19.6) — data collection ONLY, does NOT affect signals
+// Captures, at entry, the science-backed features for the breakout-vs-rejection
+// study: which S/R level, did the 5-min candle CLOSE above/below it (breakout vs
+// rejection), volume vs its recent average, and candle body strength.
+// Written to research_log.json (accumulates, committed to repo).
+// ============================================================
+function loadResearchLog() {
+  try {
+    return JSON.parse(fs.readFileSync("research_log.json", "utf8"));
+  } catch (e) {
+    return [];
+  }
+}
+
+function logResearchEntry(entry) {
+  try {
+    const log = loadResearchLog();
+    log.push(entry);
+    fs.writeFileSync("research_log.json", JSON.stringify(log, null, 2));
+    console.log(`📊 Research logged: ${entry.symbol} ${entry.signal} | closedBeyondLevel=${entry.closedBeyondLevel} | volRatio=${entry.volRatio}`);
+  } catch (e) {
+    console.error("Research log failed:", e.message);
+  }
+}
+
+// Compute the breakout/rejection features from the 5-min candles vs the level
+// being traded. Returns science-relevant fields (does not change any decision).
+function computeResearchFeatures(bars5m, level, signal) {
+  if (!bars5m || bars5m.length < 21 || !level) return null;
+  const lastClosed = bars5m[bars5m.length - 2]; // last COMPLETED 5-min candle
+  if (!lastClosed) return null;
+
+  // Volume vs average of prior 20 candles
+  const priorVols = bars5m.slice(-22, -2).map(b => b.v);
+  const avgVol = priorVols.length ? priorVols.reduce((a, b) => a + b, 0) / priorVols.length : 0;
+  const volRatio = avgVol > 0 ? +(lastClosed.v / avgVol).toFixed(2) : null;
+
+  // Did the candle CLOSE beyond the level? (science: close, not wick)
+  const body = Math.abs(lastClosed.c - lastClosed.o);
+  const range = lastClosed.h - lastClosed.l;
+  const bodyPct = range > 0 ? +(body / range * 100).toFixed(0) : 0;
+
+  let closedBeyondLevel;
+  if (signal === "PUT") {
+    closedBeyondLevel = lastClosed.c > level; // real breakout would close ABOVE resistance
+  } else {
+    closedBeyondLevel = lastClosed.c < level; // real breakdown would close BELOW support
+  }
+
+  return {
+    level: +level.toFixed(2),
+    candleClose: +lastClosed.c.toFixed(2),
+    closedBeyondLevel,
+    volRatio,
+    bodyPct,
+    volSurge: volRatio !== null && volRatio >= 1.2,
+  };
+}
+
+// ============================================================
 // MAIN: SCAN MODE
 // ============================================================
 async function runScan() {
@@ -1034,6 +1094,30 @@ async function runScan() {
       };
       state._dailyTrades_count = (state._dailyTrades_count || 0) + 1;
       saveState(state);
+
+      // v19.6: RESEARCH LOG — capture breakout/rejection features (does not affect trading)
+      try {
+        const level = result.signal === "PUT" ? result.resistance : result.support;
+        const feat = computeResearchFeatures(todayBars5m, level, result.signal);
+        if (feat) {
+          logResearchEntry({
+            time: new Date().toISOString(),
+            day: today,
+            symbol,
+            signal: result.signal,
+            window: window.name,
+            strike: contract.strike_price,
+            entryStockPrice: +price.toFixed(2),
+            entryPremium: premium,
+            rsi: +rsi5m.toFixed(1),
+            vwap: vwap5m ? +vwap5m.toFixed(2) : null,
+            ...feat,
+            // outcome fields filled in later from state._dailyTrades by the analysis script
+          });
+        }
+      } catch (e) {
+        console.error("Research capture failed:", e.message);
+      }
 
       // Break after 1 entry per scan (avoid burst entries)
       break;
