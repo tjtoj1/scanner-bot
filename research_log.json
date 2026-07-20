@@ -142,5 +142,23 @@
     "volRatio": 0.36,
     "bodyPct": 41,
     "volSurge": false
+  },
+  {
+    "time": "2026-07-20T17:30:27.857Z",
+    "day": "2026-07-20",
+    "symbol": "GLD",
+    "signal": "PUT",
+    "window": "Afternoon_Resume",
+    "strike": "368",
+    "entryStockPrice": 368.12,
+    "entryPremium": 0.44,
+    "rsi": 47.4,
+    "vwap": 368.03,
+    "level": 368.41,
+    "candleClose": 367.91,
+    "closedBeyondLevel": false,
+    "volRatio": 1.37,
+    "bodyPct": 52,
+    "volSurge": true
   }
 ]
