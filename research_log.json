@@ -1,0 +1,20 @@
+[
+  {
+    "time": "2026-07-20T14:00:51.320Z",
+    "day": "2026-07-20",
+    "symbol": "SPY",
+    "signal": "PUT",
+    "window": "ORB_Pullback",
+    "strike": "746",
+    "entryStockPrice": 745.86,
+    "entryPremium": 1.665,
+    "rsi": 58.7,
+    "vwap": 747.58,
+    "level": 746.79,
+    "candleClose": 748.56,
+    "closedBeyondLevel": true,
+    "volRatio": 4.65,
+    "bodyPct": 74,
+    "volSurge": true
+  }
+]
