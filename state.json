@@ -116,14 +116,32 @@
   ],
   "_reportSent": false,
   "_dailyLosses": 584,
-  "_dailyTrades_count": 7,
+  "_dailyTrades_count": 8,
   "_consecLosses": 0,
   "GLD": {
-    "active": false,
-    "exited": true,
-    "cooldownUntil": 1784560941143,
-    "lastSignal": "CALL",
-    "lastExitTime": 1784560341143
+    "active": true,
+    "signal": "PUT",
+    "window": "MidMorning_VWAP",
+    "optionSymbol": "GLD260720P00368000",
+    "strike": "368",
+    "entryPremium": 0.33499999999999996,
+    "qty": 24,
+    "entryTime": 1784562934342,
+    "orderId": "d6b18272-c37b-4b87-a3b8-f2a080c41e3c",
+    "stopOrderId": null,
+    "currentStop": 0.21774999999999997,
+    "peakPremium": 0.33499999999999996,
+    "targetPct": 60,
+    "stopPct": 35,
+    "timeExitMin": 25,
+    "entryMessageId": 2089,
+    "reason": "Pullback rejection at VWAP, near resistance 368.41",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 24,
+    "quickExitWindow": true
   },
   "SPY": {
     "active": true,
@@ -165,7 +183,7 @@
     "lastSignal": "CALL",
     "lastExitTime": 1784562739342
   },
-  "_dailyPeakProfit": 603.179999999993,
+  "_dailyPeakProfit": 916.2799999999988,
   "_profitProtected": false,
   "_profitGuardNotified": false
 }
