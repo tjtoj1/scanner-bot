@@ -70,5 +70,23 @@
     "volRatio": 2.12,
     "bodyPct": 61,
     "volSurge": true
+  },
+  {
+    "time": "2026-07-20T15:15:25.338Z",
+    "day": "2026-07-20",
+    "symbol": "SPY",
+    "signal": "CALL",
+    "window": "MidMorning_VWAP",
+    "strike": "745",
+    "entryStockPrice": 744.63,
+    "entryPremium": 1.1749999999999998,
+    "rsi": 39.5,
+    "vwap": 746.16,
+    "level": 743.79,
+    "candleClose": 744.11,
+    "closedBeyondLevel": false,
+    "volRatio": 0.91,
+    "bodyPct": 26,
+    "volSurge": false
   }
 ]
