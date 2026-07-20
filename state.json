@@ -20,14 +20,32 @@
   ],
   "_reportSent": false,
   "_dailyLosses": 0,
-  "_dailyTrades_count": 2,
+  "_dailyTrades_count": 3,
   "_consecLosses": 0,
   "GLD": {
-    "active": false,
-    "exited": true,
-    "cooldownUntil": 1784316376373,
-    "lastSignal": "PUT",
-    "lastExitTime": 1784315776373
+    "active": true,
+    "signal": "PUT",
+    "window": "ORB_Pullback",
+    "optionSymbol": "GLD260720P00367000",
+    "strike": "367",
+    "entryPremium": 0.87,
+    "qty": 8,
+    "entryTime": 1784556925316,
+    "orderId": "555d292e-a391-4b97-aec2-aecd96f4d707",
+    "stopOrderId": "f72d2f47-d432-4289-9ced-7e56e3bd61bd",
+    "currentStop": 0.522,
+    "peakPremium": 0.87,
+    "targetPct": 75,
+    "stopPct": 40,
+    "timeExitMin": 25,
+    "entryMessageId": 2072,
+    "reason": "Pullback rejection at EMA9, near resistance 367.07",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 8,
+    "quickExitWindow": true
   },
   "SPY": {
     "active": true,
@@ -69,7 +87,7 @@
     "lastSignal": "PUT",
     "lastExitTime": 1784313033382
   },
-  "_dailyPeakProfit": 0,
+  "_dailyPeakProfit": 375.72000000000116,
   "_profitProtected": false,
   "_profitGuardNotified": false
 }
