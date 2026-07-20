@@ -240,12 +240,28 @@
       "exitTime": 1784572397446,
       "strike": "294",
       "setup": "Late-day fade: bounce at support"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "Late_Day_Fade",
+      "entryPremium": 1.105,
+      "exitPremium": 0.82,
+      "qty": 8,
+      "pnl": -228.00000000000003,
+      "pnlPct": -25.791855203619914,
+      "reason": "stop_hit",
+      "minutes": 2,
+      "entryTime": 1784573133539,
+      "exitTime": 1784573240714,
+      "strike": "743",
+      "setup": "Late-day fade: rejection at resistance"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 2819,
+  "_dailyLosses": 3047,
   "_dailyTrades_count": 16,
-  "_consecLosses": 6,
+  "_consecLosses": 7,
   "GLD": {
     "active": false,
     "exited": true,
@@ -254,30 +270,11 @@
     "lastExitTime": 1784571796261
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "Late_Day_Fade",
-    "optionSymbol": "SPY260720P00743000",
-    "strike": "743",
-    "entryPremium": 1.105,
-    "qty": 8,
-    "entryTime": 1784573133539,
-    "orderId": "77e89239-7ae0-44d1-a6af-2660d19878d0",
-    "stopOrderId": "db8519c6-7403-4086-bc5f-86a05ef56a73",
-    "currentStop": 0.7735,
-    "peakPremium": 1.105,
-    "targetPct": 50,
-    "stopPct": 30,
-    "timeExitMin": 20,
-    "entryMessageId": 2105,
-    "reason": "Late-day fade: rejection at resistance",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 8,
-    "quickExitWindow": true,
-    "lastPremium": 0.97
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784573841475,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784573241475
   },
   "QQQ": {
     "active": false,
@@ -309,8 +306,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 14,
-    "quickExitWindow": true,
-    "lastPremium": 0.28
+    "quickExitWindow": false,
+    "lastPremium": 0.26
   },
   "_dailyPeakProfit": 916.2799999999988,
   "_profitProtected": false,
