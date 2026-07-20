@@ -721,6 +721,101 @@ function logResearchEntry(entry) {
   }
 }
 
+// ============================================================
+// MARKET LOGGER (v19.7) — logs EVERY evaluation, taken or rejected.
+// Purpose: build a dataset rich enough to backtest ANY strategy idea later
+// (breakout, reversal, trend-follow, volume-based) WITHOUT trading it first.
+// The bot records the PRESENT snapshot; a separate analysis script fetches
+// what price did AFTERWARDS from Alpaca history and joins on the timestamp.
+// This is pure data capture — it does NOT influence any trading decision.
+// ============================================================
+// Stored as JSONL (one JSON object per line) and APPENDED, never rewritten.
+// This keeps git diffs tiny — critical because the bot commits ~78x/day.
+function logMarketSnapshot(rec) {
+  try {
+    fs.appendFileSync("market_log.jsonl", JSON.stringify(rec) + "\n");
+  } catch (e) {
+    console.error("Market log failed:", e.message);
+  }
+}
+
+// Read helper for the analysis script (tolerates partial/corrupt last line)
+function loadMarketLog() {
+  try {
+    return fs.readFileSync("market_log.jsonl", "utf8")
+      .split("\n")
+      .filter(l => l.trim())
+      .map(l => { try { return JSON.parse(l); } catch (e) { return null; } })
+      .filter(Boolean);
+  } catch (e) {
+    return [];
+  }
+}
+
+// Build a full snapshot of market state at evaluation time.
+// Compact keys keep the file small (runs ~78x/day per ticker).
+function buildMarketSnapshot({ symbol, today, price, vwap5m, ema9, rsi5m, atrVal, vix,
+                               windowName, sr, result, bars5m, bars1m, taken, premium }) {
+  const support = findNearestSupport(price, sr);
+  const resistance = findNearestResistance(price, sr);
+
+  // last COMPLETED 5-min candle
+  const c5 = bars5m && bars5m.length >= 2 ? bars5m[bars5m.length - 2] : null;
+  let volR = null, bodyPct = null, candle = null;
+  if (c5) {
+    const priorVols = bars5m.slice(-22, -2).map(b => b.v);
+    const avgVol = priorVols.length ? priorVols.reduce((a, b) => a + b, 0) / priorVols.length : 0;
+    volR = avgVol > 0 ? +(c5.v / avgVol).toFixed(2) : null;
+    const body = Math.abs(c5.c - c5.o);
+    const range = c5.h - c5.l;
+    bodyPct = range > 0 ? +(body / range * 100).toFixed(0) : 0;
+    candle = { o: +c5.o.toFixed(2), h: +c5.h.toFixed(2), l: +c5.l.toFixed(2), c: +c5.c.toFixed(2) };
+  }
+
+  // 5-min trend over last 3 completed candles
+  let trend5 = null;
+  if (bars5m && bars5m.length >= 4) {
+    const a = bars5m[bars5m.length - 4].c, b = bars5m[bars5m.length - 2].c;
+    trend5 = b > a ? "up" : b < a ? "down" : "flat";
+  }
+
+  return {
+    t: new Date().toISOString(),
+    d: today,
+    s: symbol,
+    w: windowName,
+    px: +price.toFixed(2),
+    vw: vwap5m ? +vwap5m.toFixed(2) : null,
+    e9: ema9 ? +ema9.toFixed(2) : null,
+    rsi: +rsi5m.toFixed(1),
+    atr: atrVal ? +atrVal.toFixed(3) : null,
+    vix: vix ? +vix.toFixed(2) : null,
+    // support / resistance context
+    sup: support ? +support.toFixed(2) : null,
+    res: resistance ? +resistance.toFixed(2) : null,
+    dSup: support ? +((price - support) / support * 100).toFixed(3) : null,
+    dRes: resistance ? +((resistance - price) / price * 100).toFixed(3) : null,
+    // all raw levels (lets us test other level choices later)
+    lv: {
+      pmh: sr.pmh ? +sr.pmh.toFixed(2) : null, pml: sr.pml ? +sr.pml.toFixed(2) : null,
+      pdc: sr.pdc ? +sr.pdc.toFixed(2) : null, pdh: sr.pdh ? +sr.pdh.toFixed(2) : null,
+      pdl: sr.pdl ? +sr.pdl.toFixed(2) : null, piv: sr.pivot ? +sr.pivot.toFixed(2) : null,
+      r1: sr.r1 ? +sr.r1.toFixed(2) : null, s1: sr.s1 ? +sr.s1.toFixed(2) : null,
+    },
+    // candle / volume features
+    c5: candle,
+    volR,
+    body: bodyPct,
+    trend5,
+    // what the CURRENT strategy decided (and why)
+    sig: result.signal,
+    rsn: (result.reason || "").slice(0, 60),
+    pb: result.pullback ? `${result.pullback.direction}/${result.pullback.level}/${result.pullback.strength}` : null,
+    taken: !!taken,
+    prem: taken && premium ? +premium.toFixed(2) : null,
+  };
+}
+
 // Compute the breakout/rejection features from the 5-min candles vs the level
 // being traded. Returns science-relevant fields (does not change any decision).
 function computeResearchFeatures(bars5m, level, signal) {
@@ -1022,6 +1117,20 @@ async function runScan() {
     const indicators = { price, bars1m: todayBars1m, bars5m: todayBars5m, vwap5m, ema9, rsi5m, atrVal, vix };
     const result = await analyzeStrategy(window, sr, indicators);
     console.log(`${symbol}: ${result.signal} | ${result.reason}`);
+
+    // v19.7: MARKET LOG — record EVERY evaluation (taken or rejected).
+    // This is the dataset we'll backtest future strategy ideas on.
+    // Pure capture: does not affect the decision below.
+    try {
+      logMarketSnapshot(buildMarketSnapshot({
+        symbol, today, price, vwap5m, ema9, rsi5m, atrVal, vix,
+        windowName: window.name, sr, result,
+        bars5m: todayBars5m, bars1m: todayBars1m,
+        taken: false, premium: null,
+      }));
+    } catch (e) {
+      console.error("Market snapshot failed:", e.message);
+    }
 
     if (result.signal === "NEUTRAL") continue;
 
