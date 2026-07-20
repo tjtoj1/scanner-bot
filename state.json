@@ -48,12 +48,28 @@
       "exitTime": 1784557636273,
       "strike": "367",
       "setup": "Pullback rejection at EMA9, near resistance 367.07"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 2.37,
+      "exitPremium": 1.57,
+      "qty": 4,
+      "pnl": -320,
+      "pnlPct": -33.755274261603375,
+      "reason": "recovered_stop",
+      "minutes": 5,
+      "entryTime": 1784557545972,
+      "exitTime": 1784557847224,
+      "strike": "701",
+      "setup": "Recovered from Alpaca"
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 263.99999999999994,
+  "_dailyLosses": 584,
   "_dailyTrades_count": 3,
-  "_consecLosses": 1,
+  "_consecLosses": 2,
   "GLD": {
     "active": false,
     "exited": true,
@@ -71,9 +87,9 @@
   "QQQ": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1784557459326,
+    "cooldownUntil": 1784558447467,
     "lastSignal": "PUT",
-    "lastExitTime": 1784556859326
+    "lastExitTime": 1784557847467
   },
   "IWM": {
     "active": false,
