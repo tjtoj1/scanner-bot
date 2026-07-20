@@ -135,7 +135,7 @@
     "orderId": "3d5639fe-c80e-4851-864a-6fed258e10bd",
     "stopOrderId": null,
     "currentStop": 0.25025000000000003,
-    "peakPremium": 0.385,
+    "peakPremium": 0.48,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -146,7 +146,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 14,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 0.48
   },
   "_dailyPeakProfit": 603.179999999993,
   "_profitProtected": false,
