@@ -502,5 +502,23 @@
     "volRatio": 0.54,
     "bodyPct": 23,
     "volSurge": false
+  },
+  {
+    "time": "2026-07-21T17:30:25.483Z",
+    "day": "2026-07-21",
+    "symbol": "SPY",
+    "signal": "PUT",
+    "window": "Afternoon_Resume",
+    "strike": "748",
+    "entryStockPrice": 748.47,
+    "entryPremium": 0.475,
+    "rsi": 55.9,
+    "vwap": 746.88,
+    "level": 748.73,
+    "candleClose": 748.6,
+    "closedBeyondLevel": false,
+    "volRatio": 4.14,
+    "bodyPct": 57,
+    "volSurge": true
   }
 ]
