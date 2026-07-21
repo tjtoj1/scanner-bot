@@ -164,7 +164,7 @@
   ],
   "_reportSent": false,
   "_dailyLosses": 1600,
-  "_dailyTrades_count": 10,
+  "_dailyTrades_count": 11,
   "_consecLosses": 0,
   "GLD": {
     "active": false,
@@ -174,11 +174,29 @@
     "lastExitTime": 1784575277059
   },
   "SPY": {
-    "active": false,
-    "exited": true,
-    "cooldownUntil": 1784658496592,
-    "lastSignal": "PUT",
-    "lastExitTime": 1784657896592
+    "active": true,
+    "signal": "PUT",
+    "window": "Late_Day_Fade",
+    "optionSymbol": "SPY260721P00749000",
+    "strike": "749",
+    "entryPremium": 0.715,
+    "qty": 14,
+    "entryTime": 1784659519773,
+    "orderId": "e07d6739-1c40-457d-b91a-d6030cf6772f",
+    "stopOrderId": null,
+    "currentStop": 0.5005,
+    "peakPremium": 0.715,
+    "targetPct": 50,
+    "stopPct": 30,
+    "timeExitMin": 20,
+    "entryMessageId": 2147,
+    "reason": "Late-day fade: rejection at resistance",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 14,
+    "quickExitWindow": true
   },
   "QQQ": {
     "active": false,
