@@ -162,15 +162,86 @@ function analyze() {
     m += `  ${line(k, v)}\n`;
   }
 
-  // 7. Rejected-signal context from market_log
+  // 7. Rejected-signal context + FORWARD MOVE analysis
   const ml = readJSONL("market_log.jsonl");
   if (ml.length) {
     const neutral = ml.filter(r => r.sig === "NEUTRAL").length;
     m += `\n<b>7️⃣ الإشارات</b>\n  مرفوضة ${neutral} | مقبولة ${ml.length - neutral} (من ${ml.length} تقييم)\n`;
+    m += analyzeForward(ml);
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
   return m;
+}
+
+// ---------- FORWARD MOVE: what did price do AFTER each evaluation? ----------
+// Uses market_log itself as the price series (every symbol is re-evaluated
+// every ~5 min while it has no open position, so rejected signals have a
+// continuous track). No extra API calls needed.
+function analyzeForward(ml) {
+  // index snapshots by symbol+day, sorted by time
+  const series = new Map();
+  for (const r of ml) {
+    if (!r.px || !r.t) continue;
+    const k = `${r.d}|${r.s}`;
+    if (!series.has(k)) series.set(k, []);
+    series.get(k).push(r);
+  }
+  for (const arr of series.values()) arr.sort((a, b) => new Date(a.t) - new Date(b.t));
+
+  // For each snapshot, find the price ~30 min later and the max excursion
+  const HORIZON_MS = 30 * 60 * 1000;
+  const results = [];
+  for (const [k, arr] of series) {
+    for (let i = 0; i < arr.length; i++) {
+      const cur = arr[i];
+      const t0 = new Date(cur.t).getTime();
+      const fut = arr.filter(x => {
+        const dt = new Date(x.t).getTime() - t0;
+        return dt > 0 && dt <= HORIZON_MS;
+      });
+      if (fut.length < 2) continue; // need enough forward data
+      const highs = Math.max(...fut.map(x => x.px));
+      const lows = Math.min(...fut.map(x => x.px));
+      const upMove = (highs - cur.px) / cur.px * 100;
+      const dnMove = (cur.px - lows) / cur.px * 100;
+      results.push({
+        sig: cur.sig,
+        rsn: cur.rsn || "",
+        upMove: +upMove.toFixed(2),
+        dnMove: +dnMove.toFixed(2),
+        maxMove: +Math.max(upMove, dnMove).toFixed(2),
+      });
+    }
+  }
+
+  if (results.length < 20) {
+    return `\n<b>8️⃣ حركة السعر بعد التقييم</b>\n  بيانات غير كافية (${results.length})\n`;
+  }
+
+  const rejected = results.filter(r => r.sig === "NEUTRAL");
+  const taken = results.filter(r => r.sig !== "NEUTRAL");
+
+  // A 0DTE option roughly doubles on ~0.3-0.5% underlying move; use 0.3% as
+  // the "tradeable move" threshold.
+  const TRADEABLE = 0.3;
+  const bigRej = rejected.filter(r => r.maxMove >= TRADEABLE).length;
+  const bigTaken = taken.filter(r => r.maxMove >= TRADEABLE).length;
+
+  const avg = a => a.length ? (a.reduce((x, r) => x + r.maxMove, 0) / a.length).toFixed(2) : "0";
+
+  let s = `\n<b>8️⃣ حركة السعر خلال 30 دقيقة</b>\n`;
+  s += `  مرفوضة: ${rejected.length} | متوسط الحركة ${avg(rejected)}%\n`;
+  s += `    منها ${bigRej} (${pct(bigRej, rejected.length)}%) تحرّكت ${TRADEABLE}%+\n`;
+  if (taken.length) {
+    s += `  مقبولة: ${taken.length} | متوسط الحركة ${avg(taken)}%\n`;
+    s += `    منها ${bigTaken} (${pct(bigTaken, taken.length)}%) تحرّكت ${TRADEABLE}%+\n`;
+  }
+  if (taken.length >= 10) {
+    const at = parseFloat(avg(taken)), ar = parseFloat(avg(rejected));
+    s += `  ← ${at > ar ? "المقبولة تتحرك أكثر ✅ (الفلتر يشتغل)" : "المرفوضة تتحرك أكثر ⚠️ (الفلتر يرفض الفرص)"}\n`;
+  }
+  return s;
 }
 
 (async () => {
