@@ -85,7 +85,7 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 1.45
+    "lastPremium": 1.34
   },
   "QQQ": {
     "active": false,
@@ -118,7 +118,7 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 0.55
+    "lastPremium": 0.51
   },
   "_dailyPeakProfit": 304.27999999999884,
   "_profitProtected": false,
