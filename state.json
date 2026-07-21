@@ -32,12 +32,28 @@
       "exitTime": 1784642734921,
       "strike": "745",
       "setup": "Pullback bounce at VWAP, near support 744.27"
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "window": "ORB_Pullback",
+      "entryPremium": 2.3600000000000003,
+      "exitPremium": 2.77,
+      "qty": 4,
+      "pnl": 163.9999999999999,
+      "pnlPct": 17.372881355932186,
+      "reason": "stop_hit",
+      "minutes": 26,
+      "entryTime": 1784641518914,
+      "exitTime": 1784643078613,
+      "strike": "704",
+      "setup": "Pullback rejection at EMA9, near resistance 705.80"
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 51.99999999999996,
   "_dailyTrades_count": 4,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -53,30 +69,11 @@
     "lastExitTime": 1784642735538
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "window": "ORB_Pullback",
-    "optionSymbol": "QQQ260721P00704000",
-    "strike": "704",
-    "entryPremium": 2.3600000000000003,
-    "qty": 4,
-    "entryTime": 1784641518914,
-    "orderId": "bce3567f-d8aa-4430-99be-a6baf38cc938",
-    "stopOrderId": null,
-    "currentStop": 1.4160000000000001,
-    "peakPremium": 2.67,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 2127,
-    "reason": "Pullback rejection at EMA9, near resistance 705.80",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "lastPremium": 2.49
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784643679412,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784643079412
   },
   "IWM": {
     "active": true,
@@ -101,7 +98,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true
+    "quickExitWindow": false,
+    "lastPremium": 0.66
   },
   "_dailyPeakProfit": 304.27999999999884,
   "_profitProtected": false,
