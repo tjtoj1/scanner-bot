@@ -210,7 +210,7 @@
       "setup": "Late-day fade: rejection at resistance"
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "_dailyLosses": 1970,
   "_dailyTrades_count": 13,
   "_consecLosses": 2,
