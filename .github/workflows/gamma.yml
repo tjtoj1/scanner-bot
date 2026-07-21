@@ -1,0 +1,40 @@
+name: Gamma Levels Check
+
+on:
+  schedule:
+    # 8:05 AM CDT = 13:05 UTC, weekdays — once per day (free tier = 5 req/day)
+    - cron: '5 13 * * 1-5'
+  workflow_dispatch:
+
+concurrency:
+  group: gamma-check
+  cancel-in-progress: false
+permissions:
+  contents: write
+
+jobs:
+  gamma:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run gamma check
+        env:
+          FLASHALPHA_KEY: ${{ secrets.FLASHALPHA_KEY }}
+          TG_TOKEN:       ${{ secrets.TG_TOKEN }}
+        run: node gamma_check.js
+
+      - name: Commit gamma log
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add gamma_log.jsonl || true
+          git diff --quiet && git diff --staged --quiet || git commit -m "Gamma log [skip ci]"
+          git push || true
