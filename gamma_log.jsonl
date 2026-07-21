@@ -1,0 +1,3 @@
+{"d":"2026-07-21","t":"NVDA","error":403,"body":"{\"status\":\"ERROR\",\"error\":\"tier_restricted\",\"message\":\"This endpoint requires the Growth plan or higher.\",\"current_plan\":\"Free\",\"required_plan\":\"Growth\"}"}
+{"d":"2026-07-21","t":"TSLA","error":403,"body":"{\"status\":\"ERROR\",\"error\":\"tier_restricted\",\"message\":\"This endpoint requires the Growth plan or higher.\",\"current_plan\":\"Free\",\"required_plan\":\"Growth\"}"}
+{"d":"2026-07-21","t":"MSTR","error":403,"body":"{\"status\":\"ERROR\",\"error\":\"tier_restricted\",\"message\":\"This endpoint requires the Growth plan or higher.\",\"current_plan\":\"Free\",\"required_plan\":\"Growth\"}"}
