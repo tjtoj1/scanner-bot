@@ -1,6 +1,23 @@
 {
   "_date": "2026-07-21",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "IWM",
+      "signal": "PUT",
+      "window": "ORB_Pullback",
+      "entryPremium": 0.71,
+      "exitPremium": 1.4,
+      "qty": 8,
+      "pnl": 552,
+      "pnlPct": 97.18309859154928,
+      "reason": "stop_hit",
+      "minutes": 7,
+      "entryTime": 1784640919983,
+      "exitTime": 1784641344559,
+      "strike": "294",
+      "setup": "Pullback rejection at EMA9, near resistance 294.81"
+    }
+  ],
   "_reportSent": false,
   "_dailyLosses": 0,
   "_dailyTrades_count": 2,
@@ -35,8 +52,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true,
-    "lastPremium": 1.43
+    "quickExitWindow": false,
+    "lastPremium": 1.41
   },
   "QQQ": {
     "active": false,
@@ -46,30 +63,11 @@
     "lastExitTime": 1784571041124
   },
   "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "window": "ORB_Pullback",
-    "optionSymbol": "IWM260721P00294000",
-    "strike": "294",
-    "entryPremium": 0.71,
-    "qty": 8,
-    "entryTime": 1784640919983,
-    "orderId": "79c87284-5be9-45ae-9521-6a6c323652a0",
-    "stopOrderId": null,
-    "currentStop": 0.918,
-    "peakPremium": 1.08,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 2122,
-    "reason": "Pullback rejection at EMA9, near resistance 294.81",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "lastPremium": 1.08
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784641945047,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784641345047
   },
   "_dailyPeakProfit": 175.8399999999965,
   "_profitProtected": false,
