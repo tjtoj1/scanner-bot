@@ -35,7 +35,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 1.43
   },
   "QQQ": {
     "active": false,
@@ -54,21 +55,21 @@
     "qty": 8,
     "entryTime": 1784640919983,
     "orderId": "79c87284-5be9-45ae-9521-6a6c323652a0",
-    "stopOrderId": "56ea8006-9c7b-42d2-82af-df44572f2873",
-    "currentStop": 0.426,
-    "peakPremium": 0.89,
+    "stopOrderId": null,
+    "currentStop": 0.918,
+    "peakPremium": 1.08,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
     "entryMessageId": 2122,
     "reason": "Pullback rejection at EMA9, near resistance 294.81",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 8,
+    "trailing": true,
+    "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 0.89
+    "lastPremium": 1.08
   },
   "_dailyPeakProfit": 175.8399999999965,
   "_profitProtected": false,
