@@ -90,7 +90,9 @@ async function sendTelegram(text) {
   const records = [];
 
   for (const t of TICKERS) {
-    const r = await faGet(`/v1/exposure/summary/${t}`);
+    // Free tier: /v1/exposure/levels is available for individual US equities.
+    // (/exposure/summary is Growth+, ETFs are Basic+.)
+    const r = await faGet(`/v1/exposure/levels/${t}`);
 
     if (!r.ok) {
       console.log(`${t}: FAILED ${r.status} ${r.body}`);
@@ -100,30 +102,32 @@ async function sendTelegram(text) {
     }
 
     const d = r.data;
-    // Log the full raw payload once so we can map fields exactly next run
-    console.log(`${t} RAW:`, JSON.stringify(d).slice(0, 1200));
+    console.log(`${t} RAW:`, JSON.stringify(d).slice(0, 1500));
+
+    // Documented shape: { levels: { call_wall, put_wall, ... } }
+    const L = d.levels || d;
 
     const spot      = pick(d, "spot", "spot_price", "price", "underlying_price", "last");
-    const gex       = pick(d, "gex", "total_gex", "net_gex", "gamma_exposure");
-    const gammaFlip = pick(d, "gamma_flip", "gammaFlip", "flip_point", "zero_gamma", "flip");
-    const callWall  = pick(d, "call_wall", "callWall", "call_resistance");
-    const putWall   = pick(d, "put_wall", "putWall", "put_support");
-    const maxPain   = pick(d, "max_pain", "maxPain");
+    const gex       = pick(L, "net_gex", "gex", "total_gex", "gamma_exposure");
+    const gammaFlip = pick(L, "gamma_flip", "gammaFlip", "flip_point", "zero_gamma", "flip");
+    const callWall  = pick(L, "call_wall", "callWall", "call_resistance");
+    const putWall   = pick(L, "put_wall", "putWall", "put_support");
+    const maxPain   = pick(L, "max_pain", "maxPain");
 
     const regime = typeof gex === "number"
       ? (gex >= 0 ? "موجب (مستقر ↔)" : "سالب (متقلب ⚡)")
-      : "—";
+      : null;
 
-    msg += `\n<b>${t}</b>  ${spot !== null ? "$" + fmt(spot) : ""}\n`;
-    msg += `  GEX: ${fmt(gex)}  ${typeof gex === "number" ? `→ ${regime}` : ""}\n`;
-    if (gammaFlip !== null) msg += `  🔄 انقلاب الجاما: $${fmt(gammaFlip)}\n`;
+    msg += `\n<b>${t}</b>${spot !== null ? "  $" + fmt(spot) : ""}\n`;
     if (callWall !== null)  msg += `  🧱 جدار الكول: $${fmt(callWall)}\n`;
+    if (gammaFlip !== null) msg += `  🔄 انقلاب الجاما: $${fmt(gammaFlip)}\n`;
     if (putWall !== null)   msg += `  🛡 جدار البوت: $${fmt(putWall)}\n`;
     if (maxPain !== null)   msg += `  🎯 Max Pain: $${fmt(maxPain)}\n`;
+    if (gex !== null)       msg += `  GEX: ${fmt(gex)}${regime ? " → " + regime : ""}\n`;
 
     records.push({
       d: today, t, spot, gex, gammaFlip, callWall, putWall, maxPain,
-      raw: d, // keep full payload for later analysis
+      raw: d,
     });
 
     if (r.remaining) console.log(`  quota remaining: ${r.remaining}`);
