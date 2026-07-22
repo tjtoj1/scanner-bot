@@ -34,6 +34,54 @@ async function sendTelegram(text) {
 }
 
 // ---------- STEP 1: JOIN today's features with today's outcomes ----------
+// ---------- STEP 1b: record today's PEAK vs CLOSE (permanent) ----------
+// state.json wipes daily, so _dailyPeakProfit would be lost. We snapshot it
+// here along with the day's actual result, to later choose a data-driven
+// threshold for the profit guard.
+async function recordPeak() {
+  const state = readJSON("state.json", {});
+  const today = state._date;
+  if (!today) return;
+
+  const existing = readJSONL("peaks.jsonl");
+  if (existing.some(r => r.day === today)) {
+    console.log("Peak already recorded for", today);
+    return;
+  }
+
+  const peak = state._dailyPeakProfit ?? null;
+  const trades = state._dailyTrades || [];
+  const estClose = Math.round(trades.reduce((a, t) => a + (t.pnl || 0), 0));
+
+  // Real closing P&L from Alpaca if keys are available (more accurate)
+  let realClose = null;
+  const K = process.env.ALPACA_KEY, S = process.env.ALPACA_SECRET;
+  if (K && S) {
+    try {
+      const res = await fetch("https://paper-api.alpaca.markets/v2/account", {
+        headers: { "APCA-API-KEY-ID": K, "APCA-API-SECRET-KEY": S },
+      });
+      const a = await res.json();
+      const eq = parseFloat(a.portfolio_value);
+      const last = parseFloat(a.last_equity || a.equity);
+      if (!isNaN(eq) && !isNaN(last)) realClose = Math.round(eq - last);
+    } catch (e) {
+      console.error("Alpaca fetch failed:", e.message);
+    }
+  }
+
+  fs.appendFileSync("peaks.jsonl", JSON.stringify({
+    day: today,
+    peak: peak !== null ? Math.round(peak) : null,
+    close: realClose !== null ? realClose : estClose,
+    estClose,
+    realClose,
+    protectedFlag: !!state._profitProtected,
+    trades: trades.length,
+  }) + "\n");
+  console.log(`Recorded peak for ${today}: peak=${peak} close=${realClose ?? estClose}`);
+}
+
 function joinToday() {
   const research = readJSON("research_log.json", []);
   const state = readJSON("state.json", {});
@@ -171,7 +219,34 @@ function analyze() {
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
-  return m;
+  return m + analyzePeaks();
+}
+
+// ---------- PEAK vs CLOSE: how often does a good day collapse? ----------
+function analyzePeaks() {
+  const rows = readJSONL("peaks.jsonl");
+  if (rows.length === 0) return "";
+
+  let s = `\n\n<b>9️⃣ القمة مقابل الإغلاق</b>\n`;
+  for (const r of rows.slice(-10)) {
+    const p = r.peak !== null ? `+$${r.peak}` : "—";
+    const c = `${r.close >= 0 ? "+" : ""}$${r.close}`;
+    const gap = r.peak !== null ? r.peak - r.close : null;
+    const flag = r.protectedFlag ? " 🛡" : "";
+    s += `  ${r.day.slice(5)}: قمة ${p} → إغلاق ${c}${gap !== null && gap > 0 ? ` (فقد $${Math.round(gap)})` : ""}${flag}\n`;
+  }
+
+  // Which activation threshold would have caught the collapses?
+  const withPeak = rows.filter(r => r.peak !== null);
+  if (withPeak.length >= 3) {
+    s += `\n  <b>أي عتبة كانت تمسك؟</b>\n`;
+    for (const th of [500, 700, 900, 1200]) {
+      const hit = withPeak.filter(r => r.peak >= th);
+      const saved = hit.filter(r => r.peak - r.close >= 300);
+      s += `  $${th}: تتفعّل ${hit.length}/${withPeak.length} يوم | تنقذ ${saved.length}\n`;
+    }
+  }
+  return s;
 }
 
 // ---------- FORWARD MOVE: what did price do AFTER each evaluation? ----------
@@ -246,6 +321,7 @@ function analyzeForward(ml) {
 
 (async () => {
   console.log("=== Analysis", new Date().toISOString(), "===");
+  await recordPeak();
   const added = joinToday();
   const report = analyze();
   console.log(report.replace(/<[^>]+>/g, ""));
