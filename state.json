@@ -76,7 +76,7 @@
     "trailing": false,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 2.23
+    "lastPremium": 2.36
   },
   "IWM": {
     "active": true,
@@ -101,7 +101,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 14,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 0.39
   },
   "_dailyPeakProfit": 557.4799999999959,
   "_profitProtected": false,
