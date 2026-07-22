@@ -80,6 +80,22 @@
       "exitTime": 1784738777018,
       "strike": "749",
       "setup": "Pullback bounce at EMA9, near support 748.28"
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "Afternoon_Resume",
+      "entryPremium": 0.995,
+      "exitPremium": 1.19,
+      "qty": 10,
+      "pnl": 194.99999999999994,
+      "pnlPct": 19.59798994974874,
+      "reason": "time_exit",
+      "minutes": 25,
+      "entryTime": 1784741427476,
+      "exitTime": 1784742934602,
+      "strike": "749",
+      "setup": "Pullback rejection at VWAP, near resistance 750.15"
     }
   ],
   "_reportSent": false,
@@ -94,30 +110,11 @@
     "lastExitTime": 1784575277059
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "Afternoon_Resume",
-    "optionSymbol": "SPY260722P00749000",
-    "strike": "749",
-    "entryPremium": 0.995,
-    "qty": 10,
-    "entryTime": 1784741427476,
-    "orderId": "6986f7d3-4772-4e51-a268-659302ed283d",
-    "stopOrderId": "15cfe8e8-3f5d-48ac-bf79-c1a8a03c2db6",
-    "currentStop": 0.64675,
-    "peakPremium": 1.11,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 2172,
-    "reason": "Pullback rejection at VWAP, near resistance 750.15",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 10,
-    "quickExitWindow": false,
-    "lastPremium": 1.11
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1784743535173,
+    "lastSignal": "PUT",
+    "lastExitTime": 1784742935173
   },
   "QQQ": {
     "active": true,
@@ -129,9 +126,9 @@
     "qty": 6,
     "entryTime": 1784742020031,
     "orderId": "7fa6e962-35cd-4503-9722-77f816ae33ef",
-    "stopOrderId": "13ac342b-c3c4-4f8f-a13f-74f1c983e367",
-    "currentStop": 1.8784999999999998,
-    "peakPremium": 2.21,
+    "stopOrderId": "35a76c6f-0526-4572-a2e8-2eeab13fabe2",
+    "currentStop": 2.0145,
+    "peakPremium": 2.37,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -143,7 +140,7 @@
     "trailing": true,
     "remainingQty": 3,
     "quickExitWindow": false,
-    "lastPremium": 2.21
+    "lastPremium": 2.37
   },
   "IWM": {
     "active": false,
