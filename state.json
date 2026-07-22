@@ -76,7 +76,7 @@
     "trailing": true,
     "remainingQty": 3,
     "quickExitWindow": false,
-    "lastPremium": 2.57
+    "lastPremium": 2.51
   },
   "IWM": {
     "active": true,
@@ -88,21 +88,21 @@
     "qty": 14,
     "entryTime": 1784733320018,
     "orderId": "f1086014-f549-4184-8860-cb8bfd12cf30",
-    "stopOrderId": null,
-    "currentStop": 0.26325000000000004,
-    "peakPremium": 0.51,
+    "stopOrderId": "fad76eb7-a6c1-4185-9416-7704b9fe61f3",
+    "currentStop": 0.47600000000000003,
+    "peakPremium": 0.56,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
     "entryMessageId": 2163,
     "reason": "Pullback bounce at EMA9, near support 293.90",
-    "partial1Done": false,
+    "partial1Done": true,
     "bePromoted": false,
     "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 14,
+    "trailing": true,
+    "remainingQty": 7,
     "quickExitWindow": false,
-    "lastPremium": 0.51
+    "lastPremium": 0.56
   },
   "_dailyPeakProfit": 557.4799999999959,
   "_profitProtected": false,
