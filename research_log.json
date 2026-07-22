@@ -610,5 +610,23 @@
     "volRatio": 0.66,
     "bodyPct": 34,
     "volSurge": false
+  },
+  {
+    "time": "2026-07-22T13:55:35.866Z",
+    "day": "2026-07-22",
+    "symbol": "IWM",
+    "signal": "PUT",
+    "window": "ORB_Pullback",
+    "strike": "296",
+    "entryStockPrice": 295.74,
+    "entryPremium": 0.9,
+    "rsi": 56.9,
+    "vwap": 295.7,
+    "level": 296.1,
+    "candleClose": 295.87,
+    "closedBeyondLevel": false,
+    "volRatio": 12.02,
+    "bodyPct": 51,
+    "volSurge": true
   }
 ]
