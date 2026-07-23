@@ -18,7 +18,7 @@
       "setup": "Pullback bounce at EMA9, near support 694.21"
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "_dailyLosses": 364.00000000000006,
   "_dailyTrades_count": 1,
   "_consecLosses": 1,
