@@ -1021,37 +1021,47 @@ async function runScan() {
   const PROFIT_GUARD_ACTIVATE = 1000; // activate protection at +$1,000
   const PROFIT_GUARD_DRAWDOWN = 300;  // block new entries if profit drops $300 from peak
   try {
+    const rawLast = parseFloat(account.last_equity);
     const lastEquity = parseFloat(account.last_equity || account.equity || portfolio);
     const dailyProfit = portfolio - lastEquity;
 
-    // Track peak daily profit
-    if (dailyProfit > (state._dailyPeakProfit || 0)) {
-      state._dailyPeakProfit = dailyProfit;
-    }
-    // Activate protection once we've hit +$1,000 at any point today
-    if ((state._dailyPeakProfit || 0) >= PROFIT_GUARD_ACTIVATE && !state._profitProtected) {
-      state._profitProtected = true;
-      console.log(`🛡 Profit guard ACTIVATED - peak +$${state._dailyPeakProfit.toFixed(0)}`);
-      await sendTelegram(`🛡 <b>حماية المكسب مفعّلة</b>
+    // v19.7.1: Sanity guard — if last_equity is missing/zero/absurd, Alpaca
+    // returned bad data (happened 07-23: last_equity=0 made "profit" = whole
+    // portfolio, which falsely tripped the guard and halted the day).
+    // In that case skip the guard this run instead of acting on garbage.
+    const badLastEquity = !isFinite(rawLast) || rawLast < portfolio * 0.5;
+    if (badLastEquity) {
+      console.log(`⚠ Profit guard skipped — bad last_equity (${account.last_equity}), portfolio ${portfolio}`);
+    } else {
+      // Track peak daily profit
+      if (dailyProfit > (state._dailyPeakProfit || 0)) {
+        state._dailyPeakProfit = dailyProfit;
+      }
+      // Activate protection once we've hit +$1,000 at any point today
+      if ((state._dailyPeakProfit || 0) >= PROFIT_GUARD_ACTIVATE && !state._profitProtected) {
+        state._profitProtected = true;
+        console.log(`🛡 Profit guard ACTIVATED - peak +$${state._dailyPeakProfit.toFixed(0)}`);
+        await sendTelegram(`🛡 <b>حماية المكسب مفعّلة</b>
 الربح اليومي تجاوز +$1,000 (قمة +$${state._dailyPeakProfit.toFixed(0)})
 لو نزل الربح $300 من القمة → يوقف فتح صفقات جديدة
 الصفقات المفتوحة تكمل طبيعي`);
-      saveState(state);
-    }
-    // If protected and profit has dropped $300+ from peak → block new entries
-    if (state._profitProtected) {
-      const dropFromPeak = state._dailyPeakProfit - dailyProfit;
-      if (dropFromPeak >= PROFIT_GUARD_DRAWDOWN) {
-        console.log(`🛑 Profit guard: dropped $${dropFromPeak.toFixed(0)} from peak (+$${state._dailyPeakProfit.toFixed(0)} → +$${dailyProfit.toFixed(0)}), no new entries`);
-        if (!state._profitGuardNotified) {
-          state._profitGuardNotified = true;
-          await sendTelegram(`🛑 <b>توقف فتح صفقات جديدة</b>
+        saveState(state);
+      }
+      // If protected and profit dropped $300+ from peak → block new entries
+      if (state._profitProtected) {
+        const dropFromPeak = state._dailyPeakProfit - dailyProfit;
+        if (dropFromPeak >= PROFIT_GUARD_DRAWDOWN) {
+          console.log(`🛑 Profit guard: dropped $${dropFromPeak.toFixed(0)} from peak, no new entries`);
+          if (!state._profitGuardNotified) {
+            state._profitGuardNotified = true;
+            await sendTelegram(`🛑 <b>توقف فتح صفقات جديدة</b>
 الربح نزل $${dropFromPeak.toFixed(0)} من القمة
 القمة: +$${state._dailyPeakProfit.toFixed(0)} | الحالي: +$${dailyProfit.toFixed(0)}
 مسكنا المكسب ✅ الصفقات المفتوحة تكمل`);
+          }
+          saveState(state);
+          return; // skip new entries; open positions still managed by Monitor
         }
-        saveState(state);
-        return; // skip new entries, but open positions still managed by Monitor
       }
     }
   } catch (e) {
