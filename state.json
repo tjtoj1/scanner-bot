@@ -33,7 +33,7 @@
     "lastSignal": "CALL",
     "lastExitTime": 1784746243206
   },
-  "_dailyPeakProfit": 0,
-  "_profitProtected": false,
+  "_dailyPeakProfit": 101183.67,
+  "_profitProtected": true,
   "_profitGuardNotified": false
 }
