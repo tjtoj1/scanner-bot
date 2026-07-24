@@ -68,6 +68,13 @@ function fmt(v) {
   return String(v);
 }
 
+function readGammaLog() {
+  try {
+    return fs.readFileSync("gamma_log.jsonl", "utf8").split("\n").filter(l => l.trim())
+      .map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(Boolean);
+  } catch (e) { return []; }
+}
+
 async function sendTelegram(text) {
   try {
     const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
@@ -113,6 +120,10 @@ async function sendTelegram(text) {
     const callWall  = pick(L, "call_wall", "callWall", "call_resistance");
     const putWall   = pick(L, "put_wall", "putWall", "put_support");
     const maxPain   = pick(L, "max_pain", "maxPain");
+    // Freshness signals: the API's own timestamp/date + expiry it used
+    const asOf      = pick(d, "as_of", "asOf", "timestamp", "updated_at", "date", "last_updated")
+                      || pick(L, "as_of", "asOf", "timestamp", "updated_at", "date");
+    const expiry    = pick(d, "expiration", "expiry", "exp_date") || pick(L, "expiration", "expiry");
 
     const regime = typeof gex === "number"
       ? (gex >= 0 ? "موجب (مستقر ↔)" : "سالب (متقلب ⚡)")
@@ -124,14 +135,36 @@ async function sendTelegram(text) {
     if (putWall !== null)   msg += `  🛡 جدار البوت: $${fmt(putWall)}\n`;
     if (maxPain !== null)   msg += `  🎯 Max Pain: $${fmt(maxPain)}\n`;
     if (gex !== null)       msg += `  GEX: ${fmt(gex)}${regime ? " → " + regime : ""}\n`;
+    if (asOf)               msg += `  🕐 بيانات: ${String(asOf).slice(0, 19)}\n`;
+    if (expiry)             msg += `  📅 انتهاء: ${expiry}\n`;
 
     records.push({
-      d: today, t, spot, gex, gammaFlip, callWall, putWall, maxPain,
+      d: today, t, spot, gex, gammaFlip, callWall, putWall, maxPain, asOf, expiry,
       raw: d,
     });
 
     if (r.remaining) console.log(`  quota remaining: ${r.remaining}`);
   }
+
+  // Freshness verdict: compare today's spot to the last logged spot per ticker
+  try {
+    const prev = readGammaLog();
+    let freshNote = "";
+    for (const rec of records) {
+      if (rec.spot === null || rec.spot === undefined) continue;
+      const past = prev.filter(p => p.t === rec.t && p.d !== rec.d && typeof p.spot === "number");
+      if (past.length) {
+        const lastSpot = past[past.length - 1].spot;
+        const moved = Math.abs(rec.spot - lastSpot) > 0.01;
+        if (!moved) freshNote += `${rec.t} `;
+      }
+    }
+    if (freshNote) {
+      msg += `\n⚠ <b>السعر ما تغيّر منذ آخر مرة:</b> ${freshNote.trim()}\n(راجع إذا البيانات محدّثة)`;
+    } else {
+      msg += `\n✅ الأسعار تحدّثت — البيانات حيّة`;
+    }
+  } catch (e) { /* ignore */ }
 
   msg += `\n<i>للمراجعة فقط — البوت لا يتداول على هذي</i>`;
 
