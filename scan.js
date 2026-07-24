@@ -1374,9 +1374,12 @@ async function processActivePosition(state, account, symbol) {
             console.error(`${symbol}: trail stop failed: ${e.message}`);
           }
         }
+        // Realized profit on the half we just sold
+        const realizedPnl = (currentPremium - pos.entryPremium) * sellQty * 100;
+        const realizedPct = (currentPremium - pos.entryPremium) / pos.entryPremium * 100;
         await sendTelegram(`💰 <b>${symbol}</b> +30% Partial + Trailing
-بعنا ${sellQty} عقود (نص)
-السعر: $${currentPremium.toFixed(2)}
+بعنا ${sellQty} عقود (نص) @ $${currentPremium.toFixed(2)}
+ربح محقّق: +$${realizedPnl.toFixed(0)} (+${realizedPct.toFixed(1)}%)
 الباقي: ${pos.remainingQty} مع تريلينج 15%`, null, pos.entryMessageId);
       } catch (e) {
         console.error(`${symbol}: partial sell failed: ${e.message}`);
