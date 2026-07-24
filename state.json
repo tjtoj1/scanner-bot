@@ -1,27 +1,10 @@
 {
-  "_date": "2026-07-23",
-  "_dailyTrades": [
-    {
-      "symbol": "QQQ",
-      "signal": "CALL",
-      "window": "ORB_Pullback",
-      "entryPremium": 3.02,
-      "exitPremium": 2.11,
-      "qty": 4,
-      "pnl": -364.00000000000006,
-      "pnlPct": -30.13245033112583,
-      "reason": "time_exit",
-      "minutes": 25,
-      "entryTime": 1784816421540,
-      "exitTime": 1784817936968,
-      "strike": "694",
-      "setup": "Pullback bounce at EMA9, near support 694.21"
-    }
-  ],
-  "_reportSent": true,
-  "_dailyLosses": 364.00000000000006,
-  "_dailyTrades_count": 1,
-  "_consecLosses": 1,
+  "_date": "2026-07-24",
+  "_dailyTrades": [],
+  "_reportSent": false,
+  "_dailyLosses": 0,
+  "_dailyTrades_count": 0,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -50,7 +33,7 @@
     "lastSignal": "CALL",
     "lastExitTime": 1784746243206
   },
-  "_dailyPeakProfit": 101183.67,
-  "_profitProtected": true,
-  "_profitGuardNotified": true
+  "_dailyPeakProfit": 0,
+  "_profitProtected": false,
+  "_profitGuardNotified": false
 }
