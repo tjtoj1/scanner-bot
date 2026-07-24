@@ -228,5 +228,5 @@
   },
   "_dailyPeakProfit": 1039.0800000000017,
   "_profitProtected": true,
-  "_profitGuardNotified": false
+  "_profitGuardNotified": true
 }
