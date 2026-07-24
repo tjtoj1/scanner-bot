@@ -862,5 +862,23 @@
     "volRatio": 2.19,
     "bodyPct": 79,
     "volSurge": true
+  },
+  {
+    "time": "2026-07-24T15:05:17.796Z",
+    "day": "2026-07-24",
+    "symbol": "QQQ",
+    "signal": "CALL",
+    "window": "MidMorning_VWAP",
+    "strike": "687",
+    "entryStockPrice": 687.16,
+    "entryPremium": 2.18,
+    "rsi": 40,
+    "vwap": 687.73,
+    "level": 686.95,
+    "candleClose": 685.15,
+    "closedBeyondLevel": true,
+    "volRatio": 0.81,
+    "bodyPct": 45,
+    "volSurge": false
   }
 ]
