@@ -1489,6 +1489,16 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
   const minutes = Math.round((Date.now() - pos.entryTime) / 60000);
 
+  // v20: capture the UNDERLYING stock price at exit. Needed to answer whether
+  // a stop fired while price was still beyond the broken level (i.e. the stop
+  // was too tight for a breakout) vs. the breakout genuinely failed.
+  let exitStockPrice = null;
+  try {
+    exitStockPrice = await getLatestPrice(symbol);
+  } catch (e) {
+    console.error(`${symbol}: exit price fetch failed: ${e.message}`);
+  }
+
   state._dailyTrades = state._dailyTrades || [];
   state._dailyTrades.push({
     symbol,
@@ -1505,6 +1515,7 @@ async function exitPosition(state, pos, symbol, reason, reasonAr) {
     exitTime: Date.now(),
     strike: pos.strike,
     setup: pos.reason,
+    exitStockPrice: exitStockPrice !== null ? +exitStockPrice.toFixed(2) : null,
   });
 
   if (pnl < 0) {
