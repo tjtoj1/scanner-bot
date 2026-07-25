@@ -739,6 +739,18 @@ function logMarketSnapshot(rec) {
   }
 }
 
+// v20: log signals the toxic-category filter FROZE (didn't enter). A separate
+// analysis joins these with later market_log snapshots to see whether price
+// trended (reversal would've won) or chopped (freezing was right).
+function logFrozenSignal(rec) {
+  try {
+    fs.appendFileSync("frozen_log.jsonl", JSON.stringify(rec) + "\n");
+    console.log(`🧊 Frozen logged: ${rec.symbol} ${rec.signal} volR=${rec.volRatio}`);
+  } catch (e) {
+    console.error("Frozen log failed:", e.message);
+  }
+}
+
 // Read helper for the analysis script (tolerates partial/corrupt last line)
 function loadMarketLog() {
   try {
@@ -1143,6 +1155,44 @@ async function runScan() {
     }
 
     if (result.signal === "NEUTRAL") continue;
+
+    // ============================================================
+    // v20: TOXIC-CATEGORY FILTER (first use of volume in the decision)
+    // Data (3 clean days, 35 trades) showed ONE quadrant bleeds:
+    //   high volume (volSurge) + candle did NOT close beyond the level
+    //   = 16 trades, 19% WR, -$2,548 (97% of all high-volume losses).
+    // These are "battle at the level" — price has conviction but can't break,
+    // then chops and dies (theta kills both directions). So we FREEZE: don't
+    // enter. We log the frozen signal + will forward-track what price did, to
+    // later decide whether reversing beats freezing.
+    // ============================================================
+    try {
+      const lvl = result.signal === "PUT" ? result.resistance : result.support;
+      const feat = computeResearchFeatures(todayBars5m, lvl, result.signal);
+      if (feat && feat.volSurge === true && feat.closedBeyondLevel === false) {
+        console.log(`🧊 v20 FREEZE: ${symbol} ${result.signal} — high vol + not beyond level (toxic quadrant)`);
+        // log the frozen signal for forward analysis (does it trend or chop?)
+        try {
+          logFrozenSignal({
+            time: new Date().toISOString(),
+            day: today,
+            symbol,
+            signal: result.signal,
+            window: window.name,
+            entryStockPrice: +price.toFixed(2),
+            level: feat.level,
+            volRatio: feat.volRatio,
+            bodyPct: feat.bodyPct,
+            rsi: +rsi5m.toFixed(1),
+            vwap: vwap5m ? +vwap5m.toFixed(2) : null,
+            reason: result.reason,
+          });
+        } catch (e) { console.error("Frozen log failed:", e.message); }
+        continue; // FREEZE — do not enter this signal
+      }
+    } catch (e) {
+      console.error("v20 filter check failed:", e.message);
+    }
 
     // ENTRY
     const cfg = TICKER_CONFIG[symbol] || { strikeStep: 1, sizeFactor: 1.0 };
