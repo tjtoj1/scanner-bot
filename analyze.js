@@ -129,6 +129,7 @@ function joinToday() {
       rsi: f.rsi,
       level: f.level,
       entryStockPrice: f.entryStockPrice,
+      exitStockPrice: tr.exitStockPrice ?? null,
     }) + "\n");
     added++;
   }
@@ -219,7 +220,47 @@ function analyze() {
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
-  return m + analyzePeaks() + analyzeFrozen();
+  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops();
+}
+
+// ---------- BREAKOUT STOPS: was the stop too tight? ----------
+// For trades that were BREAKOUTS (closed beyond the level) and exited on a
+// stop: check whether the stock was STILL beyond the level at exit.
+// If yes → the % stop fired while the trade idea was still valid = too tight,
+// a structural stop (exit only if price returns past the level) would be better.
+function analyzeBreakoutStops() {
+  const rows = readJSONL("outcomes.jsonl")
+    .filter(r => !EXCLUDE_DAYS.has(r.day))
+    .filter(r => r.beyond === true && r.exitStockPrice != null && r.level != null);
+
+  if (rows.length === 0) return "";
+
+  const stopped = rows.filter(r => r.reason === "stop_hit" || r.reason === "quick_exit");
+  if (stopped.length === 0) {
+    return `\n\n<b>🔟 وقف الاختراقات</b>\n  ${rows.length} اختراق، لا أحد ضرب الوقف بعد\n`;
+  }
+
+  let stillBeyond = 0, trulyFailed = 0;
+  for (const r of stopped) {
+    // PUT signal → level was resistance; breakout = price ABOVE it
+    // CALL signal → level was support;    breakout = price BELOW it
+    const beyondAtExit = r.signal === "PUT"
+      ? r.exitStockPrice > r.level
+      : r.exitStockPrice < r.level;
+    if (beyondAtExit) stillBeyond++; else trulyFailed++;
+  }
+
+  let s = `\n\n<b>🔟 وقف الاختراقات</b>\n`;
+  s += `  اختراقات ضربت الوقف: ${stopped.length}\n`;
+  s += `  السعر لسا بعد المستوى (وقف ضيق): ${stillBeyond}\n`;
+  s += `  السعر رجع (اختراق فشل فعلاً): ${trulyFailed}\n`;
+  if (stopped.length >= 4) {
+    if (stillBeyond > trulyFailed) s += `  ← الوقف ضيق على الاختراقات ⚠️ (وقف بنيوي أفضل)\n`;
+    else s += `  ← الوقف مناسب ✅\n`;
+  } else {
+    s += `  <i>(عينة صغيرة — مؤشر أولي)</i>\n`;
+  }
+  return s;
 }
 
 // ---------- FROZEN SIGNALS: did the toxic-category freeze pay off? ----------
