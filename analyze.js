@@ -219,7 +219,69 @@ function analyze() {
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
-  return m + analyzePeaks();
+  return m + analyzePeaks() + analyzeFrozen();
+}
+
+// ---------- FROZEN SIGNALS: did the toxic-category freeze pay off? ----------
+// For each signal v20 froze (high vol + not beyond), look up what price did in
+// the following 30 min using market_log. If price moved HARD in the signal's
+// original direction, freezing cost us (rejection was right). If it moved
+// AGAINST, reversing would've won. If it chopped, freezing was correct.
+function analyzeFrozen() {
+  const frozen = readJSONL("frozen_log.jsonl");
+  if (frozen.length === 0) return "";
+  const ml = readJSONL("market_log.jsonl");
+
+  // index market_log by day+symbol sorted by time
+  const series = new Map();
+  for (const r of ml) {
+    if (!r.px || !r.t) continue;
+    const k = `${r.d}|${r.s}`;
+    if (!series.has(k)) series.set(k, []);
+    series.get(k).push(r);
+  }
+  for (const arr of series.values()) arr.sort((a, b) => new Date(a.t) - new Date(b.t));
+
+  const HORIZON = 30 * 60 * 1000;
+  let chop = 0, wentWithSignal = 0, wentAgainst = 0, noData = 0;
+  const details = [];
+
+  for (const f of frozen) {
+    const arr = series.get(`${f.day}|${f.symbol}`);
+    if (!arr) { noData++; continue; }
+    const t0 = new Date(f.time).getTime();
+    const fut = arr.filter(x => { const dt = new Date(x.t).getTime() - t0; return dt > 0 && dt <= HORIZON; });
+    if (fut.length < 2) { noData++; continue; }
+
+    const hi = Math.max(...fut.map(x => x.px));
+    const lo = Math.min(...fut.map(x => x.px));
+    const up = (hi - f.entryStockPrice) / f.entryStockPrice * 100;
+    const dn = (f.entryStockPrice - lo) / f.entryStockPrice * 100;
+    const maxMove = Math.max(up, dn);
+
+    // signal direction: PUT expects DOWN, CALL expects UP
+    const wentDown = dn > up;
+    const signalDir = f.signal === "PUT" ? "down" : "up";
+    const priceDir = wentDown ? "down" : "up";
+
+    if (maxMove < 0.25) { chop++; details.push(`${f.symbol} تذبذب`); }
+    else if (signalDir === priceDir) { wentWithSignal++; details.push(`${f.symbol} مع الإشارة ${maxMove.toFixed(2)}%`); }
+    else { wentAgainst++; details.push(`${f.symbol} عكس الإشارة ${maxMove.toFixed(2)}%`); }
+  }
+
+  const total = chop + wentWithSignal + wentAgainst;
+  let s = `\n\n<b>🧊 الصفقات المجمّدة (v20)</b>\n`;
+  s += `  عددها: ${frozen.length}${noData ? ` (${noData} بلا بيانات كافية)` : ""}\n`;
+  if (total > 0) {
+    s += `  تذبذبت (التجميد صح): ${chop} (${Math.round(chop/total*100)}%)\n`;
+    s += `  راحت مع إشارتنا (كان لازم ندخل): ${wentWithSignal} (${Math.round(wentWithSignal/total*100)}%)\n`;
+    s += `  راحت عكسنا (العكس كان يربح): ${wentAgainst} (${Math.round(wentAgainst/total*100)}%)\n`;
+    // verdict
+    if (chop >= total * 0.5) s += `  ← التجميد صحيح غالباً ✅\n`;
+    else if (wentWithSignal >= total * 0.4) s += `  ← ربما ما لازم نجمّد (الارتداد كان يشتغل) ⚠️\n`;
+    else if (wentAgainst >= total * 0.4) s += `  ← فكرة العكس واعدة (v21) 🔄\n`;
+  }
+  return s;
 }
 
 // ---------- PEAK vs CLOSE: how often does a good day collapse? ----------
