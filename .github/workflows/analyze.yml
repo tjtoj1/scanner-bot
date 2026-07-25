@@ -26,13 +26,15 @@ jobs:
 
       - name: Run analysis
         env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_TOKEN:      ${{ secrets.TG_TOKEN }}
+          ALPACA_KEY:    ${{ secrets.ALPACA_KEY }}
+          ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
         run: node analyze.js
 
-      - name: Commit outcomes
+      - name: Commit data
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add outcomes.jsonl || true
-          git diff --quiet && git diff --staged --quiet || git commit -m "Outcomes [skip ci]"
+          git add outcomes.jsonl peaks.jsonl frozen_log.jsonl || true
+          git diff --quiet && git diff --staged --quiet || git commit -m "Analysis data [skip ci]"
           git push || true
