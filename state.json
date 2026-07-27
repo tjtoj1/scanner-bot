@@ -70,7 +70,7 @@
     "lastSignal": "PUT",
     "lastExitTime": 1784918839192
   },
-  "_dailyPeakProfit": 587.6800000000076,
-  "_profitProtected": false,
+  "_dailyPeakProfit": 1503.6000000000058,
+  "_profitProtected": true,
   "_profitGuardNotified": false
 }
