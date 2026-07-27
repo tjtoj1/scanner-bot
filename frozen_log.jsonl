@@ -1,2 +1,3 @@
 {"time":"2026-07-27T13:50:20.103Z","day":"2026-07-27","symbol":"GLD","signal":"CALL","window":"ORB_Pullback","entryStockPrice":375.01,"level":374,"volRatio":43.74,"bodyPct":58,"rsi":47.4,"vwap":374.97,"reason":"Pullback bounce at EMA9, near support 374.00"}
 {"time":"2026-07-27T13:55:19.669Z","day":"2026-07-27","symbol":"GLD","signal":"CALL","window":"ORB_Pullback","entryStockPrice":374.56,"level":374,"volRatio":5.79,"bodyPct":75,"rsi":48.8,"vwap":374.96,"reason":"Pullback bounce at VWAP, near support 374.00"}
+{"time":"2026-07-27T14:05:17.207Z","day":"2026-07-27","symbol":"QQQ","signal":"CALL","window":"ORB_Pullback","entryStockPrice":685.25,"level":684.23,"volRatio":3.87,"bodyPct":12,"rsi":18.8,"vwap":690.71,"reason":"Pullback bounce at EMA9, near support 684.23"}
