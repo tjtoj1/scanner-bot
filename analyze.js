@@ -10,6 +10,9 @@ import fs from "fs";
 
 const TG_TOKEN = process.env.TG_TOKEN;
 const PERSONAL_CHAT = "810642442";
+// 07-23 is poisoned: Alpaca returned last_equity=0, which falsely tripped the
+// profit guard and halted the day. Its numbers are not usable.
+const EXCLUDE_DAYS = new Set(["2026-07-23"]);
 
 function readJSON(path, fallback) {
   try { return JSON.parse(fs.readFileSync(path, "utf8")); } catch (e) { return fallback; }
