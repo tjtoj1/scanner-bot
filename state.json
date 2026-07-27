@@ -64,7 +64,7 @@
     "trailing": true,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 1.09
+    "lastPremium": 1.18
   },
   "SPY": {
     "active": false,
@@ -90,9 +90,9 @@
     "qty": 4,
     "entryTime": 1785162316982,
     "orderId": "dbc76a00-fda0-409e-add1-49f8624c02e1",
-    "stopOrderId": "53d38346-88da-449f-a501-5fbb4114985d",
-    "currentStop": 1.2834999999999999,
-    "peakPremium": 1.51,
+    "stopOrderId": "ce612456-7698-4da6-ace6-301d79cee325",
+    "currentStop": 1.3685,
+    "peakPremium": 1.61,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -104,7 +104,7 @@
     "trailing": true,
     "remainingQty": 2,
     "quickExitWindow": false,
-    "lastPremium": 1.49
+    "lastPremium": 1.61
   },
   "_dailyPeakProfit": 1503.6000000000058,
   "_profitProtected": true,
