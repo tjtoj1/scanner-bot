@@ -1,0 +1,48 @@
+name: Monitor Positions 2
+
+on:
+  schedule:
+    - cron: '* 13-21 * * 1-5'
+  workflow_dispatch:
+
+concurrency:
+  group: monitor-bot-2
+  cancel-in-progress: false
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run monitor 2
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+          MODE:            monitor
+        run: node scan2.js
+
+      - name: Commit state (retry on conflict)
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --quiet && git diff --staged --quiet && exit 0
+          git commit -m "Bot2 monitor [skip ci]"
+          for i in 1 2 3 4 5; do
+            if git push; then exit 0; fi
+            echo "push failed, rebasing (attempt $i)"
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+          echo "push failed after retries"
