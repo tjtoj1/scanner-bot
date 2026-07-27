@@ -1,0 +1,20 @@
+[
+  {
+    "time": "2026-07-27T18:43:41.236Z",
+    "day": "2026-07-27",
+    "symbol": "GLD",
+    "signal": "CALL",
+    "window": "Late_Day_Fade",
+    "strike": "374",
+    "entryStockPrice": 374.07,
+    "entryPremium": 0.345,
+    "rsi": 48.8,
+    "vwap": 374.16,
+    "level": 374,
+    "candleClose": 373.93,
+    "closedBeyondLevel": true,
+    "volRatio": 0.45,
+    "bodyPct": 70,
+    "volSurge": false
+  }
+]
