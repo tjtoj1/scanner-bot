@@ -34,6 +34,23 @@
       "strike": "744",
       "setup": "Pullback rejection at VWAP, near resistance 743.72",
       "exitStockPrice": 741.88
+    },
+    {
+      "symbol": "GLD",
+      "signal": "PUT",
+      "window": "ORB_Pullback",
+      "entryPremium": 0.885,
+      "exitPremium": 1.06,
+      "qty": 8,
+      "pnl": 140.00000000000003,
+      "pnlPct": 19.77401129943503,
+      "reason": "stop_hit",
+      "minutes": 31,
+      "entryTime": 1785161117882,
+      "exitTime": 1785162982070,
+      "strike": "374",
+      "setup": "Pullback rejection at VWAP, near resistance 373.92",
+      "exitStockPrice": 373.3
     }
   ],
   "_reportSent": false,
@@ -41,30 +58,11 @@
   "_dailyTrades_count": 4,
   "_consecLosses": 0,
   "GLD": {
-    "active": true,
-    "signal": "PUT",
-    "window": "ORB_Pullback",
-    "optionSymbol": "GLD260727P00374000",
-    "strike": "374",
-    "entryPremium": 0.885,
-    "qty": 8,
-    "entryTime": 1785161117882,
-    "orderId": "72a75821-1a3c-4fce-b2b7-5af41316aa0f",
-    "stopOrderId": "5bd2b342-43a3-45b5-b31a-f5a48b5b6420",
-    "currentStop": 1.0114999999999998,
-    "peakPremium": 1.19,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 2235,
-    "reason": "Pullback rejection at VWAP, near resistance 373.92",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "lastPremium": 1.11
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1785163582680,
+    "lastSignal": "PUT",
+    "lastExitTime": 1785162982680
   },
   "SPY": {
     "active": false,
@@ -104,7 +102,7 @@
     "trailing": true,
     "remainingQty": 2,
     "quickExitWindow": false,
-    "lastPremium": 1.57
+    "lastPremium": 1.59
   },
   "_dailyPeakProfit": 1503.6000000000058,
   "_profitProtected": true,
