@@ -1213,13 +1213,24 @@ async function runScan() {
       continue;
     }
 
-    const baseQty = calculateQty(portfolio, premium, window.riskPct, window.stopPct);
-    const tickerQty = Math.max(1, Math.floor(baseQty * cfg.sizeFactor));
-    // V17.5: Force even quantity so Partial Sell (50%) works correctly
-    // If qty is odd (e.g. 5), round down to nearest even (4) so 50% sell = exactly 2
-    const qty = tickerQty >= 2 ? Math.max(2, tickerQty - (tickerQty % 2)) : 1;
+    // BOT #2: FIXED DOLLAR SIZING — $500 of premium per trade.
+    // Risk-% sizing on a $10k account produced only 1 contract, which silently
+    // broke the +30% partial sell (floor(1/2) = 0). A fixed $500 buys 2-14
+    // contracts depending on premium, so profit management works as designed.
+    const TRADE_BUDGET = 500;
+    const rawQty = Math.floor(TRADE_BUDGET / (premium * 100));
+    // Force even quantity so Partial Sell (50%) works correctly
+    const qty = rawQty >= 2 ? rawQty - (rawQty % 2) : 1;
 
-    console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)}`);
+    // Safety: never exceed available buying power
+    const cost = qty * premium * 100;
+    const buyingPower = parseFloat(account.buying_power || account.cash || portfolio);
+    if (cost > buyingPower) {
+      console.log(`${symbol}: cost $${cost.toFixed(0)} exceeds buying power $${buyingPower.toFixed(0)}, skipping`);
+      continue;
+    }
+
+    console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)} (cost $${cost.toFixed(0)})`);
 
     try {
       const order = await placeOptionOrder(contract.symbol, qty, "buy");
