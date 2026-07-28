@@ -1,9 +1,6 @@
 // ============================================================
-// 0DTE BOT #2 — SECOND PAPER ACCOUNT ($10k), v20 strategy
-// Identical criteria to bot #1. Differences ONLY:
-//   - reads ALPACA_KEY_2 / ALPACA_SECRET_2 (separate account)
-//   - all Telegram messages go to the PRIVATE chat
-//   - separate state2.json + *_log2 files (never touches bot #1 data)
+// 0DTE SPY MASTER SYSTEM v17.0
+// Window-Based Strategy with Support/Resistance + Pullback Entry
 // ============================================================
 
 import fs from "fs";
@@ -678,8 +675,7 @@ function calculateQty(portfolioValue, premium, riskPct, stopPct) {
 // TELEGRAM
 // ============================================================
 async function sendTelegram(text, chatId = null, replyTo = null) {
-  // BOT #2: all messages go to the PRIVATE chat, never the public channel.
-  const chat = PERSONAL_CHAT;
+  const chat = PERSONAL_CHAT; // BOT #2: private chat only
   try {
     const body = { chat_id: chat, text, parse_mode: "HTML" };
     if (replyTo) {
@@ -900,6 +896,11 @@ async function runScan() {
   }
   const portfolio = parseFloat(account.portfolio_value);
 
+  // v20.1: tickers that currently hold a LIVE position in Alpaca. Used as the
+  // source of truth before any new entry, so a stale/unsaved state.json can
+  // never cause a duplicate position on the same ticker.
+  const liveInAlpaca = new Set();
+
   // V17.5: ALPACA-STATE RECONCILIATION (Source of Truth = Alpaca)
   // Prevents orphan positions caused by state.json race conditions
   try {
@@ -914,6 +915,8 @@ async function runScan() {
         const ticker = match[1];
         if (!TICKERS.includes(ticker)) continue;
         alpacaSymbols.add(ticker);
+        // v20.1: remember this ticker has a LIVE position, whatever state.json says
+        if (Math.abs(parseFloat(pos.qty)) > 0) liveInAlpaca.add(ticker);
 
         // Case 1: Alpaca has position, state doesn't know → maybe ADOPT
         // v19.2: Two-layer protection:
@@ -947,7 +950,6 @@ async function runScan() {
             alpacaSymbols.add(ticker);
             continue;
           }
-
           console.log(`🔄 RECONCILE: ${ticker} at ${posPnlPct.toFixed(1)}% has MISSED ACTION - adopting`);
           const entryPremium = parseFloat(pos.avg_entry_price);
           const qty = parseInt(pos.qty);
@@ -1091,6 +1093,15 @@ async function runScan() {
   for (const symbol of TICKERS) {
     if (state[symbol]?.active) continue;
 
+    // v20.1: HARD DUPLICATE GUARD — Alpaca is the source of truth.
+    // Fixes the 07-28 bug where two SPY CALLs opened 6 min apart: state.json
+    // hadn't persisted (git push conflict) and the reconciliation skipped
+    // adopting the position because it wasn't at ±30%, leaving `active` unset.
+    if (liveInAlpaca.has(symbol)) {
+      console.log(`⛔ ${symbol}: position already open in Alpaca — no duplicate entry`);
+      continue;
+    }
+
     // v19.4: GLD only has 0DTE on Mon/Wed/Fri - skip Tue/Thu to avoid wasted scans
     if (symbol === "GLD") {
       const dow = new Date().getUTCDay(); // 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri
@@ -1214,22 +1225,15 @@ async function runScan() {
     }
 
     // BOT #2: FIXED DOLLAR SIZING — $500 of premium per trade.
-    // Risk-% sizing on a $10k account produced only 1 contract, which silently
-    // broke the +30% partial sell (floor(1/2) = 0). A fixed $500 buys 2-14
-    // contracts depending on premium, so profit management works as designed.
     const TRADE_BUDGET = 500;
     const rawQty = Math.floor(TRADE_BUDGET / (premium * 100));
-    // Force even quantity so Partial Sell (50%) works correctly
     const qty = rawQty >= 2 ? rawQty - (rawQty % 2) : 1;
-
-    // Safety: never exceed available buying power
     const cost = qty * premium * 100;
     const buyingPower = parseFloat(account.buying_power || account.cash || portfolio);
     if (cost > buyingPower) {
       console.log(`${symbol}: cost $${cost.toFixed(0)} exceeds buying power $${buyingPower.toFixed(0)}, skipping`);
       continue;
     }
-
     console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)} (cost $${cost.toFixed(0)})`);
 
     try {
