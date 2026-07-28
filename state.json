@@ -101,7 +101,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 8,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 0.71
   },
   "_dailyPeakProfit": 1236.0400000000081,
   "_profitProtected": true,
