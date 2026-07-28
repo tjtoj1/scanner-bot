@@ -896,6 +896,11 @@ async function runScan() {
   }
   const portfolio = parseFloat(account.portfolio_value);
 
+  // v20.1: tickers that currently hold a LIVE position in Alpaca. Used as the
+  // source of truth before any new entry, so a stale/unsaved state.json can
+  // never cause a duplicate position on the same ticker.
+  const liveInAlpaca = new Set();
+
   // V17.5: ALPACA-STATE RECONCILIATION (Source of Truth = Alpaca)
   // Prevents orphan positions caused by state.json race conditions
   try {
@@ -910,6 +915,8 @@ async function runScan() {
         const ticker = match[1];
         if (!TICKERS.includes(ticker)) continue;
         alpacaSymbols.add(ticker);
+        // v20.1: remember this ticker has a LIVE position, whatever state.json says
+        if (Math.abs(parseFloat(pos.qty)) > 0) liveInAlpaca.add(ticker);
 
         // Case 1: Alpaca has position, state doesn't know → maybe ADOPT
         // v19.2: Two-layer protection:
@@ -943,7 +950,6 @@ async function runScan() {
             alpacaSymbols.add(ticker);
             continue;
           }
-
           console.log(`🔄 RECONCILE: ${ticker} at ${posPnlPct.toFixed(1)}% has MISSED ACTION - adopting`);
           const entryPremium = parseFloat(pos.avg_entry_price);
           const qty = parseInt(pos.qty);
@@ -1086,6 +1092,15 @@ async function runScan() {
   // Loop over tickers for new entries
   for (const symbol of TICKERS) {
     if (state[symbol]?.active) continue;
+
+    // v20.1: HARD DUPLICATE GUARD — Alpaca is the source of truth.
+    // Fixes the 07-28 bug where two SPY CALLs opened 6 min apart: state.json
+    // hadn't persisted (git push conflict) and the reconciliation skipped
+    // adopting the position because it wasn't at ±30%, leaving `active` unset.
+    if (liveInAlpaca.has(symbol)) {
+      console.log(`⛔ ${symbol}: position already open in Alpaca — no duplicate entry`);
+      continue;
+    }
 
     // v19.4: GLD only has 0DTE on Mon/Wed/Fri - skip Tue/Thu to avoid wasted scans
     if (symbol === "GLD") {
