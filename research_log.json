@@ -1150,5 +1150,23 @@
     "volRatio": 0.64,
     "bodyPct": 46,
     "volSurge": false
+  },
+  {
+    "time": "2026-07-28T15:55:20.080Z",
+    "day": "2026-07-28",
+    "symbol": "IWM",
+    "signal": "CALL",
+    "window": "MidMorning_VWAP",
+    "strike": "293",
+    "entryStockPrice": 293.3,
+    "entryPremium": 0.735,
+    "rsi": 66.3,
+    "vwap": 291.94,
+    "level": 293.18,
+    "candleClose": 293.32,
+    "closedBeyondLevel": false,
+    "volRatio": 0.96,
+    "bodyPct": 39,
+    "volSurge": false
   }
 ]
