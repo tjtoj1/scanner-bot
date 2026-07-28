@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '*/5 13-20 * * 1-5'
   workflow_dispatch:
-  
+
 concurrency:
   group: scanner-bot
   cancel-in-progress: false
@@ -30,14 +30,20 @@ jobs:
           ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
           TG_TOKEN:      ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
-          MIN_SCORE:     ${{ vars.MIN_SCORE || '65' }}
-          SEND_SUMMARY:  ${{ vars.SEND_SUMMARY || 'false' }}
         run: node scan.js
 
-      - name: Commit state
+      - name: Commit state (retry on conflict)
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update state [skip ci]"
-          git push || true
+          git diff --quiet && git diff --staged --quiet && exit 0
+          git commit -m "Update state [skip ci]"
+          for i in 1 2 3 4 5; do
+            if git push; then echo "pushed"; exit 0; fi
+            echo "push conflict, rebasing (attempt $i)"
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+          echo "::error::state.json push FAILED after 5 retries"
+          exit 1
