@@ -1,9 +1,12 @@
 name: Monitor Positions
+
 on:
+  schedule:
+    - cron: '* 13-21 * * 1-5'
   workflow_dispatch:
 
 concurrency:
-  group: scanner-bot
+  group: monitor-bot
   cancel-in-progress: false
 permissions:
   contents: write
@@ -11,26 +14,37 @@ permissions:
 jobs:
   monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Run monitor
         env:
-          ALPACA_KEY: ${{ secrets.ALPACA_KEY }}
+          ALPACA_KEY:    ${{ secrets.ALPACA_KEY }}
           ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          MIN_SCORE: ${{ vars.MIN_SCORE || '65' }}
-          MODE: monitor
+          TG_TOKEN:      ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
+          MODE:          monitor
         run: node scan.js
 
-      - name: Commit state
+      - name: Commit state (retry on conflict)
         run: |
-          git config user.name "actions-user"
-          git config user.email "actions@github.com"
-          git add state.json || true
-          git diff --staged --quiet || git commit -m "Update state [monitor]" --no-verify
-          git push || true
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --quiet && git diff --staged --quiet && exit 0
+          git commit -m "Monitor state [skip ci]"
+          for i in 1 2 3 4 5; do
+            if git push; then echo "pushed"; exit 0; fi
+            echo "push conflict, rebasing (attempt $i)"
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+          echo "::error::state.json push FAILED after 5 retries"
+          exit 1
