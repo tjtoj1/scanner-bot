@@ -133,6 +133,8 @@ function joinToday() {
       level: f.level,
       entryStockPrice: f.entryStockPrice,
       exitStockPrice: tr.exitStockPrice ?? null,
+      exitTime: tr.exitTime ?? null,
+      minutes: tr.minutes ?? null,
     }) + "\n");
     added++;
   }
@@ -223,7 +225,76 @@ function analyze() {
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
-  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops();
+  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops() + analyzeTimeExits();
+}
+
+// ---------- TIME EXITS: would waiting have paid off? ----------
+// The 25-min rule only fires on trades that never reached +30%. Question:
+// after we bailed, did the stock keep moving OUR way (so waiting would have
+// won), or did it keep going against us (so the exit saved us)?
+// Uses market_log prices AFTER the recorded exit time.
+function analyzeTimeExits() {
+  const rows = readJSONL("outcomes.jsonl")
+    .filter(r => !EXCLUDE_DAYS.has(r.day))
+    .filter(r => r.reason === "time_exit" && r.exitStockPrice != null && r.exitTime != null);
+
+  if (rows.length === 0) return "";
+
+  const ml = readJSONL("market_log.jsonl");
+  const series = new Map();
+  for (const r of ml) {
+    if (!r.px || !r.t) continue;
+    const k = `${r.d}|${r.s}`;
+    if (!series.has(k)) series.set(k, []);
+    series.get(k).push(r);
+  }
+  for (const arr of series.values()) arr.sort((a, b) => new Date(a.t) - new Date(b.t));
+
+  const HORIZON = 30 * 60 * 1000;
+  let wouldHaveWon = 0, exitSaved = 0, flat = 0, noData = 0;
+  const lines = [];
+
+  for (const r of rows) {
+    const arr = series.get(`${r.day}|${r.symbol}`);
+    if (!arr) { noData++; continue; }
+    const t0 = new Date(r.exitTime).getTime();
+    const fut = arr.filter(x => {
+      const dt = new Date(x.t).getTime() - t0;
+      return dt > 0 && dt <= HORIZON;
+    });
+    if (fut.length === 0) { noData++; continue; }
+
+    const hi = Math.max(...fut.map(x => x.px));
+    const lo = Math.min(...fut.map(x => x.px));
+    // favourable direction: CALL wants UP, PUT wants DOWN
+    const favMove = r.signal === "CALL"
+      ? (hi - r.exitStockPrice) / r.exitStockPrice * 100
+      : (r.exitStockPrice - lo) / r.exitStockPrice * 100;
+    const advMove = r.signal === "CALL"
+      ? (r.exitStockPrice - lo) / r.exitStockPrice * 100
+      : (hi - r.exitStockPrice) / r.exitStockPrice * 100;
+
+    if (favMove >= 0.3) { wouldHaveWon++; lines.push(`${r.day.slice(5)} ${r.symbol} ${r.signal}: كان يقفز +${favMove.toFixed(2)}%`); }
+    else if (advMove >= 0.3) { exitSaved++; }
+    else { flat++; }
+  }
+
+  const total = wouldHaveWon + exitSaved + flat;
+  let s = `\n\n<b>⏱ الخروج الوقتي — لو انتظرنا؟</b>\n`;
+  s += `  صفقات خرجت بالوقت: ${rows.length}${noData ? ` (${noData} بلا بيانات)` : ""}\n`;
+  if (total === 0) return s + `  <i>لسا ما فيه بيانات كافية بعد الخروج</i>\n`;
+
+  s += `  كانت تربح لو انتظرنا: ${wouldHaveWon} (${Math.round(wouldHaveWon/total*100)}%)\n`;
+  s += `  الخروج أنقذنا (كملت ضدنا): ${exitSaved} (${Math.round(exitSaved/total*100)}%)\n`;
+  s += `  ما تحركت: ${flat} (${Math.round(flat/total*100)}%)\n`;
+  if (total >= 5) {
+    if (wouldHaveWon > exitSaved + flat) s += `  ← 25 دقيقة قصيرة ⚠️ (نمددها)\n`;
+    else s += `  ← 25 دقيقة مناسبة ✅\n`;
+  } else {
+    s += `  <i>(عينة صغيرة)</i>\n`;
+  }
+  for (const l of lines.slice(0, 4)) s += `  • ${l}\n`;
+  return s;
 }
 
 // ---------- BREAKOUT STOPS: was the stop too tight? ----------
