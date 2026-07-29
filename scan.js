@@ -1022,13 +1022,6 @@ async function runScan() {
   // Scan only handles: New entries + Daily report
   saveState(state);
 
-  // Count active positions (from current state, just adopted from Alpaca)
-  const activeCount = TICKERS.filter(s => state[s]?.active).length;
-  if (activeCount >= 2) {
-    console.log(`Max 2 active positions (${activeCount} open), skipping new entries`);
-    return;
-  }
-
   // ============================================================
   // v19.5: DAILY PROFIT GUARD (protection layer, does NOT touch signal)
   // Daily profit = current equity - start-of-day equity (last_equity)
@@ -1086,6 +1079,14 @@ async function runScan() {
     console.error("Profit guard check failed:", e.message);
   }
 
+  // Count active positions (from current state, just adopted from Alpaca)
+  const activeCount = TICKERS.filter(s => state[s]?.active).length;
+  if (activeCount >= 2) {
+    console.log(`Max 2 active positions (${activeCount} open), skipping new entries`);
+    return;
+  }
+
+
   // Get VIX once
   const vix = await getVIX();
 
@@ -1111,11 +1112,14 @@ async function runScan() {
       }
     }
 
-    // Cooldown check
-    if (state[symbol]?.cooldownUntil && Date.now() < state[symbol].cooldownUntil) {
+    // Cooldown check — v20.3: do NOT skip the symbol entirely. We still want the
+    // market snapshot during cooldown so we can measure what price did right
+    // after an exit (answers: "would waiting have paid off?"). Entry is blocked
+    // further down, after logging.
+    const inCooldown = !!(state[symbol]?.cooldownUntil && Date.now() < state[symbol].cooldownUntil);
+    if (inCooldown) {
       const remaining = Math.round((state[symbol].cooldownUntil - Date.now()) / 60000);
-      console.log(`${symbol}: cooldown active (${remaining} min remaining)`);
-      continue;
+      console.log(`${symbol}: cooldown active (${remaining} min remaining) — logging only, no entry`);
     }
 
     console.log(`\n--- Analyzing ${symbol} ---`);
@@ -1168,6 +1172,9 @@ async function runScan() {
     } catch (e) {
       console.error("Market snapshot failed:", e.message);
     }
+
+    // v20.3: cooldown blocks ENTRY only — the snapshot above is already saved.
+    if (inCooldown) continue;
 
     if (result.signal === "NEUTRAL") continue;
 
