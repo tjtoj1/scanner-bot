@@ -68,12 +68,29 @@
       "strike": "289",
       "setup": "Pullback rejection at VWAP, near resistance 290.16",
       "exitStockPrice": 289.41
+    },
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 2.7199999999999998,
+      "exitPremium": 1.82,
+      "qty": 4,
+      "pnl": -359.9999999999999,
+      "pnlPct": -33.08823529411764,
+      "reason": "stop_hit",
+      "minutes": 21,
+      "entryTime": 1785425123760,
+      "exitTime": 1785426387829,
+      "strike": "679",
+      "setup": "Pullback rejection at EMA9, near resistance 680.05",
+      "exitStockPrice": 680.75
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 499,
+  "_dailyLosses": 858.9999999999999,
   "_dailyTrades_count": 6,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "exited": true,
@@ -89,30 +106,11 @@
     "lastExitTime": 1785424588272
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "QQQ260730P00679000",
-    "strike": "679",
-    "entryPremium": 2.7199999999999998,
-    "qty": 4,
-    "entryTime": 1785425123760,
-    "orderId": "e0c244aa-5995-4e05-9459-ec3857df6aae",
-    "stopOrderId": null,
-    "currentStop": 1.7679999999999998,
-    "peakPremium": 3.43,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 2292,
-    "reason": "Pullback rejection at EMA9, near resistance 680.05",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 4,
-    "quickExitWindow": false,
-    "lastPremium": 1.96
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1785426988370,
+    "lastSignal": "PUT",
+    "lastExitTime": 1785426388370
   },
   "IWM": {
     "active": true,
@@ -138,7 +136,7 @@
     "trailing": false,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 0.63
+    "lastPremium": 0.58
   },
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
