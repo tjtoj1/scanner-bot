@@ -121,7 +121,7 @@
       "exitStockPrice": 291.41
     }
   ],
-  "_reportSent": false,
+  "_reportSent": true,
   "_dailyLosses": 1233,
   "_dailyTrades_count": 7,
   "_consecLosses": 3,
