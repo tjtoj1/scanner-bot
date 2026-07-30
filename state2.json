@@ -1,9 +1,9 @@
 {
-  "_date": "2026-07-29",
+  "_date": "2026-07-30",
   "_dailyTrades": [],
-  "_reportSent": true,
+  "_reportSent": false,
   "_dailyLosses": 0,
-  "_dailyTrades_count": 0,
+  "_dailyTrades_count": 1,
   "_consecLosses": 0,
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
@@ -23,10 +23,28 @@
     "lastExitTime": 1785268712148
   },
   "IWM": {
-    "active": false,
-    "exited": true,
-    "cooldownUntil": 1785182035655,
-    "lastSignal": "CALL",
-    "lastExitTime": 1785181435655
+    "active": true,
+    "signal": "PUT",
+    "window": "MidMorning_VWAP",
+    "optionSymbol": "IWM260730P00289000",
+    "strike": "289",
+    "entryPremium": 0.805,
+    "qty": 6,
+    "entryTime": 1785423644657,
+    "orderId": "bdfbe2ac-4974-478c-b00b-acd2398659e7",
+    "stopOrderId": null,
+    "currentStop": 0.5232500000000001,
+    "peakPremium": 0.805,
+    "targetPct": 60,
+    "stopPct": 35,
+    "timeExitMin": 25,
+    "entryMessageId": 69,
+    "reason": "Pullback rejection at VWAP, near resistance 290.16",
+    "partial1Done": false,
+    "bePromoted": false,
+    "partial2Done": false,
+    "trailing": false,
+    "remainingQty": 6,
+    "quickExitWindow": true
   }
 }

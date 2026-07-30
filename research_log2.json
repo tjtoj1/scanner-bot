@@ -70,5 +70,23 @@
     "volRatio": 0.78,
     "bodyPct": 63,
     "volSurge": false
+  },
+  {
+    "time": "2026-07-30T15:00:44.658Z",
+    "day": "2026-07-30",
+    "symbol": "IWM",
+    "signal": "PUT",
+    "window": "MidMorning_VWAP",
+    "strike": "289",
+    "entryStockPrice": 289.34,
+    "entryPremium": 0.805,
+    "rsi": 45.1,
+    "vwap": 290.48,
+    "level": 290.16,
+    "candleClose": 290.58,
+    "closedBeyondLevel": true,
+    "volRatio": 1.59,
+    "bodyPct": 62,
+    "volSurge": true
   }
 ]
