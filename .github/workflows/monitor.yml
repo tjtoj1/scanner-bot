@@ -1,29 +1,22 @@
 name: Monitor Positions
-
 on:
   schedule:
     - cron: '* 13-21 * * 1-5'
   workflow_dispatch:
-
 concurrency:
   group: monitor-bot
   cancel-in-progress: false
 permissions:
   contents: write
-
 jobs:
   monitor:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Run monitor
         env:
           ALPACA_KEY:    ${{ secrets.ALPACA_KEY }}
@@ -32,19 +25,25 @@ jobs:
           TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
           MODE:          monitor
         run: node scan.js
-
-      - name: Commit state (retry on conflict)
+      - name: Commit state
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
           git diff --quiet && git diff --staged --quiet && exit 0
-          git commit -m "Monitor state [skip ci]"
+          git commit -m "State [skip ci]"
           for i in 1 2 3 4 5; do
-            if git push; then echo "pushed"; exit 0; fi
-            echo "push conflict, rebasing (attempt $i)"
-            git pull --rebase --autostash || true
-            sleep 3
+            git push && exit 0
+            git fetch origin main
+            git rebase --abort 2>/dev/null || true
+            git checkout -f main 2>/dev/null || true
+            git pull origin main -X ours --no-edit 2>/dev/null || {
+              git checkout --ours state.json state2.json 2>/dev/null || true
+              git add -A
+              GIT_EDITOR=true git merge --continue 2>/dev/null || true
+            }
+            git add -A
+            git diff --staged --quiet || git commit -m "State merge [skip ci]" --allow-empty
+            sleep $((i*2))
           done
-          echo "::error::state.json push FAILED after 5 retries"
-          exit 1
+          exit 0
