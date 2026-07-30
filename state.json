@@ -34,12 +34,29 @@
       "strike": "290",
       "setup": "Pullback rejection at EMA9, near resistance 290.16",
       "exitStockPrice": 290.5
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 1.8050000000000002,
+      "exitPremium": 2.24,
+      "qty": 6,
+      "pnl": 261.00000000000006,
+      "pnlPct": 24.099722991689752,
+      "reason": "stop_hit",
+      "minutes": 11,
+      "entryTime": 1785423922788,
+      "exitTime": 1785424587630,
+      "strike": "736",
+      "setup": "Pullback rejection at VWAP, near resistance 738.39",
+      "exitStockPrice": 735.42
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 499,
   "_dailyTrades_count": 4,
-  "_consecLosses": 2,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -48,30 +65,11 @@
     "lastExitTime": 1785341606131
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "SPY260730P00736000",
-    "strike": "736",
-    "entryPremium": 1.8050000000000002,
-    "qty": 6,
-    "entryTime": 1785423922788,
-    "orderId": "41bc6093-2b98-4bc0-9c19-9d2ce56147a2",
-    "stopOrderId": "bf61c95d-b43f-4c15-9e72-3437eecd0fee",
-    "currentStop": 2.2015,
-    "peakPremium": 2.59,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 2289,
-    "reason": "Pullback rejection at VWAP, near resistance 738.39",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 3,
-    "quickExitWindow": false,
-    "lastPremium": 2.59
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1785425188272,
+    "lastSignal": "PUT",
+    "lastExitTime": 1785424588272
   },
   "QQQ": {
     "active": false,
@@ -104,7 +102,7 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 0.83
+    "lastPremium": 0.74
   },
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
