@@ -68,6 +68,23 @@
       "strike": "685",
       "setup": "Pullback rejection at VWAP, near resistance 685.12",
       "exitStockPrice": 682.2
+    },
+    {
+      "symbol": "GLD",
+      "signal": "CALL",
+      "window": "MidMorning_VWAP",
+      "entryPremium": 0.42,
+      "exitPremium": 0.58,
+      "qty": 18,
+      "pnl": 287.99999999999994,
+      "pnlPct": 38.095238095238095,
+      "reason": "stop_hit",
+      "minutes": 7,
+      "entryTime": 1785513026025,
+      "exitTime": 1785513445299,
+      "strike": "371",
+      "setup": "Pullback bounce at VWAP, near support 370.14",
+      "exitStockPrice": 371.08
     }
   ],
   "_reportSent": false,
@@ -75,30 +92,11 @@
   "_dailyTrades_count": 5,
   "_consecLosses": 0,
   "GLD": {
-    "active": true,
-    "signal": "CALL",
-    "window": "MidMorning_VWAP",
-    "optionSymbol": "GLD260731C00371000",
-    "strike": "371",
-    "entryPremium": 0.42,
-    "qty": 18,
-    "entryTime": 1785513026025,
-    "orderId": "4f02519d-af11-421c-a626-60f1596b4e9e",
-    "stopOrderId": "f63607a8-ba7c-4897-906d-17e0594ba5d5",
-    "currentStop": 0.561,
-    "peakPremium": 0.66,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 2314,
-    "reason": "Pullback bounce at VWAP, near support 370.14",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 9,
-    "quickExitWindow": false,
-    "lastPremium": 0.66
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1785514045971,
+    "lastSignal": "CALL",
+    "lastExitTime": 1785513445971
   },
   "SPY": {
     "active": true,
@@ -112,7 +110,7 @@
     "orderId": "954f36d2-28c9-4949-a7dd-08fd0a636863",
     "stopOrderId": "2359834a-b0a9-4df3-9ed5-94441686900e",
     "currentStop": 0.8190000000000001,
-    "peakPremium": 1.26,
+    "peakPremium": 1.36,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -124,7 +122,7 @@
     "trailing": false,
     "remainingQty": 8,
     "quickExitWindow": false,
-    "lastPremium": 1.24
+    "lastPremium": 1.36
   },
   "QQQ": {
     "active": false,
