@@ -23,7 +23,7 @@ const TRADING_BASE = "https://paper-api.alpaca.markets/v2";
 // ============================================================
 // CONFIG
 // ============================================================
-const TICKERS = ["SPY", "QQQ", "IWM", "GLD"];
+const TICKERS = ["SPY", "QQQ", "GLD"]; // v20.4: IWM removed (9 days WR 37%, weakest)
 
 // Per-ticker config (strikeStep, position size factor)
 const TICKER_CONFIG = {
@@ -67,16 +67,7 @@ const WINDOWS = [
     timeExitMin: 25,
     riskPct: 0.4,
   },
-  {
-    name: "Late_Day_Fade",
-    startUTC: { h: 18, m: 30 },  // 1:30 PM CDT
-    endUTC: { h: 19, m: 40 },    // 2:40 PM CDT (v19.4: extended, last entry)
-    strategy: "fade",
-    targetPct: 50,
-    stopPct: 30,
-    timeExitMin: 20,
-    riskPct: 0.3,
-  },
+  // v20.4: Late_Day_Fade REMOVED — 9 days WR 17% (-$793), no single profitable day
   // v19.4: MOC_Scalp REMOVED - Alpaca rejects 0DTE entries near close ("expires soon")
 ];
 
@@ -440,9 +431,9 @@ async function analyzeStrategy(window, sr, indicators) {
             return { signal: "NEUTRAL", reason: `Too close to resistance ${resistance.toFixed(2)}` };
           }
         }
-        // RSI check
-        if (rsi5m > 70) {
-          return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} > 70 (overbought)` };
+        // RSI check — v20.4: tightened from >70 to >60 (data: RSI>60 WR 30%, -$1293 over 9 days)
+        if (rsi5m > 60) {
+          return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} > 60 (overbought, v20.4)` };
         }
         return {
           signal: "CALL",
@@ -463,8 +454,9 @@ async function analyzeStrategy(window, sr, indicators) {
             return { signal: "NEUTRAL", reason: `Too close to support ${support.toFixed(2)}` };
           }
         }
-        if (rsi5m < 30) {
-          return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} < 30 (oversold)` };
+        // RSI check — v20.4: tightened from <30 to <40 (mirrors CALL logic, data: RSI<40 WR 67%)
+        if (rsi5m < 40) {
+          return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} < 40 (oversold, v20.4)` };
         }
         return {
           signal: "PUT",
