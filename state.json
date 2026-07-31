@@ -1,6 +1,24 @@
 {
   "_date": "2026-07-31",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "window": "ORB_Pullback",
+      "entryPremium": 3.36,
+      "exitPremium": 5.13,
+      "qty": 2,
+      "pnl": 354,
+      "pnlPct": 52.67857142857143,
+      "reason": "stop_hit",
+      "minutes": 17,
+      "entryTime": 1785506118720,
+      "exitTime": 1785507145514,
+      "strike": "686",
+      "setup": "Pullback rejection at EMA9, near resistance 688.01",
+      "exitStockPrice": 682.61
+    }
+  ],
   "_reportSent": false,
   "_dailyLosses": 0,
   "_dailyTrades_count": 1,
@@ -20,30 +38,11 @@
     "lastExitTime": 1785424588272
   },
   "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "window": "ORB_Pullback",
-    "optionSymbol": "QQQ260731P00686000",
-    "strike": "686",
-    "entryPremium": 3.36,
-    "qty": 2,
-    "entryTime": 1785506118720,
-    "orderId": "20f8cf7e-dc6d-431c-8fa7-e2155ebccd5c",
-    "stopOrderId": "d59937c1-bbb2-4fde-8a2e-b7e1ce6401b6",
-    "currentStop": 4.9895,
-    "peakPremium": 5.87,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 2302,
-    "reason": "Pullback rejection at EMA9, near resistance 688.01",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 1,
-    "quickExitWindow": false,
-    "lastPremium": 5.87
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1785507745979,
+    "lastSignal": "PUT",
+    "lastExitTime": 1785507145979
   },
   "IWM": {
     "active": false,
