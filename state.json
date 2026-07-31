@@ -119,12 +119,29 @@
       "strike": "689",
       "setup": "Pullback bounce at EMA9, near support 688.47",
       "exitStockPrice": 689.49
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "Afternoon_Resume",
+      "entryPremium": 1.12,
+      "exitPremium": 0.74,
+      "qty": 10,
+      "pnl": -380.0000000000001,
+      "pnlPct": -33.92857142857144,
+      "reason": "stop_hit",
+      "minutes": 19,
+      "entryTime": 1785520825193,
+      "exitTime": 1785521965362,
+      "strike": "746",
+      "setup": "Pullback rejection at EMA9, near resistance 746.55",
+      "exitStockPrice": 746.15
     }
   ],
   "_reportSent": false,
-  "_dailyLosses": 219.99999999999997,
+  "_dailyLosses": 600.0000000000001,
   "_dailyTrades_count": 8,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "exited": true,
@@ -133,30 +150,11 @@
     "lastExitTime": 1785513445971
   },
   "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "window": "Afternoon_Resume",
-    "optionSymbol": "SPY260731P00746000",
-    "strike": "746",
-    "entryPremium": 1.12,
-    "qty": 10,
-    "entryTime": 1785520825193,
-    "orderId": "f4e8ccb3-4947-4f3e-8621-3202e82a8b21",
-    "stopOrderId": "953b4d7c-b9d2-40e5-80e5-188363e96998",
-    "currentStop": 0.7280000000000001,
-    "peakPremium": 1.12,
-    "targetPct": 60,
-    "stopPct": 35,
-    "timeExitMin": 25,
-    "entryMessageId": 2324,
-    "reason": "Pullback rejection at EMA9, near resistance 746.55",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 10,
-    "quickExitWindow": false,
-    "lastPremium": 0.78
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1785522565879,
+    "lastSignal": "PUT",
+    "lastExitTime": 1785521965879
   },
   "QQQ": {
     "active": false,
@@ -189,7 +187,7 @@
     "trailing": false,
     "remainingQty": 26,
     "quickExitWindow": false,
-    "lastPremium": 0.27
+    "lastPremium": 0.26
   },
   "_dailyPeakProfit": 1545.520000000004,
   "_profitProtected": true,
