@@ -34,12 +34,29 @@
       "strike": "291",
       "setup": "Pullback bounce at VWAP, near support 290.09",
       "exitStockPrice": 290.2
+    },
+    {
+      "symbol": "SPY",
+      "signal": "PUT",
+      "window": "RECOVERED",
+      "entryPremium": 1.39,
+      "exitPremium": 1.89,
+      "qty": 8,
+      "pnl": 400,
+      "pnlPct": 35.97122302158274,
+      "reason": "recovered_profit",
+      "minutes": 5,
+      "entryTime": 1785511284167,
+      "exitTime": 1785511585486,
+      "strike": "741",
+      "setup": "Recovered from Alpaca",
+      "exitStockPrice": 740.54
     }
   ],
   "_reportSent": false,
   "_dailyLosses": 219.99999999999997,
   "_dailyTrades_count": 3,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "GLD": {
     "active": false,
     "exited": true,
@@ -50,9 +67,9 @@
   "SPY": {
     "active": false,
     "exited": true,
-    "cooldownUntil": 1785425188272,
+    "cooldownUntil": 1785512185723,
     "lastSignal": "PUT",
-    "lastExitTime": 1785424588272
+    "lastExitTime": 1785511585723
   },
   "QQQ": {
     "active": true,
@@ -64,9 +81,9 @@
     "qty": 4,
     "entryTime": 1785510618755,
     "orderId": "75385461-85aa-4743-bc39-4f425bc6b617",
-    "stopOrderId": "1eb5a96b-1332-425d-b088-d7ce5f7e18a2",
-    "currentStop": 2.8475,
-    "peakPremium": 3.35,
+    "stopOrderId": "851dc723-25d9-4686-9b5e-38d732f7305c",
+    "currentStop": 3.502,
+    "peakPremium": 4.12,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -78,7 +95,7 @@
     "trailing": true,
     "remainingQty": 2,
     "quickExitWindow": false,
-    "lastPremium": 3.35
+    "lastPremium": 4.12
   },
   "IWM": {
     "active": false,
