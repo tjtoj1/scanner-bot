@@ -156,7 +156,7 @@
     "trailing": false,
     "remainingQty": 10,
     "quickExitWindow": false,
-    "lastPremium": 1.01
+    "lastPremium": 0.93
   },
   "QQQ": {
     "active": false,
@@ -177,7 +177,7 @@
     "orderId": "56bf995f-8311-4e8b-aa11-fc5d7d6b5ac8",
     "stopOrderId": null,
     "currentStop": 0.14300000000000002,
-    "peakPremium": 0.22,
+    "peakPremium": 0.28,
     "targetPct": 60,
     "stopPct": 35,
     "timeExitMin": 25,
@@ -188,7 +188,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 26,
-    "quickExitWindow": true
+    "quickExitWindow": false,
+    "lastPremium": 0.28
   },
   "_dailyPeakProfit": 1545.520000000004,
   "_profitProtected": true,
