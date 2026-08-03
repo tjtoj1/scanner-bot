@@ -1,28 +1,10 @@
 {
-  "_date": "2026-07-31",
-  "_dailyTrades": [
-    {
-      "symbol": "GLD",
-      "signal": "CALL",
-      "window": "RECOVERED",
-      "entryPremium": 0.77,
-      "exitPremium": 0.41,
-      "qty": 7,
-      "pnl": -252.00000000000006,
-      "pnlPct": -46.753246753246756,
-      "reason": "stop_hit",
-      "minutes": 11,
-      "entryTime": 1785516654290,
-      "exitTime": 1785517305538,
-      "strike": "371",
-      "setup": "Recovered from Alpaca",
-      "exitStockPrice": 370.92
-    }
-  ],
+  "_date": "2026-08-03",
+  "_dailyTrades": [],
   "_reportSent": false,
-  "_dailyLosses": 252.00000000000006,
+  "_dailyLosses": 0,
   "_dailyTrades_count": 0,
-  "_consecLosses": 1,
+  "_consecLosses": 0,
   "_dailyPeakProfit": 0,
   "_profitProtected": false,
   "_profitGuardNotified": false,
