@@ -124,6 +124,7 @@ function joinToday() {
       pnlPct: +tr.pnlPct.toFixed(1),
       win: tr.pnl > 0,
       reason: tr.reason,
+      isFlip: !!(tr.reason && tr.reason.startsWith("FLIP:")),
       // features captured at entry
       beyond: f.closedBeyondLevel,
       volR: f.volRatio,
@@ -225,7 +226,30 @@ function analyze() {
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
-  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops() + analyzeTimeExits();
+  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops() + analyzeTimeExits() + analyzeFlips();
+}
+
+// ---------- FLIP PERFORMANCE: breakout trades vs normal ----------
+function analyzeFlips() {
+  const rows = readJSONL("outcomes.jsonl").filter(r => !EXCLUDE_DAYS.has(r.day));
+  const flips  = rows.filter(r => r.isFlip === true);
+  const normal = rows.filter(r => !r.isFlip);
+  if (flips.length === 0) return "";
+
+  function st(g){ const w=g.filter(r=>r.win).length; const net=g.reduce((a,r)=>a+r.pnl,0);
+    return `${g.length}ص | WR ${g.length?Math.round(w/g.length*100):0}% | ${net>=0?"+":""}$${net}`; }
+
+  let s = `\n\n<b>🚀 الفليب (اختراق مع الزخم)</b>\n`;
+  s += `  فليب:    ${st(flips)}\n`;
+  s += `  عادي:    ${st(normal)}\n`;
+  if (flips.length >= 3) {
+    const fw = Math.round(flips.filter(r=>r.win).length/flips.length*100);
+    const nw = normal.length ? Math.round(normal.filter(r=>r.win).length/normal.length*100) : 0;
+    s += fw > nw ? `  ← الفليب أفضل 🎯\n` : fw < nw ? `  ← الارتداد العادي أفضل\n` : `  ← متقاربان\n`;
+  } else {
+    s += `  <i>(عينة صغيرة — ${flips.length} فليب)</i>\n`;
+  }
+  return s;
 }
 
 // ---------- TIME EXITS: would waiting have paid off? ----------
