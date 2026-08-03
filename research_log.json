@@ -1600,5 +1600,23 @@
     "volRatio": 0.71,
     "bodyPct": 50,
     "volSurge": false
+  },
+  {
+    "time": "2026-08-03T18:15:19.897Z",
+    "day": "2026-08-03",
+    "symbol": "GLD",
+    "signal": "CALL",
+    "window": "Afternoon_Resume",
+    "strike": "370",
+    "entryStockPrice": 370.14,
+    "entryPremium": 0.41,
+    "rsi": 39.6,
+    "vwap": 370.11,
+    "level": 369.89,
+    "candleClose": 369.72,
+    "closedBeyondLevel": true,
+    "volRatio": 1.01,
+    "bodyPct": 25,
+    "volSurge": false
   }
 ]
