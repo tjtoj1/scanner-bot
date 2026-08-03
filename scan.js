@@ -1180,29 +1180,49 @@ async function runScan() {
     // enter. We log the frozen signal + will forward-track what price did, to
     // later decide whether reversing beats freezing.
     // ============================================================
+    // v20.5: BREAKOUT FLIP — high vol + closed BEYOND level = confirmed breakout.
+    // Instead of trading the rejection (original signal), we flip and trade WITH
+    // the breakout. e.g. PUT near resistance but price closed ABOVE it → buy CALL.
+    // Logged separately as "flip" so we can measure performance vs the freeze.
+    // ============================================================
     try {
       const lvl = result.signal === "PUT" ? result.resistance : result.support;
       const feat = computeResearchFeatures(todayBars5m, lvl, result.signal);
-      if (feat && feat.volSurge === true && feat.closedBeyondLevel === false) {
-        console.log(`🧊 v20 FREEZE: ${symbol} ${result.signal} — high vol + not beyond level (toxic quadrant)`);
-        // log the frozen signal for forward analysis (does it trend or chop?)
-        try {
-          logFrozenSignal({
-            time: new Date().toISOString(),
-            day: today,
-            symbol,
-            signal: result.signal,
-            window: window.name,
-            entryStockPrice: +price.toFixed(2),
-            level: feat.level,
-            volRatio: feat.volRatio,
-            bodyPct: feat.bodyPct,
-            rsi: +rsi5m.toFixed(1),
-            vwap: vwap5m ? +vwap5m.toFixed(2) : null,
-            reason: result.reason,
-          });
-        } catch (e) { console.error("Frozen log failed:", e.message); }
-        continue; // FREEZE — do not enter this signal
+
+      if (feat && feat.volSurge === true) {
+        if (feat.closedBeyondLevel === false) {
+          // 🔴 TOXIC: high vol + price COULDN'T break level → freeze
+          console.log(`🧊 v20 FREEZE: ${symbol} ${result.signal} — high vol + not beyond level (toxic quadrant)`);
+          try {
+            logFrozenSignal({
+              time: new Date().toISOString(), day: today, symbol,
+              signal: result.signal, window: window.name,
+              entryStockPrice: +price.toFixed(2), level: feat.level,
+              volRatio: feat.volRatio, bodyPct: feat.bodyPct,
+              rsi: +rsi5m.toFixed(1), vwap: vwap5m ? +vwap5m.toFixed(2) : null,
+              reason: result.reason, type: "freeze",
+            });
+          } catch (e) { console.error("Frozen log failed:", e.message); }
+          continue; // FREEZE
+
+        } else {
+          // 🚀 BREAKOUT: high vol + price DID close beyond level → flip signal
+          const flippedSignal = result.signal === "PUT" ? "CALL" : "PUT";
+          console.log(`🚀 v20.5 FLIP: ${symbol} ${result.signal}→${flippedSignal} — high vol + closed beyond level (real breakout)`);
+          try {
+            logFrozenSignal({
+              time: new Date().toISOString(), day: today, symbol,
+              signal: result.signal, flippedTo: flippedSignal, window: window.name,
+              entryStockPrice: +price.toFixed(2), level: feat.level,
+              volRatio: feat.volRatio, bodyPct: feat.bodyPct,
+              rsi: +rsi5m.toFixed(1), vwap: vwap5m ? +vwap5m.toFixed(2) : null,
+              reason: result.reason, type: "flip",
+            });
+          } catch (e) { console.error("Flip log failed:", e.message); }
+          // Override the signal — enter WITH the breakout
+          result = { ...result, signal: flippedSignal,
+            reason: `FLIP: ${result.reason} → breakout confirmed (vol×${feat.volRatio}, beyond level)` };
+        }
       }
     } catch (e) {
       console.error("v20 filter check failed:", e.message);
