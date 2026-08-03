@@ -1262,7 +1262,9 @@ async function runScan() {
         console.error(`${symbol}: stop loss order failed: ${e.message}`);
       }
 
-      const msg = `✅ <b>BUY ${symbol} ${result.signal} $${contract.strike_price} 0DTE</b>
+      // v20.5: indicate if this is a breakout flip
+      const isFlip = result.reason && result.reason.startsWith("FLIP:");
+      const msg = `${isFlip ? "🚀" : "✅"} <b>${isFlip ? "FLIP" : "BUY"} ${symbol} ${result.signal} $${contract.strike_price} 0DTE</b>
 💰 Entry: $${premium.toFixed(2)} × ${qty}
 🎯 Target: +${window.targetPct}% ($${(premium * (1 + window.targetPct / 100)).toFixed(2)})
 🛑 Stop: -${window.stopPct}% ($${stopPrice.toFixed(2)})
@@ -1273,6 +1275,7 @@ async function runScan() {
       state[symbol] = {
         active: true,
         signal: result.signal,
+        isFlip: !!isFlip,
         window: window.name,
         optionSymbol: contract.symbol,
         strike: contract.strike_price,
