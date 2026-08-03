@@ -46,8 +46,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 16,
-    "quickExitWindow": true,
-    "lastPremium": 0.44
+    "quickExitWindow": false,
+    "lastPremium": 0.4
   },
   "SPY": {
     "active": false,
