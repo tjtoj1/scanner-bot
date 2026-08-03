@@ -5,13 +5,13 @@
 
 import fs from "fs";
 
-const ALPACA_KEY = process.env.ALPACA_KEY_2;
-const ALPACA_SECRET = process.env.ALPACA_SECRET_2;
+const ALPACA_KEY = process.env.ALPACA_KEY;
+const ALPACA_SECRET = process.env.ALPACA_SECRET;
 const TG_TOKEN = process.env.TG_TOKEN;
 const TG_CHAT = process.env.TG_CHAT_ID;
 const PERSONAL_CHAT = "810642442";
 
-if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN) {
+if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN || !TG_CHAT) {
   console.log("Missing env vars");
   process.exit(1);
 }
@@ -90,14 +90,14 @@ const FOMC_DATES = ["2026-06-17", "2026-07-29", "2026-09-16", "2026-10-28", "202
 // ============================================================
 function loadState() {
   try {
-    return JSON.parse(fs.readFileSync("state2.json", "utf8"));
+    return JSON.parse(fs.readFileSync("state.json", "utf8"));
   } catch (e) {
     return {};
   }
 }
 
 function saveState(state) {
-  fs.writeFileSync("state2.json", JSON.stringify(state, null, 2));
+  fs.writeFileSync("state.json", JSON.stringify(state, null, 2));
 }
 
 // ============================================================
@@ -667,7 +667,7 @@ function calculateQty(portfolioValue, premium, riskPct, stopPct) {
 // TELEGRAM
 // ============================================================
 async function sendTelegram(text, chatId = null, replyTo = null) {
-  const chat = PERSONAL_CHAT; // BOT #2: private chat only
+  const chat = chatId || TG_CHAT;
   try {
     const body = { chat_id: chat, text, parse_mode: "HTML" };
     if (replyTo) {
@@ -696,7 +696,7 @@ async function sendTelegram(text, chatId = null, replyTo = null) {
 // ============================================================
 function loadResearchLog() {
   try {
-    return JSON.parse(fs.readFileSync("research_log2.json", "utf8"));
+    return JSON.parse(fs.readFileSync("research_log.json", "utf8"));
   } catch (e) {
     return [];
   }
@@ -706,7 +706,7 @@ function logResearchEntry(entry) {
   try {
     const log = loadResearchLog();
     log.push(entry);
-    fs.writeFileSync("research_log2.json", JSON.stringify(log, null, 2));
+    fs.writeFileSync("research_log.json", JSON.stringify(log, null, 2));
     console.log(`📊 Research logged: ${entry.symbol} ${entry.signal} | closedBeyondLevel=${entry.closedBeyondLevel} | volRatio=${entry.volRatio}`);
   } catch (e) {
     console.error("Research log failed:", e.message);
@@ -725,7 +725,7 @@ function logResearchEntry(entry) {
 // This keeps git diffs tiny — critical because the bot commits ~78x/day.
 function logMarketSnapshot(rec) {
   try {
-    fs.appendFileSync("market_log2.jsonl", JSON.stringify(rec) + "\n");
+    fs.appendFileSync("market_log.jsonl", JSON.stringify(rec) + "\n");
   } catch (e) {
     console.error("Market log failed:", e.message);
   }
@@ -736,7 +736,7 @@ function logMarketSnapshot(rec) {
 // trended (reversal would've won) or chopped (freezing was right).
 function logFrozenSignal(rec) {
   try {
-    fs.appendFileSync("frozen_log2.jsonl", JSON.stringify(rec) + "\n");
+    fs.appendFileSync("frozen_log.jsonl", JSON.stringify(rec) + "\n");
     console.log(`🧊 Frozen logged: ${rec.symbol} ${rec.signal} volR=${rec.volRatio}`);
   } catch (e) {
     console.error("Frozen log failed:", e.message);
@@ -746,7 +746,7 @@ function logFrozenSignal(rec) {
 // Read helper for the analysis script (tolerates partial/corrupt last line)
 function loadMarketLog() {
   try {
-    return fs.readFileSync("market_log2.jsonl", "utf8")
+    return fs.readFileSync("market_log.jsonl", "utf8")
       .split("\n")
       .filter(l => l.trim())
       .map(l => { try { return JSON.parse(l); } catch (e) { return null; } })
@@ -1180,29 +1180,49 @@ async function runScan() {
     // enter. We log the frozen signal + will forward-track what price did, to
     // later decide whether reversing beats freezing.
     // ============================================================
+    // v20.5: BREAKOUT FLIP — high vol + closed BEYOND level = confirmed breakout.
+    // Instead of trading the rejection (original signal), we flip and trade WITH
+    // the breakout. e.g. PUT near resistance but price closed ABOVE it → buy CALL.
+    // Logged separately as "flip" so we can measure performance vs the freeze.
+    // ============================================================
     try {
       const lvl = result.signal === "PUT" ? result.resistance : result.support;
       const feat = computeResearchFeatures(todayBars5m, lvl, result.signal);
-      if (feat && feat.volSurge === true && feat.closedBeyondLevel === false) {
-        console.log(`🧊 v20 FREEZE: ${symbol} ${result.signal} — high vol + not beyond level (toxic quadrant)`);
-        // log the frozen signal for forward analysis (does it trend or chop?)
-        try {
-          logFrozenSignal({
-            time: new Date().toISOString(),
-            day: today,
-            symbol,
-            signal: result.signal,
-            window: window.name,
-            entryStockPrice: +price.toFixed(2),
-            level: feat.level,
-            volRatio: feat.volRatio,
-            bodyPct: feat.bodyPct,
-            rsi: +rsi5m.toFixed(1),
-            vwap: vwap5m ? +vwap5m.toFixed(2) : null,
-            reason: result.reason,
-          });
-        } catch (e) { console.error("Frozen log failed:", e.message); }
-        continue; // FREEZE — do not enter this signal
+
+      if (feat && feat.volSurge === true) {
+        if (feat.closedBeyondLevel === false) {
+          // 🔴 TOXIC: high vol + price COULDN'T break level → freeze
+          console.log(`🧊 v20 FREEZE: ${symbol} ${result.signal} — high vol + not beyond level (toxic quadrant)`);
+          try {
+            logFrozenSignal({
+              time: new Date().toISOString(), day: today, symbol,
+              signal: result.signal, window: window.name,
+              entryStockPrice: +price.toFixed(2), level: feat.level,
+              volRatio: feat.volRatio, bodyPct: feat.bodyPct,
+              rsi: +rsi5m.toFixed(1), vwap: vwap5m ? +vwap5m.toFixed(2) : null,
+              reason: result.reason, type: "freeze",
+            });
+          } catch (e) { console.error("Frozen log failed:", e.message); }
+          continue; // FREEZE
+
+        } else {
+          // 🚀 BREAKOUT: high vol + price DID close beyond level → flip signal
+          const flippedSignal = result.signal === "PUT" ? "CALL" : "PUT";
+          console.log(`🚀 v20.5 FLIP: ${symbol} ${result.signal}→${flippedSignal} — high vol + closed beyond level (real breakout)`);
+          try {
+            logFrozenSignal({
+              time: new Date().toISOString(), day: today, symbol,
+              signal: result.signal, flippedTo: flippedSignal, window: window.name,
+              entryStockPrice: +price.toFixed(2), level: feat.level,
+              volRatio: feat.volRatio, bodyPct: feat.bodyPct,
+              rsi: +rsi5m.toFixed(1), vwap: vwap5m ? +vwap5m.toFixed(2) : null,
+              reason: result.reason, type: "flip",
+            });
+          } catch (e) { console.error("Flip log failed:", e.message); }
+          // Override the signal — enter WITH the breakout
+          result = { ...result, signal: flippedSignal,
+            reason: `FLIP: ${result.reason} → breakout confirmed (vol×${feat.volRatio}, beyond level)` };
+        }
       }
     } catch (e) {
       console.error("v20 filter check failed:", e.message);
@@ -1223,17 +1243,13 @@ async function runScan() {
       continue;
     }
 
-    // BOT #2: FIXED DOLLAR SIZING — max $500 of premium per trade, odd sizes OK.
-    const TRADE_BUDGET = 500;
-    const rawQty = Math.floor(TRADE_BUDGET / (premium * 100));
-    const qty = Math.max(1, rawQty);
-    const cost = qty * premium * 100;
-    const buyingPower = parseFloat(account.buying_power || account.cash || portfolio);
-    if (cost > buyingPower) {
-      console.log(`${symbol}: cost $${cost.toFixed(0)} exceeds buying power $${buyingPower.toFixed(0)}, skipping`);
-      continue;
-    }
-    console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)} (cost $${cost.toFixed(0)})`);
+    const baseQty = calculateQty(portfolio, premium, window.riskPct, window.stopPct);
+    const tickerQty = Math.max(1, Math.floor(baseQty * cfg.sizeFactor));
+    // V17.5: Force even quantity so Partial Sell (50%) works correctly
+    // If qty is odd (e.g. 5), round down to nearest even (4) so 50% sell = exactly 2
+    const qty = tickerQty >= 2 ? Math.max(2, tickerQty - (tickerQty % 2)) : 1;
+
+    console.log(`${symbol}: Entering ${contract.symbol} qty ${qty} @ $${premium.toFixed(2)}`);
 
     try {
       const order = await placeOptionOrder(contract.symbol, qty, "buy");
@@ -1421,8 +1437,7 @@ async function processActivePosition(state, account, symbol) {
   // REGULAR positions:
   // +30%: sell half, then trailing 15% on the rest (no time exit after this)
   if (!pos.partial1Done && pnlPct >= PROFIT_PARTIAL_1) {
-    // Round UP so odd sizes sell the bigger half: 3→sell 2 keep 1.
-    const sellQty = pos.remainingQty >= 2 ? Math.ceil(pos.remainingQty / 2) : 0;
+    const sellQty = Math.floor(pos.remainingQty / 2);
     if (sellQty >= 1) {
       console.log(`${symbol}: +30% partial: selling ${sellQty} of ${pos.remainingQty}`);
       try {
