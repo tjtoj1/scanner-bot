@@ -311,14 +311,21 @@ async function scanEntry(state, symbol) {
   const spot  = await getLatestPrice(symbol);
   if (!spot) return;
 
-  // Entry condition: current price is at the FVG edge (within tolerance)
   const tolerance = spot * FVG_EDGE_TOLERANCE / 100;
+
+  // Entry condition: price is INSIDE the FVG or touching either edge (within tolerance).
+  // Bullish FVG: price dips into the gap zone → buy CALL (expect bounce back up)
+  // Bearish FVG: price pops into the gap zone → buy PUT (expect drop back down)
   let signal = null;
 
-  if (fvg.type === "bullish" && Math.abs(spot - fvg.gapHigh) <= tolerance) {
-    signal = "CALL"; // price at top of bullish FVG → buy CALL
-  } else if (fvg.type === "bearish" && Math.abs(spot - fvg.gapLow) <= tolerance) {
-    signal = "PUT";  // price at bottom of bearish FVG → buy PUT
+  if (fvg.type === "bullish" &&
+      spot >= fvg.gapLow - tolerance &&
+      spot <= fvg.gapHigh + tolerance) {
+    signal = "CALL";
+  } else if (fvg.type === "bearish" &&
+      spot >= fvg.gapLow - tolerance &&
+      spot <= fvg.gapHigh + tolerance) {
+    signal = "PUT";
   }
 
   if (!signal) {
