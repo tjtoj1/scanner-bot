@@ -1,0 +1,47 @@
+name: FVG Scanner Bot 2
+on:
+  schedule:
+    - cron: '*/5 13-20 * * 1-5'
+  workflow_dispatch:
+concurrency:
+  group: fvg-scanner
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run FVG scanner
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+        run: node scan2_fvg.js
+      - name: Commit state
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --quiet && git diff --staged --quiet && exit 0
+          git commit -m "FVG state [skip ci]"
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            git fetch origin main
+            git rebase --abort 2>/dev/null || true
+            git checkout -f main 2>/dev/null || true
+            git pull origin main -X ours --no-edit 2>/dev/null || {
+              git checkout --ours state_fvg.json 2>/dev/null || true
+              git add -A
+              GIT_EDITOR=true git merge --continue 2>/dev/null || true
+            }
+            git add -A
+            git diff --staged --quiet || git commit -m "FVG merge [skip ci]" --allow-empty
+            sleep $((i*2))
+          done
+          exit 0
