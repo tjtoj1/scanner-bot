@@ -25,9 +25,9 @@ const DATA_BASE    = "https://data.alpaca.markets/v2";
 const TICKERS      = ["SPY", "QQQ", "GLD"];
 
 // FVG minimum size (% of price) — skip tiny gaps that are just noise
-const FVG_MIN_PCT = 0.10;  // 0.10% of price
+const FVG_MIN_PCT = 0.15; // raised for 15min (bigger meaningful gaps)  // 0.10% of price
 // How close current price must be to the FVG edge to trigger entry (% of price)
-const FVG_EDGE_TOLERANCE = 0.08;
+const FVG_EDGE_TOLERANCE = 0.12; // wider for 15min
 // Profit ladder
 const LADDER_1_PCT   = 10;   // +10% → move stop to +5%
 const LADDER_1_STOP  = 5;
@@ -79,7 +79,7 @@ async function alpaca(path, method="GET", body=null) {
   try { return JSON.parse(text); } catch { return text; }
 }
 
-async function getBars(symbol, tf="5Min", daysBack=1) {
+async function getBars(symbol, tf="15Min", daysBack=1) {
   const start = new Date(Date.now() - daysBack*24*60*60*1000).toISOString();
   const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=200&adjustment=raw`;
   const res = await fetch(url, {
@@ -201,7 +201,7 @@ async function monitorPosition(state, symbol) {
   const pos = state[symbol];
   if (!pos || !pos.active) return;
 
-  const bars = await getBars(symbol, "5Min", 1);
+  const bars = await getBars(symbol, "15Min", 1);
   if (bars.length < 2) return;
 
   const lastClosed = bars[bars.length - 2]; // last completed 5-min candle
@@ -302,7 +302,7 @@ async function scanEntry(state, symbol) {
     if (!GLD_DAYS.has(dow)) { console.log("GLD: no 0DTE today"); return; }
   }
 
-  const bars = await getBars(symbol, "5Min", 1);
+  const bars = await getBars(symbol, "15Min", 1);
   if (bars.length < 4) return;
 
   const fvg = detectFVG(bars);
@@ -345,7 +345,7 @@ async function scanEntry(state, symbol) {
   await tg(`🎯 <b>FVG ${symbol} ${signal} $${opt.strike} 0DTE</b>
 💰 Entry: $${opt.premium.toFixed(2)} × ${qty}
 📊 FVG: $${fvg.gapLow.toFixed(2)} — $${fvg.gapHigh.toFixed(2)} (${fvg.gapPct}%)
-🔄 وقف: إغلاق شمعة خارج الـ FVG → انعكاس`);
+🔄 وقف: إغلاق شمعة 15د خارج الـ FVG → انعكاس`);
 }
 
 // ─── MAIN ───────────────────────────────────────────────────
