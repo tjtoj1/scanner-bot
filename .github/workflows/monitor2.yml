@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run monitor 2
+      - name: Run FVG monitor
         env:
           ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
           ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
@@ -30,19 +30,19 @@ jobs:
           git config --local user.name "GitHub Action"
           git add -A
           git diff --quiet && git diff --staged --quiet && exit 0
-          git commit -m "State2 monitor [skip ci]"
+          git commit -m "Bot2 FVG monitor [skip ci]"
           for i in 1 2 3 4 5; do
             git push && exit 0
             git fetch origin main
             git rebase --abort 2>/dev/null || true
             git checkout -f main 2>/dev/null || true
             git pull origin main -X ours --no-edit 2>/dev/null || {
-              git checkout --ours state.json state2.json 2>/dev/null || true
+              git checkout --ours state_fvg.json 2>/dev/null || true
               git add -A
               GIT_EDITOR=true git merge --continue 2>/dev/null || true
             }
             git add -A
-            git diff --staged --quiet || git commit -m "State2 monitor merge [skip ci]" --allow-empty
+            git diff --staged --quiet || git commit -m "Bot2 FVG monitor merge [skip ci]" --allow-empty
             sleep $((i*2))
           done
           exit 0
