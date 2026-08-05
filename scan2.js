@@ -305,6 +305,10 @@ async function scanEntry(state, symbol) {
   const bars = await getBars(symbol, "15Min", 1);
   if (bars.length < 4) return;
 
+  const spot = await getLatestPrice(symbol);
+  if (!spot) return;
+  const tolerance = spot * FVG_EDGE_TOLERANCE / 100;
+
   // ── FVG MEMORY ────────────────────────────────────────────
   // Once an FVG is detected, store it in state so we keep watching it
   // even after the gap is "filled" structurally (price overlapped candle 1).
@@ -343,13 +347,6 @@ async function scanEntry(state, symbol) {
     console.log(`${symbol}: no FVG found`);
     return;
   }
-
-  const spot  = await getLatestPrice(symbol);
-  if (!spot) return;
-
-  const tolerance = spot * FVG_EDGE_TOLERANCE / 100;
-
-  // Entry condition: price is INSIDE the FVG or touching either edge (within tolerance).
   // Bullish FVG: price dips into the gap zone → buy CALL (expect bounce back up)
   // Bearish FVG: price pops into the gap zone → buy PUT (expect drop back down)
   let signal = null;
