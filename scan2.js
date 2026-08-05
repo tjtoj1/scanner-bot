@@ -157,11 +157,12 @@ async function findOption(symbol, signal, spotPrice) {
         headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
       });
       const q = await quote.json();
+      console.log(`  trying ${sym}: ap=${q.quote?.ap} bp=${q.quote?.bp}`);
       if (q.quote && q.quote.ap > 0.05) {
         const mid = (q.quote.ap + q.quote.bp) / 2;
         return { symbol: sym, strike, premium: mid };
       }
-    } catch {}
+    } catch(e) { console.log(`  ${sym}: error ${e.message}`); }
   }
   return null;
 }
