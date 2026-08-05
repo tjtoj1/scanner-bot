@@ -19,5 +19,12 @@
     "gapHigh": 771.2,
     "gapPct": 0.023,
     "bar": 54
+  },
+  "IWM_fvg": {
+    "type": "bearish",
+    "gapLow": 300.34,
+    "gapHigh": 300.44,
+    "gapPct": 0.033,
+    "bar": 60
   }
 }
