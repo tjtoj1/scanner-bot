@@ -5,5 +5,12 @@
     "gapHigh": 717.4,
     "gapPct": 0.182,
     "bar": 47
+  },
+  "GLD_fvg": {
+    "type": "bearish",
+    "gapLow": 388.59,
+    "gapHigh": 390.1,
+    "gapPct": 0.387,
+    "bar": 58
   }
 }
