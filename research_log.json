@@ -1636,5 +1636,23 @@
     "volRatio": 1.02,
     "bodyPct": 8,
     "volSurge": false
+  },
+  {
+    "time": "2026-08-05T14:05:16.700Z",
+    "day": "2026-08-05",
+    "symbol": "QQQ",
+    "signal": "PUT",
+    "window": "ORB_Pullback",
+    "strike": "726",
+    "entryStockPrice": 726.32,
+    "entryPremium": 2.83,
+    "rsi": 64.8,
+    "vwap": 726.39,
+    "level": 726.55,
+    "candleClose": 728.14,
+    "closedBeyondLevel": true,
+    "volRatio": 3.59,
+    "bodyPct": 3,
+    "volSurge": true
   }
 ]
