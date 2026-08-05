@@ -22,4 +22,4 @@ jobs:
           ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
           ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
           TG_TOKEN:        ${{ secrets.TG_TOKEN }}
-        run: node
+     run: node scan2.js
