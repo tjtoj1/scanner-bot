@@ -362,7 +362,7 @@ async function scanEntry(state, symbol) {
   }
 
   if (!signal) {
-    console.log(`${symbol}: FVG ${fvg.type} [$${fvg.gapLow.toFixed(2)}-$${fvg.gapHigh.toFixed(2)}] | spot $${spot.toFixed(2)} — not at edge`);
+    console.log(`${symbol}: FVG ${fvg.type} [$${fvg.gapLow.toFixed(2)}-$${fvg.gapHigh.toFixed(2)}] | spot $${spot.toFixed(2)} | tol $${tolerance.toFixed(2)} | range [$${(fvg.gapLow-tolerance).toFixed(2)}-$${(fvg.gapHigh+tolerance).toFixed(2)}] — not at edge`);
     return;
   }
 
