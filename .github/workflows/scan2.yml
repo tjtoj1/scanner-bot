@@ -22,12 +22,6 @@ jobs:
           ALPACA_KEY_2: ${{ secrets.ALPACA_KEY_2 }}
           ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          - name: Run FVG scanner
-        env:
-          ALPACA_KEY_2: ${{ secrets.ALPACA_KEY_2 }}
-          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-        run: node scan2.js
         run: node scan2.js
       - name: Commit state
         run: |
