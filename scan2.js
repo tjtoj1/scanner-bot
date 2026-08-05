@@ -22,7 +22,7 @@ if (!ALPACA_KEY || !ALPACA_SECRET || !TG_TOKEN) {
 
 const TRADING_BASE = "https://paper-api.alpaca.markets/v2";
 const DATA_BASE    = "https://data.alpaca.markets/v2";
-const TICKERS      = ["SPY", "QQQ", "GLD"];
+const TICKERS      = ["SPY", "QQQ", "IWM"];
 
 // FVG minimum size (% of price) — skip tiny gaps that are just noise
 const FVG_MIN_PCT = 0.0; // no minimum
@@ -35,7 +35,7 @@ const LADDER_2_PCT   = 20;   // +20% → move stop to +10% + 10% trail
 const LADDER_2_STOP  = 10;
 const TRAIL_PCT      = 10;
 // GLD only Mon/Wed/Fri
-const GLD_DAYS = new Set([1, 3, 5]); // Mon=1, Wed=3, Fri=5
+
 
 // ─── HELPERS ────────────────────────────────────────────────
 function nowUTC() { return new Date(); }
@@ -147,7 +147,7 @@ async function findOption(symbol, signal, spotPrice) {
   const expiry = getExpiry();
   const type = signal === "CALL" ? "call" : "put";
   const steps = [0, 1, -1, 2, -2, 3, -3];
-  const base = symbol === "SPY" || symbol === "QQQ" ? 1 : symbol === "GLD" ? 1 : 1;
+  const base = 1; // SPY, QQQ, IWM all use $1 strike steps
 
   for (const s of steps) {
     const strike = Math.round(spotPrice / base) * base + s * base;
@@ -296,12 +296,6 @@ async function monitorPosition(state, symbol) {
 async function scanEntry(state, symbol) {
   if (state[symbol]?.active) return;
   if (isPastLastEntry()) return;
-
-  // GLD filter
-  if (symbol === "GLD") {
-    const dow = new Date().getUTCDay();
-    if (!GLD_DAYS.has(dow)) { console.log("GLD: no 0DTE today"); return; }
-  }
 
   const bars = await getBars(symbol, "15Min", 1);
   if (bars.length < 4) return;
