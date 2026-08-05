@@ -25,9 +25,9 @@ const DATA_BASE    = "https://data.alpaca.markets/v2";
 const TICKERS      = ["SPY", "QQQ", "GLD"];
 
 // FVG minimum size (% of price) — skip tiny gaps that are just noise
-const FVG_MIN_PCT = 0.15; // raised for 15min (bigger meaningful gaps)  // 0.10% of price
+const FVG_MIN_PCT = 0.0; // no minimum
 // How close current price must be to the FVG edge to trigger entry (% of price)
-const FVG_EDGE_TOLERANCE = 0.12; // wider for 15min
+const FVG_EDGE_TOLERANCE = 2.0; // 2% tolerance — enters even if price passed the FVG
 // Profit ladder
 const LADDER_1_PCT   = 10;   // +10% → move stop to +5%
 const LADDER_1_STOP  = 5;
