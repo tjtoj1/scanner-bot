@@ -43,7 +43,7 @@
     "orderId": "18ed5f78-4c6a-4233-accf-9711388cb02c",
     "stopOrderId": null,
     "currentStop": 1.107,
-    "peakPremium": 2.26,
+    "peakPremium": 2.35,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -55,7 +55,7 @@
     "trailing": false,
     "remainingQty": 6,
     "quickExitWindow": false,
-    "lastPremium": 2.26
+    "lastPremium": 2.35
   },
   "QQQ": {
     "active": true,
@@ -70,7 +70,7 @@
     "orderId": "8cd8183c-8f35-4360-8604-c8519e2e23ef",
     "stopOrderId": null,
     "currentStop": 1.698,
-    "peakPremium": 2.91,
+    "peakPremium": 3.16,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -82,7 +82,7 @@
     "trailing": false,
     "remainingQty": 4,
     "quickExitWindow": false,
-    "lastPremium": 2.89
+    "lastPremium": 3.16
   },
   "IWM": {
     "active": false,
