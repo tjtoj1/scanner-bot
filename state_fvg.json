@@ -12,5 +12,12 @@
     "gapHigh": 390.1,
     "gapPct": 0.387,
     "bar": 58
+  },
+  "SPY_fvg": {
+    "type": "bullish",
+    "gapLow": 771.02,
+    "gapHigh": 771.2,
+    "gapPct": 0.023,
+    "bar": 54
   }
 }
