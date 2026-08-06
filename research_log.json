@@ -1798,5 +1798,23 @@
     "volRatio": 1.1,
     "bodyPct": 82,
     "volSurge": false
+  },
+  {
+    "time": "2026-08-06T15:32:38.833Z",
+    "day": "2026-08-06",
+    "symbol": "QQQ",
+    "signal": "PUT",
+    "window": "MidMorning_VWAP",
+    "strike": "717",
+    "entryStockPrice": 716.82,
+    "entryPremium": 1.915,
+    "rsi": 52.5,
+    "vwap": 715.27,
+    "level": 717.14,
+    "candleClose": 718.34,
+    "closedBeyondLevel": true,
+    "volRatio": 0.56,
+    "bodyPct": 57,
+    "volSurge": false
   }
 ]
