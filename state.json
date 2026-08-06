@@ -1,6 +1,24 @@
 {
   "_date": "2026-08-06",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 1.74,
+      "exitPremium": 2.31,
+      "qty": 6,
+      "pnl": 342.00000000000006,
+      "pnlPct": 32.758620689655174,
+      "reason": "stop_hit",
+      "minutes": 21,
+      "entryTime": 1786023317210,
+      "exitTime": 1786024578883,
+      "strike": "770",
+      "setup": "Pullback bounce at VWAP, near support 769.80",
+      "exitStockPrice": 771.21
+    }
+  ],
   "_reportSent": false,
   "_dailyLosses": 0,
   "_dailyTrades_count": 2,
@@ -13,31 +31,11 @@
     "lastExitTime": 1785782234734
   },
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "isFlip": false,
-    "window": "ORB_Pullback",
-    "optionSymbol": "SPY260806C00770000",
-    "strike": "770",
-    "entryPremium": 1.74,
-    "qty": 6,
-    "entryTime": 1786023317210,
-    "orderId": "87068b2e-7787-4fb3-8eb4-75343c6e8530",
-    "stopOrderId": "5463757b-4967-426e-a1b8-9046fd1c3b41",
-    "currentStop": 2.1675,
-    "peakPremium": 2.55,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 2360,
-    "reason": "Pullback bounce at VWAP, near support 769.80",
-    "partial1Done": true,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": true,
-    "remainingQty": 3,
-    "quickExitWindow": false,
-    "lastPremium": 2.3
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1786025179229,
+    "lastSignal": "CALL",
+    "lastExitTime": 1786024579229
   },
   "QQQ": {
     "active": true,
@@ -52,7 +50,7 @@
     "orderId": "835b94d3-e82e-4762-89d2-007c0bb1fee0",
     "stopOrderId": "16eb7227-547e-4c47-8189-2ece64733ab4",
     "currentStop": 1.4339999999999997,
-    "peakPremium": 2.3899999999999997,
+    "peakPremium": 2.8,
     "targetPct": 75,
     "stopPct": 40,
     "timeExitMin": 25,
@@ -63,7 +61,8 @@
     "partial2Done": false,
     "trailing": false,
     "remainingQty": 4,
-    "quickExitWindow": true
+    "quickExitWindow": true,
+    "lastPremium": 2.8
   },
   "IWM": {
     "active": false,
