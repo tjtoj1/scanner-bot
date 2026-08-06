@@ -1726,5 +1726,23 @@
     "volRatio": 0.43,
     "bodyPct": 39,
     "volSurge": false
+  },
+  {
+    "time": "2026-08-06T13:35:17.211Z",
+    "day": "2026-08-06",
+    "symbol": "SPY",
+    "signal": "CALL",
+    "window": "ORB_Pullback",
+    "strike": "770",
+    "entryStockPrice": 769.99,
+    "entryPremium": 1.74,
+    "rsi": 41.1,
+    "vwap": 770.65,
+    "level": 769.8,
+    "candleClose": 770.25,
+    "closedBeyondLevel": false,
+    "volRatio": 1.17,
+    "bodyPct": 62,
+    "volSurge": false
   }
 ]
