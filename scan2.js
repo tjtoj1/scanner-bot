@@ -144,32 +144,43 @@ function getExpiry() {
 }
 
 async function findOption(symbol, signal, spotPrice) {
-  const expiry = getExpiry();
+  const today = new Date().toISOString().split("T")[0];
   const type = signal === "CALL" ? "call" : "put";
-  const steps = [0, 1, -1, 2, -2, 3, -3];
-  const base = 1; // SPY, QQQ, IWM all use $1 strike steps
+  const atmStrike = Math.round(spotPrice);
 
-  for (const s of steps) {
-    const strike = Math.round(spotPrice / base) * base + s * base;
-    const sym = `${symbol}${expiry.replace(/-/g,"").slice(2)}${signal[0]}${String(strike).padStart(8,"0")}`;
+  // Use same method as Bot 1: get contracts from trading API, then quote from data API
+  for (const delta of [0, 1, -1, 2, -2, 3, -3]) {
+    const strike = atmStrike + delta;
     try {
-      const resp = await fetch(`https://data.alpaca.markets/v1beta1/options/snapshots?symbols=${sym}&feed=indicative`, {
+      const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${today}&type=${type}&strike_price_gte=${strike-0.5}&strike_price_lte=${strike+0.5}&status=active&limit=5`;
+      const res = await fetch(url, {
         headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
       });
-      const q = await resp.json();
-      // snapshots returns: { snapshots: { SYMBOL: { latestQuote: { ap, bp } } } }
-      const snap = q.snapshots?.[sym];
-      const lq = snap?.latestQuote;
-      const ap = lq?.ap ?? lq?.ask_price;
-      const bp = lq?.bp ?? lq?.bid_price;
-      console.log(`  trying ${sym}: ap=${ap} bp=${bp}`);
-      if (ap && ap > 0.05) {
-        const mid = (ap + (bp || ap)) / 2;
-        return { symbol: sym, strike, premium: mid };
+      const d = await res.json();
+      const contracts = d?.option_contracts || [];
+      if (contracts.length === 0) continue;
+      const contract = contracts.sort((a,b) => Math.abs(a.strike_price-spotPrice) - Math.abs(b.strike_price-spotPrice))[0];
+      const sym = contract.symbol;
+      const premium = await getQuote(sym);
+      console.log(`  ${sym}: premium=$${premium?.toFixed(2)}`);
+      if (premium && premium > 0.05) {
+        return { symbol: sym, strike: contract.strike_price, premium };
       }
-    } catch(e) { console.log(`  ${sym}: error ${e.message}`); }
+    } catch(e) { console.log(`  strike ${strike}: error ${e.message}`); }
   }
   return null;
+}
+
+async function getQuote(optSym) {
+  try {
+    const res = await fetch(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+    });
+    const d = await res.json();
+    const q = d.quotes?.[optSym];
+    if (!q) return null;
+    return (q.ap + q.bp) / 2;
+  } catch { return null; }
 }
 
 async function placeOrder(optSym, qty) {
@@ -187,21 +198,7 @@ async function closePosition(optSym, qty) {
 }
 
 async function getCurrentPremium(optSym) {
-  try {
-    const r = await fetch(`https://data.alpaca.markets/v1beta1/options/snapshots?symbols=${optSym}&feed=indicative`, {
-      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
-    });
-    const d = await r.json();
-    const snap = d.snapshots?.[optSym];
-    const lq = snap?.latestQuote;
-    const ap = lq?.ap ?? lq?.ask_price;
-    const bp = lq?.bp ?? lq?.bid_price;
-    if (ap && ap > 0) return (ap + (bp || ap)) / 2;
-    // fallback: try latestTrade
-    const lt = snap?.latestTrade;
-    if (lt?.p) return lt.p;
-    return null;
-  } catch { return null; }
+  return await getQuote(optSym);
 }
 
 // ─── POSITION SIZING — max $500 per trade ──────────────────
