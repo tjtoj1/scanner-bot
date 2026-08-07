@@ -1,36 +1,19 @@
 {
-  "QQQ": {
+  "IWM": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "QQQ260807P00721000",
-    "strike": "721",
-    "entryPremium": 1.24,
-    "qty": 4,
-    "entryTime": 1786122336814,
+    "optionSymbol": "IWM260807P00302000",
+    "strike": "302",
+    "entryPremium": 0.475,
+    "qty": 10,
+    "entryTime": 1786129684943,
     "fvg": {
       "type": "bearish",
-      "gapLow": 721.21,
-      "gapHigh": 722.06,
-      "gapPct": 0.118,
-      "bar": 59
+      "gapLow": 301.1,
+      "gapHigh": 301.13,
+      "gapPct": 0.01,
+      "bar": 58
     },
-    "msgId": 170
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260807P00772000",
-    "strike": "772",
-    "entryPremium": 0.525,
-    "qty": 9,
-    "entryTime": 1786125822134,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 772.63,
-      "gapHigh": 772.745,
-      "gapPct": 0.015,
-      "bar": 55
-    },
-    "msgId": 185
+    "msgId": 188
   }
 }
