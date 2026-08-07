@@ -8,65 +8,53 @@
   },
   "SPY": {
     "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260807P00772000",
+    "signal": "CALL",
+    "optionSymbol": "SPY260807C00772000",
     "strike": "772",
-    "entryPremium": 1.0750000000000002,
-    "qty": 4,
-    "entryTime": 1786113102140,
+    "entryPremium": 1.53,
+    "qty": 3,
+    "entryTime": 1786114245814,
     "fvg": {
       "type": "bullish",
-      "gapLow": 771.02,
-      "gapHigh": 771.2,
-      "gapPct": 0.023,
-      "bar": 54
-    },
-    "ladder2": true,
-    "stopPct": 5,
-    "trailPct": 10,
-    "peakPct": 37.209302325581376,
-    "ladder1": true
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260807P00301000",
-    "strike": "301",
-    "entryPremium": 0.69,
-    "qty": 7,
-    "entryTime": 1786113104077,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 300.34,
-      "gapHigh": 300.44,
-      "gapPct": 0.033,
+      "gapLow": 771.61,
+      "gapHigh": 771.71,
+      "gapPct": 0.013,
       "bar": 60
     },
-    "ladder2": true,
-    "stopPct": 5,
-    "trailPct": 10,
-    "peakPct": 46.37681159420291,
-    "ladder1": true
+    "msgId": 115
   },
   "QQQ": {
     "active": true,
     "signal": "PUT",
     "optionSymbol": "QQQ260807P00720000",
     "strike": "720",
-    "entryPremium": 1.7349999999999999,
+    "entryPremium": 1.8450000000000002,
     "qty": 2,
-    "entryTime": 1786113104844,
+    "entryTime": 1786114246235,
     "fvg": {
       "type": "bearish",
       "gapLow": 720.92,
       "gapHigh": 722.3339,
       "gapPct": 0.196,
-      "bar": 56
+      "bar": 55
     },
-    "ladder2": true,
-    "stopPct": 5,
-    "trailPct": 10,
-    "peakPct": 39.48126801152738,
-    "ladder1": true
+    "msgId": 116
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260807P00301000",
+    "strike": "301",
+    "entryPremium": 0.835,
+    "qty": 5,
+    "entryTime": 1786114246632,
+    "fvg": {
+      "type": "bearish",
+      "gapLow": 300.71,
+      "gapHigh": 300.83,
+      "gapPct": 0.04,
+      "bar": 55
+    },
+    "msgId": 117
   }
 }
