@@ -35,7 +35,7 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 29.365079365079357
+    "peakPct": 50.39682539682539
   },
   "QQQ": {
     "active": true,
@@ -55,7 +55,7 @@
     "msgId": 144,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 46.06413994169097,
+    "peakPct": 57.725947521865905,
     "ladder2": true,
     "trailPct": 10
   }
