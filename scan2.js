@@ -437,17 +437,44 @@ async function scanEntry(state, symbol) {
 
   const state = loadState();
 
+  // ── RECONCILE WITH ALPACA (source of truth) ───────────────
+  // Prevents duplicate entries when state.json is stale (git push conflict).
+  const liveInAlpaca = new Set();
+  try {
+    const positions = await fetch(`${TRADING_BASE}/positions`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+    }).then(r=>r.json());
+    if (Array.isArray(positions)) {
+      for (const pos of positions) {
+        const match = pos.symbol?.match(/^([A-Z]+)\d/);
+        if (match) liveInAlpaca.add(match[1]);
+      }
+    }
+    // Mark any symbol with a live position as active (even if state is stale)
+    for (const sym of TICKERS) {
+      if (liveInAlpaca.has(sym) && !state[sym]?.active) {
+        console.log(`${sym}: live position found in Alpaca but not in state — marking active`);
+        state[sym] = { ...state[sym], active: true };
+      }
+      // Clear state if Alpaca has no position (position was closed externally)
+      if (!liveInAlpaca.has(sym) && state[sym]?.active) {
+        console.log(`${sym}: no position in Alpaca but state says active — clearing`);
+        delete state[sym];
+      }
+    }
+    saveState(state);
+  } catch(e) { console.error("Reconciliation failed:", e.message); }
+
   if (MODE === "monitor") {
     // Phase 1: monitor open positions
     for (const sym of TICKERS) {
       if (state[sym]?.active) await monitorPosition(state, sym);
     }
-    // Phase 2: reload state (monitorPosition may have deleted/flipped positions)
-    // then scan for new entries only on truly empty symbols
+    // Phase 2: reload state then scan for new entries
     if (!isPastLastEntry()) {
       const freshState = loadState();
       for (const sym of TICKERS) {
-        if (!freshState[sym]?.active) {
+        if (!freshState[sym]?.active && !liveInAlpaca.has(sym)) {
           try { await scanEntry(freshState, sym); }
           catch(e) { console.error(`${sym} scan error:`, e.message); }
         }
@@ -455,8 +482,10 @@ async function scanEntry(state, symbol) {
     }
   } else {
     for (const sym of TICKERS) {
-      try { await scanEntry(state, sym); }
-      catch(e) { console.error(`${sym} error:`, e.message); }
+      if (!liveInAlpaca.has(sym)) {
+        try { await scanEntry(state, sym); }
+        catch(e) { console.error(`${sym} error:`, e.message); }
+      }
     }
   }
   console.log("Done.");
