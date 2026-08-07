@@ -35,6 +35,7 @@ const LADDER_2_PCT   = 20;   // +20% → move stop to +10% + 10% trail
 const LADDER_2_STOP  = 10;
 const TRAIL_PCT      = 10;
 const HARD_STOP_PCT  = -35;  // hard stop loss — exit immediately if hit
+const DAILY_TARGET_PCT = 5;  // stop new entries when daily profit >= 5% of portfolio
 // GLD only Mon/Wed/Fri
 
 
@@ -319,6 +320,24 @@ async function monitorPosition(state, symbol) {
 async function scanEntry(state, symbol) {
   if (state[symbol]?.active) return;
   if (isPastLastEntry()) return;
+
+  // ── DAILY PROFIT GUARD ───────────────────────────────────
+  // Stop new entries once daily profit reaches 5% of current portfolio
+  try {
+    const acct = await fetch(`${TRADING_BASE}/account`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+    }).then(r=>r.json());
+    const portfolio = parseFloat(acct.portfolio_value);
+    const lastEquity = parseFloat(acct.last_equity);
+    const target = portfolio * (DAILY_TARGET_PCT / 100);
+    if (isFinite(lastEquity) && lastEquity > portfolio * 0.5) {
+      const dailyPnl = portfolio - lastEquity;
+      if (dailyPnl >= target) {
+        console.log(`${symbol}: daily target reached ($${dailyPnl.toFixed(0)} ≥ $${target.toFixed(0)}) — no new entries`);
+        return;
+      }
+    }
+  } catch(e) { console.error("Daily guard check failed:", e.message); }
 
   const bars = await getBars(symbol, "15Min", 1);
   if (bars.length < 4) return;
