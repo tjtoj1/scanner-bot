@@ -1,38 +1,4 @@
 {
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260807C00773000",
-    "strike": "773",
-    "entryPremium": 1.1349999999999998,
-    "qty": 4,
-    "entryTime": 1786118817205,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 771.61,
-      "gapHigh": 771.71,
-      "gapPct": 0.013,
-      "bar": 55
-    },
-    "msgId": 134
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260807C00723000",
-    "strike": "723",
-    "entryPremium": 1.1949999999999998,
-    "qty": 4,
-    "entryTime": 1786118817953,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 721.75,
-      "gapHigh": 722.04,
-      "gapPct": 0.04,
-      "bar": 59
-    },
-    "msgId": 135
-  },
   "IWM": {
     "active": true,
     "signal": "CALL",
