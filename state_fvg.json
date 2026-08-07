@@ -20,28 +20,6 @@
     "ladder2": true,
     "trailPct": 10
   },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260807C00771000",
-    "strike": "771",
-    "entryPremium": 1.26,
-    "qty": 3,
-    "entryTime": 1786120368204,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 771.61,
-      "gapHigh": 771.71,
-      "gapPct": 0.013,
-      "bar": 53
-    },
-    "msgId": 143,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 66.66666666666664
-  },
   "QQQ": {
     "active": true,
     "signal": "PUT",
