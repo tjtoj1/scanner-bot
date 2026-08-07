@@ -20,7 +20,11 @@
       "gapHigh": 771.2,
       "gapPct": 0.023,
       "bar": 54
-    }
+    },
+    "ladder2": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 23.25581395348837
   },
   "IWM": {
     "active": true,
@@ -38,9 +42,10 @@
       "bar": 60
     },
     "ladder2": true,
-    "stopPct": 10,
+    "stopPct": 5,
     "trailPct": 10,
-    "peakPct": 30.434782608695667
+    "peakPct": 30.434782608695667,
+    "ladder1": true
   },
   "QQQ": {
     "active": true,
@@ -56,6 +61,10 @@
       "gapHigh": 722.3339,
       "gapPct": 0.196,
       "bar": 56
-    }
+    },
+    "ladder2": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 27.089337175792522
   }
 }
