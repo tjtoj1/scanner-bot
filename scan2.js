@@ -57,13 +57,17 @@ function saveState(s) {
   fs.writeFileSync("state_fvg.json", JSON.stringify(s, null, 2));
 }
 
-async function tg(text) {
+async function tg(text, replyTo = null) {
   try {
-    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    const body = { chat_id: PERSONAL_CHAT, text, parse_mode:"HTML" };
+    if (replyTo) { body.reply_to_message_id = replyTo; body.allow_sending_without_reply = true; }
+    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ chat_id: PERSONAL_CHAT, text, parse_mode:"HTML" })
+      body: JSON.stringify(body)
     });
-  } catch(e) { console.error("TG failed:", e.message); }
+    const d = await res.json();
+    return d.result?.message_id || null;
+  } catch(e) { console.error("TG failed:", e.message); return null; }
 }
 
 async function alpaca(path, method="GET", body=null) {
@@ -228,7 +232,7 @@ async function monitorPosition(state, symbol) {
   if (isForceExit()) {
     await closePosition(pos.optionSymbol, pos.qty);
     const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
-    await tg(`🔔 <b>FVG خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`);
+    await tg(`🔔 <b>FVG خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
     delete state[symbol]; saveState(state); return;
   }
 
@@ -236,7 +240,7 @@ async function monitorPosition(state, symbol) {
   if (pnlPct <= HARD_STOP_PCT) {
     await closePosition(pos.optionSymbol, pos.qty);
     const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
-    await tg(`🛑 <b>FVG وقف خسارة ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`);
+    await tg(`🛑 <b>FVG وقف خسارة ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
     delete state[symbol]; saveState(state); return;
   }
 
@@ -246,12 +250,12 @@ async function monitorPosition(state, symbol) {
     pos.stopPct  = LADDER_2_STOP;
     pos.trailPct = TRAIL_PCT;
     pos.peakPct  = Math.max(pos.peakPct || 0, pnlPct);
-    await tg(`📈 <b>FVG ${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`);
+    await tg(`📈 <b>FVG ${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`, pos.msgId);
   } else if (pnlPct >= LADDER_1_PCT && !pos.ladder1) {
     pos.ladder1 = true;
     pos.stopPct  = LADDER_1_STOP;
     pos.peakPct  = Math.max(pos.peakPct || 0, pnlPct);
-    await tg(`📊 <b>FVG ${symbol} مستوى 1</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_1_STOP}%`);
+    await tg(`📊 <b>FVG ${symbol} مستوى 1</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_1_STOP}%`, pos.msgId);
   }
 
   // update trailing peak
@@ -267,7 +271,7 @@ async function monitorPosition(state, symbol) {
     if (pnlPct <= stopFloor) {
       await closePosition(pos.optionSymbol, pos.qty);
       const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
-      await tg(`🛑 <b>FVG وقف ربح ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`);
+      await tg(`🛑 <b>FVG وقف ربح ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
       delete state[symbol]; saveState(state); return;
     }
   }
@@ -284,7 +288,7 @@ async function monitorPosition(state, symbol) {
       await closePosition(pos.optionSymbol, pos.qty);
       const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
       const flipSignal = pos.signal === "CALL" ? "PUT" : "CALL";
-      await tg(`🔄 <b>FVG انعكاس ${symbol}</b>\n${pos.signal} خسر ${pnlPct.toFixed(1)}% (${pnl>=0?"+":""}$${pnl})\nنفتح ${flipSignal}...`);
+      await tg(`🔄 <b>FVG انعكاس ${symbol}</b>\n${pos.signal} خسر ${pnlPct.toFixed(1)}% (${pnl>=0?"+":""}$${pnl})\nنفتح ${flipSignal}...`, pos.msgId);
       delete state[symbol]; saveState(state);
 
       // open flipped position if not past last entry
@@ -302,7 +306,7 @@ async function monitorPosition(state, symbol) {
               entryTime: Date.now(), fvg,
             };
             saveState(state);
-            await tg(`🚀 <b>FVG FLIP ${symbol} ${flipSignal} $${opt.strike}</b>\n💰 $${opt.premium.toFixed(2)} × ${qty}\n🔄 انعكاس FVG`);
+            await tg(`🚀 <b>FVG FLIP ${symbol} ${flipSignal} $${opt.strike}</b>\n💰 $${opt.premium.toFixed(2)} × ${qty}\n🔄 انعكاس FVG`, pos.msgId);
           }
         }
       }
@@ -387,20 +391,21 @@ async function scanEntry(state, symbol) {
   const order = await placeOrder(opt.symbol, qty);
   if (!order.id) { console.log(`${symbol}: order failed`, order); return; }
 
+  const msgId = await tg(`🎯 <b>FVG ${symbol} ${signal} $${opt.strike} 0DTE</b>
+💰 Entry: $${opt.premium.toFixed(2)} × ${qty}
+📊 FVG: $${fvg.gapLow.toFixed(2)} — $${fvg.gapHigh.toFixed(2)} (${fvg.gapPct}%)
+🔄 وقف: إغلاق شمعة 15د خارج الـ FVG → انعكاس`);
+
   state[symbol] = {
     active: true, signal,
     optionSymbol: opt.symbol, strike: opt.strike,
     entryPremium: opt.premium, qty,
     entryTime: Date.now(), fvg,
+    msgId: msgId || null,
   };
-  delete state[`${symbol}_fvg`]; // consumed — clear so we detect fresh FVGs
+  delete state[`${symbol}_fvg`];
   saveState(state);
-
   console.log(`✅ FVG ENTRY: ${symbol} ${signal} $${opt.strike} | $${opt.premium.toFixed(2)} × ${qty}`);
-  await tg(`🎯 <b>FVG ${symbol} ${signal} $${opt.strike} 0DTE</b>
-💰 Entry: $${opt.premium.toFixed(2)} × ${qty}
-📊 FVG: $${fvg.gapLow.toFixed(2)} — $${fvg.gapHigh.toFixed(2)} (${fvg.gapPct}%)
-🔄 وقف: إغلاق شمعة 15د خارج الـ FVG → انعكاس`);
 }
 
 // ─── MAIN ───────────────────────────────────────────────────
@@ -411,15 +416,17 @@ async function scanEntry(state, symbol) {
   const state = loadState();
 
   if (MODE === "monitor") {
-    // Monitor open positions AND scan for new entries every minute
+    // Phase 1: monitor open positions
     for (const sym of TICKERS) {
       if (state[sym]?.active) await monitorPosition(state, sym);
     }
-    // Also scan for new FVG entries (no position open on that symbol)
+    // Phase 2: reload state (monitorPosition may have deleted/flipped positions)
+    // then scan for new entries only on truly empty symbols
     if (!isPastLastEntry()) {
+      const freshState = loadState();
       for (const sym of TICKERS) {
-        if (!state[sym]?.active) {
-          try { await scanEntry(state, sym); }
+        if (!freshState[sym]?.active) {
+          try { await scanEntry(freshState, sym); }
           catch(e) { console.error(`${sym} scan error:`, e.message); }
         }
       }
