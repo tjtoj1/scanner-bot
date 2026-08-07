@@ -246,13 +246,16 @@ async function monitorPosition(state, symbol) {
   }
 
   // ── PROFIT LADDER ─────────────────────────────────────
+  // Check both levels independently (not else-if) so jumping levels works
   if (pnlPct >= LADDER_2_PCT && !pos.ladder2) {
     pos.ladder2 = true;
+    pos.ladder1 = true; // mark level 1 as done too
     pos.stopPct  = LADDER_2_STOP;
     pos.trailPct = TRAIL_PCT;
     pos.peakPct  = Math.max(pos.peakPct || 0, pnlPct);
     await tg(`📈 <b>FVG ${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`, pos.msgId);
-  } else if (pnlPct >= LADDER_1_PCT && !pos.ladder1) {
+  }
+  if (pnlPct >= LADDER_1_PCT && !pos.ladder1) {
     pos.ladder1 = true;
     pos.stopPct  = LADDER_1_STOP;
     pos.peakPct  = Math.max(pos.peakPct || 0, pnlPct);
