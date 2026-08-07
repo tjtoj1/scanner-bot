@@ -34,6 +34,7 @@ const LADDER_1_STOP  = 5;
 const LADDER_2_PCT   = 20;   // +20% → move stop to +10% + 10% trail
 const LADDER_2_STOP  = 10;
 const TRAIL_PCT      = 10;
+const HARD_STOP_PCT  = -35;  // hard stop loss — exit immediately if hit
 // GLD only Mon/Wed/Fri
 
 
@@ -228,6 +229,14 @@ async function monitorPosition(state, symbol) {
     await closePosition(pos.optionSymbol, pos.qty);
     const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
     await tg(`🔔 <b>FVG خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`);
+    delete state[symbol]; saveState(state); return;
+  }
+
+  // ── HARD STOP LOSS ───────────────────────────────────────
+  if (pnlPct <= HARD_STOP_PCT) {
+    await closePosition(pos.optionSymbol, pos.qty);
+    const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
+    await tg(`🛑 <b>FVG وقف خسارة ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`);
     delete state[symbol]; saveState(state); return;
   }
 
