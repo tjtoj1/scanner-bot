@@ -32,24 +32,5 @@
       "bar": 59
     },
     "msgId": 170
-  },
-  "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "IWM260807C00301000",
-    "strike": "301",
-    "entryPremium": 0.495,
-    "qty": 10,
-    "entryTime": 1786123552862,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 300.71,
-      "gapHigh": 300.83,
-      "gapPct": 0.04,
-      "bar": 45
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.101010101010111
   }
 }
