@@ -21,24 +21,11 @@
       "gapPct": 0.013,
       "bar": 60
     },
-    "msgId": 115
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260807P00720000",
-    "strike": "720",
-    "entryPremium": 1.8450000000000002,
-    "qty": 2,
-    "entryTime": 1786114246235,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 720.92,
-      "gapHigh": 722.3339,
-      "gapPct": 0.196,
-      "bar": 55
-    },
-    "msgId": 116
+    "msgId": 115,
+    "ladder2": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 27.124183006535933
   },
   "IWM": {
     "active": true,
@@ -56,5 +43,22 @@
       "bar": 55
     },
     "msgId": 117
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260807P00722000",
+    "strike": "722",
+    "entryPremium": 1.795,
+    "qty": 2,
+    "entryTime": 1786116196250,
+    "fvg": {
+      "type": "bearish",
+      "gapLow": 720.92,
+      "gapHigh": 722.3339,
+      "gapPct": 0.196,
+      "bar": 53
+    },
+    "msgId": 123
   }
 }
