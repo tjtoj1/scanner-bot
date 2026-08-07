@@ -47,6 +47,11 @@
       "gapHigh": 300.83,
       "gapPct": 0.04,
       "bar": 44
-    }
+    },
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 34.177215189873415
   }
 }
