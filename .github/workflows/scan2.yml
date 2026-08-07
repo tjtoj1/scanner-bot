@@ -1,7 +1,7 @@
 name: Scanner Bot 2
 on:
   schedule:
-    - cron: '*/5 13-21 * * 1-5'
+    - cron: '*/1 13-21 * * 1-5'
   workflow_dispatch:
 concurrency:
   group: scanner-bot-2
@@ -17,19 +17,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run FVG scanner
+      - name: Run monitor then scan
         env:
           ALPACA_KEY_2: ${{ secrets.ALPACA_KEY_2 }}
           ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
-        run: node scan2.js
+        run: |
+          MODE=monitor node scan2.js
+          node scan2.js
       - name: Commit state
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
           git diff --quiet && git diff --staged --quiet && exit 0
-          git commit -m "Bot2 FVG state [skip ci]"
+          git commit -m "Bot2 state [skip ci]"
           for i in 1 2 3 4 5; do
             git push && exit 0
             git fetch origin main
@@ -37,7 +39,7 @@ jobs:
             git checkout -f main 2>/dev/null || true
             git pull origin main -X ours --no-edit 2>/dev/null || true
             git add -A
-            git diff --staged --quiet || git commit -m "Bot2 FVG merge [skip ci]" --allow-empty
+            git diff --staged --quiet || git commit -m "Bot2 merge [skip ci]" --allow-empty
             sleep $((i*2))
           done
           exit 0
