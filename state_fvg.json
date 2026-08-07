@@ -14,7 +14,10 @@
       "gapPct": 0.118,
       "bar": 60
     },
-    "msgId": 151
+    "msgId": 151,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 14.344262295081972
   },
   "SPY": {
     "active": true,
@@ -31,7 +34,12 @@
       "gapPct": 0.015,
       "bar": 60
     },
-    "msgId": 154
+    "msgId": 154,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 21.559633027522942
   },
   "IWM": {
     "active": true,
