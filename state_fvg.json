@@ -22,9 +22,10 @@
       "bar": 54
     },
     "ladder2": true,
-    "stopPct": 10,
+    "stopPct": 5,
     "trailPct": 10,
-    "peakPct": 23.25581395348837
+    "peakPct": 37.209302325581376,
+    "ladder1": true
   },
   "IWM": {
     "active": true,
@@ -44,7 +45,7 @@
     "ladder2": true,
     "stopPct": 5,
     "trailPct": 10,
-    "peakPct": 30.434782608695667,
+    "peakPct": 31.884057971014506,
     "ladder1": true
   },
   "QQQ": {
@@ -63,8 +64,9 @@
       "bar": 56
     },
     "ladder2": true,
-    "stopPct": 10,
+    "stopPct": 5,
     "trailPct": 10,
-    "peakPct": 27.089337175792522
+    "peakPct": 36.59942363112393,
+    "ladder1": true
   }
 }
