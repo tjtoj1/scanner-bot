@@ -30,7 +30,12 @@
       "gapPct": 0.013,
       "bar": 53
     },
-    "msgId": 143
+    "msgId": 143,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 29.365079365079357
   },
   "QQQ": {
     "active": true,
@@ -49,7 +54,9 @@
     },
     "msgId": 144,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.495626822157444
+    "stopPct": 10,
+    "peakPct": 46.06413994169097,
+    "ladder2": true,
+    "trailPct": 10
   }
 }
