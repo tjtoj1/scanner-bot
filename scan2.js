@@ -153,13 +153,18 @@ async function findOption(symbol, signal, spotPrice) {
     const strike = Math.round(spotPrice / base) * base + s * base;
     const sym = `${symbol}${expiry.replace(/-/g,"").slice(2)}${signal[0]}${String(strike).padStart(8,"0")}`;
     try {
-      const quote = await fetch(`${DATA_BASE}/options/${sym}/quotes/latest`, {
+      const resp = await fetch(`https://data.alpaca.markets/v1beta1/options/snapshots?symbols=${sym}&feed=indicative`, {
         headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
       });
-      const q = await quote.json();
-      console.log(`  trying ${sym}: ap=${q.quote?.ap} bp=${q.quote?.bp}`);
-      if (q.quote && q.quote.ap > 0.05) {
-        const mid = (q.quote.ap + q.quote.bp) / 2;
+      const q = await resp.json();
+      // snapshots returns: { snapshots: { SYMBOL: { latestQuote: { ap, bp } } } }
+      const snap = q.snapshots?.[sym];
+      const lq = snap?.latestQuote;
+      const ap = lq?.ap ?? lq?.ask_price;
+      const bp = lq?.bp ?? lq?.bid_price;
+      console.log(`  trying ${sym}: ap=${ap} bp=${bp}`);
+      if (ap && ap > 0.05) {
+        const mid = (ap + (bp || ap)) / 2;
         return { symbol: sym, strike, premium: mid };
       }
     } catch(e) { console.log(`  ${sym}: error ${e.message}`); }
@@ -183,11 +188,19 @@ async function closePosition(optSym, qty) {
 
 async function getCurrentPremium(optSym) {
   try {
-    const r = await fetch(`${DATA_BASE}/options/${optSym}/quotes/latest`, {
+    const r = await fetch(`https://data.alpaca.markets/v1beta1/options/snapshots?symbols=${optSym}&feed=indicative`, {
       headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
     });
     const d = await r.json();
-    return d.quote ? (d.quote.ap + d.quote.bp) / 2 : null;
+    const snap = d.snapshots?.[optSym];
+    const lq = snap?.latestQuote;
+    const ap = lq?.ap ?? lq?.ask_price;
+    const bp = lq?.bp ?? lq?.bid_price;
+    if (ap && ap > 0) return (ap + (bp || ap)) / 2;
+    // fallback: try latestTrade
+    const lt = snap?.latestTrade;
+    if (lt?.p) return lt.p;
+    return null;
   } catch { return null; }
 }
 
