@@ -21,28 +21,6 @@
     "ladder2": true,
     "trailPct": 10
   },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260810P00300000",
-    "strike": "300",
-    "entryPremium": 0.485,
-    "qty": 10,
-    "entryTime": 1786379845508,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 300.5,
-      "gapHigh": 300.63,
-      "gapPct": 0.043,
-      "bar": 18
-    },
-    "msgId": 292,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 41.23711340206187,
-    "ladder2": true,
-    "trailPct": 10
-  },
   "QQQ": {
     "active": true,
     "signal": "CALL",
