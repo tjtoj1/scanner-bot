@@ -1,21 +1,4 @@
 {
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260810C00724000",
-    "strike": "724",
-    "entryPremium": 1.84,
-    "qty": 2,
-    "entryTime": 1786371388441,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 720.54,
-      "gapHigh": 721.98,
-      "gapPct": 0.2,
-      "bar": 59
-    },
-    "msgId": 193
-  },
   "IWM": {
     "active": true
   },
