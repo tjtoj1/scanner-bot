@@ -1,20 +1,4 @@
 {
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260810C00774000",
-    "strike": "774",
-    "entryPremium": 0.565,
-    "qty": 8,
-    "entryTime": 1786378521431,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 774.03,
-      "gapHigh": 774.1747,
-      "gapPct": 0.019,
-      "bar": 26
-    }
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -48,5 +32,12 @@
       "bar": 30
     },
     "msgId": 282
+  },
+  "SPY_fvg": {
+    "type": "bearish",
+    "gapLow": 774.03,
+    "gapHigh": 774.1747,
+    "gapPct": 0.019,
+    "bar": 26
   }
 }
