@@ -1,15 +1,23 @@
 {
-  "SPY": {
-    "active": true
-  },
-  "QQQ": {
-    "active": true
-  },
   "IWM_fvg": {
     "type": "bullish",
     "gapLow": 299.835,
     "gapHigh": 299.88,
     "gapPct": 0.015,
     "bar": 43
+  },
+  "SPY_fvg": {
+    "type": "bullish",
+    "gapLow": 772.93,
+    "gapHigh": 773.05,
+    "gapPct": 0.016,
+    "bar": 42
+  },
+  "QQQ_fvg": {
+    "type": "bullish",
+    "gapLow": 721.1799,
+    "gapHigh": 721.3,
+    "gapPct": 0.017,
+    "bar": 41
   }
 }
