@@ -30,7 +30,10 @@
       "gapHigh": 723.3372,
       "gapPct": 0.072,
       "bar": 16
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.493827160493822
   },
   "IWM": {
     "active": true,
@@ -47,6 +50,9 @@
       "gapPct": 0.043,
       "bar": 18
     },
-    "msgId": 223
+    "msgId": 223,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.584415584415584
   }
 }
