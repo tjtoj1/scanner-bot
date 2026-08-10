@@ -1,27 +1,5 @@
 {
   "SPY": {
     "active": true
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260810P00721000",
-    "strike": "721",
-    "entryPremium": 0.655,
-    "qty": 7,
-    "entryTime": 1786383796352,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 721.77,
-      "gapHigh": 722.37,
-      "gapPct": 0.083,
-      "bar": 33
-    },
-    "msgId": 329,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 33.58778625954198,
-    "ladder2": true,
-    "trailPct": 10
   }
 }
