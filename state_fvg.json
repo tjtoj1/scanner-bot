@@ -32,5 +32,8 @@
       "bar": 18
     },
     "msgId": 258
+  },
+  "QQQ": {
+    "active": true
   }
 }
