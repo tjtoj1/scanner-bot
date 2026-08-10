@@ -30,7 +30,10 @@
       "gapHigh": 723.3372,
       "gapPct": 0.072,
       "bar": 16
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.26765799256504
   },
   "SPY": {
     "active": true,
