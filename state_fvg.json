@@ -18,5 +18,22 @@
   },
   "IWM": {
     "active": true
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260810C00774000",
+    "strike": "774",
+    "entryPremium": 1.1349999999999998,
+    "qty": 4,
+    "entryTime": 1786373600716,
+    "fvg": {
+      "type": "bullish",
+      "gapLow": 773.52,
+      "gapHigh": 773.765,
+      "gapPct": 0.032,
+      "bar": 23
+    },
+    "msgId": 215
   }
 }
