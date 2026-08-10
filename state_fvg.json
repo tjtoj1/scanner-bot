@@ -14,7 +14,10 @@
       "gapPct": 0.043,
       "bar": 18
     },
-    "msgId": 301
+    "msgId": 301,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.962962962962955
   },
   "SPY": {
     "active": true
