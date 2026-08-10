@@ -35,19 +35,18 @@
   },
   "IWM": {
     "active": true,
-    "signal": "CALL",
-    "optionSymbol": "IWM260810C00300000",
+    "signal": "PUT",
+    "optionSymbol": "IWM260810P00300000",
     "strike": "300",
-    "entryPremium": 0.95,
-    "qty": 5,
-    "entryTime": 1786371389265,
+    "entryPremium": 0.405,
+    "qty": 12,
+    "entryTime": 1786371486099,
     "fvg": {
       "type": "bullish",
       "gapLow": 301.07,
       "gapHigh": 301.715,
       "gapPct": 0.214,
       "bar": 59
-    },
-    "msgId": 194
+    }
   }
 }
