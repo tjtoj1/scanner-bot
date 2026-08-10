@@ -16,22 +16,6 @@
     },
     "msgId": 234
   },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260810P00774000",
-    "strike": "774",
-    "entryPremium": 1.005,
-    "qty": 4,
-    "entryTime": 1786374921930,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 773.52,
-      "gapHigh": 773.765,
-      "gapPct": 0.032,
-      "bar": 23
-    }
-  },
   "QQQ": {
     "active": true,
     "signal": "PUT",
@@ -46,6 +30,22 @@
       "gapHigh": 723.3372,
       "gapPct": 0.072,
       "bar": 16
+    }
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260810C00774000",
+    "strike": "774",
+    "entryPremium": 0.735,
+    "qty": 6,
+    "entryTime": 1786375806920,
+    "fvg": {
+      "type": "bullish",
+      "gapLow": 773.52,
+      "gapHigh": 773.765,
+      "gapPct": 0.032,
+      "bar": 23
     }
   }
 }
