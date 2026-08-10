@@ -1,5 +1,8 @@
 {
   "SPY": {
     "active": true
+  },
+  "QQQ": {
+    "active": true
   }
 }
