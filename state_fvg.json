@@ -36,7 +36,9 @@
     },
     "msgId": 262,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 16.66666666666666
+    "stopPct": 10,
+    "peakPct": 20.370370370370367,
+    "ladder2": true,
+    "trailPct": 10
   }
 }
