@@ -24,7 +24,10 @@
       "gapPct": 0.007,
       "bar": 30
     },
-    "msgId": 289
+    "msgId": 289,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 13.06532663316583
   },
   "IWM_fvg": {
     "type": "bearish",
