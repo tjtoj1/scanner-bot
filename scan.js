@@ -1021,7 +1021,7 @@ async function runScan() {
   // If profit then drops $300 from its peak, block NEW entries for the rest
   // of the day. Open positions are NOT closed - they keep running normally.
   // ============================================================
-  const PROFIT_GUARD_ACTIVATE = 1000; // activate protection at +$1,000
+  const PROFIT_GUARD_ACTIVATE = 500; // v20.6: lowered from $1,000 — data shows 4/9 days saved
   const PROFIT_GUARD_DRAWDOWN = 300;  // block new entries if profit drops $300 from peak
   try {
     const rawLast = parseFloat(account.last_equity);
@@ -1045,7 +1045,7 @@ async function runScan() {
         state._profitProtected = true;
         console.log(`🛡 Profit guard ACTIVATED - peak +$${state._dailyPeakProfit.toFixed(0)}`);
         await sendTelegram(`🛡 <b>حماية المكسب مفعّلة</b>
-الربح اليومي تجاوز +$1,000 (قمة +$${state._dailyPeakProfit.toFixed(0)})
+الربح اليومي تجاوز +$500 (قمة +$${state._dailyPeakProfit.toFixed(0)})
 لو نزل الربح $300 من القمة → يوقف فتح صفقات جديدة
 الصفقات المفتوحة تكمل طبيعي`);
         saveState(state);
