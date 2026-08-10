@@ -4,5 +4,12 @@
   },
   "QQQ": {
     "active": true
+  },
+  "IWM_fvg": {
+    "type": "bullish",
+    "gapLow": 299.835,
+    "gapHigh": 299.88,
+    "gapPct": 0.015,
+    "bar": 43
   }
 }
