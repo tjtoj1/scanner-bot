@@ -1,26 +1,4 @@
 {
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260810C00774000",
-    "strike": "774",
-    "entryPremium": 1.0750000000000002,
-    "qty": 4,
-    "entryTime": 1786371387840,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 771.81,
-      "gapHigh": 772.8,
-      "gapPct": 0.128,
-      "bar": 59
-    },
-    "msgId": 192,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 37.67441860465114,
-    "ladder2": true,
-    "trailPct": 10
-  },
   "QQQ": {
     "active": true,
     "signal": "CALL",
