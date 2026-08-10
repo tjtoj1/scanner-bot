@@ -1,21 +1,4 @@
 {
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260810C00722000",
-    "strike": "722",
-    "entryPremium": 0.9299999999999999,
-    "qty": 5,
-    "entryTime": 1786379958045,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 722.47,
-      "gapHigh": 722.52,
-      "gapPct": 0.007,
-      "bar": 30
-    },
-    "msgId": 295
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -35,5 +18,21 @@
   },
   "SPY": {
     "active": true
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260810P00722000",
+    "strike": "722",
+    "entryPremium": 1.1949999999999998,
+    "qty": 4,
+    "entryTime": 1786381232319,
+    "fvg": {
+      "type": "bullish",
+      "gapLow": 722.47,
+      "gapHigh": 722.52,
+      "gapPct": 0.007,
+      "bar": 30
+    }
   }
 }
