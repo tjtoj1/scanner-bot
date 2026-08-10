@@ -24,18 +24,16 @@
     "signal": "PUT",
     "optionSymbol": "QQQ260810P00722000",
     "strike": "722",
-    "entryPremium": 1.1949999999999998,
+    "entryPremium": 1.22,
     "qty": 4,
-    "entryTime": 1786381232319,
+    "entryTime": 1786381516573,
     "fvg": {
-      "type": "bullish",
-      "gapLow": 722.47,
-      "gapHigh": 722.52,
-      "gapPct": 0.007,
-      "bar": 30
+      "type": "bearish",
+      "gapLow": 721.77,
+      "gapHigh": 722.37,
+      "gapPct": 0.083,
+      "bar": 33
     },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.878661087866139
+    "msgId": 307
   }
 }
