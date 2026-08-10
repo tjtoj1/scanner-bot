@@ -18,5 +18,22 @@
       "bar": 23
     },
     "msgId": 215
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260810P00722000",
+    "strike": "722",
+    "entryPremium": 1.0750000000000002,
+    "qty": 4,
+    "entryTime": 1786373721659,
+    "fvg": {
+      "type": "bearish",
+      "gapLow": 722.8129,
+      "gapHigh": 723.3372,
+      "gapPct": 0.072,
+      "bar": 16
+    },
+    "msgId": 217
   }
 }
