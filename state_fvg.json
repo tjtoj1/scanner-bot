@@ -27,9 +27,9 @@
     "signal": "PUT",
     "optionSymbol": "IWM260810P00300000",
     "strike": "300",
-    "entryPremium": 0.275,
-    "qty": 18,
-    "entryTime": 1786377560513,
+    "entryPremium": 0.455,
+    "qty": 10,
+    "entryTime": 1786378222932,
     "fvg": {
       "type": "bearish",
       "gapLow": 300.5,
@@ -37,11 +37,6 @@
       "gapPct": 0.043,
       "bar": 18
     },
-    "msgId": 266,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 67.27272727272725,
-    "ladder2": true,
-    "trailPct": 10
+    "msgId": 272
   }
 }
