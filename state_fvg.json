@@ -1,24 +1,4 @@
 {
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260810C00722000",
-    "strike": "722",
-    "entryPremium": 0.995,
-    "qty": 5,
-    "entryTime": 1786379663595,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 722.47,
-      "gapHigh": 722.52,
-      "gapPct": 0.007,
-      "bar": 30
-    },
-    "msgId": 289,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 13.06532663316583
-  },
   "SPY": {
     "active": true,
     "signal": "PUT",
