@@ -16,8 +16,10 @@
     },
     "msgId": 291,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.734463276836156
+    "stopPct": 10,
+    "peakPct": 32.768361581920885,
+    "ladder2": true,
+    "trailPct": 10
   },
   "IWM": {
     "active": true,
@@ -34,7 +36,10 @@
       "gapPct": 0.043,
       "bar": 18
     },
-    "msgId": 292
+    "msgId": 292,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 11.340206185567022
   },
   "QQQ": {
     "active": true,
