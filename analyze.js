@@ -226,7 +226,71 @@ function analyze() {
   }
 
   m += `\n<i>ص = صفقة | النسبة = WR</i>`;
-  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops() + analyzeTimeExits() + analyzeFlips();
+  return m + analyzePeaks() + analyzeFrozen() + analyzeBreakoutStops() + analyzeTimeExits() + analyzeFlips() + analyzeTrend();
+}
+
+// ---------- TREND FILTER: price vs VWAP at entry ----------
+// Hypothesis: trading AGAINST the trend (e.g. PUT when price > VWAP) loses.
+// Uses market_log to get VWAP at the time closest to each entry.
+function analyzeTrend() {
+  const rows = readJSONL("outcomes.jsonl").filter(r => !EXCLUDE_DAYS.has(r.day));
+  const ml   = readJSONL("market_log.jsonl");
+  if (rows.length < 10 || ml.length < 10) return "";
+
+  // Index market_log by day+symbol
+  const idx = new Map();
+  for (const r of ml) {
+    if (!r.px || !r.vw) continue;
+    const k = `${r.d}|${r.s}`;
+    if (!idx.has(k)) idx.set(k, []);
+    idx.get(k).push(r);
+  }
+
+  function classify(r) {
+    const arr = idx.get(`${r.day}|${r.symbol}`);
+    if (!arr) return null;
+    const c = arr.reduce((b, m) =>
+      Math.abs(m.px - r.entryStockPrice) < Math.abs(b.px - r.entryStockPrice) ? m : b
+    );
+    return c.vw ? c.px > c.vw : null;
+  }
+
+  function st(g) {
+    const w = g.filter(r => r.win).length;
+    const net = g.reduce((a, r) => a + r.pnl, 0);
+    return `${g.length}ص | WR ${g.length ? Math.round(w/g.length*100) : 0}% | ${net>=0?"+":""}$${net}`;
+  }
+
+  const withTrend = rows.filter(r => classify(r) !== null);
+  if (withTrend.length < 10) return "";
+
+  // CALL above VWAP = with trend | CALL below VWAP = against trend
+  // PUT below VWAP = with trend  | PUT above VWAP = against trend
+  const withT  = withTrend.filter(r => (r.signal==="CALL" && classify(r)===true) || (r.signal==="PUT" && classify(r)===false));
+  const agstT  = withTrend.filter(r => (r.signal==="CALL" && classify(r)===false) || (r.signal==="PUT" && classify(r)===true));
+
+  // Also: PUT above VWAP specifically (the most common "against trend" case)
+  const putAbove = withTrend.filter(r => r.signal==="PUT" && classify(r)===true);
+  const putBelow = withTrend.filter(r => r.signal==="PUT" && classify(r)===false);
+  const callAbove = withTrend.filter(r => r.signal==="CALL" && classify(r)===true);
+  const callBelow = withTrend.filter(r => r.signal==="CALL" && classify(r)===false);
+
+  let s = `\n\n<b>📐 الترند — السعر مقابل VWAP</b>\n`;
+  s += `  مع الترند:   ${st(withT)}\n`;
+  s += `  ضد الترند:   ${st(agstT)}\n`;
+  s += `\n  PUT فوق VWAP (ضد): ${st(putAbove)}\n`;
+  s += `  PUT تحت VWAP (مع): ${st(putBelow)}\n`;
+  s += `  CALL فوق VWAP (مع): ${st(callAbove)}\n`;
+  s += `  CALL تحت VWAP (ضد): ${st(callBelow)}\n`;
+
+  if (withT.length >= 10 && agstT.length >= 10) {
+    const wwr = Math.round(withT.filter(r=>r.win).length/withT.length*100);
+    const awr = Math.round(agstT.filter(r=>r.win).length/agstT.length*100);
+    s += wwr > awr + 10
+      ? `  ← مع الترند أفضل بوضوح ✅ (فلتر مقترح)\n`
+      : `  ← الفرق صغير — الترند مش العامل الحاسم\n`;
+  }
+  return s;
 }
 
 // ---------- FLIP PERFORMANCE: breakout trades vs normal ----------
