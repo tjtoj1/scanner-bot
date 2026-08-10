@@ -17,7 +17,7 @@
     "msgId": 192,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 28.83720930232554,
+    "peakPct": 36.279069767441825,
     "ladder2": true,
     "trailPct": 10
   },
@@ -54,7 +54,9 @@
       "bar": 18
     },
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 12.195121951219495
+    "stopPct": 10,
+    "peakPct": 31.097560975609767,
+    "ladder2": true,
+    "trailPct": 10
   }
 }
