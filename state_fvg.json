@@ -17,7 +17,10 @@
       "gapPct": 0.019,
       "bar": 26
     },
-    "msgId": 261
+    "msgId": 261,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.598425196850387
   },
   "IWM": {
     "active": true,
@@ -37,7 +40,7 @@
     "msgId": 266,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 54.545454545454554,
+    "peakPct": 58.181818181818166,
     "ladder2": true,
     "trailPct": 10
   }
