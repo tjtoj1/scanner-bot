@@ -32,5 +32,8 @@
       "bar": 18
     },
     "msgId": 301
+  },
+  "SPY": {
+    "active": true
   }
 }
