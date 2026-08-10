@@ -1,0 +1,25 @@
+name: FVG Daily Report
+
+on:
+  schedule:
+    - cron: '5 20 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Send FVG report
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+        run: node report2.js
