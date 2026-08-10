@@ -18,5 +18,22 @@
       "bar": 33
     },
     "msgId": 315
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260810P00300000",
+    "strike": "300",
+    "entryPremium": 0.53,
+    "qty": 9,
+    "entryTime": 1786382428477,
+    "fvg": {
+      "type": "bearish",
+      "gapLow": 300.5,
+      "gapHigh": 300.63,
+      "gapPct": 0.043,
+      "bar": 18
+    },
+    "msgId": 318
   }
 }
