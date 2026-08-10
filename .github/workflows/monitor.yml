@@ -11,13 +11,13 @@ permissions:
 jobs:
   monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run monitor
+      - name: Run monitor (Bot 1)
         env:
           ALPACA_KEY:    ${{ secrets.ALPACA_KEY }}
           ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
@@ -25,6 +25,13 @@ jobs:
           TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
           MODE:          monitor
         run: node scan.js
+      - name: Run FVG monitor (Bot 2)
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+          MODE:            monitor
+        run: node scan2.js
       - name: Commit state
         run: |
           git config --local user.email "action@github.com"
@@ -38,7 +45,7 @@ jobs:
             git rebase --abort 2>/dev/null || true
             git checkout -f main 2>/dev/null || true
             git pull origin main -X ours --no-edit 2>/dev/null || {
-              git checkout --ours state.json state2.json 2>/dev/null || true
+              git checkout --ours state.json state2.json state_fvg.json 2>/dev/null || true
               git add -A
               GIT_EDITOR=true git merge --continue 2>/dev/null || true
             }
