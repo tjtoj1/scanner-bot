@@ -25,5 +25,12 @@
       "bar": 30
     },
     "msgId": 289
+  },
+  "IWM_fvg": {
+    "type": "bearish",
+    "gapLow": 300.5,
+    "gapHigh": 300.63,
+    "gapPct": 0.043,
+    "bar": 18
   }
 }
