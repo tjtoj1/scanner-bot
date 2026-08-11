@@ -23,8 +23,10 @@
     },
     "msgId": 363,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 11.650485436893192
+    "stopPct": 10,
+    "peakPct": 27.18446601941748,
+    "ladder2": true,
+    "trailPct": 10
   },
   "QQQ_fvg": {
     "type": "bearish",
