@@ -1,10 +1,28 @@
 {
   "_date": "2026-08-11",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "symbol": "SPY",
+      "signal": "CALL",
+      "window": "ORB_Pullback",
+      "entryPremium": 0.895,
+      "exitPremium": 0.76,
+      "qty": 14,
+      "pnl": -189,
+      "pnlPct": -15.083798882681565,
+      "reason": "time_exit",
+      "minutes": 26,
+      "entryTime": 1786457425772,
+      "exitTime": 1786458979818,
+      "strike": "774",
+      "setup": "Pullback bounce at VWAP, near support 773.23",
+      "exitStockPrice": 773.68
+    }
+  ],
   "_reportSent": false,
-  "_dailyLosses": 0,
+  "_dailyLosses": 189,
   "_dailyTrades_count": 1,
-  "_consecLosses": 0,
+  "_consecLosses": 1,
   "GLD": {
     "active": false,
     "exited": true,
@@ -13,31 +31,11 @@
     "lastExitTime": 1786384887477
   },
   "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "isFlip": false,
-    "window": "ORB_Pullback",
-    "optionSymbol": "SPY260811C00774000",
-    "strike": "774",
-    "entryPremium": 0.895,
-    "qty": 14,
-    "entryTime": 1786457425772,
-    "orderId": "d52b86e8-5b1c-4bae-9910-75351db0a234",
-    "stopOrderId": null,
-    "currentStop": 0.537,
-    "peakPremium": 0.95,
-    "targetPct": 75,
-    "stopPct": 40,
-    "timeExitMin": 25,
-    "entryMessageId": 2406,
-    "reason": "Pullback bounce at VWAP, near support 773.23",
-    "partial1Done": false,
-    "bePromoted": false,
-    "partial2Done": false,
-    "trailing": false,
-    "remainingQty": 14,
-    "quickExitWindow": false,
-    "lastPremium": 0.67
+    "active": false,
+    "exited": true,
+    "cooldownUntil": 1786459580383,
+    "lastSignal": "CALL",
+    "lastExitTime": 1786458980383
   },
   "QQQ": {
     "active": false,
