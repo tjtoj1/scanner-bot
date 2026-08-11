@@ -22,5 +22,12 @@
       "bar": 60
     },
     "msgId": 357
+  },
+  "QQQ_fvg": {
+    "type": "bearish",
+    "gapLow": 720.8,
+    "gapHigh": 720.9,
+    "gapPct": 0.014,
+    "bar": 59
   }
 }
