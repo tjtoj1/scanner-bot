@@ -20,7 +20,10 @@
       "gapHigh": 721.3,
       "gapPct": 0.017,
       "bar": 41
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.307692307692331
   },
   "SPY_fvg": {
     "type": "bearish",
