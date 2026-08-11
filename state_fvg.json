@@ -12,22 +12,5 @@
     "gapHigh": 721.3,
     "gapPct": 0.017,
     "bar": 41
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260811C00773000",
-    "strike": "773",
-    "entryPremium": 1.545,
-    "qty": 3,
-    "entryTime": 1786455322904,
-    "fvg": {
-      "type": "bullish",
-      "gapLow": 772.93,
-      "gapHigh": 773.05,
-      "gapPct": 0.016,
-      "bar": 42
-    },
-    "msgId": 344
   }
 }
