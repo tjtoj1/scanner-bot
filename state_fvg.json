@@ -21,7 +21,10 @@
       "gapPct": 0.014,
       "bar": 59
     },
-    "msgId": 360
+    "msgId": 360,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.526315789473681
   },
   "SPY_fvg": {
     "type": "bearish",
