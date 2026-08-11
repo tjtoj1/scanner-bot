@@ -28,6 +28,9 @@
       "gapPct": 0.066,
       "bar": 60
     },
-    "msgId": 347
+    "msgId": 347,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 17.209302325581376
   }
 }
