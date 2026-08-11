@@ -12,5 +12,8 @@
     "gapHigh": 721.3,
     "gapPct": 0.017,
     "bar": 41
+  },
+  "SPY": {
+    "active": true
   }
 }
