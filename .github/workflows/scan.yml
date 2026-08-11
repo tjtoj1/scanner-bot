@@ -24,13 +24,20 @@ jobs:
           TG_TOKEN:      ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID:    ${{ secrets.TG_CHAT_ID }}
         run: node scan.js
-      - name: Run FVG Bot 2 (monitor + scan)
+      - name: Run FVG monitor (Bot 2)
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+          MODE:            monitor
+        run: node scan2.js
+      - name: Run FVG scan (Bot 2)
         env:
           ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
           ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
           TG_TOKEN:        ${{ secrets.TG_TOKEN }}
         run: |
-          MODE=monitor node scan2.js
+          sleep 10
           node scan2.js
       - name: Commit state
         run: |
