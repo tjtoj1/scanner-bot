@@ -13,9 +13,6 @@
     "gapPct": 0.014,
     "bar": 55
   },
-  "QQQ": {
-    "active": true
-  },
   "SPY_fvg": {
     "type": "bearish",
     "gapLow": 772.84,
