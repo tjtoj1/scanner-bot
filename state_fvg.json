@@ -14,6 +14,20 @@
     "bar": 41
   },
   "SPY": {
-    "active": true
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260811P00773000",
+    "strike": "773",
+    "entryPremium": 1.0750000000000002,
+    "qty": 4,
+    "entryTime": 1786462233422,
+    "fvg": {
+      "type": "bearish",
+      "gapLow": 772.84,
+      "gapHigh": 773.35,
+      "gapPct": 0.066,
+      "bar": 60
+    },
+    "msgId": 347
   }
 }
