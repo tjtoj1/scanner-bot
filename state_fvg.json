@@ -21,7 +21,10 @@
       "gapPct": 0.066,
       "bar": 60
     },
-    "msgId": 357
+    "msgId": 357,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 13.872832369942195
   },
   "QQQ_fvg": {
     "type": "bearish",
