@@ -392,7 +392,7 @@ function detectPullback(bars1m, bars5m, vwapVal, ema9Val) {
 // STRATEGY: Window-Specific Analysis
 // ============================================================
 async function analyzeStrategy(window, sr, indicators) {
-  const { price, bars1m, bars5m, vwap5m, ema9, rsi5m, atrVal, vix } = indicators;
+  const { price, bars1m, bars5m, vwap5m: vwapVal, ema9, rsi5m, atrVal, vix } = indicators;
 
   // VIX filter (15-25 ideal)
   if (vix && (vix < 12 || vix > 30)) {
@@ -435,6 +435,10 @@ async function analyzeStrategy(window, sr, indicators) {
         if (rsi5m > 60) {
           return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} > 60 (overbought, v20.4)` };
         }
+        // v20.7: VWAP trend filter — CALL below VWAP = against trend (data: WR 15%, -$2364 over 14 days)
+        if (vwapVal && price < vwapVal) {
+          return { signal: "NEUTRAL", reason: `CALL below VWAP ($${vwapVal.toFixed(2)}) — against trend (v20.7)` };
+        }
         return {
           signal: "CALL",
           reason: `Pullback bounce at ${pullback.level}, near support ${support.toFixed(2)}`,
@@ -457,6 +461,10 @@ async function analyzeStrategy(window, sr, indicators) {
         // RSI check — v20.4: tightened from <30 to <40 (mirrors CALL logic, data: RSI<40 WR 67%)
         if (rsi5m < 40) {
           return { signal: "NEUTRAL", reason: `RSI ${rsi5m.toFixed(1)} < 40 (oversold, v20.4)` };
+        }
+        // v20.7: VWAP trend filter — PUT above VWAP = against trend (data: WR 33%, -$1184 over 14 days)
+        if (vwapVal && price > vwapVal) {
+          return { signal: "NEUTRAL", reason: `PUT above VWAP ($${vwapVal.toFixed(2)}) — against trend (v20.7)` };
         }
         return {
           signal: "PUT",
