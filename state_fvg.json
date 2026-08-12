@@ -12,22 +12,5 @@
     "gapHigh": 773.35,
     "gapPct": 0.066,
     "bar": 54
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260812P00726000",
-    "strike": "726",
-    "entryPremium": 2.83,
-    "qty": 1,
-    "entryTime": 1786541839907,
-    "fvg": {
-      "type": "bearish",
-      "gapLow": 720.8,
-      "gapHigh": 720.9,
-      "gapPct": 0.014,
-      "bar": 55
-    },
-    "msgId": 370
   }
 }
