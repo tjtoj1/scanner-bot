@@ -12,5 +12,12 @@
     "gapHigh": 773.35,
     "gapPct": 0.066,
     "bar": 54
+  },
+  "QQQ_fvg": {
+    "type": "bullish",
+    "gapLow": 725.36,
+    "gapHigh": 725.73,
+    "gapPct": 0.051,
+    "bar": 60
   }
 }
