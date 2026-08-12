@@ -405,7 +405,7 @@ async function analyzeStrategy(window, sr, indicators) {
   }
 
   // Detect pullback
-  const pullback = detectPullback(bars1m, bars5m, vwap5m, ema9);
+  const pullback = detectPullback(bars1m, bars5m, vwapVal, ema9);
   if (!pullback) {
     return { signal: "NEUTRAL", reason: "No valid pullback detected" };
   }
