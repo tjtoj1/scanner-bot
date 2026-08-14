@@ -2140,5 +2140,23 @@
     "volRatio": 0.33,
     "bodyPct": 44,
     "volSurge": false
+  },
+  {
+    "time": "2026-08-14T15:30:21.592Z",
+    "day": "2026-08-14",
+    "symbol": "GLD",
+    "signal": "PUT",
+    "window": "MidMorning_VWAP",
+    "strike": "402",
+    "entryStockPrice": 402.14,
+    "entryPremium": 0.54,
+    "rsi": 51.8,
+    "vwap": 402.46,
+    "level": 402.44,
+    "candleClose": 402.84,
+    "closedBeyondLevel": true,
+    "volRatio": 0.56,
+    "bodyPct": 73,
+    "volSurge": false
   }
 ]
