@@ -136,22 +136,49 @@ function calcQty(premium) {
   return Math.max(1, Math.floor(TRADE_BUDGET / (premium * 100)));
 }
 
-// ─── BUILD / UPDATE OPENING RANGE ───────────────────────────
+// ─── BUILD OPENING RANGE FROM BARS ─────────────────────────
+// Computes the 8:30-8:45 AM range from actual 15-min bar data
+// This works even if the bot wasn't running during that window
 async function buildRange(state, symbol) {
   const today = getToday();
   if (!state.range) state.range = {};
-  if (!state.range[symbol]) state.range[symbol] = { day: today, high: null, low: null };
-  if (state.range[symbol].day !== today) {
-    state.range[symbol] = { day: today, high: null, low: null };
+
+  // Already built for today?
+  if (state.range[symbol]?.day === today &&
+      state.range[symbol].high !== null &&
+      state.range[symbol].low !== null) {
+    console.log(`${symbol}: range already built H=${state.range[symbol].high?.toFixed(2)} L=${state.range[symbol].low?.toFixed(2)}`);
+    return;
   }
 
-  const spot = await getLatestPrice(symbol);
-  if (!spot) return;
+  // Get today's 15-min bars
+  const bars = await getBars(symbol, "15Min", 1);
+  if (!bars.length) { console.log(`${symbol}: no bars available`); return; }
 
-  const r = state.range[symbol];
-  r.high = r.high === null ? spot : Math.max(r.high, spot);
-  r.low  = r.low  === null ? spot : Math.min(r.low, spot);
-  console.log(`${symbol}: building range H=${r.high?.toFixed(2)} L=${r.low?.toFixed(2)} | spot=${spot.toFixed(2)}`);
+  // Filter bars from 8:30-8:45 AM CDT (13:30-13:45 UTC)
+  const rangeBars = bars.filter(b => {
+    const t = new Date(b.t);
+    const m = t.getUTCHours() * 60 + t.getUTCMinutes();
+    return m >= RANGE_START_UTC && m < RANGE_END_UTC;
+  });
+
+  // If no range bars yet (before 8:45), use all bars so far today
+  const todayBars = rangeBars.length > 0 ? rangeBars : bars.filter(b => {
+    const t = new Date(b.t);
+    const m = t.getUTCHours() * 60 + t.getUTCMinutes();
+    return m >= RANGE_START_UTC;
+  });
+
+  if (!todayBars.length) {
+    console.log(`${symbol}: no bars in range window yet`);
+    return;
+  }
+
+  const high = Math.max(...todayBars.map(b => b.h));
+  const low  = Math.min(...todayBars.map(b => b.l));
+
+  state.range[symbol] = { day: today, high, low };
+  console.log(`${symbol}: range built from ${todayBars.length} bar(s) → H=${high.toFixed(2)} L=${low.toFixed(2)}`);
 }
 
 // ─── DETECT BREAKOUT ────────────────────────────────────────
@@ -373,25 +400,22 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
     for (const sym of TICKERS) {
       if (state[sym]?.active) await monitorPosition(state, sym);
     }
-    // After monitor, scan for new entries
     if (!isPastLastEntry()) {
       const freshState = loadState();
       for (const sym of TICKERS) {
+        // Always try to build/verify range first
+        await buildRange(freshState, sym);
         if (!freshState[sym]?.active && !liveInAlpaca.has(sym)) {
-          if (isRangeBuilding()) {
-            await buildRange(freshState, sym);
-          } else {
-            await scanEntry(freshState, sym, portfolio, liveInAlpaca);
-          }
+          await scanEntry(freshState, sym, portfolio, liveInAlpaca);
         }
       }
       saveState(freshState);
     }
   } else {
     for (const sym of TICKERS) {
-      if (isRangeBuilding()) {
-        await buildRange(state, sym);
-      } else if (!state[sym]?.active && !liveInAlpaca.has(sym)) {
+      // Always build range from bars (works anytime after 8:30)
+      await buildRange(state, sym);
+      if (!state[sym]?.active && !liveInAlpaca.has(sym)) {
         await scanEntry(state, sym, portfolio, liveInAlpaca);
       }
     }
