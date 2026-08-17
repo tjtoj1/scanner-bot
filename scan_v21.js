@@ -81,13 +81,16 @@ async function alpaca(path, method="GET", body=null) {
 }
 
 async function getBars(symbol, tf="15Min", daysBack=1) {
-  const start = new Date(Date.now()-daysBack*24*60*60*1000).toISOString();
-  const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=100&adjustment=raw`;
-  const res = await fetch(url, {
-    headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
-  });
-  const d = await res.json();
-  return d.bars || [];
+  try {
+    const start = new Date(Date.now()-daysBack*24*60*60*1000).toISOString();
+    const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=100&adjustment=raw`;
+    const res = await fetch(url, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+    });
+    const text = await res.text();
+    try { return JSON.parse(text).bars || []; }
+    catch { console.error(`${symbol} getBars parse error:`, text.slice(0,100)); return []; }
+  } catch(e) { console.error(`${symbol} getBars error:`, e.message); return []; }
 }
 
 async function getLatestPrice(symbol) {
@@ -393,8 +396,12 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   } catch(e) { console.error("Reconcile failed:", e.message); }
 
   // Get portfolio value
-  const acctInfo = await alpaca("/account");
-  const portfolio = parseFloat(acctInfo.portfolio_value) || 10000;
+  let portfolio = 5000;
+  try {
+    const acctInfo = await alpaca("/account");
+    portfolio = parseFloat(acctInfo.portfolio_value) || 5000;
+    console.log(`Account: $${portfolio.toFixed(0)}`);
+  } catch(e) { console.error("Account fetch failed:", e.message); }
 
   if (MODE === "monitor") {
     for (const sym of TICKERS) {
