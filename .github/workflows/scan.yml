@@ -26,8 +26,8 @@ jobs:
         run: node scan.js
       - name: Run FVG monitor (Bot 2)
         env:
-          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
-          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          ALPACA_KEY_2:   ${{ secrets.ALPACA_KEY }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET }}
           TG_TOKEN:        ${{ secrets.TG_TOKEN }}
           MODE:            monitor
         run: node scan2.js
