@@ -216,6 +216,25 @@ async function checkBreakout(state, symbol) {
   return null;
 }
 
+// ─── UPDATE STOP ORDER ──────────────────────────────────────
+async function updateStopOrder(pos, newStopPrice) {
+  try {
+    // Cancel old stop order
+    if (pos.stopOrderId) {
+      await alpaca(`/orders/${pos.stopOrderId}`, "DELETE");
+      console.log(`Stop order ${pos.stopOrderId} cancelled`);
+    }
+    // Place new stop order
+    const stopOrder = await alpaca("/orders", "POST", {
+      symbol: pos.optionSymbol, qty: String(pos.qty), side: "sell",
+      type: "stop", time_in_force: "day",
+      stop_price: String(Math.max(0.01, newStopPrice))
+    });
+    pos.stopOrderId = stopOrder.id || null;
+    console.log(`New stop placed @ $${newStopPrice.toFixed(2)} (order ${pos.stopOrderId})`);
+  } catch(e) { console.error("updateStopOrder failed:", e.message); }
+}
+
 // ─── MONITOR OPEN POSITION ──────────────────────────────────
 async function monitorPosition(state, symbol) {
   const pos = state[symbol];
@@ -230,6 +249,7 @@ async function monitorPosition(state, symbol) {
 
   // Force exit
   if (isForceExit()) {
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
     await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
     const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
     await tg(`🔔 <b>v21 خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
@@ -238,6 +258,7 @@ async function monitorPosition(state, symbol) {
 
   // Hard stop
   if (pnlPct <= HARD_STOP_PCT) {
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
     await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
     const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
     await tg(`🛑 <b>v21 وقف خسارة ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
@@ -249,11 +270,17 @@ async function monitorPosition(state, symbol) {
     pos.ladder2=true; pos.ladder1=true;
     pos.stopPct=LADDER_2_STOP; pos.trailPct=TRAIL_PCT;
     pos.peakPct=Math.max(pos.peakPct||0, pnlPct);
+    // Update stop order to lock in +10%
+    const newStop = +(pos.entryPremium * (1 + LADDER_2_STOP/100)).toFixed(2);
+    await updateStopOrder(pos, newStop);
     await tg(`📈 <b>v21 ${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`, pos.msgId);
   }
   if (pnlPct >= LADDER_1_PCT && !pos.ladder1) {
     pos.ladder1=true; pos.stopPct=LADDER_1_STOP;
     pos.peakPct=Math.max(pos.peakPct||0, pnlPct);
+    // Update stop order to lock in +5%
+    const newStop = +(pos.entryPremium * (1 + LADDER_1_STOP/100)).toFixed(2);
+    await updateStopOrder(pos, newStop);
     await tg(`📊 <b>v21 ${symbol} مستوى 1</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_1_STOP}%`, pos.msgId);
   }
   if (pos.trailPct) pos.peakPct = Math.max(pos.peakPct||0, pnlPct);
@@ -339,11 +366,25 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
 📈 اختراق: $${breakout.level.toFixed(2)} | حجم ×${breakout.volSurge.toFixed(2)}
 🛑 وقف: إغلاق شمعة 15د داخل النطاق + حجم عادي`);
 
+  // Place hard stop loss order at -35%
+  const hardStopPrice = +(opt.premium * (1 + HARD_STOP_PCT/100)).toFixed(2);
+  let stopOrderId = null;
+  try {
+    const stopOrder = await alpaca("/orders", "POST", {
+      symbol: opt.symbol, qty: String(qty), side: "sell",
+      type: "stop", time_in_force: "day",
+      stop_price: String(Math.max(0.01, hardStopPrice))
+    });
+    stopOrderId = stopOrder.id || null;
+    console.log(`${symbol}: hard stop placed @ $${hardStopPrice.toFixed(2)} (order ${stopOrderId})`);
+  } catch(e) { console.error(`${symbol}: stop order failed:`, e.message); }
+
   state[symbol] = {
     active: true, signal: breakout.signal,
     optionSymbol: opt.symbol, strike: opt.strike,
     entryPremium: opt.premium, qty,
     entryTime: Date.now(), level: breakout.level, msgId,
+    stopOrderId, hardStopPrice,
   };
   if (!state._dailyTrades) state._dailyTrades = [];
   state._dailyTrades.push({ day: today, symbol, signal: breakout.signal, pnl: 0 });
