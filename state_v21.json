@@ -1,6 +1,19 @@
 {
   "_lastDay": "2026-08-18",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-08-18",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-08-18",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-08-18",
@@ -12,5 +25,27 @@
       "high": 734.58,
       "low": 729.02
     }
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260818P00768000",
+    "strike": "768",
+    "entryPremium": 1.185,
+    "qty": 4,
+    "entryTime": 1787062518424,
+    "level": 772.17,
+    "msgId": 385
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260818P00718000",
+    "strike": "718",
+    "entryPremium": 2.035,
+    "qty": 2,
+    "entryTime": 1787062519230,
+    "level": 729.02,
+    "msgId": 386
   }
 }
