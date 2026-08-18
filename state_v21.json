@@ -1,16 +1,16 @@
 {
-  "_lastDay": "2026-08-17",
+  "_lastDay": "2026-08-18",
   "_dailyTrades": [],
   "range": {
     "SPY": {
-      "day": "2026-08-17",
-      "high": null,
-      "low": null
+      "day": "2026-08-18",
+      "high": 776.0101,
+      "low": 772.17
     },
     "QQQ": {
-      "day": "2026-08-17",
-      "high": null,
-      "low": null
+      "day": "2026-08-18",
+      "high": 734.58,
+      "low": 729.02
     }
   }
 }
