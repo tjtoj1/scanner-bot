@@ -38,20 +38,6 @@
       "low": 729.02
     }
   },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260818P00768000",
-    "strike": "768",
-    "entryPremium": 0.685,
-    "qty": 7,
-    "entryTime": 1787068602539,
-    "level": 772.17,
-    "msgId": 389,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.218978102189773
-  },
   "QQQ": {
     "active": true,
     "signal": "PUT",
