@@ -47,6 +47,9 @@
     "qty": 3,
     "entryTime": 1787068603242,
     "level": 729.02,
-    "msgId": 390
+    "msgId": 390,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.391634980988602
   }
 }
