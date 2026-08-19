@@ -37,23 +37,5 @@
       "high": 720.56,
       "low": 715.92
     }
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260819C00770000",
-    "strike": "770",
-    "entryPremium": 1.065,
-    "qty": 4,
-    "entryTime": 1787149054598,
-    "level": 769.27,
-    "msgId": 401,
-    "stopOrderId": "9083ef1d-a6a4-46a6-ad30-3af39ebd5110",
-    "hardStopPrice": 0.69,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 96.71361502347416
   }
 }
