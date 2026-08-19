@@ -6,6 +6,12 @@
       "symbol": "SPY",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-19",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -25,12 +31,12 @@
     "signal": "CALL",
     "optionSymbol": "SPY260819C00770000",
     "strike": "770",
-    "entryPremium": 1.4449999999999998,
-    "qty": 3,
-    "entryTime": 1787147126113,
+    "entryPremium": 1.2349999999999999,
+    "qty": 4,
+    "entryTime": 1787147745373,
     "level": 769.27,
-    "msgId": 397,
-    "stopOrderId": "3f68bfe4-6a3a-4cb3-af8f-39646d650cce",
-    "hardStopPrice": 0.94
+    "msgId": 399,
+    "stopOrderId": "786e1f32-e6ab-4b45-b3f2-52654fbab7f0",
+    "hardStopPrice": 0.8
   }
 }
