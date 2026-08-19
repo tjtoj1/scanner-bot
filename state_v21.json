@@ -12,6 +12,18 @@
       "symbol": "SPY",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-19",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-08-19",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -31,15 +43,25 @@
     "signal": "CALL",
     "optionSymbol": "SPY260819C00770000",
     "strike": "770",
-    "entryPremium": 1.2349999999999999,
+    "entryPremium": 1.065,
     "qty": 4,
-    "entryTime": 1787147745373,
+    "entryTime": 1787149054598,
     "level": 769.27,
-    "msgId": 399,
-    "stopOrderId": "cad8b461-b3c2-4809-b783-7a868cd6d20c",
-    "hardStopPrice": 0.8,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.526315789473696
+    "msgId": 401,
+    "stopOrderId": "72fd0458-e0de-46c9-8b32-6958eedf6171",
+    "hardStopPrice": 0.69
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260819P00714000",
+    "strike": "714",
+    "entryPremium": 1.78,
+    "qty": 2,
+    "entryTime": 1787149055004,
+    "level": 715.92,
+    "msgId": 402,
+    "stopOrderId": null,
+    "hardStopPrice": 1.16
   }
 }
