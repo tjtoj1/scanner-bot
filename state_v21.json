@@ -48,20 +48,12 @@
     "entryTime": 1787149054598,
     "level": 769.27,
     "msgId": 401,
-    "stopOrderId": "72fd0458-e0de-46c9-8b32-6958eedf6171",
-    "hardStopPrice": 0.69
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260819P00714000",
-    "strike": "714",
-    "entryPremium": 1.78,
-    "qty": 2,
-    "entryTime": 1787149055004,
-    "level": 715.92,
-    "msgId": 402,
-    "stopOrderId": null,
-    "hardStopPrice": 1.16
+    "stopOrderId": "9083ef1d-a6a4-46a6-ad30-3af39ebd5110",
+    "hardStopPrice": 0.69,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 96.71361502347416
   }
 }
