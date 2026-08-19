@@ -11,6 +11,7 @@
 //   6. Max 4 trades/day | $500 per trade
 // ============================================================
 import fs from "fs";
+import { computeHalfTrend } from "./halftrend.js";
 
 const ALPACA_KEY    = process.env.ALPACA_KEY_2;
 const ALPACA_SECRET = process.env.ALPACA_SECRET_2;
@@ -19,7 +20,11 @@ const PERSONAL_CHAT = "810642442";
 const MODE          = process.env.MODE || "scan";
 const TRADING_BASE  = "https://paper-api.alpaca.markets/v2";
 const DATA_BASE     = "https://data.alpaca.markets/v2";
-const TICKERS       = ["SPY", "QQQ"];
+// 0DTE tickers (daily expiry)
+const TICKERS_0DTE  = ["SPY", "QQQ", "IWM"];
+// Non-0DTE tickers (use next available expiry after today)
+const TICKERS_NEXT  = ["NVDA", "TSLA", "AMZN"];
+const TICKERS       = [...TICKERS_0DTE, ...TICKERS_NEXT];
 
 // Config
 const TRADE_BUDGET      = 500;   // $ per trade
@@ -49,6 +54,27 @@ function isRangeBuilding() { const m=utcMin(); return m>=RANGE_START_UTC && m<RA
 function isPastLastEntry() { return utcMin() >= LAST_ENTRY_UTC; }
 function isForceExit() { return utcMin() >= FORCE_EXIT_UTC; }
 function getToday() { return new Date().toISOString().split("T")[0]; }
+
+// Get next available expiry after today (for NVDA/TSLA/AMZN)
+async function getNextExpiry(symbol) {
+  try {
+    const today = getToday();
+    const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date_gte=${today}&status=active&limit=50&type=call`;
+    const res = await fetch(url, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+    });
+    const d = await res.json();
+    const contracts = d?.option_contracts || [];
+    // Get unique expiry dates sorted
+    const dates = [...new Set(contracts.map(c => c.expiration_date))].sort();
+    // Find first expiry AFTER today
+    const next = dates.find(d => d > today);
+    return next || today;
+  } catch(e) {
+    console.error(`${symbol} getNextExpiry error:`, e.message);
+    return getToday();
+  }
+}
 
 function loadState() {
   try { return JSON.parse(fs.readFileSync("state_v21.json","utf8")); }
@@ -104,12 +130,18 @@ async function getLatestPrice(symbol) {
 }
 
 async function findOption(symbol, signal, spotPrice) {
-  const today = getToday();
+  // 0DTE for ETFs, next available expiry for individual stocks
+  const expiry = TICKERS_0DTE.includes(symbol)
+    ? getToday()
+    : await getNextExpiry(symbol);
+
   const type = signal === "CALL" ? "call" : "put";
-  for (const delta of [0, 1, -1, 2, -2, 3, -3]) {
+  console.log(`${symbol}: ${type} expiry ${expiry}`);
+
+  for (const delta of [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]) {
     const strike = Math.round(spotPrice) + delta;
     try {
-      const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${today}&type=${type}&strike_price_gte=${strike-0.5}&strike_price_lte=${strike+0.5}&status=active&limit=5`;
+      const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${expiry}&type=${type}&strike_price_gte=${strike-0.5}&strike_price_lte=${strike+0.5}&status=active&limit=5`;
       const res = await fetch(url, {
         headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
       });
@@ -118,7 +150,7 @@ async function findOption(symbol, signal, spotPrice) {
       if (!contracts.length) continue;
       const contract = contracts.sort((a,b)=>Math.abs(a.strike_price-spotPrice)-Math.abs(b.strike_price-spotPrice))[0];
       const premium = await getQuote(contract.symbol);
-      if (premium && premium > 0.05) return { symbol: contract.symbol, strike: contract.strike_price, premium };
+      if (premium && premium > 0.05) return { symbol: contract.symbol, strike: contract.strike_price, premium, expiry };
     } catch(e) { console.log(`  strike ${strike}: ${e.message}`); }
   }
   return null;
@@ -158,18 +190,20 @@ async function buildRange(state, symbol) {
   const bars = await getBars(symbol, "15Min", 1);
   if (!bars.length) { console.log(`${symbol}: no bars available`); return; }
 
-  // Filter bars from 8:30-8:45 AM CDT (13:30-13:45 UTC)
+  // Filter bars from TODAY 8:30-8:45 AM CDT (13:30-13:45 UTC)
   const rangeBars = bars.filter(b => {
     const t = new Date(b.t);
+    const barDate = t.toISOString().split("T")[0];
     const m = t.getUTCHours() * 60 + t.getUTCMinutes();
-    return m >= RANGE_START_UTC && m < RANGE_END_UTC;
+    return barDate === today && m >= RANGE_START_UTC && m < RANGE_END_UTC;
   });
 
-  // If no range bars yet (before 8:45), use all bars so far today
+  // If no range bars yet (before 8:45), use all TODAY's bars so far
   const todayBars = rangeBars.length > 0 ? rangeBars : bars.filter(b => {
     const t = new Date(b.t);
+    const barDate = t.toISOString().split("T")[0];
     const m = t.getUTCHours() * 60 + t.getUTCMinutes();
-    return m >= RANGE_START_UTC;
+    return barDate === today && m >= RANGE_START_UTC;
   });
 
   if (!todayBars.length) {
@@ -235,6 +269,32 @@ async function updateStopOrder(pos, newStopPrice) {
   } catch(e) { console.error("updateStopOrder failed:", e.message); }
 }
 
+// ─── PROGRESS BAR ────────────────────────────────────────────
+function progressBar(pnlPct, tp1Pct=LADDER_1_PCT*3.3, maxPct=100) {
+  const filled = Math.max(0, Math.min(10, Math.round((pnlPct / maxPct) * 10)));
+  const bar = "█".repeat(filled) + "░".repeat(10 - filled);
+  return bar;
+}
+
+function buildUpdateMsg(symbol, pos, pnlPct, currentPremium, ht) {
+  const bar = progressBar(pnlPct);
+  const sign = pnlPct >= 0 ? "+" : "";
+  const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
+  const elapsed = Math.round((Date.now() - pos.entryTime) / 60000);
+
+  // TP status
+  const tp1Done = pos.ladder1 ? "✅" : `$${pos.tp1Stock?.toFixed(2) || "—"}`;
+  const tp2Done = pos.ladder2 ? "✅" : `$${pos.tp2Stock?.toFixed(2) || "—"}`;
+  const tp3 = `$${pos.tp3Stock?.toFixed(2) || "—"}`;
+
+  const emoji = pnlPct >= 20 ? "🚀" : pnlPct >= 10 ? "📈" : pnlPct >= 0 ? "🟢" : pnlPct >= -15 ? "🟡" : "🔴";
+
+  return `${symbol} ${pos.signal} $${pos.strike} ${emoji}
+${bar} ${sign}${pnlPct.toFixed(1)}% | ${sign}$${pnl} | ${elapsed}m
+TP1 ${tp1Done} | TP2 ${tp2Done} | TP3 ${tp3}
+SL $${pos.slStock?.toFixed(2) || "—"} | $${currentPremium.toFixed(2)}/عقد`;
+}
+
 // ─── MONITOR OPEN POSITION ──────────────────────────────────
 async function monitorPosition(state, symbol) {
   const pos = state[symbol];
@@ -247,12 +307,21 @@ async function monitorPosition(state, symbol) {
   const elapsed = Math.round((Date.now() - pos.entryTime) / 60000);
   console.log(`${symbol} [v21]: ${pos.signal} | ${pnlPct.toFixed(1)}% | ${elapsed}m`);
 
+  // ── UPDATE EVERY 2 MINUTES ────────────────────────────────
+  const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
+  const now = Date.now();
+  if (!pos.lastUpdate || (now - pos.lastUpdate) >= UPDATE_INTERVAL) {
+    pos.lastUpdate = now;
+    const updateMsg = buildUpdateMsg(symbol, pos, pnlPct, currentPremium);
+    await tg(updateMsg, pos.msgId);
+  }
+
   // Force exit
   if (isForceExit()) {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
     await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
     const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-    await tg(`🔔 <b>v21 خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
+    await tg(`🔔 <b>خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
     delete state[symbol]; saveState(state); return;
   }
 
@@ -261,7 +330,7 @@ async function monitorPosition(state, symbol) {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
     await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
     const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-    await tg(`🛑 <b>v21 وقف خسارة ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
+    await tg(`🛑 <b>وقف خسارة ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
     delete state[symbol]; saveState(state); return;
   }
 
@@ -273,7 +342,7 @@ async function monitorPosition(state, symbol) {
     // Update stop order to lock in +10%
     const newStop = +(pos.entryPremium * (1 + LADDER_2_STOP/100)).toFixed(2);
     await updateStopOrder(pos, newStop);
-    await tg(`📈 <b>v21 ${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`, pos.msgId);
+    await tg(`📈 <b>${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`, pos.msgId);
   }
   if (pnlPct >= LADDER_1_PCT && !pos.ladder1) {
     pos.ladder1=true; pos.stopPct=LADDER_1_STOP;
@@ -281,7 +350,7 @@ async function monitorPosition(state, symbol) {
     // Update stop order to lock in +5%
     const newStop = +(pos.entryPremium * (1 + LADDER_1_STOP/100)).toFixed(2);
     await updateStopOrder(pos, newStop);
-    await tg(`📊 <b>v21 ${symbol} مستوى 1</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_1_STOP}%`, pos.msgId);
+    await tg(`📊 <b>${symbol} مستوى 1</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_1_STOP}%`, pos.msgId);
   }
   if (pos.trailPct) pos.peakPct = Math.max(pos.peakPct||0, pnlPct);
 
@@ -291,7 +360,7 @@ async function monitorPosition(state, symbol) {
     if (pnlPct <= floor) {
       await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
       const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-      await tg(`💰 <b>v21 وقف ربح ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
+      await tg(`💰 <b>وقف ربح ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
       delete state[symbol]; saveState(state); return;
     }
   }
@@ -311,7 +380,7 @@ async function monitorPosition(state, symbol) {
       if (failedBreakout) {
         await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
         const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-        await tg(`🔄 <b>v21 وقف بنيوي ${symbol}</b>\nالاختراق فشل (حجم عادي) | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
+        await tg(`🔄 <b>وقف بنيوي ${symbol}</b>\nالاختراق فشل (حجم عادي) | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
         delete state[symbol]; saveState(state); return;
       }
     }
@@ -353,6 +422,21 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   const spot = await getLatestPrice(symbol);
   if (!spot) return;
 
+  // ── HALFTREND FILTER ────────────────────────────────────────
+  const bars15m = await getBars(symbol, "15Min", 3); // 3 days for enough history
+  const ht = bars15m.length >= 120 ? computeHalfTrend(bars15m) : null;
+
+  if (ht) {
+    // Filter: CALL needs bullish trend (trend=0), PUT needs bearish (trend=1)
+    const htOk = (breakout.signal === "CALL" && ht.trend === 0) ||
+                 (breakout.signal === "PUT"  && ht.trend === 1);
+    if (!htOk) {
+      console.log(`${symbol}: HalfTrend مخالف (trend=${ht.trend}) — تجاهل إشارة ${breakout.signal}`);
+      return;
+    }
+    console.log(`${symbol}: HalfTrend ✅ (trend=${ht.trend === 0 ? "صاعد" : "هابط"})`);
+  }
+
   const opt = await findOption(symbol, breakout.signal, spot);
   if (!opt || opt.premium < 0.05) { console.log(`${symbol}: no option found`); return; }
 
@@ -360,11 +444,33 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   const order = await alpaca("/orders","POST",{symbol:opt.symbol,qty:String(qty),side:"buy",type:"market",time_in_force:"day"});
   if (!order.id) { console.log(`${symbol}: order failed`, order); return; }
 
-  const msgId = await tg(`🚀 <b>v21 ORB ${symbol} ${breakout.signal} $${opt.strike} 0DTE</b>
-💰 دخول: $${opt.premium.toFixed(2)} × ${qty}
-📊 النطاق: $${state.range[symbol].low.toFixed(2)} — $${state.range[symbol].high.toFixed(2)}
-📈 اختراق: $${breakout.level.toFixed(2)} | حجم ×${breakout.volSurge.toFixed(2)}
-🛑 وقف: إغلاق شمعة 15د داخل النطاق + حجم عادي`);
+  // HalfTrend targets (on stock price)
+  let targetsMsg = "";
+  if (ht && ht.atr2) {
+    const dist = ht.atr2 * 3; // baseRiskMult=3
+    if (breakout.signal === "CALL") {
+      targetsMsg = `\n🎯 أهداف السهم (HalfTrend):\n  TP1: $${(spot + dist).toFixed(2)}\n  TP2: $${(spot + dist*2).toFixed(2)}\n  TP3: $${(spot + dist*3).toFixed(2)}\n🛑 SL السهم: $${(spot - dist).toFixed(2)}`;
+    } else {
+      targetsMsg = `\n🎯 أهداف السهم (HalfTrend):\n  TP1: $${(spot - dist).toFixed(2)}\n  TP2: $${(spot - dist*2).toFixed(2)}\n  TP3: $${(spot - dist*3).toFixed(2)}\n🛑 SL السهم: $${(spot + dist).toFixed(2)}`;
+    }
+  }
+
+  const expiryLabel = TICKERS_0DTE.includes(symbol) ? "0DTE" : `exp ${new Date(opt.expiry).toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}`;
+  const entryBar = progressBar(0);
+  // Build clean entry message
+  const tp1 = ht?.atr2 ? (breakout.signal==="CALL" ? spot+ht.atr2*3 : spot-ht.atr2*3) : null;
+  const tp2 = ht?.atr2 ? (breakout.signal==="CALL" ? spot+ht.atr2*6 : spot-ht.atr2*6) : null;
+  const tp3 = ht?.atr2 ? (breakout.signal==="CALL" ? spot+ht.atr2*9 : spot-ht.atr2*9) : null;
+  const sl  = ht?.atr2 ? (breakout.signal==="CALL" ? spot-ht.atr2*3 : spot+ht.atr2*3) : null;
+
+  const tpLine = tp1 ? `TP1 $${tp1.toFixed(2)} | TP2 $${tp2.toFixed(2)} | TP3 $${tp3.toFixed(2)}` : "";
+  const slLine = sl  ? `🛑 $${sl.toFixed(2)}` : "";
+
+  const msgId = await tg(`<b>${symbol} ${breakout.signal} $${opt.strike} 🚀</b> (${expiryLabel})
+💰 $${opt.premium.toFixed(2)} × ${qty} = $${(opt.premium*qty*100).toFixed(0)}
+█████░░░░░ +0%
+${tpLine}
+${slLine}`);
 
   // Place hard stop loss order at -35%
   const hardStopPrice = +(opt.premium * (1 + HARD_STOP_PCT/100)).toFixed(2);
@@ -385,6 +491,11 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
     entryPremium: opt.premium, qty,
     entryTime: Date.now(), level: breakout.level, msgId,
     stopOrderId, hardStopPrice,
+    // HalfTrend stock price targets
+    tp1Stock: ht?.atr2 ? (breakout.signal === "CALL" ? spot + ht.atr2*3 : spot - ht.atr2*3) : null,
+    tp2Stock: ht?.atr2 ? (breakout.signal === "CALL" ? spot + ht.atr2*6 : spot - ht.atr2*6) : null,
+    tp3Stock: ht?.atr2 ? (breakout.signal === "CALL" ? spot + ht.atr2*9 : spot - ht.atr2*9) : null,
+    slStock:  ht?.atr2 ? (breakout.signal === "CALL" ? spot - ht.atr2*3 : spot + ht.atr2*3) : null,
   };
   if (!state._dailyTrades) state._dailyTrades = [];
   state._dailyTrades.push({ day: today, symbol, signal: breakout.signal, pnl: 0 });
