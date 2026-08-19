@@ -1,0 +1,33 @@
+name: v21 Daily Analysis
+
+on:
+  schedule:
+    - cron: '10 20 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run v21 analysis
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+        run: node analyze_v21.js
+      - name: Commit outcomes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add outcomes_v21.jsonl || true
+          git diff --staged --quiet && exit 0
+          git commit -m "v21 outcomes [skip ci]"
+          git push || true
