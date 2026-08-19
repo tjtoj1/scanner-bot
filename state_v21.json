@@ -36,7 +36,10 @@
     "entryTime": 1787147745373,
     "level": 769.27,
     "msgId": 399,
-    "stopOrderId": "786e1f32-e6ab-4b45-b3f2-52654fbab7f0",
-    "hardStopPrice": 0.8
+    "stopOrderId": "cad8b461-b3c2-4809-b783-7a868cd6d20c",
+    "hardStopPrice": 0.8,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.526315789473696
   }
 }
