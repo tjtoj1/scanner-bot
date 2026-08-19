@@ -1,41 +1,16 @@
 {
-  "_lastDay": "2026-08-18",
-  "_dailyTrades": [
-    {
-      "day": "2026-08-18",
-      "symbol": "SPY",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-08-18",
-      "symbol": "QQQ",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-08-18",
-      "symbol": "SPY",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-08-18",
-      "symbol": "QQQ",
-      "signal": "PUT",
-      "pnl": 0
-    }
-  ],
+  "_lastDay": "2026-08-19",
+  "_dailyTrades": [],
   "range": {
     "SPY": {
-      "day": "2026-08-18",
-      "high": 776.0101,
-      "low": 772.17
+      "day": "2026-08-19",
+      "high": 769.27,
+      "low": 766.7
     },
     "QQQ": {
-      "day": "2026-08-18",
-      "high": 734.58,
-      "low": 729.02
+      "day": "2026-08-19",
+      "high": 720.56,
+      "low": 715.92
     }
   }
 }
