@@ -1,6 +1,13 @@
 {
   "_lastDay": "2026-08-19",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-08-19",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-08-19",
@@ -12,5 +19,18 @@
       "high": 720.56,
       "low": 715.92
     }
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260819C00770000",
+    "strike": "770",
+    "entryPremium": 1.4449999999999998,
+    "qty": 3,
+    "entryTime": 1787147126113,
+    "level": 769.27,
+    "msgId": 397,
+    "stopOrderId": "3f68bfe4-6a3a-4cb3-af8f-39646d650cce",
+    "hardStopPrice": 0.94
   }
 }
