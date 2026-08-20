@@ -1,6 +1,13 @@
 {
   "_lastDay": "2026-08-20",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-08-20",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-08-20",
@@ -32,5 +39,22 @@
       "high": 263.84,
       "low": 261.64
     }
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260820P00298000",
+    "strike": "298",
+    "entryPremium": 0.55,
+    "qty": 9,
+    "entryTime": 1787235665118,
+    "level": 299.01,
+    "msgId": 408,
+    "stopOrderId": "65c2588e-34ba-4995-ac11-b6c2284f884d",
+    "hardStopPrice": 0.36,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
