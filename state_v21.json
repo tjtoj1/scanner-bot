@@ -18,6 +18,12 @@
       "symbol": "TSLA",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-20",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -52,23 +58,6 @@
       "low": 261.64
     }
   },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260820P00299000",
-    "strike": "299",
-    "entryPremium": 0.61,
-    "qty": 8,
-    "entryTime": 1787238012214,
-    "level": 299.01,
-    "msgId": 409,
-    "stopOrderId": "a699fed3-9575-4a9e-8dd1-a93e894748c0",
-    "hardStopPrice": 0.4,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null
-  },
   "TSLA": {
     "active": true,
     "signal": "PUT",
@@ -81,6 +70,23 @@
     "msgId": 410,
     "stopOrderId": "beddcddf-469d-4177-b4b1-d0fdf6ce11f4",
     "hardStopPrice": 3.25,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260820P00299000",
+    "strike": "299",
+    "entryPremium": 0.415,
+    "qty": 12,
+    "entryTime": 1787238204294,
+    "level": 299.01,
+    "msgId": 411,
+    "stopOrderId": "cb0f30cf-bd5b-458c-a07d-365cc8f2f89d",
+    "hardStopPrice": 0.27,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
