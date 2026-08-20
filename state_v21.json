@@ -58,23 +58,6 @@
       "low": 261.64
     }
   },
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA260821P00342500",
-    "strike": "342.5",
-    "entryPremium": 4.995,
-    "qty": 1,
-    "entryTime": 1787238014662,
-    "level": 342.25,
-    "msgId": 410,
-    "stopOrderId": "beddcddf-469d-4177-b4b1-d0fdf6ce11f4",
-    "hardStopPrice": 3.25,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -85,11 +68,17 @@
     "entryTime": 1787238204294,
     "level": 299.01,
     "msgId": 411,
-    "stopOrderId": "cb0f30cf-bd5b-458c-a07d-365cc8f2f89d",
+    "stopOrderId": "5ff6ad35-0169-44bc-a953-b4fdd4f0bbc2",
     "hardStopPrice": 0.27,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastUpdate": 1787240494358,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 195.1807228915663
   }
 }
