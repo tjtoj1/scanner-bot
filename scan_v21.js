@@ -251,14 +251,24 @@ async function checkBreakout(state, symbol) {
 }
 
 // ─── LOG TRADE OUTCOME ───────────────────────────────────────
-function logTrade(pos, symbol, exitPremium, reason) {
+function logTrade(pos, symbol, exitPremium, reason, fillSource) {
   try {
+    const tradeId = `${symbol}_${pos.entryTime}`;
+    let existing = "";
+    try { existing = fs.readFileSync("outcomes_v21.jsonl", "utf8"); } catch {}
+    if (existing.includes(`"tradeId":"${tradeId}"`)) {
+      console.log(`logTrade: skipped duplicate ${tradeId}`);
+      return false;
+    }
     const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
     const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
     const record = {
       day: getToday(),
       symbol,
       signal: pos.signal,
+      optionSymbol: pos.optionSymbol,
+      strike: pos.strike,
+      tradeId,
       entryPremium: pos.entryPremium,
       exitPremium: +exitPremium.toFixed(2),
       qty: pos.qty,
@@ -266,13 +276,54 @@ function logTrade(pos, symbol, exitPremium, reason) {
       pnlPct: +pnlPct.toFixed(1),
       win: pnl > 0,
       reason,
+      fillSource,
       entryTime: new Date(pos.entryTime).toISOString(),
       exitTime: new Date().toISOString(),
       level: pos.level,
     };
     fs.appendFileSync("outcomes_v21.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
-  } catch(e) { console.error("logTrade failed:", e.message); }
+    return true;
+  } catch(e) { console.error("logTrade failed:", e.message); return false; }
+}
+
+// ─── CLOSE MESSAGE TEXT ──────────────────────────────────────
+function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
+  const sign = pnl >= 0 ? "+" : "";
+  const tail = `${pnlPct.toFixed(1)}% | ${sign}$${pnl}`;
+  switch (reason) {
+    case "force_exit":      return `🔔 <b>خروج إجباري ${symbol}</b>\n${pos.signal} | ${tail}`;
+    case "hard_stop":       return `🛑 <b>وقف خسارة ${symbol}</b>\n${tail}`;
+    case "ladder_stop":     return `💰 <b>وقف ربح ${symbol}</b>\n${tail}`;
+    case "structural_stop": return `🔄 <b>وقف بنيوي ${symbol}</b>\nالاختراق فشل (حجم عادي) | ${tail}`;
+    case "alpaca_stop":
+    case "alpaca_stop_est": return `🛑 <b>${symbol} أُقفلت (Alpaca)</b>\n${tail}`;
+    default:                return `${symbol} أُغلقت (${reason})\n${tail}`;
+  }
+}
+
+// ─── UNIFIED POSITION CLOSE ──────────────────────────────────
+// skipSell=true is for the Alpaca-reconcile path, where the broker
+// already closed the position — no cancel/sell needed, just record it.
+async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false) {
+  if (!skipSell) {
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
+    const order = await alpaca("/orders", "POST", {
+      symbol: pos.optionSymbol, qty: String(pos.qty), side: "sell",
+      type: "market", time_in_force: "day"
+    });
+    if (!order.id) {
+      console.error(`${symbol}: close sell order failed (${reason}):`, order);
+      await tg(`⚠️ <b>فشل إغلاق ${symbol}</b>\nأمر البيع لم يُنفَّذ (${reason}) — يحتاج تدخلاً يدوياً.`, pos.msgId);
+      return;
+    }
+  }
+  const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
+  const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
+  logTrade(pos, symbol, exitPremium, reason, fillSource);
+  await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
+  delete state[symbol];
+  saveState(state);
 }
 
 // ─── UPDATE STOP ORDER ──────────────────────────────────────
@@ -343,22 +394,14 @@ async function monitorPosition(state, symbol) {
 
   // Force exit
   if (isForceExit()) {
-    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
-    await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
-    const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-    logTrade(pos, symbol, currentPremium, "force_exit");
-    await tg(`🔔 <b>خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
-    delete state[symbol]; saveState(state); return;
+    await closePosition(state, symbol, pos, currentPremium, "force_exit", "order_fill");
+    return;
   }
 
   // Hard stop
   if (pnlPct <= HARD_STOP_PCT) {
-    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
-    await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
-    const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-    logTrade(pos, symbol, currentPremium, "hard_stop");
-    await tg(`🛑 <b>وقف خسارة ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
-    delete state[symbol]; saveState(state); return;
+    await closePosition(state, symbol, pos, currentPremium, "hard_stop", "order_fill");
+    return;
   }
 
   // Profit ladder
@@ -385,11 +428,8 @@ async function monitorPosition(state, symbol) {
   if (pos.stopPct !== undefined) {
     const floor = pos.trailPct ? (pos.peakPct - pos.trailPct) : pos.stopPct;
     if (pnlPct <= floor) {
-      await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
-      const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-      logTrade(pos, symbol, currentPremium, "ladder_stop");
-      await tg(`💰 <b>وقف ربح ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
-      delete state[symbol]; saveState(state); return;
+      await closePosition(state, symbol, pos, currentPremium, "ladder_stop", "order_fill");
+      return;
     }
   }
 
@@ -406,11 +446,8 @@ async function monitorPosition(state, symbol) {
         (pos.signal==="CALL" && last.c < range.high && lowVolume) ||
         (pos.signal==="PUT"  && last.c > range.low  && lowVolume);
       if (failedBreakout) {
-        await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
-        const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
-        logTrade(pos, symbol, currentPremium, "structural_stop");
-        await tg(`🔄 <b>وقف بنيوي ${symbol}</b>\nالاختراق فشل (حجم عادي) | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
-        delete state[symbol]; saveState(state); return;
+        await closePosition(state, symbol, pos, currentPremium, "structural_stop", "order_fill");
+        return;
       }
     }
   }
@@ -561,29 +598,31 @@ ${slLine}`);
       for (const pos of positions) {
         const match = pos.symbol?.match(/^([A-Z]+)\d/);
         if (match && TICKERS.includes(match[1])) {
-          liveInAlpaca.add(match[1]);
-          if (!state[match[1]]?.active) {
-            state[match[1]] = { ...state[match[1]], active: true };
+          const sym = match[1];
+          liveInAlpaca.add(sym);
+          if (!state[sym]?.active) {
+            state[sym] = { ...state[sym], active: true };
+          }
+          if (!state[sym].optionSymbol || !state[sym].entryPremium) {
+            await tg(`⚠️ <b>${sym}</b>: صفقة نشطة في Alpaca (${pos.symbol}) لكن بيانات المتابعة المحلية ناقصة — تحتاج مراجعة يدوية.`, null);
           }
         }
       }
       for (const sym of TICKERS) {
         if (!liveInAlpaca.has(sym) && state[sym]?.active) {
-          // Position closed in Alpaca (stop order executed) — log it before deleting
+          // Position closed in Alpaca (stop order executed) — log + notify, no new sell needed
           const pos = state[sym];
           if (pos.optionSymbol && pos.entryPremium) {
             const exitPrem = await getQuote(pos.optionSymbol);
             if (exitPrem !== null) {
-              logTrade(pos, sym, exitPrem, "alpaca_stop");
-              const pnl = Math.round((exitPrem - pos.entryPremium) * pos.qty * 100);
-              const pnlPct = (exitPrem - pos.entryPremium) / pos.entryPremium * 100;
-              await tg(`🛑 <b>${sym} أُقفلت (Alpaca)</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
+              await closePosition(state, sym, pos, exitPrem, "alpaca_stop", "order_fill", true);
             } else {
               // Can't get quote — estimate from last known
-              logTrade(pos, sym, pos.entryPremium * 0.65, "alpaca_stop_est");
+              await closePosition(state, sym, pos, pos.entryPremium * 0.65, "alpaca_stop_est", "quote_estimate", true);
             }
+          } else {
+            delete state[sym];
           }
-          delete state[sym];
         }
       }
     }
