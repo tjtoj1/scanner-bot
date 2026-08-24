@@ -12,6 +12,12 @@
       "symbol": "NVDA",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-24",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -45,5 +51,22 @@
       "high": 262.85,
       "low": 259.05
     }
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260824P00298000",
+    "strike": "298",
+    "entryPremium": 0.545,
+    "qty": 9,
+    "entryTime": 1787594292233,
+    "level": 298.42,
+    "msgId": 438,
+    "stopOrderId": "36a98f09-2a67-4e8e-88c2-8d0f52707f78",
+    "hardStopPrice": 0.35,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
