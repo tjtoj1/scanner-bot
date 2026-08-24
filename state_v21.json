@@ -6,6 +6,12 @@
       "symbol": "NVDA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-24",
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -42,16 +48,16 @@
   },
   "NVDA": {
     "active": true,
-    "signal": "CALL",
-    "optionSymbol": "NVDA260824C00210000",
+    "signal": "PUT",
+    "optionSymbol": "NVDA260824P00210000",
     "strike": "210",
-    "entryPremium": 1.25,
-    "qty": 4,
-    "entryTime": 1787579293075,
-    "level": 215.59,
-    "msgId": 430,
-    "stopOrderId": "bbb9ffa1-cc65-4dd0-91a0-78344feeadb6",
-    "hardStopPrice": 0.81,
+    "entryPremium": 1.48,
+    "qty": 3,
+    "entryTime": 1787581682284,
+    "level": 209.6801,
+    "msgId": 434,
+    "stopOrderId": "98909697-9306-41db-a215-21a671cde626",
+    "hardStopPrice": 0.96,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
