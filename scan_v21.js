@@ -540,6 +540,20 @@ ${slLine}`);
       }
       for (const sym of TICKERS) {
         if (!liveInAlpaca.has(sym) && state[sym]?.active) {
+          // Position closed in Alpaca (stop order executed) — log it before deleting
+          const pos = state[sym];
+          if (pos.optionSymbol && pos.entryPremium) {
+            const exitPrem = await getQuote(pos.optionSymbol);
+            if (exitPrem !== null) {
+              logTrade(pos, sym, exitPrem, "alpaca_stop");
+              const pnl = Math.round((exitPrem - pos.entryPremium) * pos.qty * 100);
+              const pnlPct = (exitPrem - pos.entryPremium) / pos.entryPremium * 100;
+              await tg(`🛑 <b>${sym} أُقفلت (Alpaca)</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
+            } else {
+              // Can't get quote — estimate from last known
+              logTrade(pos, sym, pos.entryPremium * 0.65, "alpaca_stop_est");
+            }
+          }
           delete state[sym];
         }
       }
