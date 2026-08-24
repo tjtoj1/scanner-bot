@@ -1,1 +1,2 @@
 
+{"day":"2026-08-24","symbol":"IWM","signal":"PUT","optionSymbol":"IWM260824P00298000","strike":"298","tradeId":"IWM_1787594292233","entryPremium":0.545,"exitPremium":0.29,"qty":9,"pnl":-234,"pnlPct":-47.7,"win":false,"reason":"alpaca_stop","fillSource":"order_fill","entryTime":"2026-08-24T17:58:12.233Z","exitTime":"2026-08-24T18:15:25.484Z","level":298.42}
