@@ -250,6 +250,31 @@ async function checkBreakout(state, symbol) {
   return null;
 }
 
+// ─── LOG TRADE OUTCOME ───────────────────────────────────────
+function logTrade(pos, symbol, exitPremium, reason) {
+  try {
+    const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
+    const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
+    const record = {
+      day: getToday(),
+      symbol,
+      signal: pos.signal,
+      entryPremium: pos.entryPremium,
+      exitPremium: +exitPremium.toFixed(2),
+      qty: pos.qty,
+      pnl,
+      pnlPct: +pnlPct.toFixed(1),
+      win: pnl > 0,
+      reason,
+      entryTime: new Date(pos.entryTime).toISOString(),
+      exitTime: new Date().toISOString(),
+      level: pos.level,
+    };
+    fs.appendFileSync("outcomes_v21.jsonl", JSON.stringify(record) + "\n");
+    console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
+  } catch(e) { console.error("logTrade failed:", e.message); }
+}
+
 // ─── UPDATE STOP ORDER ──────────────────────────────────────
 async function updateStopOrder(pos, newStopPrice) {
   try {
@@ -321,6 +346,7 @@ async function monitorPosition(state, symbol) {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
     await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
     const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
+    logTrade(pos, symbol, currentPremium, "force_exit");
     await tg(`🔔 <b>خروج إجباري ${symbol}</b>\n${pos.signal} | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
     delete state[symbol]; saveState(state); return;
   }
@@ -330,6 +356,7 @@ async function monitorPosition(state, symbol) {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(()=>{});
     await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
     const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
+    logTrade(pos, symbol, currentPremium, "hard_stop");
     await tg(`🛑 <b>وقف خسارة ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
     delete state[symbol]; saveState(state); return;
   }
@@ -360,6 +387,7 @@ async function monitorPosition(state, symbol) {
     if (pnlPct <= floor) {
       await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
       const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
+      logTrade(pos, symbol, currentPremium, "ladder_stop");
       await tg(`💰 <b>وقف ربح ${symbol}</b>\n${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
       delete state[symbol]; saveState(state); return;
     }
@@ -380,6 +408,7 @@ async function monitorPosition(state, symbol) {
       if (failedBreakout) {
         await alpaca("/orders","POST",{symbol:pos.optionSymbol,qty:String(pos.qty),side:"sell",type:"market",time_in_force:"day"});
         const pnl = Math.round((currentPremium-pos.entryPremium)*pos.qty*100);
+        logTrade(pos, symbol, currentPremium, "structural_stop");
         await tg(`🔄 <b>وقف بنيوي ${symbol}</b>\nالاختراق فشل (حجم عادي) | ${pnlPct.toFixed(1)}% | ${pnl>=0?"+":""}$${pnl}`, pos.msgId);
         delete state[symbol]; saveState(state); return;
       }
