@@ -1,0 +1,599 @@
+// ============================================================
+// BOT LAB — SELF-TUNING MOMENTUM/BREAKOUT STRATEGY (experimental)
+// Uses ALPACA_KEY_3 / ALPACA_SECRET_3 (separate paper account, $10k)
+// Independent of v21 — does not read/write any v21 file.
+//
+// Strategy (initial, see strategy_lab.json for live params):
+//   1. Trend regime from EMA(fast) vs EMA(slow) on 15-min bars.
+//   2. Entry: last closed bar breaks the prior N-bar high/low in the
+//      direction of the regime, confirmed by a volume surge.
+//   3. Exit: hard stop, 2-tier profit ladder + trailing stop,
+//      regime flip (trend invalidated), force exit, daily loss breaker.
+//   4. Once/day after close, a bounded rule-based tuner may adjust ONE
+//      strategy_lab.json param if the cumulative sample supports it
+//      (never touches this file's logic, never exceeds PARAM_BOUNDS).
+//
+// Hard safety limits below are fixed constants — the self-tuner can
+// only ever modify strategy_lab.json params, and every param is
+// clamped against PARAM_BOUNDS on load and after any adjustment.
+// ============================================================
+import fs from "fs";
+
+const ALPACA_KEY    = process.env.ALPACA_KEY_3;
+const ALPACA_SECRET = process.env.ALPACA_SECRET_3;
+const TG_TOKEN       = process.env.TG_TOKEN;
+const PERSONAL_CHAT  = "810642442";
+const MODE           = process.env.MODE || "scan";
+const TRADING_BASE   = "https://paper-api.alpaca.markets/v2";
+const DATA_BASE      = "https://data.alpaca.markets/v2";
+const HEADERS = {
+  "APCA-API-KEY-ID": ALPACA_KEY,
+  "APCA-API-SECRET-KEY": ALPACA_SECRET,
+  "Content-Type": "application/json",
+};
+
+// ─── HARD SAFETY LIMITS (fixed — never modified by self-tuning) ────
+const ALLOWED_TICKERS    = ["SPY", "QQQ", "IWM", "NVDA", "TSLA", "AMZN"];
+const MAX_DAILY_LOSS     = 1000;  // $ — halts new entries + flattens open positions
+const MAX_TRADE_BUDGET   = 1000;  // $ per trade, hard ceiling
+const MAX_OPEN_POSITIONS = 3;
+const MAX_DTE            = 2;     // days — never trade an expiry further out
+const MARKET_OPEN_UTC    = 13 * 60 + 30; // 8:30 AM CDT
+const MARKET_CLOSE_UTC   = 20 * 60 + 30; // 3:30 PM CDT
+const FORCE_EXIT_UTC     = 19 * 60 + 55; // 2:55 PM CDT
+const LAST_ENTRY_UTC     = FORCE_EXIT_UTC - 25; // 2:30 PM CDT
+
+// Bounds the daily self-tuner may adjust learnable params within —
+// separate guardrail from the hard limits above, prevents drift.
+const PARAM_BOUNDS = {
+  emaFast:             [5, 15],
+  emaSlow:             [15, 40],
+  breakoutLookback:    [5, 20],
+  volAvgLookback:      [10, 30],
+  volumeMultiplier:    [1.1, 2.0],
+  tradeBudget:         [100, MAX_TRADE_BUDGET],
+  stopLossPct:         [-40, -15],
+  takeProfit1Pct:      [8, 25],
+  takeProfit1LockPct:  [2, 10],
+  takeProfit2Pct:      [15, 40],
+  takeProfit2LockPct:  [5, 20],
+  trailingPct:         [5, 15],
+};
+const MIN_SAMPLE_FOR_LEARNING = 20;   // cumulative closed trades required before any tuning
+const MAX_PARAM_STEP_FRACTION = 0.15; // one daily change moves a param by at most 15% of its value
+
+const DEFAULT_STRATEGY = {
+  version: 1,
+  name: "momentum_breakout_ema",
+  description: "EMA fast/slow trend regime + rolling N-bar breakout with volume confirmation, on 15-min bars.",
+  params: {
+    emaFast: 9, emaSlow: 21, breakoutLookback: 10, volAvgLookback: 20,
+    volumeMultiplier: 1.3, tradeBudget: 500, stopLossPct: -30,
+    takeProfit1Pct: 15, takeProfit1LockPct: 5, takeProfit2Pct: 25,
+    takeProfit2LockPct: 12, trailingPct: 8,
+  },
+  changelog: [],
+};
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function utcMin() { const n = new Date(); return n.getUTCHours() * 60 + n.getUTCMinutes(); }
+function isMarketOpen()   { const m = utcMin(); return m >= MARKET_OPEN_UTC && m < MARKET_CLOSE_UTC; }
+function isPastLastEntry(){ return utcMin() >= LAST_ENTRY_UTC; }
+function isForceExit()    { return utcMin() >= FORCE_EXIT_UTC; }
+function getToday() { return new Date().toISOString().split("T")[0]; }
+
+function loadStrategy() {
+  let s;
+  try { s = JSON.parse(fs.readFileSync("strategy_lab.json", "utf8")); }
+  catch { s = JSON.parse(JSON.stringify(DEFAULT_STRATEGY)); }
+  if (!s.params) s.params = { ...DEFAULT_STRATEGY.params };
+  if (!s.changelog) s.changelog = [];
+  for (const k of Object.keys(PARAM_BOUNDS)) {
+    if (typeof s.params[k] !== "number") s.params[k] = DEFAULT_STRATEGY.params[k];
+    s.params[k] = clamp(s.params[k], PARAM_BOUNDS[k][0], PARAM_BOUNDS[k][1]);
+  }
+  s.params.tradeBudget = Math.min(s.params.tradeBudget, MAX_TRADE_BUDGET);
+  return s;
+}
+function saveStrategy(s) { fs.writeFileSync("strategy_lab.json", JSON.stringify(s, null, 2)); }
+
+function loadState() {
+  try { return JSON.parse(fs.readFileSync("state_lab.json", "utf8")); }
+  catch { return {}; }
+}
+function saveState(s) { fs.writeFileSync("state_lab.json", JSON.stringify(s, null, 2)); }
+
+async function tg(text, replyTo = null) {
+  try {
+    const body = { chat_id: PERSONAL_CHAT, text: `🧪 LAB: ${text}`, parse_mode: "HTML" };
+    if (replyTo) { body.reply_to_message_id = replyTo; body.allow_sending_without_reply = true; }
+    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    return d.result?.message_id || null;
+  } catch (e) { console.error("TG:", e.message); return null; }
+}
+
+async function alpaca(path, method = "GET", body = null) {
+  const res = await fetch(`${TRADING_BASE}${path}`, {
+    method, headers: HEADERS, body: body ? JSON.stringify(body) : null
+  });
+  const t = await res.text();
+  try { return JSON.parse(t); } catch { return t; }
+}
+
+async function getBars(symbol, tf = "15Min", daysBack = 5) {
+  try {
+    const start = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+    const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=300&adjustment=raw`;
+    const res = await fetch(url, { headers: HEADERS });
+    const text = await res.text();
+    try { return JSON.parse(text).bars || []; }
+    catch { console.error(`${symbol} getBars parse error:`, text.slice(0, 100)); return []; }
+  } catch (e) { console.error(`${symbol} getBars error:`, e.message); return []; }
+}
+
+async function getLatestPrice(symbol) {
+  try {
+    const r = await fetch(`${DATA_BASE}/stocks/${symbol}/quotes/latest`, { headers: HEADERS });
+    const d = await r.json();
+    return d.quote ? (d.quote.ap + d.quote.bp) / 2 : null;
+  } catch { return null; }
+}
+
+async function getQuote(optSym) {
+  try {
+    const res = await fetch(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, { headers: HEADERS });
+    const d = await res.json();
+    const q = d.quotes?.[optSym];
+    return q ? (q.ap + q.bp) / 2 : null;
+  } catch { return null; }
+}
+
+// ─── NEAREST EXPIRY WITHIN MAX_DTE (hard cap, not learnable) ───────
+async function getNearExpiry(symbol) {
+  try {
+    const today = getToday();
+    const maxDate = new Date(Date.now() + MAX_DTE * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date_gte=${today}&expiration_date_lte=${maxDate}&status=active&limit=50&type=call`;
+    const res = await fetch(url, { headers: HEADERS });
+    const d = await res.json();
+    const dates = [...new Set((d?.option_contracts || []).map(c => c.expiration_date))].sort();
+    return dates[0] || null;
+  } catch (e) { console.error(`${symbol} getNearExpiry error:`, e.message); return null; }
+}
+
+async function findOption(symbol, signal, spotPrice) {
+  const expiry = await getNearExpiry(symbol);
+  if (!expiry) return null;
+  const type = signal === "CALL" ? "call" : "put";
+  for (const delta of [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]) {
+    const strike = Math.round(spotPrice) + delta;
+    try {
+      const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${expiry}&type=${type}&strike_price_gte=${strike-0.5}&strike_price_lte=${strike+0.5}&status=active&limit=5`;
+      const res = await fetch(url, { headers: HEADERS });
+      const d = await res.json();
+      const contracts = d?.option_contracts || [];
+      if (!contracts.length) continue;
+      const contract = contracts.sort((a, b) => Math.abs(a.strike_price - spotPrice) - Math.abs(b.strike_price - spotPrice))[0];
+      const premium = await getQuote(contract.symbol);
+      if (premium && premium > 0.05) return { symbol: contract.symbol, strike: contract.strike_price, premium, expiry };
+    } catch (e) { console.log(`  strike ${strike}: ${e.message}`); }
+  }
+  return null;
+}
+
+function calcQty(premium, tradeBudget) {
+  const budget = Math.min(tradeBudget, MAX_TRADE_BUDGET);
+  return Math.max(1, Math.floor(budget / (premium * 100)));
+}
+
+// ─── INDICATORS ──────────────────────────────────────────────
+function computeEMA(values, period) {
+  if (!values || values.length < period) return null;
+  const k = 2 / (period + 1);
+  let ema = values.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < values.length; i++) ema = values[i] * k + ema * (1 - k);
+  return ema;
+}
+
+// ─── SIGNAL: EMA REGIME + ROLLING BREAKOUT + VOLUME ─────────────
+function computeSignal(bars, params) {
+  const minBars = params.emaSlow + Math.max(params.breakoutLookback, params.volAvgLookback) + 2;
+  if (bars.length < minBars) return null;
+
+  const closedBars = bars.slice(0, -1); // drop the currently-forming bar
+  if (closedBars.length < minBars - 1) return null;
+  const lastClosed = closedBars[closedBars.length - 1];
+
+  const closes = closedBars.map(b => b.c);
+  const emaFast = computeEMA(closes, params.emaFast);
+  const emaSlow = computeEMA(closes, params.emaSlow);
+  if (emaFast === null || emaSlow === null) return null;
+
+  const priorBars = closedBars.slice(0, -1); // bars before the last closed bar
+  const breakoutWindow = priorBars.slice(-params.breakoutLookback);
+  const volWindow = priorBars.slice(-params.volAvgLookback);
+  if (breakoutWindow.length < params.breakoutLookback || volWindow.length < params.volAvgLookback) return null;
+
+  const breakoutHigh = Math.max(...breakoutWindow.map(b => b.h));
+  const breakoutLow  = Math.min(...breakoutWindow.map(b => b.l));
+  const avgVol = volWindow.reduce((a, b) => a + b.v, 0) / volWindow.length;
+  const volRatio = avgVol > 0 ? lastClosed.v / avgVol : 0;
+  const volumeOk = volRatio >= params.volumeMultiplier;
+
+  const regime = emaFast > emaSlow ? "bullish" : emaFast < emaSlow ? "bearish" : "flat";
+
+  let signal = null;
+  if (regime === "bullish" && lastClosed.c > breakoutHigh && volumeOk) signal = "CALL";
+  if (regime === "bearish" && lastClosed.c < breakoutLow && volumeOk) signal = "PUT";
+
+  return { signal, regime, emaFast, emaSlow, breakoutHigh, breakoutLow, volRatio, lastClose: lastClosed.c, lastVolume: lastClosed.v, barTime: lastClosed.t };
+}
+
+function computeRegime(bars, params) {
+  const closedBars = bars.slice(0, -1);
+  const closes = closedBars.map(b => b.c);
+  const emaFast = computeEMA(closes, params.emaFast);
+  const emaSlow = computeEMA(closes, params.emaSlow);
+  if (emaFast === null || emaSlow === null) return null;
+  return emaFast > emaSlow ? "bullish" : emaFast < emaSlow ? "bearish" : "flat";
+}
+
+// ─── DAILY REALIZED P&L / OPEN POSITION COUNT ───────────────────
+function getTodayRealizedPnl() {
+  const today = getToday();
+  let total = 0;
+  try {
+    const lines = fs.readFileSync("outcomes_lab.jsonl", "utf8").split("\n").filter(Boolean);
+    for (const line of lines) {
+      try { const r = JSON.parse(line); if (r.day === today) total += r.pnl; } catch {}
+    }
+  } catch {}
+  return total;
+}
+function countOpenPositions(state) {
+  return ALLOWED_TICKERS.filter(sym => state[sym]?.active).length;
+}
+
+// ─── LOG TRADE OUTCOME (with entry-condition snapshot) ──────────
+function logTrade(pos, symbol, exitPremium, reason, fillSource) {
+  try {
+    const tradeId = `${symbol}_${pos.entryTime}`;
+    let existing = "";
+    try { existing = fs.readFileSync("outcomes_lab.jsonl", "utf8"); } catch {}
+    if (existing.includes(`"tradeId":"${tradeId}"`)) {
+      console.log(`logTrade: skipped duplicate ${tradeId}`);
+      return false;
+    }
+    const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
+    const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
+    const record = {
+      day: getToday(), symbol, signal: pos.signal, optionSymbol: pos.optionSymbol, strike: pos.strike,
+      tradeId, entryPremium: pos.entryPremium, exitPremium: +exitPremium.toFixed(2), qty: pos.qty,
+      pnl, pnlPct: +pnlPct.toFixed(1), win: pnl > 0, reason, fillSource,
+      entryTime: new Date(pos.entryTime).toISOString(), exitTime: new Date().toISOString(),
+      entryConditions: pos.entryConditions || null,
+      strategyVersion: pos.strategyVersion || null,
+    };
+    fs.appendFileSync("outcomes_lab.jsonl", JSON.stringify(record) + "\n");
+    console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
+    return true;
+  } catch (e) { console.error("logTrade failed:", e.message); return false; }
+}
+
+function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
+  const sign = pnl >= 0 ? "+" : "";
+  const tail = `${pnlPct.toFixed(1)}% | ${sign}$${pnl}`;
+  switch (reason) {
+    case "force_exit":         return `🔔 <b>خروج إجباري ${symbol}</b>\n${pos.signal} | ${tail}`;
+    case "hard_stop":          return `🛑 <b>وقف خسارة ${symbol}</b>\n${tail}`;
+    case "ladder_stop":        return `💰 <b>وقف ربح ${symbol}</b>\n${tail}`;
+    case "regime_flip":        return `🔄 <b>${symbol} انعكاس الاتجاه</b>\n${tail}`;
+    case "daily_loss_breaker": return `🚨 <b>${symbol} إغلاق طارئ — تجاوز حد الخسارة اليومي</b>\n${tail}`;
+    case "alpaca_stop":
+    case "alpaca_stop_est":    return `🛑 <b>${symbol} أُقفلت (Alpaca)</b>\n${tail}`;
+    default:                   return `${symbol} أُغلقت (${reason})\n${tail}`;
+  }
+}
+
+// ─── UNIFIED POSITION CLOSE ──────────────────────────────────
+async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false) {
+  if (!skipSell) {
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(() => {});
+    const order = await alpaca("/orders", "POST", {
+      symbol: pos.optionSymbol, qty: String(pos.qty), side: "sell",
+      type: "market", time_in_force: "day"
+    });
+    if (!order.id) {
+      console.error(`${symbol}: close sell order failed (${reason}):`, order);
+      await tg(`⚠️ <b>فشل إغلاق ${symbol}</b>\nأمر البيع لم يُنفَّذ (${reason}) — يحتاج تدخلاً يدوياً.`, pos.msgId);
+      return;
+    }
+  }
+  const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
+  const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
+  logTrade(pos, symbol, exitPremium, reason, fillSource);
+  await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
+  delete state[symbol];
+  saveState(state);
+}
+
+async function updateStopOrder(pos, newStopPrice) {
+  try {
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE");
+    const stopOrder = await alpaca("/orders", "POST", {
+      symbol: pos.optionSymbol, qty: String(pos.qty), side: "sell",
+      type: "stop", time_in_force: "day", stop_price: String(Math.max(0.01, newStopPrice))
+    });
+    pos.stopOrderId = stopOrder.id || null;
+  } catch (e) { console.error("updateStopOrder failed:", e.message); }
+}
+
+// ─── MONITOR OPEN POSITION ──────────────────────────────────
+async function monitorPosition(state, strategy, symbol) {
+  const pos = state[symbol];
+  if (!pos?.active) return;
+
+  const currentPremium = await getQuote(pos.optionSymbol);
+  if (!currentPremium) return;
+  const pnlPct = (currentPremium - pos.entryPremium) / pos.entryPremium * 100;
+
+  // Daily loss circuit breaker — flatten immediately
+  if (getTodayRealizedPnl() <= -MAX_DAILY_LOSS) {
+    await closePosition(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill");
+    return;
+  }
+
+  if (isForceExit()) {
+    await closePosition(state, symbol, pos, currentPremium, "force_exit", "order_fill");
+    return;
+  }
+
+  if (pnlPct <= pos.stopLossPct) {
+    await closePosition(state, symbol, pos, currentPremium, "hard_stop", "order_fill");
+    return;
+  }
+
+  // Profit ladder
+  if (pnlPct >= pos.takeProfit2Pct && !pos.ladder2) {
+    pos.ladder2 = true; pos.ladder1 = true;
+    pos.stopPct = pos.takeProfit2LockPct; pos.trailPct = pos.trailingPct;
+    pos.peakPct = Math.max(pos.peakPct || 0, pnlPct);
+    const newStop = +(pos.entryPremium * (1 + pos.takeProfit2LockPct / 100)).toFixed(2);
+    await updateStopOrder(pos, newStop);
+    await tg(`${symbol} مستوى 2: +${pnlPct.toFixed(1)}% | وقف +${pos.takeProfit2LockPct}% + تريلينق ${pos.trailingPct}%`, pos.msgId);
+  }
+  if (pnlPct >= pos.takeProfit1Pct && !pos.ladder1) {
+    pos.ladder1 = true; pos.stopPct = pos.takeProfit1LockPct;
+    pos.peakPct = Math.max(pos.peakPct || 0, pnlPct);
+    const newStop = +(pos.entryPremium * (1 + pos.takeProfit1LockPct / 100)).toFixed(2);
+    await updateStopOrder(pos, newStop);
+    await tg(`${symbol} مستوى 1: +${pnlPct.toFixed(1)}% | وقف +${pos.takeProfit1LockPct}%`, pos.msgId);
+  }
+  if (pos.trailPct) pos.peakPct = Math.max(pos.peakPct || 0, pnlPct);
+
+  if (pos.stopPct !== undefined) {
+    const floor = pos.trailPct ? (pos.peakPct - pos.trailPct) : pos.stopPct;
+    if (pnlPct <= floor) {
+      await closePosition(state, symbol, pos, currentPremium, "ladder_stop", "order_fill");
+      return;
+    }
+  }
+
+  // Regime flip — trend thesis invalidated
+  const bars = await getBars(symbol, "15Min", 5);
+  const regimeNow = computeRegime(bars, strategy.params);
+  if (regimeNow) {
+    const against = (pos.signal === "CALL" && regimeNow === "bearish") || (pos.signal === "PUT" && regimeNow === "bullish");
+    if (against) {
+      await closePosition(state, symbol, pos, currentPremium, "regime_flip", "order_fill");
+      return;
+    }
+  }
+
+  saveState(state);
+}
+
+// ─── SCAN FOR NEW ENTRIES ───────────────────────────────────
+async function scanEntry(state, strategy, symbol, liveInAlpaca) {
+  if (state[symbol]?.active) return;
+  if (liveInAlpaca.has(symbol)) return;
+  if (isPastLastEntry()) return;
+
+  if (countOpenPositions(state) >= MAX_OPEN_POSITIONS) {
+    console.log(`Max open positions (${MAX_OPEN_POSITIONS}) reached — skip ${symbol}`);
+    return;
+  }
+  if (getTodayRealizedPnl() <= -MAX_DAILY_LOSS) {
+    console.log(`Daily loss cap hit — no new entries today`);
+    return;
+  }
+
+  const bars = await getBars(symbol, "15Min", 5);
+  const sig = computeSignal(bars, strategy.params);
+  if (!sig || !sig.signal) return;
+
+  const spot = await getLatestPrice(symbol);
+  if (!spot) return;
+
+  const opt = await findOption(symbol, sig.signal, spot);
+  if (!opt) { console.log(`${symbol}: no option within ${MAX_DTE} DTE`); return; }
+
+  const qty = calcQty(opt.premium, strategy.params.tradeBudget);
+  const order = await alpaca("/orders", "POST", { symbol: opt.symbol, qty: String(qty), side: "buy", type: "market", time_in_force: "day" });
+  if (!order.id) { console.log(`${symbol}: entry order failed`, order); return; }
+
+  const hardStopPrice = +(opt.premium * (1 + strategy.params.stopLossPct / 100)).toFixed(2);
+  let stopOrderId = null;
+  try {
+    const stopOrder = await alpaca("/orders", "POST", {
+      symbol: opt.symbol, qty: String(qty), side: "sell", type: "stop",
+      time_in_force: "day", stop_price: String(Math.max(0.01, hardStopPrice))
+    });
+    stopOrderId = stopOrder.id || null;
+  } catch (e) { console.error(`${symbol}: stop order failed:`, e.message); }
+
+  const msgId = await tg(`<b>${symbol} ${sig.signal} $${opt.strike}</b> (exp ${opt.expiry})\n💰 $${opt.premium.toFixed(2)} × ${qty} = $${(opt.premium*qty*100).toFixed(0)}\nنظام: ${strategy.name} | نطاق: ${sig.regime} | حجم×${sig.volRatio.toFixed(2)}`);
+
+  state[symbol] = {
+    active: true, signal: sig.signal, optionSymbol: opt.symbol, strike: opt.strike,
+    entryPremium: opt.premium, qty, entryTime: Date.now(), msgId, stopOrderId, hardStopPrice,
+    stopLossPct: strategy.params.stopLossPct,
+    takeProfit1Pct: strategy.params.takeProfit1Pct, takeProfit1LockPct: strategy.params.takeProfit1LockPct,
+    takeProfit2Pct: strategy.params.takeProfit2Pct, takeProfit2LockPct: strategy.params.takeProfit2LockPct,
+    trailingPct: strategy.params.trailingPct,
+    strategyVersion: strategy.version,
+    entryConditions: {
+      spot, regime: sig.regime, emaFast: +sig.emaFast.toFixed(4), emaSlow: +sig.emaSlow.toFixed(4),
+      breakoutHigh: sig.breakoutHigh, breakoutLow: sig.breakoutLow, volRatio: +sig.volRatio.toFixed(2),
+      lastClose: sig.lastClose, lastVolume: sig.lastVolume, barTime: sig.barTime, entryTimeUTC: new Date().toISOString(),
+    },
+  };
+  saveState(state);
+  console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty}`);
+}
+
+// ─── DAILY SELF-TUNING (rule-based, bounded, single param/day) ──
+async function runDailyLearning(state, strategy) {
+  const today = getToday();
+  if (state._lastLearnedDay === today) return;
+  state._lastLearnedDay = today;
+  saveState(state);
+
+  let records = [];
+  try {
+    records = fs.readFileSync("outcomes_lab.jsonl", "utf8").split("\n").filter(Boolean)
+      .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  } catch { records = []; }
+
+  const n = records.length;
+  console.log(`Daily learning: ${n} cumulative closed trades`);
+  if (n < MIN_SAMPLE_FOR_LEARNING) {
+    console.log(`Sample too small (${n} < ${MIN_SAMPLE_FOR_LEARNING}) — no change today.`);
+    return;
+  }
+
+  const wins = records.filter(r => r.win).length;
+  const wr = wins / n;
+  const netPnl = records.reduce((a, r) => a + r.pnl, 0);
+  const byReason = {};
+  for (const r of records) {
+    byReason[r.reason] = byReason[r.reason] || { n: 0, wins: 0, pnl: 0 };
+    byReason[r.reason].n++;
+    if (r.win) byReason[r.reason].wins++;
+    byReason[r.reason].pnl += r.pnl;
+  }
+
+  let change = null;
+  const hardStop = byReason["hard_stop"];
+  const ladder = byReason["ladder_stop"];
+
+  if (hardStop && hardStop.n >= MIN_SAMPLE_FOR_LEARNING * 0.5 && (hardStop.n / n) > 0.4) {
+    change = {
+      param: "volumeMultiplier", direction: +1,
+      reason: `${hardStop.n}/${n} صفقة (${(hardStop.n/n*100).toFixed(0)}%) خرجت عبر وقف الخسارة الصلب — رفع عتبة تأكيد الحجم لتقليل الإشارات الضعيفة.`,
+    };
+  } else if (ladder && ladder.n >= MIN_SAMPLE_FOR_LEARNING * 0.3 && (ladder.wins / ladder.n) > 0.6 && wr > 0.5) {
+    change = {
+      param: "takeProfit2Pct", direction: +1,
+      reason: `${ladder.wins}/${ladder.n} من صفقات سلم الأرباح رابحة (${(ladder.wins/ladder.n*100).toFixed(0)}%) ونسبة الربح الكلية ${(wr*100).toFixed(0)}% — رفع هدف الربح الثاني للاستفادة من الاتجاهات القوية.`,
+    };
+  } else if (wr < 0.4) {
+    change = {
+      param: "stopLossPct", direction: +1,
+      reason: `نسبة الربح الكلية ${(wr*100).toFixed(0)}% على ${n} صفقة أقل من 40% — تضييق وقف الخسارة لتقليل حجم الخسارة لكل صفقة ريثما تتحسن جودة الإشارات.`,
+    };
+  }
+
+  if (!change) { console.log("No clear data-justified change today."); return; }
+
+  const [lo, hi] = PARAM_BOUNDS[change.param];
+  const old = strategy.params[change.param];
+  const step = Math.max(Math.abs(old) * MAX_PARAM_STEP_FRACTION, change.param.toLowerCase().includes("pct") ? 1 : 0.05);
+  let next = clamp(+(old + change.direction * step).toFixed(3), lo, hi);
+
+  if (next === old) { console.log(`${change.param} already at bound (${old}) — no change applied.`); return; }
+
+  strategy.params[change.param] = next;
+  strategy.changelog.push({ date: today, param: change.param, oldValue: old, newValue: next, reason: change.reason, sampleSize: n, winRate: +(wr * 100).toFixed(1), netPnl });
+  saveStrategy(strategy);
+
+  await tg(`تعديل استراتيجية تلقائي (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\nالسبب: ${change.reason}\nالعينة: ${n} صفقة | WR ${(wr*100).toFixed(1)}% | صافي $${netPnl}`);
+  console.log(`Applied change: ${change.param} ${old} -> ${next}`);
+}
+
+// ─── MAIN ───────────────────────────────────────────────────
+(async () => {
+  console.log(`=== LAB bot started ${new Date().toISOString()} ===`);
+  if (!isMarketOpen()) { console.log("Market closed"); process.exit(0); }
+
+  const state = loadState();
+  const strategy = loadStrategy();
+  const today = getToday();
+
+  if (state._lastDay !== today) {
+    state._lastDay = today;
+    saveState(state);
+  }
+
+  // Reconcile with Alpaca
+  const liveInAlpaca = new Set();
+  try {
+    const positions = await alpaca("/positions");
+    if (Array.isArray(positions)) {
+      for (const p of positions) {
+        const match = p.symbol?.match(/^([A-Z]+)\d/);
+        if (match && ALLOWED_TICKERS.includes(match[1])) {
+          const sym = match[1];
+          liveInAlpaca.add(sym);
+          if (!state[sym]?.active) state[sym] = { ...state[sym], active: true };
+          if (!state[sym].optionSymbol || !state[sym].entryPremium) {
+            await tg(`⚠️ <b>${sym}</b>: صفقة نشطة في Alpaca (${p.symbol}) لكن بيانات المتابعة المحلية ناقصة — تحتاج مراجعة يدوية.`, null);
+          }
+        }
+      }
+      for (const sym of ALLOWED_TICKERS) {
+        if (!liveInAlpaca.has(sym) && state[sym]?.active) {
+          const pos = state[sym];
+          if (pos.optionSymbol && pos.entryPremium) {
+            const exitPrem = await getQuote(pos.optionSymbol);
+            if (exitPrem !== null) await closePosition(state, sym, pos, exitPrem, "alpaca_stop", "order_fill", true);
+            else await closePosition(state, sym, pos, pos.entryPremium * 0.65, "alpaca_stop_est", "quote_estimate", true);
+          } else { delete state[sym]; }
+        }
+      }
+    }
+    saveState(state);
+  } catch (e) { console.error("Reconcile failed:", e.message); }
+
+  // Daily loss breaker — one-time alert
+  const dailyPnlNow = getTodayRealizedPnl();
+  if (dailyPnlNow <= -MAX_DAILY_LOSS && state._lossBreakerAlerted !== today) {
+    state._lossBreakerAlerted = today;
+    saveState(state);
+    await tg(`🚨 <b>تم بلوغ حد الخسارة اليومي</b> ($${Math.abs(dailyPnlNow)} ≥ $${MAX_DAILY_LOSS}) — إيقاف كل الدخول الجديد وإغلاق كل الصفقات المفتوحة لبقية اليوم.`);
+  }
+
+  if (MODE === "monitor") {
+    for (const sym of ALLOWED_TICKERS) {
+      if (state[sym]?.active) await monitorPosition(state, strategy, sym);
+    }
+    if (!isPastLastEntry()) {
+      for (const sym of ALLOWED_TICKERS) {
+        if (!state[sym]?.active && !liveInAlpaca.has(sym)) await scanEntry(state, strategy, sym, liveInAlpaca);
+      }
+    }
+    if (utcMin() >= FORCE_EXIT_UTC + 5) {
+      await runDailyLearning(state, strategy);
+    }
+  } else {
+    for (const sym of ALLOWED_TICKERS) {
+      if (!state[sym]?.active && !liveInAlpaca.has(sym)) await scanEntry(state, strategy, sym, liveInAlpaca);
+    }
+  }
+  saveState(state);
+  console.log("Done.");
+})();

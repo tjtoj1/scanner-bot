@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "name": "momentum_breakout_ema",
+  "description": "EMA(fast)/EMA(slow) trend regime + rolling N-bar breakout with volume confirmation, on 15-min bars. Exits: hard stop, 2-tier profit ladder with trailing stop, regime flip, force exit.",
+  "params": {
+    "emaFast": 9,
+    "emaSlow": 21,
+    "breakoutLookback": 10,
+    "volAvgLookback": 20,
+    "volumeMultiplier": 1.3,
+    "tradeBudget": 500,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8
+  },
+  "changelog": []
+}
