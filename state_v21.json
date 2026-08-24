@@ -1,61 +1,60 @@
 {
-  "_lastDay": "2026-08-21",
+  "_lastDay": "2026-08-24",
   "_dailyTrades": [
     {
-      "day": "2026-08-21",
-      "symbol": "SPY",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-08-21",
-      "symbol": "QQQ",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-08-21",
+      "day": "2026-08-24",
       "symbol": "NVDA",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-08-21",
-      "symbol": "TSLA",
       "signal": "CALL",
       "pnl": 0
     }
   ],
   "range": {
     "SPY": {
-      "day": "2026-08-21",
-      "high": 766.15,
-      "low": 764.62
+      "day": "2026-08-24",
+      "high": 764.81,
+      "low": 762.19
     },
     "QQQ": {
-      "day": "2026-08-21",
-      "high": 715.4,
-      "low": 711.4
+      "day": "2026-08-24",
+      "high": 709.79,
+      "low": 703.38
     },
     "IWM": {
-      "day": "2026-08-21",
-      "high": 300.07,
-      "low": 299.015
+      "day": "2026-08-24",
+      "high": 299.74,
+      "low": 298.42
     },
     "NVDA": {
-      "day": "2026-08-21",
-      "high": 218.74,
-      "low": 216.73
+      "day": "2026-08-24",
+      "high": 215.59,
+      "low": 209.6801
     },
     "TSLA": {
-      "day": "2026-08-21",
-      "high": 351.5799,
-      "low": 346.9
+      "day": "2026-08-24",
+      "high": 363.24,
+      "low": 352.5
     },
     "AMZN": {
-      "day": "2026-08-21",
-      "high": 261.09,
-      "low": 257.035
+      "day": "2026-08-24",
+      "high": 262.85,
+      "low": 259.05
     }
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260824C00210000",
+    "strike": "210",
+    "entryPremium": 1.25,
+    "qty": 4,
+    "entryTime": 1787579293075,
+    "level": 215.59,
+    "msgId": 430,
+    "stopOrderId": "bbb9ffa1-cc65-4dd0-91a0-78344feeadb6",
+    "hardStopPrice": 0.81,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
