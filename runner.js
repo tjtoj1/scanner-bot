@@ -40,6 +40,37 @@ function isMarketHours() { return isWeekday() && utcMin() >= MARKET_START_UTC &&
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function sh(cmd) { return execSync(cmd, { stdio: "ignore" }); }
 
+// Runs a command capturing stdout/stderr instead of discarding them,
+// for diagnostics. Never throws — returns a result object.
+function shCap(cmd) {
+  try {
+    const out = execSync(cmd, { stdio: ["ignore", "pipe", "pipe"] });
+    return { ok: true, code: 0, stdout: out.toString(), stderr: "" };
+  } catch (e) {
+    return {
+      ok: false,
+      code: typeof e.status === "number" ? e.status : null,
+      stdout: e.stdout ? e.stdout.toString() : "",
+      stderr: e.stderr ? e.stderr.toString() : "",
+      message: e.message,
+    };
+  }
+}
+
+function maskToken(str) {
+  if (!str) return str;
+  return GH_PUSH_TOKEN ? str.split(GH_PUSH_TOKEN).join("***") : str;
+}
+
+function logResult(label, r) {
+  console.log(`[runner] ${label}: ${r.ok ? "ok" : `FAILED (exit ${r.code})`}`);
+  const out = maskToken(r.stdout && r.stdout.trim());
+  const err = maskToken(r.stderr && r.stderr.trim());
+  if (out) console.log(`[runner]   stdout: ${out}`);
+  if (err) console.log(`[runner]   stderr: ${err}`);
+  if (!r.ok && !out && !err && r.message) console.log(`[runner]   message: ${maskToken(r.message)}`);
+}
+
 // ─── GIT SETUP / SYNC ────────────────────────────────────────
 function ensureGitRepo() {
   try {
@@ -90,27 +121,35 @@ function syncToGitHub() {
     sh("git add -A");
     sh(`git commit -m "railway state [skip ci]"`);
 
+    // ── Diagnostics: dump repo state right before attempting to push ──
+    logResult("git remote -v", shCap("git remote -v"));
+    logResult("git branch --show-current", shCap("git branch --show-current"));
+    logResult("git rev-parse HEAD", shCap("git rev-parse HEAD"));
+    logResult("git status (pre-push)", shCap("git status"));
+    logResult("git config user.email", shCap("git config --get user.email"));
+    logResult("git config user.name", shCap("git config --get user.name"));
+
     const authedUrl = `https://x-access-token:${GH_PUSH_TOKEN}@github.com/tjtoj1/scanner-bot.git`;
     for (let i = 1; i <= 5; i++) {
-      try {
-        sh(`git push ${authedUrl} HEAD:main`);
-        return;
-      } catch {
-        try { sh("git rebase --abort"); } catch {}
-        try { sh("git fetch origin main"); } catch {}
-        try {
-          sh(`git pull ${authedUrl} main -X ours --no-edit`);
-        } catch {
-          for (const f of STATE_FILES) {
-            try { sh(`git checkout --ours ${f}`); } catch {}
-          }
-          try { sh("git add -A"); } catch {}
-          try { execSync(`git merge --continue`, { stdio: "ignore", env: { ...process.env, GIT_EDITOR: "true" } }); } catch {}
+      const pushResult = shCap(`git push ${authedUrl} HEAD:main`);
+      logResult(`git push attempt ${i}/5`, pushResult);
+      if (pushResult.ok) return;
+
+      logResult("  rebase --abort", shCap("git rebase --abort"));
+      logResult("  fetch origin main", shCap("git fetch origin main"));
+      const pullResult = shCap(`git pull ${authedUrl} main -X ours --no-edit`);
+      logResult("  pull -X ours", pullResult);
+      if (!pullResult.ok) {
+        for (const f of STATE_FILES) {
+          logResult(`  checkout --ours ${f}`, shCap(`git checkout --ours ${f}`));
         }
+        logResult("  add -A", shCap("git add -A"));
+        logResult("  merge --continue", shCap(`GIT_EDITOR=true git merge --continue`));
       }
+
       try { execSync(`sleep ${i * 2}`); } catch {} // simple sync backoff (seconds)
     }
-    console.error("[runner] git push failed after 5 retries — state changes NOT persisted this cycle");
+    console.error("[runner] git push failed after 5 retries — state changes NOT persisted this cycle. See attempt logs above for the actual error.");
   } catch (e) {
     console.error("[runner] syncToGitHub error:", e.message);
   }
