@@ -34,6 +34,12 @@ const STATE_FILES = [
   "state_lab.json", "strategy_lab.json", "outcomes_lab.jsonl",
 ];
 
+// Build-generated paths that must never enter git history — Nixpacks
+// writes secrets (env vars) into .nixpacks/build.sh in plaintext.
+// .gitignore keeps them from being staged in the first place; this is
+// a defensive second layer in case one was ever committed already.
+const SENSITIVE_PATTERNS = [".nixpacks"];
+
 function utcMin() { const n = new Date(); return n.getUTCHours() * 60 + n.getUTCMinutes(); }
 function isWeekday() { const d = new Date().getUTCDay(); return d >= 1 && d <= 5; }
 function isMarketHours() { return isWeekday() && utcMin() >= MARKET_START_UTC && utcMin() < MARKET_END_UTC; }
@@ -122,6 +128,30 @@ function ensureGitRepo() {
   if (branch && branch !== "main") {
     logResult(`git branch -m ${branch} main`, shCap(`git branch -m ${branch} main`));
   }
+
+  cleanupSensitiveTrackedFiles();
+}
+
+// Untracks (but does not delete on disk) any path matching
+// SENSITIVE_PATTERNS that somehow ended up tracked by git already —
+// e.g. from a commit made before .gitignore existed.
+function cleanupSensitiveTrackedFiles() {
+  for (const pattern of SENSITIVE_PATTERNS) {
+    const tracked = shCap(`git ls-files -- ${pattern}`);
+    if (tracked.ok && tracked.stdout.trim()) {
+      logResult(`git rm -r --cached ${pattern} (was tracked!)`, shCap(`git rm -r --cached --ignore-unmatch ${pattern}`));
+    }
+  }
+}
+
+// Stages ONLY the known state/outcome files by explicit name — never
+// `git add -A`, which would also pick up .nixpacks/build.sh (contains
+// plaintext env vars) or any other unexpected file in the working tree.
+function addStateFiles() {
+  for (const f of STATE_FILES) {
+    const r = shCap(`git add ${f}`);
+    if (!r.ok) console.warn(`[runner] git add ${f} failed:`, (r.stderr || r.message || "").trim());
+  }
 }
 
 // Hard-resets the working copy to the latest origin/main. Run once
@@ -151,10 +181,10 @@ function syncToGitHub() {
   try {
     ensureGitRepo();
 
-    const diff = execSync("git status --porcelain").toString().trim();
+    const diff = execSync(`git status --porcelain -- ${STATE_FILES.join(" ")}`).toString().trim();
     if (!diff) return;
 
-    sh("git add -A");
+    addStateFiles();
     sh(`git commit -m "railway state [skip ci]"`);
 
     // ── Diagnostics: dump repo state right before attempting to push ──
@@ -177,8 +207,8 @@ function syncToGitHub() {
       if (!pullResult.ok) {
         for (const f of STATE_FILES) {
           logResult(`  checkout --ours ${f}`, shCap(`git checkout --ours ${f}`));
+          logResult(`  add ${f}`, shCap(`git add ${f}`));
         }
-        logResult("  add -A", shCap("git add -A"));
         logResult("  merge --continue", shCap(`GIT_EDITOR=true git merge --continue`));
       }
 
