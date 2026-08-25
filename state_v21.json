@@ -58,40 +58,6 @@
       "low": 261.76
     }
   },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260825P00765000",
-    "strike": "765",
-    "entryPremium": 0.935,
-    "qty": 5,
-    "entryTime": 1787668168350,
-    "level": 765.87,
-    "msgId": 452,
-    "stopOrderId": "831635dc-989a-4eab-a3c0-b28af3f5042a",
-    "hardStopPrice": 0.61,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260825P00299000",
-    "strike": "299",
-    "entryPremium": 0.5700000000000001,
-    "qty": 8,
-    "entryTime": 1787668169147,
-    "level": 298.73,
-    "msgId": 453,
-    "stopOrderId": "85e96bb6-f07b-41fb-ae94-f862298f05aa",
-    "hardStopPrice": 0.37,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null
-  },
   "NVDA": {
     "active": true,
     "signal": "CALL",
@@ -107,23 +73,7 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260825P00710000",
-    "strike": "710",
-    "entryPremium": 1.48,
-    "qty": 3,
-    "entryTime": 1787668665585,
-    "level": 710.76,
-    "msgId": 457,
-    "stopOrderId": "2b428833-e285-4286-9f28-008f30e1ee98",
-    "hardStopPrice": 0.96,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastUpdate": 1787672896129
   }
 }
