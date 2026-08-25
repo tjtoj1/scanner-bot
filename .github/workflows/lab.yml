@@ -1,27 +1,34 @@
-name: Scanner LAB
+name: LAB (scan + monitor)
 on:
   schedule:
-    - cron: '*/5 13-21 * * 1-5'
+    - cron: '* 13-21 * * 1-5'
   workflow_dispatch:
 concurrency:
-  group: scanner-lab
+  group: lab-bot
   cancel-in-progress: false
 permissions:
   contents: write
 jobs:
-  scan:
+  run:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run LAB scanner
+      - name: Run LAB scan
         env:
           ALPACA_KEY_3:    ${{ secrets.ALPACA_KEY_3 }}
           ALPACA_SECRET_3: ${{ secrets.ALPACA_SECRET_3 }}
           TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+        run: node scan_lab.js
+      - name: Run LAB monitor
+        env:
+          ALPACA_KEY_3:    ${{ secrets.ALPACA_KEY_3 }}
+          ALPACA_SECRET_3: ${{ secrets.ALPACA_SECRET_3 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+          MODE:            monitor
         run: node scan_lab.js
       - name: Commit state
         run: |

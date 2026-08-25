@@ -321,6 +321,23 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
   saveState(state);
 }
 
+// ─── PERIODIC UPDATE MESSAGE ─────────────────────────────────
+function progressBar(pnlPct, maxPct = 100) {
+  const filled = Math.max(0, Math.min(10, Math.round((pnlPct / maxPct) * 10)));
+  return "█".repeat(filled) + "░".repeat(10 - filled);
+}
+
+function buildUpdateMsg(symbol, pos, pnlPct, currentPremium) {
+  const bar = progressBar(pnlPct);
+  const sign = pnlPct >= 0 ? "+" : "";
+  const pnl = Math.round((currentPremium - pos.entryPremium) * pos.qty * 100);
+  const elapsed = Math.round((Date.now() - pos.entryTime) / 60000);
+  const emoji = pnlPct >= 20 ? "🚀" : pnlPct >= 10 ? "📈" : pnlPct >= 0 ? "🟢" : pnlPct >= -15 ? "🟡" : "🔴";
+  const tp1 = pos.ladder1 ? "✅" : `+${pos.takeProfit1Pct}%`;
+  const tp2 = pos.ladder2 ? "✅" : `+${pos.takeProfit2Pct}%`;
+  return `${symbol} ${pos.signal} $${pos.strike} ${emoji}\n${bar} ${sign}${pnlPct.toFixed(1)}% | ${sign}$${pnl} | ${elapsed}m\nTP1 ${tp1} | TP2 ${tp2} | SL ${pos.stopLossPct}%\n$${currentPremium.toFixed(2)}/عقد`;
+}
+
 async function updateStopOrder(pos, newStopPrice) {
   try {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE");
@@ -340,6 +357,14 @@ async function monitorPosition(state, strategy, symbol) {
   const currentPremium = await getQuote(pos.optionSymbol);
   if (!currentPremium) return;
   const pnlPct = (currentPremium - pos.entryPremium) / pos.entryPremium * 100;
+
+  // ── UPDATE EVERY 2 MINUTES ────────────────────────────────
+  const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
+  const now = Date.now();
+  if (!pos.lastUpdate || (now - pos.lastUpdate) >= UPDATE_INTERVAL) {
+    pos.lastUpdate = now;
+    await tg(buildUpdateMsg(symbol, pos, pnlPct, currentPremium), pos.msgId);
+  }
 
   // Daily loss circuit breaker — flatten immediately
   if (getTodayRealizedPnl() <= -MAX_DAILY_LOSS) {

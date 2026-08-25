@@ -1,47 +1,54 @@
-name: FVG Scanner Bot 2
+name: v21 ORB (scan + monitor)
 on:
   schedule:
-    - cron: '*/5 13-20 * * 1-5'
+    - cron: '* 13-21 * * 1-5'
   workflow_dispatch:
 concurrency:
-  group: fvg-scanner
+  group: v21-bot
   cancel-in-progress: false
 permissions:
   contents: write
 jobs:
-  scan:
+  run:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Run FVG scanner
+      - name: Run v21 scan
         env:
           ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
           ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
           TG_TOKEN:        ${{ secrets.TG_TOKEN }}
-        run: node scan2_fvg.js
+        run: node scan_v21.js
+      - name: Run v21 monitor
+        env:
+          ALPACA_KEY_2:    ${{ secrets.ALPACA_KEY_2 }}
+          ALPACA_SECRET_2: ${{ secrets.ALPACA_SECRET_2 }}
+          TG_TOKEN:        ${{ secrets.TG_TOKEN }}
+          MODE:            monitor
+        run: node scan_v21.js
       - name: Commit state
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
           git diff --quiet && git diff --staged --quiet && exit 0
-          git commit -m "FVG state [skip ci]"
+          git commit -m "v21 state [skip ci]"
           for i in 1 2 3 4 5; do
             git push && exit 0
             git fetch origin main
             git rebase --abort 2>/dev/null || true
             git checkout -f main 2>/dev/null || true
             git pull origin main -X ours --no-edit 2>/dev/null || {
-              git checkout --ours state_fvg.json 2>/dev/null || true
+              git checkout --ours state_v21.json 2>/dev/null || true
               git add -A
               GIT_EDITOR=true git merge --continue 2>/dev/null || true
             }
             git add -A
-            git diff --staged --quiet || git commit -m "FVG merge [skip ci]" --allow-empty
+            git diff --staged --quiet || git commit -m "v21 merge [skip ci]" --allow-empty
             sleep $((i*2))
           done
           exit 0
