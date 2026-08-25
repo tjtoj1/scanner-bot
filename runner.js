@@ -32,7 +32,10 @@ const IDLE_INTERVAL_MS  = 5 * 60 * 1000;  // 5 min outside market hours
 const STATE_FILES = [
   "state_v21.json", "outcomes_v21.jsonl",
   "state_lab.json", "strategy_lab.json", "outcomes_lab.jsonl",
+  "report_state.json",
 ];
+
+const REPORT_WINDOW_START_UTC = 20 * 60 + 35; // 20:35 UTC — after LAB's own 20:00-20:30 learning window
 
 // Build-generated paths that must never enter git history — Nixpacks
 // writes secrets (env vars) into .nixpacks/build.sh in plaintext.
@@ -260,6 +263,10 @@ async function main() {
         console.log(`[runner] cycle start ${new Date().toISOString()}`);
         await runBotCycle("v21", "scan_v21.js");
         await runBotCycle("lab", "scan_lab.js");
+        if (utcMin() >= REPORT_WINDOW_START_UTC) {
+          console.log("[runner] daily report window — checking");
+          await runNode("daily_report.js", {});
+        }
         syncToGitHub();
         await sleep(CYCLE_INTERVAL_MS);
       } else {
