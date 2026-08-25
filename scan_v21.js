@@ -20,6 +20,23 @@ const PERSONAL_CHAT = "810642442";
 const MODE          = process.env.MODE || "scan";
 const TRADING_BASE  = "https://paper-api.alpaca.markets/v2";
 const DATA_BASE     = "https://data.alpaca.markets/v2";
+
+// Every network call in this file goes through here — a stalled
+// connection (no response, no error) used to hang this process
+// forever, which hung the whole Railway runner loop since it just
+// awaits this child process's exit. 15s is generous for these APIs;
+// on timeout the fetch simply rejects like any other network error,
+// so existing try/catch blocks handle it exactly as before.
+async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 // 0DTE tickers (daily expiry)
 const TICKERS_0DTE  = ["SPY", "QQQ", "IWM"];
 // Non-0DTE tickers (use next available expiry after today)
@@ -60,7 +77,7 @@ async function getNextExpiry(symbol) {
   try {
     const today = getToday();
     const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date_gte=${today}&status=active&limit=50&type=call`;
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
     });
     const d = await res.json();
@@ -86,7 +103,7 @@ async function tg(text, replyTo=null) {
   try {
     const body = { chat_id: PERSONAL_CHAT, text, parse_mode:"HTML" };
     if (replyTo) { body.reply_to_message_id=replyTo; body.allow_sending_without_reply=true; }
-    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    const res = await fetchWithTimeout(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
     });
     const d = await res.json();
@@ -95,7 +112,7 @@ async function tg(text, replyTo=null) {
 }
 
 async function alpaca(path, method="GET", body=null) {
-  const res = await fetch(`${TRADING_BASE}${path}`, {
+  const res = await fetchWithTimeout(`${TRADING_BASE}${path}`, {
     method, headers: {
       "APCA-API-KEY-ID": ALPACA_KEY,
       "APCA-API-SECRET-KEY": ALPACA_SECRET,
@@ -110,7 +127,7 @@ async function getBars(symbol, tf="15Min", daysBack=1) {
   try {
     const start = new Date(Date.now()-daysBack*24*60*60*1000).toISOString();
     const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=100&adjustment=raw`;
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
     });
     const text = await res.text();
@@ -121,7 +138,7 @@ async function getBars(symbol, tf="15Min", daysBack=1) {
 
 async function getLatestPrice(symbol) {
   try {
-    const r = await fetch(`${DATA_BASE}/stocks/${symbol}/quotes/latest`, {
+    const r = await fetchWithTimeout(`${DATA_BASE}/stocks/${symbol}/quotes/latest`, {
       headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
     });
     const d = await r.json();
@@ -142,7 +159,7 @@ async function findOption(symbol, signal, spotPrice) {
     const strike = Math.round(spotPrice) + delta;
     try {
       const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${expiry}&type=${type}&strike_price_gte=${strike-0.5}&strike_price_lte=${strike+0.5}&status=active&limit=5`;
-      const res = await fetch(url, {
+      const res = await fetchWithTimeout(url, {
         headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
       });
       const d = await res.json();
@@ -158,7 +175,7 @@ async function findOption(symbol, signal, spotPrice) {
 
 async function getQuote(optSym) {
   try {
-    const res = await fetch(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, {
+    const res = await fetchWithTimeout(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, {
       headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
     });
     const d = await res.json();
@@ -470,7 +487,7 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   }
 
   // Daily profit target (3-5%)
-  const acct = await fetch(`${TRADING_BASE}/account`, {
+  const acct = await fetchWithTimeout(`${TRADING_BASE}/account`, {
     headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
   }).then(r=>r.json());
   const lastEquity = parseFloat(acct.last_equity);

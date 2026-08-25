@@ -32,6 +32,22 @@ const HEADERS = {
   "Content-Type": "application/json",
 };
 
+// Every network call in this file goes through here — a stalled
+// connection (no response, no error) used to hang this process
+// forever, which hung the whole Railway runner loop since it just
+// awaits this child process's exit. 15s is generous for these APIs;
+// on timeout the fetch simply rejects like any other network error,
+// so existing try/catch blocks handle it exactly as before.
+async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 // ─── HARD SAFETY LIMITS (fixed — never modified by self-tuning) ────
 const ALLOWED_TICKERS    = ["SPY", "QQQ", "IWM", "NVDA", "TSLA", "AMZN"];
 const MAX_DAILY_LOSS     = 1000;  // $ — halts new entries + flattens open positions
@@ -108,7 +124,7 @@ async function tg(text, replyTo = null) {
   try {
     const body = { chat_id: PERSONAL_CHAT, text: `🧪 LAB: ${text}`, parse_mode: "HTML" };
     if (replyTo) { body.reply_to_message_id = replyTo; body.allow_sending_without_reply = true; }
-    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    const res = await fetchWithTimeout(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
     });
     const d = await res.json();
@@ -117,7 +133,7 @@ async function tg(text, replyTo = null) {
 }
 
 async function alpaca(path, method = "GET", body = null) {
-  const res = await fetch(`${TRADING_BASE}${path}`, {
+  const res = await fetchWithTimeout(`${TRADING_BASE}${path}`, {
     method, headers: HEADERS, body: body ? JSON.stringify(body) : null
   });
   const t = await res.text();
@@ -128,7 +144,7 @@ async function getBars(symbol, tf = "15Min", daysBack = 5) {
   try {
     const start = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
     const url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=300&adjustment=raw`;
-    const res = await fetch(url, { headers: HEADERS });
+    const res = await fetchWithTimeout(url, { headers: HEADERS });
     const text = await res.text();
     try { return JSON.parse(text).bars || []; }
     catch { console.error(`${symbol} getBars parse error:`, text.slice(0, 100)); return []; }
@@ -137,7 +153,7 @@ async function getBars(symbol, tf = "15Min", daysBack = 5) {
 
 async function getLatestPrice(symbol) {
   try {
-    const r = await fetch(`${DATA_BASE}/stocks/${symbol}/quotes/latest`, { headers: HEADERS });
+    const r = await fetchWithTimeout(`${DATA_BASE}/stocks/${symbol}/quotes/latest`, { headers: HEADERS });
     const d = await r.json();
     return d.quote ? (d.quote.ap + d.quote.bp) / 2 : null;
   } catch { return null; }
@@ -145,7 +161,7 @@ async function getLatestPrice(symbol) {
 
 async function getQuote(optSym) {
   try {
-    const res = await fetch(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, { headers: HEADERS });
+    const res = await fetchWithTimeout(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, { headers: HEADERS });
     const d = await res.json();
     const q = d.quotes?.[optSym];
     return q ? (q.ap + q.bp) / 2 : null;
@@ -158,7 +174,7 @@ async function getNearExpiry(symbol) {
     const today = getToday();
     const maxDate = new Date(Date.now() + MAX_DTE * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
     const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date_gte=${today}&expiration_date_lte=${maxDate}&status=active&limit=50&type=call`;
-    const res = await fetch(url, { headers: HEADERS });
+    const res = await fetchWithTimeout(url, { headers: HEADERS });
     const d = await res.json();
     const dates = [...new Set((d?.option_contracts || []).map(c => c.expiration_date))].sort();
     return dates[0] || null;
@@ -173,7 +189,7 @@ async function findOption(symbol, signal, spotPrice) {
     const strike = Math.round(spotPrice) + delta;
     try {
       const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${expiry}&type=${type}&strike_price_gte=${strike-0.5}&strike_price_lte=${strike+0.5}&status=active&limit=5`;
-      const res = await fetch(url, { headers: HEADERS });
+      const res = await fetchWithTimeout(url, { headers: HEADERS });
       const d = await res.json();
       const contracts = d?.option_contracts || [];
       if (!contracts.length) continue;

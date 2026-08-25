@@ -43,17 +43,23 @@ const REPORT_WINDOW_START_UTC = 20 * 60 + 35; // 20:35 UTC — after LAB's own 2
 // a defensive second layer in case one was ever committed already.
 const SENSITIVE_PATTERNS = [".nixpacks"];
 
+// Git ops go over the network (fetch/push/pull) and execSync has NO
+// default timeout — a stalled connection used to hang this process
+// (and therefore the whole runner loop) forever. Every execSync call
+// below passes this explicitly.
+const GIT_TIMEOUT_MS = 20000;
+
 function utcMin() { const n = new Date(); return n.getUTCHours() * 60 + n.getUTCMinutes(); }
 function isWeekday() { const d = new Date().getUTCDay(); return d >= 1 && d <= 5; }
 function isMarketHours() { return isWeekday() && utcMin() >= MARKET_START_UTC && utcMin() < MARKET_END_UTC; }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-function sh(cmd) { return execSync(cmd, { stdio: "ignore" }); }
+function sh(cmd) { return execSync(cmd, { stdio: "ignore", timeout: GIT_TIMEOUT_MS }); }
 
 // Runs a command capturing stdout/stderr instead of discarding them,
 // for diagnostics. Never throws — returns a result object.
 function shCap(cmd) {
   try {
-    const out = execSync(cmd, { stdio: ["ignore", "pipe", "pipe"] });
+    const out = execSync(cmd, { stdio: ["ignore", "pipe", "pipe"], timeout: GIT_TIMEOUT_MS });
     return { ok: true, code: 0, stdout: out.toString(), stderr: "" };
   } catch (e) {
     return {
@@ -103,7 +109,7 @@ function originUrl() {
 // be called mid-cycle (from syncToGitHub) without wiping local changes.
 function ensureGitRepo() {
   let isRepo = true;
-  try { execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" }); }
+  try { execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore", timeout: GIT_TIMEOUT_MS }); }
   catch { isRepo = false; }
 
   if (!isRepo) {
@@ -112,7 +118,7 @@ function ensureGitRepo() {
   }
 
   let hasOrigin = true;
-  try { execSync("git remote get-url origin", { stdio: "ignore" }); }
+  try { execSync("git remote get-url origin", { stdio: "ignore", timeout: GIT_TIMEOUT_MS }); }
   catch { hasOrigin = false; }
 
   if (!hasOrigin) {
@@ -184,7 +190,7 @@ function syncToGitHub() {
   try {
     ensureGitRepo();
 
-    const diff = execSync(`git status --porcelain -- ${STATE_FILES.join(" ")}`).toString().trim();
+    const diff = execSync(`git status --porcelain -- ${STATE_FILES.join(" ")}`, { timeout: GIT_TIMEOUT_MS }).toString().trim();
     if (!diff) return;
 
     addStateFiles();
@@ -215,7 +221,7 @@ function syncToGitHub() {
         logResult("  merge --continue", shCap(`GIT_EDITOR=true git merge --continue`));
       }
 
-      try { execSync(`sleep ${i * 2}`); } catch {} // simple sync backoff (seconds)
+      try { execSync(`sleep ${i * 2}`, { timeout: GIT_TIMEOUT_MS }); } catch {} // simple sync backoff (seconds)
     }
     console.error("[runner] git push failed after 5 retries — state changes NOT persisted this cycle. See attempt logs above for the actual error.");
   } catch (e) {
@@ -224,14 +230,38 @@ function syncToGitHub() {
 }
 
 // ─── BOT INVOCATION ──────────────────────────────────────────
+// Final safety net: no matter what hangs inside a child process (an
+// un-timed-out fetch we missed, a stuck native call, anything) this
+// guarantees runNode() always resolves within CHILD_TIMEOUT_MS, so
+// the main loop can never freeze on a child that never exits.
+const CHILD_TIMEOUT_MS = 90 * 1000;
+
 function runNode(script, extraEnv = {}) {
   return new Promise((resolve) => {
+    let settled = false;
     const child = spawn("node", [script], {
       env: { ...process.env, ...extraEnv },
       stdio: "inherit",
     });
-    child.on("exit", (code) => resolve(code ?? 0));
+
+    const watchdog = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      console.error(`[runner] WATCHDOG: ${script} exceeded ${CHILD_TIMEOUT_MS / 1000}s — killing and continuing to next cycle`);
+      try { child.kill("SIGKILL"); } catch (e) { console.error(`[runner] failed to kill ${script}:`, e.message); }
+      resolve(1);
+    }, CHILD_TIMEOUT_MS);
+
+    child.on("exit", (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(watchdog);
+      resolve(code ?? 0);
+    });
     child.on("error", (err) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(watchdog);
       console.error(`[runner] failed to spawn ${script}:`, err.message);
       resolve(1);
     });
