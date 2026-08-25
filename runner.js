@@ -72,18 +72,55 @@ function logResult(label, r) {
 }
 
 // ─── GIT SETUP / SYNC ────────────────────────────────────────
+// Origin URL: token-embedded when GH_PUSH_TOKEN is set (needed for both
+// fetch and push against the configured remote), plain otherwise (fetch
+// still works — public repo — but push will fail without a token).
+function originUrl() {
+  return GH_PUSH_TOKEN
+    ? `https://x-access-token:${GH_PUSH_TOKEN}@github.com/tjtoj1/scanner-bot.git`
+    : REPO_URL_PLAIN;
+}
+
+// Idempotent bootstrap: safe to call every cycle. Railway deploys the
+// source tree WITHOUT a .git directory (no repo, no remote, no history),
+// so this must fully construct one from scratch on first call:
+//   1. git init (with initial branch forced to "main")
+//   2. git remote add origin <token-embedded URL>
+//   3. git config user.email / user.name
+//   4. make sure the local branch is literally "main"
+// Fetch + reset to origin/main is intentionally NOT done here — that's
+// a one-time destructive step, handled separately by
+// syncStateFromGitHub() at boot only (see below), so this function can
+// be called mid-cycle (from syncToGitHub) without wiping local changes.
 function ensureGitRepo() {
-  try {
-    execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" });
-  } catch {
+  let isRepo = true;
+  try { execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" }); }
+  catch { isRepo = false; }
+
+  if (!isRepo) {
     console.log("[runner] no git repo present — initializing");
-    sh("git init");
-    sh(`git remote add origin ${REPO_URL_PLAIN}`);
+    logResult("git init -b main", shCap("git init -b main"));
   }
-  try {
-    sh("git remote get-url origin");
-  } catch {
-    sh(`git remote add origin ${REPO_URL_PLAIN}`);
+
+  let hasOrigin = true;
+  try { execSync("git remote get-url origin", { stdio: "ignore" }); }
+  catch { hasOrigin = false; }
+
+  if (!hasOrigin) {
+    logResult("git remote add origin", shCap(`git remote add origin ${originUrl()}`));
+  } else if (GH_PUSH_TOKEN) {
+    // keep the stored remote URL's token current (idempotent, harmless if unchanged)
+    logResult("git remote set-url origin", shCap(`git remote set-url origin ${originUrl()}`));
+  }
+
+  sh(`git config user.email "railway@scanner-bot.local"`);
+  sh(`git config user.name "Railway Runner"`);
+
+  // Force the local branch to be literally "main" (git init -b main
+  // already guarantees this on a fresh repo; this covers any edge case).
+  const branch = (shCap("git branch --show-current").stdout || "").trim();
+  if (branch && branch !== "main") {
+    logResult(`git branch -m ${branch} main`, shCap(`git branch -m ${branch} main`));
   }
 }
 
@@ -92,8 +129,9 @@ function ensureGitRepo() {
 function syncStateFromGitHub() {
   try {
     ensureGitRepo();
-    sh("git fetch origin main");
-    sh("git reset --hard origin/main");
+    logResult("git fetch origin main", shCap("git fetch origin main"));
+    logResult("git reset --hard origin/main", shCap("git reset --hard origin/main"));
+    logResult("git branch --set-upstream-to", shCap("git branch --set-upstream-to=origin/main main"));
     console.log("[runner] synced working copy to origin/main");
   } catch (e) {
     console.error("[runner] syncStateFromGitHub failed (continuing with local files):", e.message);
@@ -112,8 +150,6 @@ function syncToGitHub() {
   }
   try {
     ensureGitRepo();
-    sh(`git config user.email "railway@scanner-bot.local"`);
-    sh(`git config user.name "Railway Runner"`);
 
     const diff = execSync("git status --porcelain").toString().trim();
     if (!diff) return;
@@ -129,15 +165,14 @@ function syncToGitHub() {
     logResult("git config user.email", shCap("git config --get user.email"));
     logResult("git config user.name", shCap("git config --get user.name"));
 
-    const authedUrl = `https://x-access-token:${GH_PUSH_TOKEN}@github.com/tjtoj1/scanner-bot.git`;
     for (let i = 1; i <= 5; i++) {
-      const pushResult = shCap(`git push ${authedUrl} HEAD:main`);
+      const pushResult = shCap(`git push origin HEAD:main`);
       logResult(`git push attempt ${i}/5`, pushResult);
       if (pushResult.ok) return;
 
       logResult("  rebase --abort", shCap("git rebase --abort"));
       logResult("  fetch origin main", shCap("git fetch origin main"));
-      const pullResult = shCap(`git pull ${authedUrl} main -X ours --no-edit`);
+      const pullResult = shCap(`git pull origin main -X ours --no-edit`);
       logResult("  pull -X ours", pullResult);
       if (!pullResult.ok) {
         for (const f of STATE_FILES) {
