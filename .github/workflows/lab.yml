@@ -1,7 +1,5 @@
 name: LAB (scan + monitor)
 on:
-  schedule:
-    - cron: '*/3 13-21 * * 1-5'
   workflow_dispatch:
 concurrency:
   group: lab-bot
