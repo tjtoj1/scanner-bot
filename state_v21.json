@@ -18,6 +18,12 @@
       "symbol": "NVDA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-25",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -98,6 +104,23 @@
     "msgId": 454,
     "stopOrderId": "c0c5130f-c4e7-4de3-a99a-f557a8d20d27",
     "hardStopPrice": 3.84,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260825P00710000",
+    "strike": "710",
+    "entryPremium": 1.48,
+    "qty": 3,
+    "entryTime": 1787668665585,
+    "level": 710.76,
+    "msgId": 457,
+    "stopOrderId": "2b428833-e285-4286-9f28-008f30e1ee98",
+    "hardStopPrice": 0.96,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
