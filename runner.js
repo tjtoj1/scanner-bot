@@ -246,6 +246,11 @@ function syncToGitHub() {
     const nixpacksUntracked = ensureGitRepo();
 
     const diff = execSync(`git status --porcelain -- ${STATE_FILES.join(" ")}`, { timeout: GIT_TIMEOUT_MS }).toString().trim();
+    // Log exactly which state files actually changed this cycle (or that
+    // none did) — this used to be silent, which is exactly why "did the
+    // state files change but the commit missed them, or did they just not
+    // change" was unanswerable from the logs alone.
+    console.log(diff ? `[runner] state files changed this cycle:\n${diff}` : "[runner] no state file changes this cycle");
     // Commit even with no state-file changes when cleanup just untracked a
     // sensitive file — that removal must reach GitHub on its own and as
     // fast as possible (it's the fix for GH013 blocking every push), not
@@ -266,7 +271,24 @@ function syncToGitHub() {
     for (let i = 1; i <= 5; i++) {
       const pushResult = shCap(`git push origin HEAD:main`);
       logResult(`git push attempt ${i}/5`, pushResult);
-      if (pushResult.ok) { pushFailureAlerted = false; return; }
+
+      if (pushResult.ok) {
+        // Exit code 0 alone is NOT proof anything reached GitHub — `git
+        // push` also exits 0 for "Everything up-to-date" (nothing new to
+        // send). Confirm origin/main on GitHub's side actually now equals
+        // what we just committed locally before trusting "ok"; if it
+        // doesn't, treat this exactly like a failed attempt and fall
+        // through into the same recovery/retry path below instead of
+        // returning early on a false positive.
+        const localHead = (shCap("git rev-parse HEAD").stdout || "").trim();
+        const remoteHead = ((shCap("git ls-remote origin main").stdout || "").split(/\s+/)[0] || "").trim();
+        if (localHead && remoteHead === localHead) {
+          console.log(`[runner] push CONFIRMED — origin/main on GitHub now at ${localHead}`);
+          pushFailureAlerted = false;
+          return;
+        }
+        console.error(`[runner] git push reported ok but origin/main on GitHub (${remoteHead || "unknown"}) does not match local HEAD (${localHead || "unknown"}) — NOT confirmed, retrying`);
+      }
 
       // GH013: GitHub's secret-scanning push protection rejects the whole
       // push because SOME commit being pushed still carries a tracked
