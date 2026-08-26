@@ -268,6 +268,12 @@ function syncToGitHub() {
     logResult("git config user.email", shCap("git config --get user.email"));
     logResult("git config user.name", shCap("git config --get user.name"));
 
+    // Diagnostic text from the most recent failed (or unconfirmed) push
+    // attempt, carried past the loop so the final Telegram alert can
+    // include the actual error instead of a generic message — no more
+    // needing to open Railway Deploy Logs just to see why.
+    let lastPushError = "";
+
     for (let i = 1; i <= 5; i++) {
       const pushResult = shCap(`git push origin HEAD:main`);
       logResult(`git push attempt ${i}/5`, pushResult);
@@ -287,7 +293,10 @@ function syncToGitHub() {
           pushFailureAlerted = false;
           return;
         }
+        lastPushError = `push exited 0 but origin/main is at ${remoteHead || "unknown"}, not the expected ${localHead || "unknown"} — not confirmed`;
         console.error(`[runner] git push reported ok but origin/main on GitHub (${remoteHead || "unknown"}) does not match local HEAD (${localHead || "unknown"}) — NOT confirmed, retrying`);
+      } else {
+        lastPushError = (pushResult.stderr || pushResult.stdout || pushResult.message || "").trim();
       }
 
       // GH013: GitHub's secret-scanning push protection rejects the whole
@@ -329,7 +338,11 @@ function syncToGitHub() {
     console.error("[runner] git push failed after 5 retries — state changes NOT persisted this cycle. See attempt logs above for the actual error.");
     if (!pushFailureAlerted) {
       pushFailureAlerted = true;
-      alertTelegram("⚠️ Railway: git push فشل بعد 5 محاولات — حالة الصفقات لن تُحفظ في GitHub حتى يُصلح هذا. راجع Railway Deploy Logs لسبب الفشل الدقيق (ابحث عن \"git push attempt\").");
+      // Mask BEFORE truncating — truncating first could cut the token in
+      // half, leaving a partial (still-identifying) fragment that no
+      // longer matches maskToken's exact string search.
+      const reason = maskToken(lastPushError || "سبب غير معروف — لا رسالة خطأ من آخر محاولة").slice(0, 200);
+      alertTelegram(`⚠️ Railway: git push فشل\nالسبب: ${reason}`);
     }
   } catch (e) {
     console.error("[runner] syncToGitHub error:", e.message);
