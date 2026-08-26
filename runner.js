@@ -172,19 +172,31 @@ function ensureGitRepo() {
     logResult(`git branch -m ${branch} main`, shCap(`git branch -m ${branch} main`));
   }
 
-  cleanupSensitiveTrackedFiles();
+  return cleanupSensitiveTrackedFiles();
 }
 
 // Untracks (but does not delete on disk) any path matching
-// SENSITIVE_PATTERNS that somehow ended up tracked by git already —
-// e.g. from a commit made before .gitignore existed.
+// SENSITIVE_PATTERNS — e.g. .nixpacks/build.sh, which Nixpacks writes with
+// the live env vars (including GH_PUSH_TOKEN) in plaintext on every build.
+// GH013 (GitHub secret-scanning push protection) rejects any push whose
+// commits track that file, and .gitignore only stops NEW staging — it does
+// nothing once a path is already tracked. This used to run only when a
+// preceding `git ls-files` check found something; that gate is the exact
+// kind of thing that can silently stop matching (path form, timing, a
+// rebuilt .nixpacks not yet reflected) and leave the file tracked forever.
+// Unconditional now: runs `git rm --cached` every single call, every
+// cycle, with no pre-check — `--ignore-unmatch` makes it a safe no-op when
+// there is truly nothing tracked, so there is no cost to calling it always.
 function cleanupSensitiveTrackedFiles() {
+  let removedAny = false;
   for (const pattern of SENSITIVE_PATTERNS) {
-    const tracked = shCap(`git ls-files -- ${pattern}`);
-    if (tracked.ok && tracked.stdout.trim()) {
-      logResult(`git rm -r --cached ${pattern} (was tracked!)`, shCap(`git rm -r --cached --ignore-unmatch ${pattern}`));
+    const r = shCap(`git rm -r --cached --ignore-unmatch -- ${pattern}`);
+    if (r.stdout && r.stdout.trim()) {
+      logResult(`git rm -r --cached --ignore-unmatch ${pattern} (was tracked!)`, r);
+      removedAny = true;
     }
   }
+  return removedAny;
 }
 
 // Stages ONLY the known state/outcome files by explicit name — never
@@ -226,10 +238,19 @@ function syncToGitHub() {
     return;
   }
   try {
-    ensureGitRepo();
+    // ensureGitRepo() always ends with an unconditional
+    // cleanupSensitiveTrackedFiles() call — .nixpacks/build.sh (holds the
+    // live GH_PUSH_TOKEN in plaintext) gets untracked from the index right
+    // here, before anything below stages or commits. Its return value
+    // tells us whether that untracking itself needs to reach GitHub.
+    const nixpacksUntracked = ensureGitRepo();
 
     const diff = execSync(`git status --porcelain -- ${STATE_FILES.join(" ")}`, { timeout: GIT_TIMEOUT_MS }).toString().trim();
-    if (!diff) return;
+    // Commit even with no state-file changes when cleanup just untracked a
+    // sensitive file — that removal must reach GitHub on its own and as
+    // fast as possible (it's the fix for GH013 blocking every push), not
+    // wait for the next trade to happen to also change a state file.
+    if (!diff && !nixpacksUntracked) return;
 
     addStateFiles();
     sh(`git commit -m "railway state [skip ci]"`);
@@ -247,16 +268,38 @@ function syncToGitHub() {
       logResult(`git push attempt ${i}/5`, pushResult);
       if (pushResult.ok) { pushFailureAlerted = false; return; }
 
-      logResult("  rebase --abort", shCap("git rebase --abort"));
-      logResult("  fetch origin main", shCap("git fetch origin main"));
-      const pullResult = shCap(`git pull origin main -X ours --no-edit`);
-      logResult("  pull -X ours", pullResult);
-      if (!pullResult.ok) {
-        for (const f of STATE_FILES) {
-          logResult(`  checkout --ours ${f}`, shCap(`git checkout --ours ${f}`));
-          logResult(`  add ${f}`, shCap(`git add ${f}`));
+      // GH013: GitHub's secret-scanning push protection rejects the whole
+      // push because SOME commit being pushed still carries a tracked
+      // secret file (.nixpacks/build.sh, holding GH_PUSH_TOKEN in
+      // plaintext). cleanupSensitiveTrackedFiles() only stops it from
+      // being in the commit made THIS cycle — it cannot fix a commit that
+      // already exists further back in local (unpushed) history, from
+      // before that cleanup ran. The only real fix for that is to drop
+      // the tainted commits from history entirely: `reset --soft` onto
+      // origin/main collapses ALL unpushed local commits into one, while
+      // leaving the working tree (today's actual state file contents)
+      // completely untouched — so no trade data is lost, only the
+      // throwaway intermediate "railway state" commit history, which was
+      // never meaningful on its own.
+      if (/GH013|push protection|Personal Access Token/i.test(pushResult.stderr || "")) {
+        console.error("[runner] push blocked by GitHub secret scanning (GH013) — squashing unpushed local history onto origin/main to drop the tracked secret file for good");
+        logResult("  fetch origin main", shCap("git fetch origin main"));
+        logResult("  reset --soft origin/main", shCap("git reset --soft origin/main"));
+        cleanupSensitiveTrackedFiles();
+        addStateFiles();
+        logResult("  commit (squashed)", shCap(`git commit -m "railway state [skip ci]"`));
+      } else {
+        logResult("  rebase --abort", shCap("git rebase --abort"));
+        logResult("  fetch origin main", shCap("git fetch origin main"));
+        const pullResult = shCap(`git pull origin main -X ours --no-edit`);
+        logResult("  pull -X ours", pullResult);
+        if (!pullResult.ok) {
+          for (const f of STATE_FILES) {
+            logResult(`  checkout --ours ${f}`, shCap(`git checkout --ours ${f}`));
+            logResult(`  add ${f}`, shCap(`git add ${f}`));
+          }
+          logResult("  merge --continue", shCap(`GIT_EDITOR=true git merge --continue`));
         }
-        logResult("  merge --continue", shCap(`GIT_EDITOR=true git merge --continue`));
       }
 
       try { execSync(`sleep ${i * 2}`, { timeout: GIT_TIMEOUT_MS }); } catch {} // simple sync backoff (seconds)
