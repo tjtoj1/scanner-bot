@@ -463,14 +463,6 @@ async function monitorPosition(state, strategy, symbol) {
   if (!currentPremium) return;
   const pnlPct = (currentPremium - pos.entryPremium) / pos.entryPremium * 100;
 
-  // ── UPDATE EVERY 2 MINUTES ────────────────────────────────
-  const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
-  const now = Date.now();
-  if (!pos.lastUpdate || (now - pos.lastUpdate) >= UPDATE_INTERVAL) {
-    pos.lastUpdate = now;
-    await tg(buildUpdateMsg(symbol, pos, pnlPct, currentPremium), pos.msgId);
-  }
-
   // Daily loss circuit breaker — flatten immediately
   if (getTodayRealizedPnl() <= -MAX_DAILY_LOSS) {
     await closePosition(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill");
@@ -488,6 +480,7 @@ async function monitorPosition(state, strategy, symbol) {
   }
 
   // Profit ladder
+  let ladderJustFired = false;
   if (pnlPct >= pos.takeProfit2Pct && !pos.ladder2) {
     pos.ladder2 = true; pos.ladder1 = true;
     pos.stopPct = pos.takeProfit2LockPct; pos.trailPct = pos.trailingPct;
@@ -495,6 +488,7 @@ async function monitorPosition(state, strategy, symbol) {
     const newStop = +(pos.entryPremium * (1 + pos.takeProfit2LockPct / 100)).toFixed(2);
     await updateStopOrder(pos, newStop);
     await tg(`${symbol} مستوى 2: +${pnlPct.toFixed(1)}% | وقف +${pos.takeProfit2LockPct}% + تريلينق ${pos.trailingPct}%`, pos.msgId);
+    ladderJustFired = true;
   }
   if (pnlPct >= pos.takeProfit1Pct && !pos.ladder1) {
     pos.ladder1 = true; pos.stopPct = pos.takeProfit1LockPct;
@@ -502,15 +496,20 @@ async function monitorPosition(state, strategy, symbol) {
     const newStop = +(pos.entryPremium * (1 + pos.takeProfit1LockPct / 100)).toFixed(2);
     await updateStopOrder(pos, newStop);
     await tg(`${symbol} مستوى 1: +${pnlPct.toFixed(1)}% | وقف +${pos.takeProfit1LockPct}%`, pos.msgId);
+    ladderJustFired = true;
   }
   if (pos.trailPct) pos.peakPct = Math.max(pos.peakPct || 0, pnlPct);
 
-  if (pos.stopPct !== undefined) {
-    const floor = pos.trailPct ? (pos.peakPct - pos.trailPct) : pos.stopPct;
-    if (pnlPct <= floor) {
-      await closePosition(state, symbol, pos, currentPremium, "ladder_stop", "order_fill");
-      return;
-    }
+  // Current effective stop floor — the ladder-tightened floor once
+  // profit-locking has kicked in, otherwise the original hard stop.
+  // Reused below for both the close check and the near-stop warning.
+  const currentStopFloor = pos.stopPct !== undefined
+    ? (pos.trailPct ? pos.peakPct - pos.trailPct : pos.stopPct)
+    : pos.stopLossPct;
+
+  if (pos.stopPct !== undefined && pnlPct <= currentStopFloor) {
+    await closePosition(state, symbol, pos, currentPremium, "ladder_stop", "order_fill");
+    return;
   }
 
   // Regime flip — trend thesis invalidated
@@ -521,6 +520,31 @@ async function monitorPosition(state, strategy, symbol) {
     if (against) {
       await closePosition(state, symbol, pos, currentPremium, "regime_flip", "order_fill");
       return;
+    }
+  }
+
+  // ── EVENT-DRIVEN UPDATES (position still open this cycle) ───
+  // Replaces the old fixed 2-minute interval, which sent a message every
+  // cycle regardless of whether anything happened. Now: silence unless
+  // something noteworthy occurred.
+
+  // Near-stop warning — once, the first time price comes within 5 points
+  // of whichever stop currently protects the position. Never repeats.
+  if (!pos.nearStopWarned && (pnlPct - currentStopFloor) <= 5) {
+    pos.nearStopWarned = true;
+    await tg(`⚠️ <b>${symbol} قريب من الوقف</b>\n${pnlPct.toFixed(1)}% | الوقف الحالي عند ${currentStopFloor.toFixed(1)}%`, pos.msgId);
+  }
+
+  // ±10% premium bands from entry — one message per NEW band crossed,
+  // tracked via pos.lastReportedThreshold so re-entering an
+  // already-reported band (price oscillating near a boundary) stays
+  // silent. Skipped if a ladder message above already covered this exact
+  // crossing (takeProfit1Pct/takeProfit2Pct can land on the same band).
+  const thresholdLevel = Math.trunc(pnlPct / 10) * 10;
+  if (thresholdLevel !== 0 && thresholdLevel !== pos.lastReportedThreshold) {
+    pos.lastReportedThreshold = thresholdLevel;
+    if (!ladderJustFired) {
+      await tg(buildUpdateMsg(symbol, pos, pnlPct, currentPremium), pos.msgId);
     }
   }
 

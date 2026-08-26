@@ -489,15 +489,6 @@ async function monitorPosition(state, symbol) {
   const elapsed = Math.round((Date.now() - pos.entryTime) / 60000);
   console.log(`${symbol} [v21]: ${pos.signal} | ${pnlPct.toFixed(1)}% | ${elapsed}m`);
 
-  // ── UPDATE EVERY 2 MINUTES ────────────────────────────────
-  const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
-  const now = Date.now();
-  if (!pos.lastUpdate || (now - pos.lastUpdate) >= UPDATE_INTERVAL) {
-    pos.lastUpdate = now;
-    const updateMsg = buildUpdateMsg(symbol, pos, pnlPct, currentPremium);
-    await tg(updateMsg, pos.msgId);
-  }
-
   // Force exit
   if (isForceExit()) {
     await closePosition(state, symbol, pos, currentPremium, "force_exit", "order_fill");
@@ -511,6 +502,7 @@ async function monitorPosition(state, symbol) {
   }
 
   // Profit ladder
+  let ladderJustFired = false;
   if (pnlPct >= LADDER_2_PCT && !pos.ladder2) {
     pos.ladder2=true; pos.ladder1=true;
     pos.stopPct=LADDER_2_STOP; pos.trailPct=TRAIL_PCT;
@@ -519,6 +511,7 @@ async function monitorPosition(state, symbol) {
     const newStop = +(pos.entryPremium * (1 + LADDER_2_STOP/100)).toFixed(2);
     await updateStopOrder(pos, newStop);
     await tg(`📈 <b>${symbol} مستوى 2</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_2_STOP}% + تريلينق ${TRAIL_PCT}%`, pos.msgId);
+    ladderJustFired = true;
   }
   if (pnlPct >= LADDER_1_PCT && !pos.ladder1) {
     pos.ladder1=true; pos.stopPct=LADDER_1_STOP;
@@ -527,16 +520,21 @@ async function monitorPosition(state, symbol) {
     const newStop = +(pos.entryPremium * (1 + LADDER_1_STOP/100)).toFixed(2);
     await updateStopOrder(pos, newStop);
     await tg(`📊 <b>${symbol} مستوى 1</b>\n+${pnlPct.toFixed(1)}% | وقف +${LADDER_1_STOP}%`, pos.msgId);
+    ladderJustFired = true;
   }
   if (pos.trailPct) pos.peakPct = Math.max(pos.peakPct||0, pnlPct);
 
+  // Current effective stop floor — the ladder-tightened floor once
+  // profit-locking has kicked in, otherwise the original hard stop.
+  // Reused below for both the close check and the near-stop warning.
+  const currentStopFloor = pos.stopPct !== undefined
+    ? (pos.trailPct ? pos.peakPct - pos.trailPct : pos.stopPct)
+    : HARD_STOP_PCT;
+
   // Trail/ladder stop exit
-  if (pos.stopPct !== undefined) {
-    const floor = pos.trailPct ? (pos.peakPct - pos.trailPct) : pos.stopPct;
-    if (pnlPct <= floor) {
-      await closePosition(state, symbol, pos, currentPremium, "ladder_stop", "order_fill");
-      return;
-    }
+  if (pos.stopPct !== undefined && pnlPct <= currentStopFloor) {
+    await closePosition(state, symbol, pos, currentPremium, "ladder_stop", "order_fill");
+    return;
   }
 
   // Structural stop: 15-min candle closes back inside/through range on low volume
@@ -557,6 +555,32 @@ async function monitorPosition(state, symbol) {
       }
     }
   }
+
+  // ── EVENT-DRIVEN UPDATES (position still open this cycle) ───
+  // Replaces the old fixed 2-minute interval, which sent a message every
+  // cycle regardless of whether anything happened. Now: silence unless
+  // something noteworthy occurred.
+
+  // Near-stop warning — once, the first time price comes within 5 points
+  // of whichever stop currently protects the position. Never repeats.
+  if (!pos.nearStopWarned && (pnlPct - currentStopFloor) <= 5) {
+    pos.nearStopWarned = true;
+    await tg(`⚠️ <b>${symbol} قريب من الوقف</b>\n${pnlPct.toFixed(1)}% | الوقف الحالي عند ${currentStopFloor.toFixed(1)}%`, pos.msgId);
+  }
+
+  // ±10% premium bands from entry — one message per NEW band crossed,
+  // tracked via pos.lastReportedThreshold so re-entering an
+  // already-reported band (price oscillating near a boundary) stays
+  // silent. Skipped if a ladder message above already covered this exact
+  // crossing (LADDER_1_PCT/LADDER_2_PCT can land on the same band).
+  const thresholdLevel = Math.trunc(pnlPct / 10) * 10;
+  if (thresholdLevel !== 0 && thresholdLevel !== pos.lastReportedThreshold) {
+    pos.lastReportedThreshold = thresholdLevel;
+    if (!ladderJustFired) {
+      await tg(buildUpdateMsg(symbol, pos, pnlPct, currentPremium), pos.msgId);
+    }
+  }
+
   saveState(state);
 }
 
