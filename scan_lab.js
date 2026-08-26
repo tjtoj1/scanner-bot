@@ -140,6 +140,30 @@ async function alpaca(path, method = "GET", body = null) {
   try { return JSON.parse(t); } catch { return t; }
 }
 
+// Alpaca's actual open position is the source of truth for how many
+// contracts we're allowed to sell — never local state, which can be
+// stale or wrong (e.g. lost across a Railway restart before git push
+// persistence was fixed). Returns:
+//   > 0  → that many contracts held long, safe to sell up to this amount
+//   0    → no position at Alpaca (already flat / never really opened)
+//   null → couldn't determine (network/parse error) — caller must NOT
+//          fall back to local state and must NOT place any sell order
+async function getOwnedQty(optionSymbol) {
+  try {
+    const d = await alpaca(`/positions/${optionSymbol}`);
+    if (d && typeof d.qty !== "undefined") {
+      const qty = parseFloat(d.qty);
+      return Number.isFinite(qty) && qty > 0 ? qty : 0;
+    }
+    if (d && d.code === 40410000) return 0; // "position does not exist"
+    console.error(`getOwnedQty(${optionSymbol}): unexpected response`, d);
+    return null;
+  } catch (e) {
+    console.error(`getOwnedQty(${optionSymbol}) failed:`, e.message);
+    return null;
+  }
+}
+
 async function getBars(symbol, tf = "15Min", daysBack = 5) {
   try {
     const start = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
@@ -317,10 +341,39 @@ function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
 
 // ─── UNIFIED POSITION CLOSE ──────────────────────────────────
 async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false) {
+  let soldQty = pos.qty;
   if (!skipSell) {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(() => {});
+
+    // Never trust local state's qty for how much to sell — verify against
+    // Alpaca first. This is the fix for the AMZN incident: a stale/lost
+    // local qty led to a sell order for more contracts than were actually
+    // held, flipping a long option position into an unintended short.
+    const ownedQty = await getOwnedQty(pos.optionSymbol);
+
+    if (ownedQty === null) {
+      console.error(`${symbol}: could not verify owned qty at Alpaca — skipping sell this cycle (${reason})`);
+      await tg(`⚠️ <b>${symbol}: تعذّر التحقق من الكمية في Alpaca</b>\nلم يُرسل أمر بيع (${reason}) — ستتم إعادة المحاولة الدورة القادمة.`, pos.msgId);
+      return;
+    }
+
+    if (ownedQty === 0) {
+      console.warn(`${symbol}: no position at Alpaca (already flat) — clearing local state without selling (${reason})`);
+      await tg(`ℹ️ <b>${symbol}: لا يوجد مركز فعلي في Alpaca</b>\nتم تنظيف الحالة المحلية بدون إرسال أمر بيع (${reason}).`, pos.msgId);
+      logTrade(pos, symbol, exitPremium, reason, fillSource);
+      delete state[symbol];
+      saveState(state);
+      return;
+    }
+
+    if (pos.qty > ownedQty) {
+      console.warn(`${symbol}: requested sell qty ${pos.qty} > owned ${ownedQty} — selling owned qty only (${reason})`);
+      await tg(`⚠️ <b>${symbol}: فرق في الكمية</b>\nالمطلوب بيعه ${pos.qty} لكن المملوك فعلياً في Alpaca ${ownedQty} — تم بيع ${ownedQty} فقط.`, pos.msgId);
+      soldQty = ownedQty;
+    }
+
     const order = await alpaca("/orders", "POST", {
-      symbol: pos.optionSymbol, qty: String(pos.qty), side: "sell",
+      symbol: pos.optionSymbol, qty: String(soldQty), side: "sell",
       type: "market", time_in_force: "day"
     });
     if (!order.id) {
@@ -329,7 +382,7 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
       return;
     }
   }
-  const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
+  const pnl = Math.round((exitPremium - pos.entryPremium) * soldQty * 100);
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
   logTrade(pos, symbol, exitPremium, reason, fillSource);
   await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
@@ -357,8 +410,30 @@ function buildUpdateMsg(symbol, pos, pnlPct, currentPremium) {
 async function updateStopOrder(pos, newStopPrice) {
   try {
     if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE");
+
+    // A stop order is a sell path too — it just executes later, when
+    // triggered. Same guard as closePosition(): verify against Alpaca's
+    // actual position instead of trusting pos.qty, so a stale qty can't
+    // eventually flip the position short when this stop fires.
+    const ownedQty = await getOwnedQty(pos.optionSymbol);
+    if (ownedQty === null) {
+      console.error(`updateStopOrder(${pos.optionSymbol}): could not verify owned qty at Alpaca — skipping stop update`);
+      return;
+    }
+    if (ownedQty === 0) {
+      console.warn(`updateStopOrder(${pos.optionSymbol}): no position at Alpaca — skipping stop update`);
+      pos.stopOrderId = null;
+      return;
+    }
+    let stopQty = pos.qty;
+    if (stopQty > ownedQty) {
+      console.warn(`updateStopOrder(${pos.optionSymbol}): requested qty ${stopQty} > owned ${ownedQty} — using owned qty`);
+      await tg(`⚠️ <b>${pos.optionSymbol}: فرق كمية في أمر الوقف</b>\nالمطلوب ${stopQty} لكن المملوك ${ownedQty} — استُخدم ${ownedQty}.`, pos.msgId);
+      stopQty = ownedQty;
+    }
+
     const stopOrder = await alpaca("/orders", "POST", {
-      symbol: pos.optionSymbol, qty: String(pos.qty), side: "sell",
+      symbol: pos.optionSymbol, qty: String(stopQty), side: "sell",
       type: "stop", time_in_force: "day", stop_price: String(Math.max(0.01, newStopPrice))
     });
     pos.stopOrderId = stopOrder.id || null;
