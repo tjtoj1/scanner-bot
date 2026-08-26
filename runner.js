@@ -24,6 +24,12 @@ import { spawn, execSync } from "child_process";
 const REPO_URL_PLAIN = "https://github.com/tjtoj1/scanner-bot.git"; // public repo — no auth needed to read
 const GH_PUSH_TOKEN = process.env.GH_PUSH_TOKEN; // needed only to push
 
+// Used only to alert on GitHub push failure — same chat/token scan_v21.js
+// and scan_lab.js already send trade messages to, so a failure to persist
+// state reaches the same place the trader is already watching.
+const TG_TOKEN = process.env.TG_TOKEN;
+const PERSONAL_CHAT = "810642442";
+
 const MARKET_START_UTC = 13 * 60 + 30; // 13:30 UTC
 const MARKET_END_UTC   = 21 * 60;      // 21:00 UTC
 const CYCLE_INTERVAL_MS = 60 * 1000;      // 60s during market hours
@@ -71,6 +77,34 @@ function shCap(cmd) {
     };
   }
 }
+
+// Fire-and-forget Telegram alert — state persistence failing silently in
+// container logs is how open-trade state got lost before (a Railway
+// restart hard-resets to origin/main, discarding any commits that never
+// made it to GitHub). This makes that failure loud immediately instead
+// of only visible to someone reading Deploy Logs.
+async function alertTelegram(text) {
+  if (!TG_TOKEN) return;
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 15000);
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: PERSONAL_CHAT, text, parse_mode: "HTML" }),
+      signal: controller.signal,
+    });
+  } catch (e) {
+    console.error("[runner] alertTelegram failed:", e.message);
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// Set once a push-failure alert has been sent, so a persistent failure
+// (e.g. every 60s cycle during market hours) doesn't spam Telegram —
+// cleared the moment a push succeeds again.
+let pushFailureAlerted = false;
 
 function maskToken(str) {
   if (!str) return str;
@@ -185,6 +219,10 @@ function syncStateFromGitHub() {
 function syncToGitHub() {
   if (!GH_PUSH_TOKEN) {
     console.warn("[runner] GH_PUSH_TOKEN not set — state changes will NOT persist across redeploys");
+    if (!pushFailureAlerted) {
+      pushFailureAlerted = true;
+      alertTelegram("⚠️ Railway: GH_PUSH_TOKEN غير معرّف في البيئة — حالة الصفقات (state_v21/state_lab) لن تُحفظ في GitHub، وأي إعادة تشغيل ستفقدها.");
+    }
     return;
   }
   try {
@@ -207,7 +245,7 @@ function syncToGitHub() {
     for (let i = 1; i <= 5; i++) {
       const pushResult = shCap(`git push origin HEAD:main`);
       logResult(`git push attempt ${i}/5`, pushResult);
-      if (pushResult.ok) return;
+      if (pushResult.ok) { pushFailureAlerted = false; return; }
 
       logResult("  rebase --abort", shCap("git rebase --abort"));
       logResult("  fetch origin main", shCap("git fetch origin main"));
@@ -224,6 +262,10 @@ function syncToGitHub() {
       try { execSync(`sleep ${i * 2}`, { timeout: GIT_TIMEOUT_MS }); } catch {} // simple sync backoff (seconds)
     }
     console.error("[runner] git push failed after 5 retries — state changes NOT persisted this cycle. See attempt logs above for the actual error.");
+    if (!pushFailureAlerted) {
+      pushFailureAlerted = true;
+      alertTelegram("⚠️ Railway: git push فشل بعد 5 محاولات — حالة الصفقات لن تُحفظ في GitHub حتى يُصلح هذا. راجع Railway Deploy Logs لسبب الفشل الدقيق (ابحث عن \"git push attempt\").");
+    }
   } catch (e) {
     console.error("[runner] syncToGitHub error:", e.message);
   }
