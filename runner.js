@@ -24,6 +24,24 @@ import { spawn, execSync } from "child_process";
 const REPO_URL_PLAIN = "https://github.com/tjtoj1/scanner-bot.git"; // public repo — no auth needed to read
 const GH_PUSH_TOKEN = process.env.GH_PUSH_TOKEN; // needed only to push
 
+// Diagnostic for a specific recurring failure: "Invalid username or token"
+// persisting even after rotating to a fresh token — the suspicion being
+// that GH_PUSH_TOKEN never actually reaches this process, so every push
+// silently uses the unauthenticated REPO_URL_PLAIN. process.env is read
+// once at module load and never touched again anywhere in this file (no
+// dotenv, no .env file, no dependency that could shadow it), so whatever
+// prints here IS what every originUrl() call for the rest of this
+// process's life will see — this line is the ground truth.
+{
+  const len = GH_PUSH_TOKEN ? GH_PUSH_TOKEN.length : 0;
+  const trimmedLen = GH_PUSH_TOKEN ? GH_PUSH_TOKEN.trim().length : 0;
+  let note = "";
+  if (len === 0) note = " — EMPTY/UNSET: Railway is not delivering this variable to this process. Check the variable name/scope in Railway (a plain restart may not reload env vars depending on service config — try a full redeploy). Every push this run will use the unauthenticated URL and fail.";
+  else if (len !== trimmedLen) note = ` — WARNING: ${len - trimmedLen} char(s) of leading/trailing whitespace in the value itself`;
+  else if (len < 20) note = " — WARNING: unusually short for a real GitHub token (classic PATs are ~40 chars, fine-grained ~93+)";
+  console.log(`[runner] GH_PUSH_TOKEN at startup: length=${len}${note}`);
+}
+
 // Used only to alert on GitHub push failure — same chat/token scan_v21.js
 // and scan_lab.js already send trade messages to, so a failure to persist
 // state reaches the same place the trader is already watching.
@@ -156,10 +174,24 @@ function ensureGitRepo() {
   catch { hasOrigin = false; }
 
   if (!hasOrigin) {
-    logResult("git remote add origin", shCap(`git remote add origin ${originUrl()}`));
+    const url = originUrl();
+    console.log(`[runner] git remote add origin -> ${maskToken(url)}`);
+    logResult("git remote add origin", shCap(`git remote add origin ${url}`));
   } else if (GH_PUSH_TOKEN) {
     // keep the stored remote URL's token current (idempotent, harmless if unchanged)
-    logResult("git remote set-url origin", shCap(`git remote set-url origin ${originUrl()}`));
+    const url = originUrl();
+    console.log(`[runner] git remote set-url origin -> ${maskToken(url)}`);
+    logResult("git remote set-url origin", shCap(`git remote set-url origin ${url}`));
+  }
+
+  // Ground truth check: what git actually has stored for origin right
+  // now, regardless of which branch above ran (or whether either did,
+  // e.g. hasOrigin was true and GH_PUSH_TOKEN was falsy so neither ran).
+  // This is the exact URL `git push origin` will resolve and use next.
+  const storedUrl = (shCap("git remote get-url origin").stdout || "").trim();
+  console.log(`[runner] git remote get-url origin (actual, post-setup) -> ${maskToken(storedUrl)}`);
+  if (GH_PUSH_TOKEN && !storedUrl.includes("x-access-token:")) {
+    console.error(`[runner] ⚠️ origin has NO embedded token even though GH_PUSH_TOKEN is set (length ${GH_PUSH_TOKEN.length}) — the next push will fail with an auth error. This means the remote URL was never (re)written with the token — see the add/set-url line(s) above.`);
   }
 
   sh(`git config user.email "railway@scanner-bot.local"`);
