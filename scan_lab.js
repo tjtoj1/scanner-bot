@@ -343,19 +343,27 @@ function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
 async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false) {
   let soldQty = pos.qty;
   if (!skipSell) {
-    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(() => {});
-
     // Never trust local state's qty for how much to sell — verify against
     // Alpaca first. This is the fix for the AMZN incident: a stale/lost
     // local qty led to a sell order for more contracts than were actually
     // held, flipping a long option position into an unintended short.
+    //
+    // Checked BEFORE touching the existing protective stop order, on
+    // purpose: that stop order is the last line of defense for exactly
+    // the moment this check can't reach Alpaca (persistent network
+    // failure) — cancelling it before confirming a replacement can be
+    // placed would strip the position's only protection at the worst
+    // possible time. On `null`, leave it completely alone and retry
+    // next cycle.
     const ownedQty = await getOwnedQty(pos.optionSymbol);
 
     if (ownedQty === null) {
-      console.error(`${symbol}: could not verify owned qty at Alpaca — skipping sell this cycle (${reason})`);
-      await tg(`⚠️ <b>${symbol}: تعذّر التحقق من الكمية في Alpaca</b>\nلم يُرسل أمر بيع (${reason}) — ستتم إعادة المحاولة الدورة القادمة.`, pos.msgId);
+      console.error(`${symbol}: could not verify owned qty at Alpaca — leaving existing stop order in place, skipping sell this cycle (${reason})`);
+      await tg(`⚠️ <b>${symbol}: تعذّر التحقق من الكمية في Alpaca</b>\nلم يُرسل أمر بيع (${reason})، ووقف الخسارة الحالي في Alpaca بقي كما هو دون تعديل. ستتم إعادة المحاولة الدورة القادمة.`, pos.msgId);
       return;
     }
+
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE").catch(() => {});
 
     if (ownedQty === 0) {
       console.warn(`${symbol}: no position at Alpaca (already flat) — clearing local state without selling (${reason})`);
@@ -409,17 +417,23 @@ function buildUpdateMsg(symbol, pos, pnlPct, currentPremium) {
 
 async function updateStopOrder(pos, newStopPrice) {
   try {
-    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE");
-
     // A stop order is a sell path too — it just executes later, when
-    // triggered. Same guard as closePosition(): verify against Alpaca's
-    // actual position instead of trusting pos.qty, so a stale qty can't
-    // eventually flip the position short when this stop fires.
+    // triggered. Same guard as closePosition(), checked BEFORE touching
+    // the existing stop order: if we can't verify the real position, the
+    // current (older, wider) stop order must be left completely alone
+    // rather than cancelled with no replacement — this call only runs
+    // when a profit ladder already fired and flipped pos.ladder1/2 to
+    // true, so a failure here means monitorPosition() won't retry this
+    // specific tightening again; the ONLY thing still protecting the
+    // position broker-side is whatever stop order is currently live.
     const ownedQty = await getOwnedQty(pos.optionSymbol);
     if (ownedQty === null) {
-      console.error(`updateStopOrder(${pos.optionSymbol}): could not verify owned qty at Alpaca — skipping stop update`);
+      console.error(`updateStopOrder(${pos.optionSymbol}): could not verify owned qty at Alpaca — leaving existing stop order in place`);
       return;
     }
+
+    if (pos.stopOrderId) await alpaca(`/orders/${pos.stopOrderId}`, "DELETE");
+
     if (ownedQty === 0) {
       console.warn(`updateStopOrder(${pos.optionSymbol}): no position at Alpaca — skipping stop update`);
       pos.stopOrderId = null;
