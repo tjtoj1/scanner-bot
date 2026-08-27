@@ -34,7 +34,8 @@
     "lastReportedThreshold": 20,
     "ladder1": true,
     "stopPct": 5,
-    "peakPct": 24.425887265135714
+    "peakPct": 24.425887265135714,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
