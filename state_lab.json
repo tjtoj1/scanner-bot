@@ -31,12 +31,13 @@
       "barTime": "2026-08-27T13:00:00Z",
       "entryTimeUTC": "2026-08-27T13:43:14.370Z"
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 20,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 31.481481481481467
+    "peakPct": 31.481481481481467,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
