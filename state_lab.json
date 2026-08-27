@@ -1,16 +1,16 @@
 {
-  "_lastDay": "2026-08-25",
-  "AMZN": {
+  "_lastDay": "2026-08-27",
+  "IWM": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "AMZN260826P00262500",
-    "strike": "262.5",
-    "entryPremium": 2.745,
-    "qty": 1,
-    "entryTime": 1787668399375,
-    "msgId": 456,
-    "stopOrderId": "16634162-cbed-4fd1-aaee-a96342f3e271",
-    "hardStopPrice": 1.92,
+    "optionSymbol": "IWM260827P00299000",
+    "strike": "299",
+    "entryPremium": 0.78,
+    "qty": 6,
+    "entryTime": 1787837581894,
+    "msgId": 1228,
+    "stopOrderId": "a90cab2b-5abf-4de2-9f82-3d83d9767211",
+    "hardStopPrice": 0.55,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -19,18 +19,17 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 261.08500000000004,
+      "spot": 298.83000000000004,
       "regime": "bearish",
-      "emaFast": 262.5269,
-      "emaSlow": 262.8858,
-      "breakoutHigh": 263.89,
-      "breakoutLow": 261.62,
-      "volRatio": 6.56,
-      "lastClose": 260.9,
-      "lastVolume": 985639,
-      "barTime": "2026-08-25T14:00:00Z",
-      "entryTimeUTC": "2026-08-25T14:33:19.375Z"
-    },
-    "lastUpdate": 1787681284988
+      "emaFast": 298.6998,
+      "emaSlow": 298.8256,
+      "breakoutHigh": 299.0568,
+      "breakoutLow": 298.5,
+      "volRatio": 4.65,
+      "lastClose": 298.44,
+      "lastVolume": 49719,
+      "barTime": "2026-08-27T13:00:00Z",
+      "entryTimeUTC": "2026-08-27T13:33:01.894Z"
+    }
   }
 }
