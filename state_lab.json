@@ -1,44 +1,5 @@
 {
   "_lastDay": "2026-08-27",
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260827P00299000",
-    "strike": "299",
-    "entryPremium": 0.54,
-    "qty": 9,
-    "entryTime": 1787838194370,
-    "msgId": 1242,
-    "stopOrderId": "2b4dceeb-06a4-4ae5-b96b-aab435ec46b1",
-    "hardStopPrice": 0.38,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 299.115,
-      "regime": "bearish",
-      "emaFast": 298.6998,
-      "emaSlow": 298.8256,
-      "breakoutHigh": 299.0568,
-      "breakoutLow": 298.5,
-      "volRatio": 4.65,
-      "lastClose": 298.44,
-      "lastVolume": 49719,
-      "barTime": "2026-08-27T13:00:00Z",
-      "entryTimeUTC": "2026-08-27T13:43:14.370Z"
-    },
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 31.481481481481467,
-    "nearStopWarned": true
-  },
   "AMZN": {
     "active": true,
     "signal": "PUT",
@@ -70,6 +31,6 @@
       "barTime": "2026-08-27T13:15:00Z",
       "entryTimeUTC": "2026-08-27T13:45:02.977Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10
   }
 }
