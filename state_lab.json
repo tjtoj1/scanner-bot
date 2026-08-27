@@ -63,7 +63,8 @@
       "lastVolume": 783280,
       "barTime": "2026-08-27T14:45:00Z",
       "entryTimeUTC": "2026-08-27T15:15:37.525Z"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "NVDA": {
     "active": true,
