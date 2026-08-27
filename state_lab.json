@@ -30,6 +30,7 @@
       "lastVolume": 49719,
       "barTime": "2026-08-27T13:00:00Z",
       "entryTimeUTC": "2026-08-27T13:37:01.637Z"
-    }
+    },
+    "lastReportedThreshold": -20
   }
 }
