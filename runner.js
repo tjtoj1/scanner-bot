@@ -20,6 +20,7 @@
 // deploy never runs on stale baked-in state.
 // ============================================================
 import { spawn, execSync } from "child_process";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 
 const REPO_URL_PLAIN = "https://github.com/tjtoj1/scanner-bot.git"; // public repo — no auth needed to read
 const GH_PUSH_TOKEN = process.env.GH_PUSH_TOKEN; // needed only to push
@@ -381,6 +382,28 @@ function syncToGitHub() {
   }
 }
 
+// The main loop only calls syncToGitHub() during market hours (see
+// main() below) — outside market hours it just idles, so a broken
+// GH_PUSH_TOKEN after a redeploy could go unnoticed for hours, until
+// the market opens and a real trade needs to persist. Touching
+// report_state.json here guarantees syncToGitHub() always has something
+// to commit right at boot, so a push failure surfaces (via its existing
+// Telegram alert) immediately instead of silently waiting for the
+// market. Runs once per process start; syncToGitHub() itself is the
+// exact same code path a live trading state push uses.
+function bootPushSelfTest() {
+  try {
+    const raw = existsSync("report_state.json") ? readFileSync("report_state.json", "utf8") : "{}";
+    const state = raw.trim() ? JSON.parse(raw) : {};
+    state._lastBootPushSelfTest = new Date().toISOString();
+    writeFileSync("report_state.json", JSON.stringify(state, null, 2) + "\n");
+    console.log("[runner] boot push self-test: wrote _lastBootPushSelfTest to report_state.json, syncing now");
+    syncToGitHub();
+  } catch (e) {
+    console.error("[runner] bootPushSelfTest failed:", e.message);
+  }
+}
+
 // ─── BOT INVOCATION ──────────────────────────────────────────
 // Final safety net: no matter what hangs inside a child process (an
 // un-timed-out fetch we missed, a stuck native call, anything) this
@@ -438,6 +461,7 @@ process.on("unhandledRejection", (e) => console.error("[runner] unhandledRejecti
 async function main() {
   console.log(`=== Runner started ${new Date().toISOString()} ===`);
   syncStateFromGitHub();
+  bootPushSelfTest();
 
   while (true) {
     try {
