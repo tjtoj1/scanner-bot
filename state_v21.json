@@ -12,6 +12,12 @@
       "symbol": "TSLA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-27",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -49,23 +55,18 @@
   "TSLA": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "TSLA260828C00347500",
-    "strike": "347.5",
-    "entryPremium": 5.925,
+    "optionSymbol": "TSLA260828C00352500",
+    "strike": "352.5",
+    "entryPremium": 3.2800000000000002,
     "qty": 1,
-    "entryTime": 1787839745001,
+    "entryTime": 1787840418914,
     "level": 349.5,
-    "msgId": 1273,
-    "stopOrderId": "cec3e84c-ad4f-4a9c-b480-a88ca4cce346",
-    "hardStopPrice": 3.85,
+    "msgId": 1287,
+    "stopOrderId": "b77c4186-442e-4cd5-a617-125cdb132147",
+    "hardStopPrice": 2.13,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 14.683544303797472,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
+    "slStock": null
   }
 }
