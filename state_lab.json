@@ -33,17 +33,17 @@
     },
     "lastReportedThreshold": -10
   },
-  "IWM": {
+  "TSLA": {
     "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260827P00299000",
-    "strike": "299",
-    "entryPremium": 0.775,
-    "qty": 6,
-    "entryTime": 1787841098288,
-    "msgId": 1311,
-    "stopOrderId": "d4c36c6d-b171-4711-85bc-8fc139f70edc",
-    "hardStopPrice": 0.54,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260828C00352500",
+    "strike": "352.5",
+    "entryPremium": 3.59,
+    "qty": 1,
+    "entryTime": 1787841951017,
+    "msgId": 1322,
+    "stopOrderId": null,
+    "hardStopPrice": 2.51,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -52,19 +52,17 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 298.52,
-      "regime": "bearish",
-      "emaFast": 298.6996,
-      "emaSlow": 298.796,
-      "breakoutHigh": 299.625,
-      "breakoutLow": 298.33,
-      "volRatio": 4.16,
-      "lastClose": 298.32,
-      "lastVolume": 532431,
-      "barTime": "2026-08-27T14:00:00Z",
-      "entryTimeUTC": "2026-08-27T14:31:38.288Z"
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
+      "spot": 351,
+      "regime": "bullish",
+      "emaFast": 349.3468,
+      "emaSlow": 348.1111,
+      "breakoutHigh": 352.44,
+      "breakoutLow": 345.34,
+      "volRatio": 5,
+      "lastClose": 352.47,
+      "lastVolume": 1636949,
+      "barTime": "2026-08-27T14:15:00Z",
+      "entryTimeUTC": "2026-08-27T14:45:51.017Z"
+    }
   }
 }
