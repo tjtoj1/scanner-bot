@@ -33,40 +33,6 @@
     },
     "lastReportedThreshold": -10
   },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260827C00771000",
-    "strike": "771",
-    "entryPremium": 0.915,
-    "qty": 5,
-    "entryTime": 1787843737525,
-    "msgId": 1328,
-    "stopOrderId": "aa9d42ed-2127-4196-9ca6-2d7036b76ef2",
-    "hardStopPrice": 0.64,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 770.985,
-      "regime": "bullish",
-      "emaFast": 769.3004,
-      "emaSlow": 769.1221,
-      "breakoutHigh": 770.04,
-      "breakoutLow": 767.16,
-      "volRatio": 1.8,
-      "lastClose": 770.395,
-      "lastVolume": 783280,
-      "barTime": "2026-08-27T14:45:00Z",
-      "entryTimeUTC": "2026-08-27T15:15:37.525Z"
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
-  },
   "NVDA": {
     "active": true,
     "signal": "CALL",
@@ -99,5 +65,37 @@
       "entryTimeUTC": "2026-08-27T15:15:38.654Z"
     },
     "lastReportedThreshold": -10
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260827C00770000",
+    "strike": "770",
+    "entryPremium": 1.145,
+    "qty": 4,
+    "entryTime": 1787844605976,
+    "msgId": 1335,
+    "stopOrderId": "569fb1ca-3c16-4621-ad7c-e5049b717b78",
+    "hardStopPrice": 0.8,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 770.345,
+      "regime": "bullish",
+      "emaFast": 769.6043,
+      "emaSlow": 769.2765,
+      "breakoutHigh": 770.44,
+      "breakoutLow": 767.16,
+      "volRatio": 1.68,
+      "lastClose": 770.82,
+      "lastVolume": 796300,
+      "barTime": "2026-08-27T15:00:00Z",
+      "entryTimeUTC": "2026-08-27T15:30:05.976Z"
+    }
   }
 }
