@@ -344,26 +344,44 @@ function syncToGitHub() {
       // completely untouched — so no trade data is lost, only the
       // throwaway intermediate "railway state" commit history, which was
       // never meaningful on its own.
-      if (/GH013|push protection|Personal Access Token/i.test(pushResult.stderr || "")) {
+      const stderrText = pushResult.stderr || "";
+      if (/GH013|push protection|Personal Access Token/i.test(stderrText)) {
         console.error("[runner] push blocked by GitHub secret scanning (GH013) — squashing unpushed local history onto origin/main to drop the tracked secret file for good");
         logResult("  fetch origin main", shCap("git fetch origin main"));
         logResult("  reset --soft origin/main", shCap("git reset --soft origin/main"));
         cleanupSensitiveTrackedFiles();
         addStateFiles();
         logResult("  commit (squashed)", shCap(`git commit -m "railway state [skip ci]"`));
-      } else {
-        logResult("  rebase --abort", shCap("git rebase --abort"));
+      } else if (/\[rejected\]|non-fast-forward|failed to push some refs|fetch first|Updates were rejected/i.test(stderrText)) {
+        // Expected, routine case: origin/main moved ahead of Railway's local
+        // branch (e.g. a commit landed from outside this process — Claude
+        // Code, a manual push, another tool). Recover explicitly instead of
+        // relying on `git pull`, whose merge-vs-rebase behavior depends on
+        // the container's (uncontrolled) pull.rebase default: fetch, then
+        // merge origin/main in with -X ours so any file-level conflict
+        // resolves in favor of Railway's just-committed state — never a
+        // stale value from GitHub overwriting live trading state.
+        console.log("[runner] push rejected as non-fast-forward — auto-recovering (fetch + merge -X ours)");
+        shCap("git merge --abort"); // clears any stale merge state from a previous crashed attempt
         logResult("  fetch origin main", shCap("git fetch origin main"));
-        const pullResult = shCap(`git pull origin main -X ours --no-edit`);
-        logResult("  pull -X ours", pullResult);
-        if (!pullResult.ok) {
+        const mergeResult = shCap("git merge -X ours origin/main --no-edit");
+        logResult("  merge -X ours origin/main", mergeResult);
+        if (!mergeResult.ok) {
+          // A conflict -X ours couldn't auto-resolve (e.g. a delete/modify
+          // conflict) — force Railway's own copy of every state file and
+          // finish the merge by hand rather than leaving the repo mid-merge.
+          console.error("[runner] merge -X ours could not auto-resolve — forcing Railway's copy of every state file");
           for (const f of STATE_FILES) {
             logResult(`  checkout --ours ${f}`, shCap(`git checkout --ours ${f}`));
             logResult(`  add ${f}`, shCap(`git add ${f}`));
           }
-          logResult("  merge --continue", shCap(`GIT_EDITOR=true git merge --continue`));
+          logResult("  commit (merge resolution)", shCap("git commit --no-edit"));
         }
       }
+      // Anything else (auth failure, network error, GitHub outage) isn't
+      // something more git commands can fix — just back off and retry the
+      // push as-is below; if it's still failing after 5 attempts it's a
+      // real, non-self-healing problem worth the Telegram alert below.
 
       try { execSync(`sleep ${i * 2}`, { timeout: GIT_TIMEOUT_MS }); } catch {} // simple sync backoff (seconds)
     }
