@@ -1,6 +1,13 @@
 {
   "_lastDay": "2026-08-27",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-08-27",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "TSLA": {
       "day": "2026-08-27",
@@ -32,5 +39,22 @@
       "high": 225.83,
       "low": 220.9
     }
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260828C00347500",
+    "strike": "347.5",
+    "entryPremium": 5.655,
+    "qty": 1,
+    "entryTime": 1787839222822,
+    "level": 349.5,
+    "msgId": 1252,
+    "stopOrderId": "730c80bc-29ad-4220-950b-313c78a59937",
+    "hardStopPrice": 3.68,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
