@@ -64,7 +64,8 @@
       "barTime": "2026-08-27T14:45:00Z",
       "entryTimeUTC": "2026-08-27T15:15:37.525Z"
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "NVDA": {
     "active": true,
