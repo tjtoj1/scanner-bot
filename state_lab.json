@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:45:32.299Z"
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
