@@ -7,7 +7,7 @@
     "emaSlow": 21,
     "breakoutLookback": 10,
     "volAvgLookback": 20,
-    "volumeMultiplier": 1.3,
+    "volumeMultiplier": 1.495,
     "tradeBudget": 500,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -16,5 +16,16 @@
     "takeProfit2LockPct": 12,
     "trailingPct": 8
   },
-  "changelog": []
+  "changelog": [
+    {
+      "date": "2026-08-28",
+      "param": "volumeMultiplier",
+      "oldValue": 1.3,
+      "newValue": 1.495,
+      "reason": "36/86 صفقة (42%) خرجت عبر وقف الخسارة الصلب — رفع عتبة تأكيد الحجم لتقليل الإشارات الضعيفة.",
+      "sampleSize": 86,
+      "winRate": 55.8,
+      "netPnl": 617
+    }
+  ]
 }
