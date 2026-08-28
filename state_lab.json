@@ -10,7 +10,7 @@
     "qty": 5,
     "entryTime": 1787930743991,
     "msgId": 1599,
-    "stopOrderId": "edf2786f-f840-4861-b949-2d81ba0b478e",
+    "stopOrderId": "df48cec9-6270-4454-831a-efe3776216dd",
     "hardStopPrice": 0.58,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -32,6 +32,11 @@
       "barTime": "2026-08-28T14:45:00Z",
       "entryTimeUTC": "2026-08-28T15:25:43.991Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 30,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 34.730538922155695
   }
 }
