@@ -610,7 +610,7 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty}`);
 }
 
-// ─── RICH EXPLANATORY NOTIFICATION (comparison template, first adjustment only) ──
+// ─── RICH EXPLANATORY NOTIFICATION (sent for every self-adjustment) ──
 // Formats up to 3 example trades as "SYMBOL: +/-X% (regime, volRatio)". Picks
 // from win/loss rather than matching r.reason exactly — outcomes_lab.jsonl
 // reason labels (e.g. "alpaca_stop") don't always line up 1:1 with the
@@ -625,7 +625,7 @@ function fmtExamples(records) {
   }).join("\n");
 }
 
-function buildTemplate2(change, old, next, n, wr, netPnl, records) {
+function buildTemplate2(change, old, next, n, wr, netPnl, records, today) {
   const losers = records.filter(r => !r.win).slice().sort((a, b) => a.pnlPct - b.pnlPct);
   const winners = records.filter(r => r.win).slice().sort((a, b) => b.pnlPct - a.pnlPct);
 
@@ -648,7 +648,7 @@ function buildTemplate2(change, old, next, n, wr, netPnl, records) {
     expected = "انخفاض متوقع في متوسط حجم الخسارة لكل صفقة، دون بالضرورة تحسّن فوري في نسبة الربح نفسها. سيُعاد تقييم الأثر في دورة التعلم القادمة.";
   }
 
-  return `📊 ما لوحظ:\n${observed}\n\n🔍 السبب المحتمل:\n${cause}\n\n⚙️ التغيير ولماذا:\n${whatChanged}\n\n📈 الأثر المتوقع:\n${expected}\n\nصافي $${netPnl} على العينة الكاملة (${n} صفقة).`;
+  return `🧪 <b>تعديل استراتيجية تلقائي</b> (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\n\n📊 ما لوحظ:\n${observed}\n\n🔍 السبب المحتمل:\n${cause}\n\n⚙️ التغيير ولماذا:\n${whatChanged}\n\n📈 الأثر المتوقع:\n${expected}\n\nصافي $${netPnl} على العينة الكاملة (${n} صفقة).`;
 }
 
 // ─── DAILY SELF-TUNING (rule-based, bounded, single param/day) ──
@@ -729,23 +729,11 @@ async function runDailyLearning(state, strategy) {
 
   if (next === old) { console.log(`${change.param} already at bound (${old}) — no change applied.`); return; }
 
-  // Only true the very first time this ever fires — used solely to decide
-  // which notification template(s) to send below; the tuning decision
-  // above is unaffected either way.
-  const isFirstAdjustment = strategy.changelog.length === 0;
-
   strategy.params[change.param] = next;
   strategy.changelog.push({ date: today, param: change.param, oldValue: old, newValue: next, reason: change.reason, sampleSize: n, winRate: +(wr * 100).toFixed(1), netPnl });
   saveStrategy(strategy);
 
-  const template1 = `تعديل استراتيجية تلقائي (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\nالسبب: ${change.reason}\nالعينة: ${n} صفقة | WR ${(wr*100).toFixed(1)}% | صافي $${netPnl}`;
-
-  if (isFirstAdjustment) {
-    const template2 = buildTemplate2(change, old, next, n, wr, netPnl, records);
-    await tg(`🧪 أول تعديل ذاتي — مقارنة نموذجي إشعار (النموذج 1 وحده سيُستخدم للتعديلات القادمة ما لم تُحدَّد غير ذلك)\n\n— النموذج 1 —\n${template1}\n\n— النموذج 2 —\n${template2}`);
-  } else {
-    await tg(template1);
-  }
+  await tg(buildTemplate2(change, old, next, n, wr, netPnl, records, today));
   console.log(`Applied change: ${change.param} ${old} -> ${next}`);
 }
 
