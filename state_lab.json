@@ -39,12 +39,12 @@
     "signal": "CALL",
     "optionSymbol": "AMZN260828C00265000",
     "strike": "265",
-    "entryPremium": 1.02,
+    "entryPremium": 1.18,
     "qty": 4,
-    "entryTime": 1787928732451,
-    "msgId": 1547,
-    "stopOrderId": "6df8da1d-afc9-4c06-8be7-a137b18128f8",
-    "hardStopPrice": 0.71,
+    "entryTime": 1787929128347,
+    "msgId": 1550,
+    "stopOrderId": "3aa4110d-020f-4d39-b3f6-5cd3e9839cd0",
+    "hardStopPrice": 0.83,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -53,7 +53,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 264.74,
+      "spot": 265.13,
       "regime": "bullish",
       "emaFast": 258.9542,
       "emaSlow": 258.124,
@@ -63,11 +63,7 @@
       "lastClose": 260.84,
       "lastVolume": 1976215,
       "barTime": "2026-08-28T14:15:00Z",
-      "entryTimeUTC": "2026-08-28T14:52:12.451Z"
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 23.52941176470588,
-    "lastReportedThreshold": 20
+      "entryTimeUTC": "2026-08-28T14:58:48.347Z"
+    }
   }
 }
