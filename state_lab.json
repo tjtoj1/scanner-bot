@@ -39,12 +39,12 @@
     "signal": "CALL",
     "optionSymbol": "TSLA260828C00352500",
     "strike": "352.5",
-    "entryPremium": 3.965,
+    "entryPremium": 4.324999999999999,
     "qty": 1,
-    "entryTime": 1787925091298,
-    "msgId": 1380,
-    "stopOrderId": "b9606bfe-09aa-42e5-bb3c-675a22e9d01d",
-    "hardStopPrice": 2.78,
+    "entryTime": 1787925237118,
+    "msgId": 1386,
+    "stopOrderId": "fffde5e0-add9-4d38-82b6-02c895fe53a0",
+    "hardStopPrice": 3.03,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -53,7 +53,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 352.745,
+      "spot": 352.945,
       "regime": "bullish",
       "emaFast": 356.0909,
       "emaSlow": 355.9229,
@@ -63,11 +63,7 @@
       "lastClose": 357.19,
       "lastVolume": 58239,
       "barTime": "2026-08-28T13:15:00Z",
-      "entryTimeUTC": "2026-08-28T13:51:31.298Z"
-    },
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.006305170239614
+      "entryTimeUTC": "2026-08-28T13:53:57.119Z"
+    }
   }
 }
