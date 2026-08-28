@@ -32,7 +32,8 @@
       "barTime": "2026-08-28T15:30:00Z",
       "entryTimeUTC": "2026-08-28T16:02:59.497Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
@@ -65,7 +66,7 @@
       "barTime": "2026-08-28T15:30:00Z",
       "entryTimeUTC": "2026-08-28T16:03:28.746Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
