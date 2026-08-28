@@ -32,39 +32,6 @@
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:45:32.299Z"
     },
-    "lastReportedThreshold": -20
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260828P00717000",
-    "strike": "717",
-    "entryPremium": 1.63,
-    "qty": 3,
-    "entryTime": 1787935533175,
-    "msgId": 1698,
-    "stopOrderId": null,
-    "hardStopPrice": 1.14,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 716.72,
-      "regime": "bearish",
-      "emaFast": 719.463,
-      "emaSlow": 719.9243,
-      "breakoutHigh": 724.125,
-      "breakoutLow": 716.78,
-      "volRatio": 1.45,
-      "lastClose": 716.31,
-      "lastVolume": 1236925,
-      "barTime": "2026-08-28T16:15:00Z",
-      "entryTimeUTC": "2026-08-28T16:45:33.176Z"
-    },
     "lastReportedThreshold": -20,
     "nearStopWarned": true
   },
@@ -99,6 +66,39 @@
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:45:33.960Z"
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA260828P00222500",
+    "strike": "222.5",
+    "entryPremium": 1.955,
+    "qty": 2,
+    "entryTime": 1787935763266,
+    "msgId": 1712,
+    "stopOrderId": null,
+    "hardStopPrice": 1.37,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 220.89,
+      "regime": "bearish",
+      "emaFast": 222.8677,
+      "emaSlow": 224.512,
+      "breakoutHigh": 228.34,
+      "breakoutLow": 220.37,
+      "volRatio": 1.39,
+      "lastClose": 220.18,
+      "lastVolume": 6034753,
+      "barTime": "2026-08-28T16:15:00Z",
+      "entryTimeUTC": "2026-08-28T16:49:23.266Z"
+    }
   }
 }
