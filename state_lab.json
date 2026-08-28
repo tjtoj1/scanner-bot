@@ -64,7 +64,8 @@
       "lastVolume": 2119056,
       "barTime": "2026-08-28T14:00:00Z",
       "entryTimeUTC": "2026-08-28T14:35:06.052Z"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
