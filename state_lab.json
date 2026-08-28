@@ -35,42 +35,6 @@
     "lastReportedThreshold": -20,
     "nearStopWarned": true
   },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA260828P00222500",
-    "strike": "222.5",
-    "entryPremium": 1.955,
-    "qty": 2,
-    "entryTime": 1787935763266,
-    "msgId": 1712,
-    "stopOrderId": "2f215b08-5e9d-4587-bdf7-6515b005b229",
-    "hardStopPrice": 1.37,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 220.89,
-      "regime": "bearish",
-      "emaFast": 222.8677,
-      "emaSlow": 224.512,
-      "breakoutHigh": 228.34,
-      "breakoutLow": 220.37,
-      "volRatio": 1.39,
-      "lastClose": 220.18,
-      "lastVolume": 6034753,
-      "barTime": "2026-08-28T16:15:00Z",
-      "entryTimeUTC": "2026-08-28T16:49:23.266Z"
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 19.693094629156,
-    "lastReportedThreshold": 10
-  },
   "QQQ": {
     "active": true,
     "signal": "PUT",
@@ -101,6 +65,38 @@
       "lastVolume": 1236925,
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:51:59.178Z"
+    }
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260828P00297000",
+    "strike": "297",
+    "entryPremium": 0.685,
+    "qty": 7,
+    "entryTime": 1787935951735,
+    "msgId": 1721,
+    "stopOrderId": "d616d8c2-206e-4122-917b-e055e76ceb70",
+    "hardStopPrice": 0.48,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 296.635,
+      "regime": "bearish",
+      "emaFast": 297.249,
+      "emaSlow": 298.163,
+      "breakoutHigh": 300.13,
+      "breakoutLow": 296.27,
+      "volRatio": 1.39,
+      "lastClose": 295.89,
+      "lastVolume": 657859,
+      "barTime": "2026-08-28T16:15:00Z",
+      "entryTimeUTC": "2026-08-28T16:52:31.735Z"
     }
   }
 }
