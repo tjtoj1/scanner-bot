@@ -57,24 +57,5 @@
       "high": 259.55,
       "low": 257.78
     }
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA260828P00225000",
-    "strike": "225",
-    "entryPremium": 1.4,
-    "qty": 3,
-    "entryTime": 1787927029273,
-    "level": 226.05,
-    "msgId": 1487,
-    "stopOrderId": "9af5574f-c067-4c3c-8b33-c3718ed41a40",
-    "hardStopPrice": 0.91,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   }
 }
