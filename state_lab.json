@@ -10,7 +10,7 @@
     "qty": 9,
     "entryTime": 1787927907157,
     "msgId": 1519,
-    "stopOrderId": "35e22ebc-3e38-4300-bdc2-2ac030a267c9",
+    "stopOrderId": "f40a5dcd-f426-4443-b8d0-94534332e66f",
     "hardStopPrice": 0.37,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -32,40 +32,12 @@
       "barTime": "2026-08-28T14:00:00Z",
       "entryTimeUTC": "2026-08-28T14:38:27.157Z"
     },
-    "lastReportedThreshold": 10
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260828C00775000",
-    "strike": "775",
-    "entryPremium": 1.0750000000000002,
-    "qty": 4,
-    "entryTime": 1787929226635,
-    "msgId": 1551,
-    "stopOrderId": "a1ea7b5b-81a2-483a-a5cf-0d5a6b5764bc",
-    "hardStopPrice": 0.75,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 775.045,
-      "regime": "bullish",
-      "emaFast": 771.8793,
-      "emaSlow": 771.5521,
-      "breakoutHigh": 773.13,
-      "breakoutLow": 769.77,
-      "volRatio": 3.1,
-      "lastClose": 773.39,
-      "lastVolume": 1075736,
-      "barTime": "2026-08-28T14:30:00Z",
-      "entryTimeUTC": "2026-08-28T15:00:26.635Z"
-    },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 26.666666666666668
   },
   "QQQ": {
     "active": true,
@@ -97,6 +69,39 @@
       "lastVolume": 1610464,
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:06:58.450Z"
+    },
+    "lastReportedThreshold": -10
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN260828C00267500",
+    "strike": "267.5",
+    "entryPremium": 0.71,
+    "qty": 7,
+    "entryTime": 1787929712172,
+    "msgId": 1567,
+    "stopOrderId": null,
+    "hardStopPrice": 0.5,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 266.29999999999995,
+      "regime": "bullish",
+      "emaFast": 259.8474,
+      "emaSlow": 258.6055,
+      "breakoutHigh": 261.9,
+      "breakoutLow": 257.08,
+      "volRatio": 6.13,
+      "lastClose": 263.42,
+      "lastVolume": 2357037,
+      "barTime": "2026-08-28T14:30:00Z",
+      "entryTimeUTC": "2026-08-28T15:08:32.172Z"
     }
   }
 }
