@@ -43,7 +43,7 @@
     "qty": 3,
     "entryTime": 1787926428404,
     "msgId": 1440,
-    "stopOrderId": "9ac1f494-4ee6-46d3-948b-8dbc8cf0d149",
+    "stopOrderId": "93bb47c7-d15e-4b88-b5af-142a1d567e82",
     "hardStopPrice": 1.08,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -65,7 +65,10 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:13:48.404Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 17.74193548387098
   },
   "AMZN": {
     "active": true,
