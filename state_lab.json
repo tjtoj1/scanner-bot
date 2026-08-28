@@ -65,7 +65,7 @@
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:00:26.635Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
