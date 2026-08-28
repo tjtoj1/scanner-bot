@@ -43,7 +43,7 @@
     "qty": 3,
     "entryTime": 1787926428404,
     "msgId": 1440,
-    "stopOrderId": "93bb47c7-d15e-4b88-b5af-142a1d567e82",
+    "stopOrderId": "db0739cd-0b8e-4fd2-872d-67270aec24be",
     "hardStopPrice": 1.08,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -65,10 +65,12 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:13:48.404Z"
     },
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 17.74193548387098
+    "stopPct": 12,
+    "peakPct": 29.67741935483869,
+    "ladder2": true,
+    "trailPct": 8
   },
   "AMZN": {
     "active": true,
@@ -79,7 +81,7 @@
     "qty": 6,
     "entryTime": 1787926467176,
     "msgId": 1446,
-    "stopOrderId": null,
+    "stopOrderId": "ca1937f2-5ccb-434c-bf19-c3393649fb77",
     "hardStopPrice": 0.55,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -100,6 +102,10 @@
       "lastVolume": 2324966,
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:14:27.176Z"
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.620253164556964,
+    "lastReportedThreshold": 10
   }
 }
