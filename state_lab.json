@@ -66,7 +66,7 @@
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:10:07.097Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "SPY": {
     "active": true,
@@ -98,6 +98,7 @@
       "lastVolume": 1778063,
       "barTime": "2026-08-28T14:45:00Z",
       "entryTimeUTC": "2026-08-28T15:21:17.047Z"
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
