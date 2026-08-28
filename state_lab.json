@@ -64,7 +64,8 @@
       "lastVolume": 879966,
       "barTime": "2026-08-28T15:45:00Z",
       "entryTimeUTC": "2026-08-28T16:26:10.047Z"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
@@ -96,6 +97,7 @@
       "lastVolume": 1586065,
       "barTime": "2026-08-28T15:45:00Z",
       "entryTimeUTC": "2026-08-28T16:29:15.255Z"
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
