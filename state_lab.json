@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:04:28.533Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "SPY": {
     "active": true,
@@ -98,11 +98,12 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:09:09.545Z"
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 20,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 31.617647058823543
+    "peakPct": 31.617647058823543,
+    "nearStopWarned": true
   }
 }
