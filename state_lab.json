@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T13:45:00Z",
       "entryTimeUTC": "2026-08-28T14:23:18.237Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -98,11 +98,12 @@
       "barTime": "2026-08-28T14:15:00Z",
       "entryTimeUTC": "2026-08-28T14:45:19.220Z"
     },
-    "lastReportedThreshold": 50,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
     "peakPct": 53.043478260869584,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   }
 }
