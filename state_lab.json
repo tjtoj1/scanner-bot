@@ -1,44 +1,6 @@
 {
   "_lastDay": "2026-08-28",
   "_lastLearnedDay": "2026-08-27",
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260828P00298000",
-    "strike": "298",
-    "entryPremium": 0.525,
-    "qty": 9,
-    "entryTime": 1787927907157,
-    "msgId": 1519,
-    "stopOrderId": "f40a5dcd-f426-4443-b8d0-94534332e66f",
-    "hardStopPrice": 0.37,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 298.485,
-      "regime": "bearish",
-      "emaFast": 299.0962,
-      "emaSlow": 299.428,
-      "breakoutHigh": 300.39,
-      "breakoutLow": 299.01,
-      "volRatio": 21.14,
-      "lastClose": 297.59,
-      "lastVolume": 2119056,
-      "barTime": "2026-08-28T14:00:00Z",
-      "entryTimeUTC": "2026-08-28T14:38:27.157Z"
-    },
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 26.666666666666668
-  },
   "QQQ": {
     "active": true,
     "signal": "CALL",
@@ -102,6 +64,38 @@
       "lastVolume": 2357037,
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:08:32.172Z"
+    }
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260828C00774000",
+    "strike": "774",
+    "entryPremium": 1.1949999999999998,
+    "qty": 4,
+    "entryTime": 1787929744519,
+    "msgId": 1569,
+    "stopOrderId": "84e93526-40d5-4aac-afc5-870023632847",
+    "hardStopPrice": 0.84,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 774.37,
+      "regime": "bullish",
+      "emaFast": 771.8793,
+      "emaSlow": 771.5521,
+      "breakoutHigh": 773.13,
+      "breakoutLow": 769.77,
+      "volRatio": 3.1,
+      "lastClose": 773.39,
+      "lastVolume": 1075736,
+      "barTime": "2026-08-28T14:30:00Z",
+      "entryTimeUTC": "2026-08-28T15:09:04.519Z"
     }
   }
 }
