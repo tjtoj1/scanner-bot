@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:06:58.450Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "AMZN": {
     "active": true,
@@ -64,7 +64,8 @@
       "lastVolume": 2357037,
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:08:32.172Z"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "SPY": {
     "active": true,
