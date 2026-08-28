@@ -35,7 +35,7 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 21.08433734939757,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
@@ -71,7 +71,7 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 19.884726224783876,
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20
   },
   "TSLA": {
     "active": true,
@@ -107,6 +107,6 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 24.066390041493776,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 10
   }
 }
