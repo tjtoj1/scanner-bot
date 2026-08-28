@@ -1,40 +1,6 @@
 {
   "_lastDay": "2026-08-28",
   "_lastLearnedDay": "2026-08-27",
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA260828P00355000",
-    "strike": "355",
-    "entryPremium": 3.8,
-    "qty": 1,
-    "entryTime": 1787926998237,
-    "msgId": 1485,
-    "stopOrderId": null,
-    "hardStopPrice": 2.66,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 353.935,
-      "regime": "bearish",
-      "emaFast": 355.8098,
-      "emaSlow": 355.825,
-      "breakoutHigh": 358.8,
-      "breakoutLow": 354.81,
-      "volRatio": 8.59,
-      "lastClose": 354.63,
-      "lastVolume": 1441930,
-      "barTime": "2026-08-28T13:45:00Z",
-      "entryTimeUTC": "2026-08-28T14:23:18.237Z"
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -99,10 +65,10 @@
       "barTime": "2026-08-28T14:15:00Z",
       "entryTimeUTC": "2026-08-28T14:45:19.220Z"
     },
-    "lastReportedThreshold": 60,
+    "lastReportedThreshold": 80,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 67.82608695652175,
+    "peakPct": 85.21739130434783,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
