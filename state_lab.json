@@ -1,39 +1,6 @@
 {
   "_lastDay": "2026-08-28",
   "_lastLearnedDay": "2026-08-27",
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260828C00721000",
-    "strike": "721",
-    "entryPremium": 1.8450000000000002,
-    "qty": 2,
-    "entryTime": 1787925693735,
-    "msgId": 1393,
-    "stopOrderId": "fd0f846f-3442-470e-83c2-2ae1651421dd",
-    "hardStopPrice": 1.29,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 720.665,
-      "regime": "bullish",
-      "emaFast": 720.2508,
-      "emaSlow": 719.8649,
-      "breakoutHigh": 721,
-      "breakoutLow": 719.035,
-      "volRatio": 56.49,
-      "lastClose": 721.1863,
-      "lastVolume": 1580183,
-      "barTime": "2026-08-28T13:30:00Z",
-      "entryTimeUTC": "2026-08-28T14:01:33.735Z"
-    },
-    "lastReportedThreshold": -20
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -43,7 +10,7 @@
     "qty": 5,
     "entryTime": 1787925728984,
     "msgId": 1397,
-    "stopOrderId": "9b8dfd64-b92b-4651-9381-f5dfaf906560",
+    "stopOrderId": "b856d6c1-a1e0-48ef-8c86-f22bf42a16ef",
     "hardStopPrice": 0.65,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -66,9 +33,11 @@
       "entryTimeUTC": "2026-08-28T14:02:08.984Z"
     },
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 24.32432432432431,
-    "lastReportedThreshold": 20
+    "stopPct": 12,
+    "peakPct": 32.97297297297296,
+    "lastReportedThreshold": 30,
+    "ladder2": true,
+    "trailPct": 8
   },
   "SPY": {
     "active": true,
@@ -101,6 +70,38 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:02:47.747Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260828C00719000",
+    "strike": "719",
+    "entryPremium": 2.205,
+    "qty": 2,
+    "entryTime": 1787925868533,
+    "msgId": 1405,
+    "stopOrderId": "932962ca-f6d1-4494-aff0-0b82e2e3f8b8",
+    "hardStopPrice": 1.54,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 719.12,
+      "regime": "bullish",
+      "emaFast": 720.2508,
+      "emaSlow": 719.8649,
+      "breakoutHigh": 721,
+      "breakoutLow": 719.035,
+      "volRatio": 56.49,
+      "lastClose": 721.1863,
+      "lastVolume": 1580183,
+      "barTime": "2026-08-28T13:30:00Z",
+      "entryTimeUTC": "2026-08-28T14:04:28.533Z"
+    }
   }
 }
