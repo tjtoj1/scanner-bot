@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T15:45:00Z",
       "entryTimeUTC": "2026-08-28T16:19:33.906Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
