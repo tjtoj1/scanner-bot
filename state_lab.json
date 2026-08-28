@@ -32,40 +32,6 @@
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:45:32.299Z"
     },
-    "lastReportedThreshold": -10,
-    "nearStopWarned": true
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260828P00296000",
-    "strike": "296",
-    "entryPremium": 0.355,
-    "qty": 14,
-    "entryTime": 1787935533960,
-    "msgId": 1699,
-    "stopOrderId": null,
-    "hardStopPrice": 0.25,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 296.4,
-      "regime": "bearish",
-      "emaFast": 297.249,
-      "emaSlow": 298.163,
-      "breakoutHigh": 300.13,
-      "breakoutLow": 296.27,
-      "volRatio": 1.39,
-      "lastClose": 295.89,
-      "lastVolume": 657859,
-      "barTime": "2026-08-28T16:15:00Z",
-      "entryTimeUTC": "2026-08-28T16:45:33.960Z"
-    },
     "lastReportedThreshold": -20,
     "nearStopWarned": true
   },
@@ -104,5 +70,37 @@
     "stopPct": 5,
     "peakPct": 19.693094629156,
     "lastReportedThreshold": 10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260828P00717500",
+    "strike": "717.5",
+    "entryPremium": 1.31,
+    "qty": 3,
+    "entryTime": 1787935919178,
+    "msgId": 1719,
+    "stopOrderId": "860478a2-98c3-4a45-b552-440ae390937a",
+    "hardStopPrice": 0.92,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 717.525,
+      "regime": "bearish",
+      "emaFast": 719.463,
+      "emaSlow": 719.9243,
+      "breakoutHigh": 724.125,
+      "breakoutLow": 716.78,
+      "volRatio": 1.45,
+      "lastClose": 716.31,
+      "lastVolume": 1236925,
+      "barTime": "2026-08-28T16:15:00Z",
+      "entryTimeUTC": "2026-08-28T16:51:59.178Z"
+    }
   }
 }
