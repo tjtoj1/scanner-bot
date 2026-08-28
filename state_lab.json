@@ -37,7 +37,8 @@
     "stopPct": 12,
     "peakPct": 29.69121140142518,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "SPY": {
     "active": true,
@@ -75,7 +76,8 @@
     "stopPct": 12,
     "peakPct": 53.548387096774185,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
@@ -111,7 +113,7 @@
     "ladder1": true,
     "stopPct": 12,
     "peakPct": 63.291139240506325,
-    "lastReportedThreshold": 60,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
