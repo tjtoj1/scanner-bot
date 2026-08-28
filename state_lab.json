@@ -35,7 +35,7 @@
     "lastReportedThreshold": 30,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 31.11638954869358,
+    "peakPct": 35.154394299287404,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -74,7 +74,7 @@
     "lastReportedThreshold": 50,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 58.70967741935483,
+    "peakPct": 59.67741935483871,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -112,8 +112,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 77.84810126582275,
-    "lastReportedThreshold": 70,
+    "peakPct": 81.64556962025317,
+    "lastReportedThreshold": 80,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
