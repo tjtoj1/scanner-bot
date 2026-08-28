@@ -32,10 +32,10 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:12:02.944Z"
     },
-    "lastReportedThreshold": 40,
+    "lastReportedThreshold": 60,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 49.168646080760084,
+    "peakPct": 62.23277909738718,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -71,10 +71,10 @@
       "barTime": "2026-08-28T13:30:00Z",
       "entryTimeUTC": "2026-08-28T14:13:48.404Z"
     },
-    "lastReportedThreshold": 60,
+    "lastReportedThreshold": 70,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 63.87096774193548,
+    "peakPct": 74.51612903225806,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -112,8 +112,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 91.7721518987342,
-    "lastReportedThreshold": 90,
+    "peakPct": 170.253164556962,
+    "lastReportedThreshold": 170,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
