@@ -34,39 +34,6 @@
     },
     "lastReportedThreshold": -10
   },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ260828P00721000",
-    "strike": "721",
-    "entryPremium": 1.6949999999999998,
-    "qty": 2,
-    "entryTime": 1787927742765,
-    "msgId": 1509,
-    "stopOrderId": "d3b75d80-8a13-4072-8cab-30ee60d3200f",
-    "hardStopPrice": 1.19,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 721.0450000000001,
-      "regime": "bearish",
-      "emaFast": 719.6561,
-      "emaSlow": 719.6582,
-      "breakoutHigh": 721.5499,
-      "breakoutLow": 718.1762,
-      "volRatio": 9.61,
-      "lastClose": 717.55,
-      "lastVolume": 1933166,
-      "barTime": "2026-08-28T14:00:00Z",
-      "entryTimeUTC": "2026-08-28T14:35:42.765Z"
-    },
-    "lastReportedThreshold": -10
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -99,5 +66,37 @@
       "entryTimeUTC": "2026-08-28T14:38:27.157Z"
     },
     "lastReportedThreshold": -10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260828P00722000",
+    "strike": "722",
+    "entryPremium": 1.635,
+    "qty": 3,
+    "entryTime": 1787928194066,
+    "msgId": 1527,
+    "stopOrderId": "83d513e7-1874-411f-8169-53976d5fb165",
+    "hardStopPrice": 1.14,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 721.81,
+      "regime": "bearish",
+      "emaFast": 719.6561,
+      "emaSlow": 719.6582,
+      "breakoutHigh": 721.5499,
+      "breakoutLow": 718.1762,
+      "volRatio": 9.61,
+      "lastClose": 717.55,
+      "lastVolume": 1933166,
+      "barTime": "2026-08-28T14:00:00Z",
+      "entryTimeUTC": "2026-08-28T14:43:14.066Z"
+    }
   }
 }
