@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T13:45:00Z",
       "entryTimeUTC": "2026-08-28T14:23:18.237Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -65,7 +65,7 @@
       "barTime": "2026-08-28T14:00:00Z",
       "entryTimeUTC": "2026-08-28T14:35:06.052Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
@@ -97,6 +97,7 @@
       "lastVolume": 1933166,
       "barTime": "2026-08-28T14:00:00Z",
       "entryTimeUTC": "2026-08-28T14:35:42.765Z"
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }

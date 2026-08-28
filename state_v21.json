@@ -58,25 +58,6 @@
       "low": 257.78
     }
   },
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA260828P00352500",
-    "strike": "352.5",
-    "entryPremium": 2.43,
-    "qty": 2,
-    "entryTime": 1787926564075,
-    "level": 354.925,
-    "msgId": 1448,
-    "stopOrderId": "20167d9e-b9dd-43e7-8755-2b4819ffe8d6",
-    "hardStopPrice": 1.58,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
-  },
   "NVDA": {
     "active": true,
     "signal": "PUT",
