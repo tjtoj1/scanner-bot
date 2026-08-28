@@ -44,7 +44,7 @@
     "qty": 5,
     "entryTime": 1787933008746,
     "msgId": 1635,
-    "stopOrderId": "e50e8404-22af-49b2-bb71-933df5c27632",
+    "stopOrderId": "947c0025-1f10-41cb-a8c5-7d7a584b5534",
     "hardStopPrice": 0.58,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -66,10 +66,12 @@
       "barTime": "2026-08-28T15:30:00Z",
       "entryTimeUTC": "2026-08-28T16:03:28.746Z"
     },
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 30,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.568862275449117
+    "stopPct": 12,
+    "peakPct": 31.7365269461078,
+    "ladder2": true,
+    "trailPct": 8
   },
   "NVDA": {
     "active": true,
@@ -80,7 +82,7 @@
     "qty": 2,
     "entryTime": 1787933259306,
     "msgId": 1640,
-    "stopOrderId": "b42ec8fa-6696-4b14-bf0f-17b5ffa847ca",
+    "stopOrderId": "fd1eeff7-38b4-4844-9a64-f71c290e8cbf",
     "hardStopPrice": 1.46,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -102,6 +104,9 @@
       "barTime": "2026-08-28T15:30:00Z",
       "entryTimeUTC": "2026-08-28T16:07:39.306Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 21.77033492822967
   }
 }
