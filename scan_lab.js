@@ -610,6 +610,47 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty}`);
 }
 
+// ─── RICH EXPLANATORY NOTIFICATION (comparison template, first adjustment only) ──
+// Formats up to 3 example trades as "SYMBOL: +/-X% (regime, volRatio)". Picks
+// from win/loss rather than matching r.reason exactly — outcomes_lab.jsonl
+// reason labels (e.g. "alpaca_stop") don't always line up 1:1 with the
+// byReason buckets runDailyLearning groups by, so this stays meaningful
+// regardless of which exact reason string produced the trade.
+function fmtExamples(records) {
+  if (!records.length) return "  (لا تتوفر أمثلة كافية في العينة)";
+  return records.slice(0, 3).map(r => {
+    const ec = r.entryConditions || {};
+    const ctx = [ec.regime, ec.volRatio != null ? `حجم×${ec.volRatio}` : null].filter(Boolean).join("، ");
+    return `  • ${r.symbol}: ${r.pnlPct > 0 ? "+" : ""}${r.pnlPct}%${ctx ? ` (${ctx})` : ""}`;
+  }).join("\n");
+}
+
+function buildTemplate2(change, old, next, n, wr, netPnl, records) {
+  const losers = records.filter(r => !r.win).slice().sort((a, b) => a.pnlPct - b.pnlPct);
+  const winners = records.filter(r => r.win).slice().sort((a, b) => b.pnlPct - a.pnlPct);
+
+  let observed, cause, whatChanged, expected;
+
+  if (change.param === "volumeMultiplier") {
+    observed = `${change.reason}\nأسوأ الأمثلة من الصفقات الخاسرة:\n${fmtExamples(losers)}`;
+    cause = "الدخول يحدث عند تأكيد حجم ضعيف نسبياً، ما يزيد احتمال الدخول في اختراقات كاذبة تصطدم بوقف الخسارة بسرعة.";
+    whatChanged = `رفع عتبة تأكيد الحجم (volumeMultiplier) من ${old} إلى ${next} — يتطلب حجم تداول أقوى نسبياً قبل قبول أي إشارة دخول، لتصفية الإشارات الضعيفة.`;
+    expected = "عدد صفقات أقل لكن بجودة دخول أعلى، وانخفاض تدريجي متوقع في نسبة الخروج عبر وقف الخسارة. سيُعاد تقييم الأثر الفعلي في دورة التعلم القادمة على عينة جديدة.";
+  } else if (change.param === "takeProfit2Pct") {
+    observed = `${change.reason}\nأفضل الأمثلة من الصفقات الرابحة:\n${fmtExamples(winners)}`;
+    cause = "تحركات قوية ومتجهة يبدو أنها تُقطع مبكراً عند هدف الربح الثاني الحالي، ما يحد من الاستفادة القصوى من الاتجاهات الجيدة.";
+    whatChanged = `رفع هدف الربح الثاني (takeProfit2Pct) من ${old} إلى ${next} — يمنح الصفقات الرابحة مساحة أكبر للاستمرار قبل الإغلاق الجزئي.`;
+    expected = "متوسط ربح أعلى محتمل للصفقات الرابحة القوية، مع احتمال تقلب أكبر إن انعكس السعر قبل بلوغ الهدف الجديد. سيُعاد تقييم الأثر في دورة التعلم القادمة.";
+  } else {
+    observed = `${change.reason}\nأسوأ الأمثلة من العينة الكاملة:\n${fmtExamples(losers)}`;
+    cause = "مزيج من جودة إشارات غير مثالية وخسائر تتجاوز حجم الأرباح المقابلة لكل صفقة رابحة، ما يضغط على صافي الأداء الكلي.";
+    whatChanged = `تضييق وقف الخسارة (stopLossPct) من ${old} إلى ${next} — يقلل حجم الخسارة لكل صفقة خاسرة ريثما تُعالَج جودة الإشارات في دورات لاحقة.`;
+    expected = "انخفاض متوقع في متوسط حجم الخسارة لكل صفقة، دون بالضرورة تحسّن فوري في نسبة الربح نفسها. سيُعاد تقييم الأثر في دورة التعلم القادمة.";
+  }
+
+  return `📊 ما لوحظ:\n${observed}\n\n🔍 السبب المحتمل:\n${cause}\n\n⚙️ التغيير ولماذا:\n${whatChanged}\n\n📈 الأثر المتوقع:\n${expected}\n\nصافي $${netPnl} على العينة الكاملة (${n} صفقة).`;
+}
+
 // ─── DAILY SELF-TUNING (rule-based, bounded, single param/day) ──
 async function runDailyLearning(state, strategy) {
   const today = getToday();
@@ -671,11 +712,23 @@ async function runDailyLearning(state, strategy) {
 
   if (next === old) { console.log(`${change.param} already at bound (${old}) — no change applied.`); return; }
 
+  // Only true the very first time this ever fires — used solely to decide
+  // which notification template(s) to send below; the tuning decision
+  // above is unaffected either way.
+  const isFirstAdjustment = strategy.changelog.length === 0;
+
   strategy.params[change.param] = next;
   strategy.changelog.push({ date: today, param: change.param, oldValue: old, newValue: next, reason: change.reason, sampleSize: n, winRate: +(wr * 100).toFixed(1), netPnl });
   saveStrategy(strategy);
 
-  await tg(`تعديل استراتيجية تلقائي (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\nالسبب: ${change.reason}\nالعينة: ${n} صفقة | WR ${(wr*100).toFixed(1)}% | صافي $${netPnl}`);
+  const template1 = `تعديل استراتيجية تلقائي (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\nالسبب: ${change.reason}\nالعينة: ${n} صفقة | WR ${(wr*100).toFixed(1)}% | صافي $${netPnl}`;
+
+  if (isFirstAdjustment) {
+    const template2 = buildTemplate2(change, old, next, n, wr, netPnl, records);
+    await tg(`🧪 أول تعديل ذاتي — مقارنة نموذجي إشعار (النموذج 1 وحده سيُستخدم للتعديلات القادمة ما لم تُحدَّد غير ذلك)\n\n— النموذج 1 —\n${template1}\n\n— النموذج 2 —\n${template2}`);
+  } else {
+    await tg(template1);
+  }
   console.log(`Applied change: ${change.param} ${old} -> ${next}`);
 }
 
