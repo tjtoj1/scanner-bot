@@ -674,12 +674,29 @@ async function runDailyLearning(state, strategy) {
   const wins = records.filter(r => r.win).length;
   const wr = wins / n;
   const netPnl = records.reduce((a, r) => a + r.pnl, 0);
+
+  // Bucket by *functional* stop type, not the literal reason string.
+  // "alpaca_stop"/"alpaca_stop_est" fire when Alpaca's own resting stop
+  // order fills before our live monitorPosition() poll catches the same
+  // breach itself (see the reconciliation pass in the main loop below) —
+  // by construction the only resting stop order at any moment is either
+  // the original hard stop-loss or the ladder-tightened stop after a
+  // profit lock, so a loss through that path is functionally a hard stop
+  // and a win is functionally a ladder stop, same as when
+  // monitorPosition() catches the breach itself and logs "hard_stop" /
+  // "ladder_stop" directly. Without this, hard_stop/ladder_stop stayed
+  // almost always empty and no tuning rule below could ever fire.
+  function tuningBucket(r) {
+    if (r.reason === "alpaca_stop" || r.reason === "alpaca_stop_est") return r.win ? "ladder_stop" : "hard_stop";
+    return r.reason;
+  }
   const byReason = {};
   for (const r of records) {
-    byReason[r.reason] = byReason[r.reason] || { n: 0, wins: 0, pnl: 0 };
-    byReason[r.reason].n++;
-    if (r.win) byReason[r.reason].wins++;
-    byReason[r.reason].pnl += r.pnl;
+    const bucket = tuningBucket(r);
+    byReason[bucket] = byReason[bucket] || { n: 0, wins: 0, pnl: 0 };
+    byReason[bucket].n++;
+    if (r.win) byReason[bucket].wins++;
+    byReason[bucket].pnl += r.pnl;
   }
 
   let change = null;
