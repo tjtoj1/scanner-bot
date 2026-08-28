@@ -1,43 +1,6 @@
 {
   "_lastDay": "2026-08-28",
   "_lastLearnedDay": "2026-08-27",
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA260828P00350000",
-    "strike": "350",
-    "entryPremium": 2.645,
-    "qty": 1,
-    "entryTime": 1787932979497,
-    "msgId": 1632,
-    "stopOrderId": "1f0b4969-4475-4907-9bd8-9cc4c8f25fad",
-    "hardStopPrice": 1.85,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 349.725,
-      "regime": "bearish",
-      "emaFast": 352.9738,
-      "emaSlow": 354.1559,
-      "breakoutHigh": 358.8,
-      "breakoutLow": 351.21,
-      "volRatio": 2.7,
-      "lastClose": 349.83,
-      "lastVolume": 1643419,
-      "barTime": "2026-08-28T15:30:00Z",
-      "entryTimeUTC": "2026-08-28T16:02:59.497Z"
-    },
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.311909262759919
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -72,7 +35,7 @@
     "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 45.50898203592813,
+    "peakPct": 46.10778443113773,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -107,6 +70,39 @@
       "lastVolume": 7671590,
       "barTime": "2026-08-28T15:45:00Z",
       "entryTimeUTC": "2026-08-28T16:19:33.906Z"
+    },
+    "lastReportedThreshold": 10
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "TSLA260828P00347500",
+    "strike": "347.5",
+    "entryPremium": 1.45,
+    "qty": 3,
+    "entryTime": 1787934070804,
+    "msgId": 1666,
+    "stopOrderId": "de69c422-7244-4e14-aef6-e8972446fec7",
+    "hardStopPrice": 1.01,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 346.525,
+      "regime": "bearish",
+      "emaFast": 352.071,
+      "emaSlow": 353.6381,
+      "breakoutHigh": 358.8,
+      "breakoutLow": 349.71,
+      "volRatio": 2.3,
+      "lastClose": 348.4601,
+      "lastVolume": 1586065,
+      "barTime": "2026-08-28T15:45:00Z",
+      "entryTimeUTC": "2026-08-28T16:21:10.804Z"
     }
   }
 }
