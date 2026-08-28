@@ -31,7 +31,8 @@
       "lastVolume": 1643419,
       "barTime": "2026-08-28T15:30:00Z",
       "entryTimeUTC": "2026-08-28T16:02:59.497Z"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
@@ -65,5 +66,37 @@
       "entryTimeUTC": "2026-08-28T16:03:28.746Z"
     },
     "lastReportedThreshold": -10
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA260828P00222500",
+    "strike": "222.5",
+    "entryPremium": 2.09,
+    "qty": 2,
+    "entryTime": 1787933259306,
+    "msgId": 1640,
+    "stopOrderId": "b42ec8fa-6696-4b14-bf0f-17b5ffa847ca",
+    "hardStopPrice": 1.46,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 220.865,
+      "regime": "bearish",
+      "emaFast": 224.9531,
+      "emaSlow": 225.7644,
+      "breakoutHigh": 229.26,
+      "breakoutLow": 223.22,
+      "volRatio": 1.61,
+      "lastClose": 223.03,
+      "lastVolume": 5393256,
+      "barTime": "2026-08-28T15:30:00Z",
+      "entryTimeUTC": "2026-08-28T16:07:39.306Z"
+    }
   }
 }
