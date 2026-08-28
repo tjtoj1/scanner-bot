@@ -1,43 +1,4 @@
 {
   "_lastDay": "2026-08-28",
-  "_lastLearnedDay": "2026-08-27",
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA260828P00220000",
-    "strike": "220",
-    "entryPremium": 0.94,
-    "qty": 5,
-    "entryTime": 1787936238754,
-    "msgId": 1734,
-    "stopOrderId": "cce3bea3-b85c-4f8e-bb41-521f676078fa",
-    "hardStopPrice": 0.66,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 219.985,
-      "regime": "bearish",
-      "emaFast": 222.8677,
-      "emaSlow": 224.512,
-      "breakoutHigh": 228.34,
-      "breakoutLow": 220.37,
-      "volRatio": 1.39,
-      "lastClose": 220.18,
-      "lastVolume": 6034753,
-      "barTime": "2026-08-28T16:15:00Z",
-      "entryTimeUTC": "2026-08-28T16:57:18.754Z"
-    },
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 134.5744680851064,
-    "lastReportedThreshold": 130,
-    "nearStopWarned": true
-  }
+  "_lastLearnedDay": "2026-08-27"
 }
