@@ -92,7 +92,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -30,
+    "lastReportedThreshold": -20,
     "nearStopWarned": true
   }
 }
