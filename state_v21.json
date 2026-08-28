@@ -18,6 +18,12 @@
       "symbol": "NVDA",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-28",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -87,5 +93,22 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260828P00771000",
+    "strike": "771",
+    "entryPremium": 1.2850000000000001,
+    "qty": 3,
+    "entryTime": 1787927429970,
+    "level": 771.47,
+    "msgId": 1490,
+    "stopOrderId": "505e1fae-649e-43c3-8a49-3613baea8f7c",
+    "hardStopPrice": 0.84,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
