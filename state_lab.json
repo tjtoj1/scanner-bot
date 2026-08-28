@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T14:00:00Z",
       "entryTimeUTC": "2026-08-28T14:38:27.157Z"
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "AMZN": {
     "active": true,
@@ -69,8 +69,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 32.6271186440678,
-    "lastReportedThreshold": 30
+    "peakPct": 42.79661016949154,
+    "lastReportedThreshold": 40
   },
   "SPY": {
     "active": true,
@@ -102,6 +102,7 @@
       "lastVolume": 1075736,
       "barTime": "2026-08-28T14:30:00Z",
       "entryTimeUTC": "2026-08-28T15:00:26.635Z"
-    }
+    },
+    "lastReportedThreshold": 10
   }
 }
