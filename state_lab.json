@@ -32,7 +32,7 @@
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:45:32.299Z"
     },
-    "lastReportedThreshold": -20,
+    "lastReportedThreshold": -10,
     "nearStopWarned": true
   },
   "IWM": {
@@ -78,7 +78,7 @@
     "qty": 2,
     "entryTime": 1787935763266,
     "msgId": 1712,
-    "stopOrderId": null,
+    "stopOrderId": "2f215b08-5e9d-4587-bdf7-6515b005b229",
     "hardStopPrice": 1.37,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -99,6 +99,10 @@
       "lastVolume": 6034753,
       "barTime": "2026-08-28T16:15:00Z",
       "entryTimeUTC": "2026-08-28T16:49:23.266Z"
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.693094629156,
+    "lastReportedThreshold": 10
   }
 }
