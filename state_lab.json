@@ -33,38 +33,5 @@
       "entryTimeUTC": "2026-08-28T15:25:43.991Z"
     },
     "lastReportedThreshold": 10
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260828C00723000",
-    "strike": "723",
-    "entryPremium": 1.375,
-    "qty": 3,
-    "entryTime": 1787930810934,
-    "msgId": 1603,
-    "stopOrderId": "68bd5ce2-1ab7-4ab8-9840-a08a3afd5aa9",
-    "hardStopPrice": 0.96,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 723.31,
-      "regime": "bullish",
-      "emaFast": 720.9888,
-      "emaSlow": 720.3004,
-      "breakoutHigh": 722.505,
-      "breakoutLow": 716.78,
-      "volRatio": 2.8,
-      "lastClose": 723.8,
-      "lastVolume": 1372184,
-      "barTime": "2026-08-28T14:45:00Z",
-      "entryTimeUTC": "2026-08-28T15:26:50.934Z"
-    },
-    "lastReportedThreshold": -10
   }
 }
