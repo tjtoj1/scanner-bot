@@ -230,6 +230,50 @@ function calcQty(premium, tradeBudget) {
   return Math.max(1, Math.floor(budget / (premium * 100)));
 }
 
+// ─── ENTRY-SNAPSHOT INDICATORS (VWAP + RSI, for later analysis only) ──
+// Computed from bars already fetched for computeSignal() — no extra
+// network call. Never used in any entry/exit decision; purely recorded
+// on the trade for the weekly deep-dive analysis planned later (e.g.
+// price-vs-VWAP trend filter, RSI context).
+//
+// Session VWAP: cumulative (typical price × volume) over TODAY's bars
+// only, up to and including the last CLOSED bar (mirrors how
+// computeSignal already treats "the last closed bar" as the decision
+// point).
+function computeVWAP(bars) {
+  const today = getToday();
+  const todayBars = bars.filter(b => new Date(b.t).toISOString().split("T")[0] === today);
+  if (!todayBars.length) return null;
+  const closedTodayBars = todayBars.length > 1 ? todayBars.slice(0, -1) : todayBars;
+  let cumPV = 0, cumV = 0;
+  for (const b of closedTodayBars) {
+    cumPV += (b.h + b.l + b.c) / 3 * b.v;
+    cumV += b.v;
+  }
+  return cumV > 0 ? +(cumPV / cumV).toFixed(4) : null;
+}
+
+// RSI(14), Wilder smoothing, over the full multi-day closes series
+// (not reset daily — a daily reset would leave too few bars early in
+// the session). Ends at the last CLOSED bar, same convention as above.
+function computeRSI(closes, period = 14) {
+  if (closes.length < period + 1) return null;
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= period; i++) {
+    const diff = closes[i] - closes[i - 1];
+    if (diff >= 0) gains += diff; else losses -= diff;
+  }
+  let avgGain = gains / period, avgLoss = losses / period;
+  for (let i = period + 1; i < closes.length; i++) {
+    const diff = closes[i] - closes[i - 1];
+    avgGain = (avgGain * (period - 1) + Math.max(diff, 0)) / period;
+    avgLoss = (avgLoss * (period - 1) + Math.max(-diff, 0)) / period;
+  }
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return +(100 - 100 / (1 + rs)).toFixed(2);
+}
+
 // ─── INDICATORS ──────────────────────────────────────────────
 function computeEMA(values, period) {
   if (!values || values.length < period) return null;
@@ -299,7 +343,9 @@ function countOpenPositions(state) {
 }
 
 // ─── LOG TRADE OUTCOME (with entry-condition snapshot) ──────────
-function logTrade(pos, symbol, exitPremium, reason, fillSource) {
+// exitStockPrice is optional (undefined for any call site that doesn't
+// have it) — falls back to null so old-style callers never break.
+function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) {
   try {
     const tradeId = `${symbol}_${pos.entryTime}`;
     let existing = "";
@@ -317,6 +363,9 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource) {
       entryTime: new Date(pos.entryTime).toISOString(), exitTime: new Date().toISOString(),
       entryConditions: pos.entryConditions || null,
       strategyVersion: pos.strategyVersion || null,
+      // Exit-snapshot indicator, for the weekly deep-dive analysis —
+      // null on any trade closed before this field existed.
+      exitStockPrice: exitStockPrice ?? null,
     };
     fs.appendFileSync("outcomes_lab.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
@@ -341,6 +390,12 @@ function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
 
 // ─── UNIFIED POSITION CLOSE ──────────────────────────────────
 async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false) {
+  // One extra lightweight quote fetch here — only when a position is
+  // actually closing, not every monitor cycle — same call already used
+  // once per trade at entry (getLatestPrice). Recorded for later
+  // analysis only; getLatestPrice already returns null on failure, so
+  // this never blocks or fails the actual close below.
+  const exitStockPrice = await getLatestPrice(symbol);
   let soldQty = pos.qty;
   if (!skipSell) {
     // Never trust local state's qty for how much to sell — verify against
@@ -368,7 +423,7 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
     if (ownedQty === 0) {
       console.warn(`${symbol}: no position at Alpaca (already flat) — clearing local state without selling (${reason})`);
       await tg(`ℹ️ <b>${symbol}: لا يوجد مركز فعلي في Alpaca</b>\nتم تنظيف الحالة المحلية بدون إرسال أمر بيع (${reason}).`, pos.msgId);
-      logTrade(pos, symbol, exitPremium, reason, fillSource);
+      logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
       delete state[symbol];
       saveState(state);
       return;
@@ -392,7 +447,7 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
   }
   const pnl = Math.round((exitPremium - pos.entryPremium) * soldQty * 100);
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
-  logTrade(pos, symbol, exitPremium, reason, fillSource);
+  logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
   await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
   delete state[symbol];
   saveState(state);
@@ -570,6 +625,12 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   const sig = computeSignal(bars, strategy.params);
   if (!sig || !sig.signal) return;
 
+  // Entry-snapshot indicators for later analysis only (see
+  // computeVWAP/computeRSI above) — reuses bars, no extra fetch.
+  const closedBars = bars.length > 1 ? bars.slice(0, -1) : bars;
+  const vwapAtEntry = computeVWAP(bars);
+  const rsiAtEntry = computeRSI(closedBars.map(b => b.c));
+
   const spot = await getLatestPrice(symbol);
   if (!spot) return;
 
@@ -604,6 +665,7 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
       spot, regime: sig.regime, emaFast: +sig.emaFast.toFixed(4), emaSlow: +sig.emaSlow.toFixed(4),
       breakoutHigh: sig.breakoutHigh, breakoutLow: sig.breakoutLow, volRatio: +sig.volRatio.toFixed(2),
       lastClose: sig.lastClose, lastVolume: sig.lastVolume, barTime: sig.barTime, entryTimeUTC: new Date().toISOString(),
+      vwapAtEntry, rsiAtEntry, signalType: "breakout",
     },
   };
   saveState(state);
