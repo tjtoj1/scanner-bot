@@ -31,7 +31,8 @@
       "lastVolume": 1477253,
       "barTime": "2026-08-31T13:45:00Z",
       "entryTimeUTC": "2026-08-31T14:28:09.014Z"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
@@ -63,7 +64,8 @@
       "lastVolume": 1189910,
       "barTime": "2026-08-31T13:45:00Z",
       "entryTimeUTC": "2026-08-31T14:30:00.049Z"
-    }
+    },
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
@@ -96,6 +98,6 @@
       "barTime": "2026-08-31T14:00:00Z",
       "entryTimeUTC": "2026-08-31T14:30:03.328Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   }
 }
