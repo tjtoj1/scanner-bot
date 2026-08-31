@@ -18,6 +18,12 @@
       "symbol": "AMZN",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-08-31",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -87,5 +93,22 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260831C00362500",
+    "strike": "362.5",
+    "entryPremium": 2.205,
+    "qty": 2,
+    "entryTime": 1788185995858,
+    "level": 355.94,
+    "msgId": 1830,
+    "stopOrderId": "332b9c60-de06-46bb-9505-d40cbc117d34",
+    "hardStopPrice": 1.43,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }

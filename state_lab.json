@@ -32,7 +32,7 @@
       "barTime": "2026-08-31T13:30:00Z",
       "entryTimeUTC": "2026-08-31T14:12:21.640Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "AMZN": {
     "active": true,
