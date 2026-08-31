@@ -10,7 +10,7 @@
     "qty": 1,
     "entryTime": 1788187989964,
     "msgId": 1916,
-    "stopOrderId": null,
+    "stopOrderId": "b30be8ee-0cbd-41a7-8ccc-afb16347b295",
     "hardStopPrice": 1.89,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -32,43 +32,10 @@
       "barTime": "2026-08-31T14:15:00Z",
       "entryTimeUTC": "2026-08-31T14:53:09.964Z"
     },
-    "lastReportedThreshold": -10
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260831P00293000",
-    "strike": "293",
-    "entryPremium": 0.295,
-    "qty": 16,
-    "entryTime": 1788188217941,
-    "msgId": 1924,
-    "stopOrderId": "14b9554b-c81d-4fc0-86e5-850c5a9ab024",
-    "hardStopPrice": 0.21,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 293.425,
-      "regime": "bearish",
-      "emaFast": 294.0986,
-      "emaSlow": 294.7977,
-      "breakoutHigh": 295.76,
-      "breakoutLow": 293.26,
-      "volRatio": 3.36,
-      "lastClose": 293.041,
-      "lastVolume": 826976,
-      "barTime": "2026-08-31T14:15:00Z",
-      "entryTimeUTC": "2026-08-31T14:56:57.941Z"
-    },
     "lastReportedThreshold": 10,
     "ladder1": true,
     "stopPct": 5,
-    "peakPct": 16.94915254237288
+    "peakPct": 15.925925925925915
   },
   "SPY": {
     "active": true,
