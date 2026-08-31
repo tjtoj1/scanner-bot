@@ -1,6 +1,25 @@
 {
   "_lastDay": "2026-08-31",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-08-31",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-08-31",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-08-31",
+      "symbol": "AMZN",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-08-31",
@@ -32,5 +51,56 @@
       "high": 264.36,
       "low": 261.26
     }
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260831P00293000",
+    "strike": "293",
+    "entryPremium": 0.405,
+    "qty": 12,
+    "entryTime": 1788185729541,
+    "level": 293.8595,
+    "msgId": 1811,
+    "stopOrderId": "a042b722-b568-4817-876e-fcb3b3e1ea3b",
+    "hardStopPrice": 0.26,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260831C00362500",
+    "strike": "362.5",
+    "entryPremium": 1.835,
+    "qty": 2,
+    "entryTime": 1788185731740,
+    "level": 355.94,
+    "msgId": 1812,
+    "stopOrderId": "2382b580-8478-4673-9cc7-c8846ed78b3f",
+    "hardStopPrice": 1.19,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "AMZN260831P00260000",
+    "strike": "260",
+    "entryPremium": 0.96,
+    "qty": 5,
+    "entryTime": 1788185733010,
+    "level": 261.26,
+    "msgId": 1813,
+    "stopOrderId": "3eafed5a-8b38-4696-99ad-c914637603c8",
+    "hardStopPrice": 0.62,
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
