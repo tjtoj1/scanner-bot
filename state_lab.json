@@ -6,12 +6,12 @@
     "signal": "PUT",
     "optionSymbol": "AMZN260831P00262500",
     "strike": "262.5",
-    "entryPremium": 1.8399999999999999,
-    "qty": 2,
-    "entryTime": 1788183945085,
-    "msgId": 1775,
-    "stopOrderId": "391bc0ce-8590-454e-90e2-59716d7cc21f",
-    "hardStopPrice": 1.29,
+    "entryPremium": 1.325,
+    "qty": 3,
+    "entryTime": 1788184339430,
+    "msgId": 1779,
+    "stopOrderId": "2890ef55-e594-4754-bc10-d4fbb9fd803d",
+    "hardStopPrice": 0.93,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -20,7 +20,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 261.315,
+      "spot": 262.125,
       "regime": "bearish",
       "emaFast": 264.3921,
       "emaSlow": 264.8449,
@@ -30,8 +30,7 @@
       "lastClose": 263.68,
       "lastVolume": 66423,
       "barTime": "2026-08-31T13:15:00Z",
-      "entryTimeUTC": "2026-08-31T13:45:45.085Z"
-    },
-    "lastReportedThreshold": -20
+      "entryTimeUTC": "2026-08-31T13:52:19.430Z"
+    }
   }
 }
