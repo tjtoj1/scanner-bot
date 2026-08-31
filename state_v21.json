@@ -68,12 +68,15 @@
     "entryTime": 1788185729541,
     "level": 293.8595,
     "msgId": 1811,
-    "stopOrderId": "a042b722-b568-4817-876e-fcb3b3e1ea3b",
+    "stopOrderId": "5d89c79d-34dd-4a49-9ace-b46c60872a43",
     "hardStopPrice": 0.26,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.753086419753075
   }
 }
