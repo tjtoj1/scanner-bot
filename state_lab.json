@@ -1,40 +1,6 @@
 {
   "_lastDay": "2026-08-31",
   "_lastLearnedDay": "2026-08-28",
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN260831P00260000",
-    "strike": "260",
-    "entryPremium": 0.9199999999999999,
-    "qty": 5,
-    "entryTime": 1788186489014,
-    "msgId": 1857,
-    "stopOrderId": "be378002-e0d4-4db9-897c-28223f4489ec",
-    "hardStopPrice": 0.64,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 260.025,
-      "regime": "bearish",
-      "emaFast": 263.2826,
-      "emaSlow": 264.2331,
-      "breakoutHigh": 265.45,
-      "breakoutLow": 261.26,
-      "volRatio": 9.53,
-      "lastClose": 261.17,
-      "lastVolume": 1477253,
-      "barTime": "2026-08-31T13:45:00Z",
-      "entryTimeUTC": "2026-08-31T14:28:09.014Z"
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -104,6 +70,38 @@
       "lastVolume": 1019125,
       "barTime": "2026-08-31T14:15:00Z",
       "entryTimeUTC": "2026-08-31T14:51:56.662Z"
+    }
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260831C00362500",
+    "strike": "362.5",
+    "entryPremium": 2.7,
+    "qty": 1,
+    "entryTime": 1788187989964,
+    "msgId": 1916,
+    "stopOrderId": null,
+    "hardStopPrice": 1.89,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 360.87,
+      "regime": "bullish",
+      "emaFast": 354.9353,
+      "emaSlow": 351.1246,
+      "breakoutHigh": 361.93,
+      "breakoutLow": 345.2861,
+      "volRatio": 7,
+      "lastClose": 363.57,
+      "lastVolume": 3627994,
+      "barTime": "2026-08-31T14:15:00Z",
+      "entryTimeUTC": "2026-08-31T14:53:09.964Z"
     }
   }
 }
