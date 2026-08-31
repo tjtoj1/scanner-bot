@@ -35,7 +35,7 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 18.357487922705307,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 10
   },
   "IWM": {
     "active": true,
@@ -68,7 +68,7 @@
       "barTime": "2026-08-31T13:30:00Z",
       "entryTimeUTC": "2026-08-31T14:00:02.554Z"
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
