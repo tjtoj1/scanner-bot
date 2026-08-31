@@ -35,40 +35,6 @@
     "lastReportedThreshold": -10,
     "nearStopWarned": true
   },
-  "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "NVDA260831C00220000",
-    "strike": "220",
-    "entryPremium": 1.025,
-    "qty": 4,
-    "entryTime": 1788187124293,
-    "msgId": 1881,
-    "stopOrderId": "f738de61-8ede-4df4-b56c-86738abb405d",
-    "hardStopPrice": 0.72,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 220.05,
-      "regime": "bullish",
-      "emaFast": 218.9144,
-      "emaSlow": 218.7849,
-      "breakoutHigh": 219.348,
-      "breakoutLow": 216.21,
-      "volRatio": 6.33,
-      "lastClose": 220.19,
-      "lastVolume": 6014678,
-      "barTime": "2026-08-31T14:00:00Z",
-      "entryTimeUTC": "2026-08-31T14:38:44.293Z"
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -107,5 +73,37 @@
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260831P00766000",
+    "strike": "766",
+    "entryPremium": 1.185,
+    "qty": 4,
+    "entryTime": 1788187916662,
+    "msgId": 1909,
+    "stopOrderId": "7c2a813c-bc57-423d-85a3-7dbcc5fa9880",
+    "hardStopPrice": 0.83,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 765.5699999999999,
+      "regime": "bearish",
+      "emaFast": 766.2675,
+      "emaSlow": 767.0858,
+      "breakoutHigh": 768.11,
+      "breakoutLow": 765.34,
+      "volRatio": 4.28,
+      "lastClose": 764.93,
+      "lastVolume": 1019125,
+      "barTime": "2026-08-31T14:15:00Z",
+      "entryTimeUTC": "2026-08-31T14:51:56.662Z"
+    }
   }
 }
