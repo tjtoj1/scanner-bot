@@ -1,44 +1,6 @@
 {
   "_lastDay": "2026-08-31",
   "_lastLearnedDay": "2026-08-28",
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN260831P00262500",
-    "strike": "262.5",
-    "entryPremium": 1.325,
-    "qty": 3,
-    "entryTime": 1788184339430,
-    "msgId": 1779,
-    "stopOrderId": "aaec6aba-7adc-40c1-b315-b8df6b73d257",
-    "hardStopPrice": 0.93,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 262.125,
-      "regime": "bearish",
-      "emaFast": 264.3921,
-      "emaSlow": 264.8449,
-      "breakoutHigh": 265.45,
-      "breakoutLow": 263.8,
-      "volRatio": 3.87,
-      "lastClose": 263.68,
-      "lastVolume": 66423,
-      "barTime": "2026-08-31T13:15:00Z",
-      "entryTimeUTC": "2026-08-31T13:52:19.430Z"
-    },
-    "lastReportedThreshold": 80,
-    "ladder1": true,
-    "stopPct": 12,
-    "peakPct": 86.7924528301887,
-    "ladder2": true,
-    "trailPct": 8
-  },
   "SPY": {
     "active": true,
     "signal": "PUT",
@@ -102,6 +64,38 @@
       "barTime": "2026-08-31T13:30:00Z",
       "entryTimeUTC": "2026-08-31T14:00:02.554Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260831C00360000",
+    "strike": "360",
+    "entryPremium": 3.225,
+    "qty": 1,
+    "entryTime": 1788184944536,
+    "msgId": 1792,
+    "stopOrderId": "4393a3ce-0089-4226-9b1d-e42419e09af8",
+    "hardStopPrice": 2.26,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 360.4,
+      "regime": "bullish",
+      "emaFast": 348.4028,
+      "emaSlow": 347.644,
+      "breakoutHigh": 347.96,
+      "breakoutLow": 345.2861,
+      "volRatio": 196.93,
+      "lastClose": 355.82,
+      "lastVolume": 3640219,
+      "barTime": "2026-08-31T13:30:00Z",
+      "entryTimeUTC": "2026-08-31T14:02:24.536Z"
+    }
   }
 }
