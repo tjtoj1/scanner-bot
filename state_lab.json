@@ -32,10 +32,10 @@
       "barTime": "2026-08-31T13:15:00Z",
       "entryTimeUTC": "2026-08-31T13:52:19.430Z"
     },
-    "lastReportedThreshold": 50,
+    "lastReportedThreshold": 80,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 54.339622641509436,
+    "peakPct": 86.7924528301887,
     "ladder2": true,
     "trailPct": 8
   },
