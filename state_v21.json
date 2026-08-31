@@ -67,7 +67,8 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
@@ -79,12 +80,18 @@
     "entryTime": 1788185731740,
     "level": 355.94,
     "msgId": 1812,
-    "stopOrderId": "2382b580-8478-4673-9cc7-c8846ed78b3f",
+    "stopOrderId": "cbc4795f-198f-4a9e-b404-947ecf80aecc",
     "hardStopPrice": 1.19,
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 35.4223433242507,
+    "lastReportedThreshold": 30
   },
   "AMZN": {
     "active": true,
