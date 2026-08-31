@@ -65,7 +65,7 @@
       "barTime": "2026-08-31T13:30:00Z",
       "entryTimeUTC": "2026-08-31T14:02:24.536Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   },
   "SPY": {
     "active": true,
