@@ -37,7 +37,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 30.93922651933702
+    "peakPct": 35.911602209944746
   },
   "IWM": {
     "active": true,
@@ -75,7 +75,8 @@
     "stopPct": 12,
     "peakPct": 37.68115942028986,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
