@@ -70,14 +70,14 @@
   "SPY": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "SPY260831P00766000",
-    "strike": "766",
-    "entryPremium": 1.1949999999999998,
-    "qty": 4,
-    "entryTime": 1788185185544,
-    "msgId": 1798,
-    "stopOrderId": "d72a1fcf-7d84-490e-8786-020c9b003d3a",
-    "hardStopPrice": 0.84,
+    "optionSymbol": "SPY260831P00765000",
+    "strike": "765",
+    "entryPremium": 0.905,
+    "qty": 5,
+    "entryTime": 1788185541640,
+    "msgId": 1808,
+    "stopOrderId": "878f2fa3-ec95-4e23-8536-7fd678715833",
+    "hardStopPrice": 0.63,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -86,7 +86,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 765.885,
+      "spot": 765.375,
       "regime": "bearish",
       "emaFast": 766.9548,
       "emaSlow": 767.5776,
@@ -96,12 +96,7 @@
       "lastClose": 765.805,
       "lastVolume": 2308689,
       "barTime": "2026-08-31T13:30:00Z",
-      "entryTimeUTC": "2026-08-31T14:06:25.544Z"
-    },
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.062761506276164,
-    "nearStopWarned": true
+      "entryTimeUTC": "2026-08-31T14:12:21.640Z"
+    }
   }
 }
