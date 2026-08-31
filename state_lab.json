@@ -37,7 +37,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 35.911602209944746
+    "peakPct": 35.911602209944746,
+    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
@@ -70,10 +71,10 @@
       "barTime": "2026-08-31T13:45:00Z",
       "entryTimeUTC": "2026-08-31T14:19:17.212Z"
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 37.68115942028986,
+    "peakPct": 40.579710144927546,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
