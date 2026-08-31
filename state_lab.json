@@ -10,7 +10,7 @@
     "qty": 5,
     "entryTime": 1788188292995,
     "msgId": 1929,
-    "stopOrderId": "45e0e1f5-aacc-4209-9d33-1f6d87bd587e",
+    "stopOrderId": "229fcfbd-79a3-4f8d-98ea-cd2061525a80",
     "hardStopPrice": 0.6,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -32,6 +32,43 @@
       "barTime": "2026-08-31T14:15:00Z",
       "entryTimeUTC": "2026-08-31T14:58:12.995Z"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 26.900584795321635
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260831C00362500",
+    "strike": "362.5",
+    "entryPremium": 2.9299999999999997,
+    "qty": 1,
+    "entryTime": 1788188571547,
+    "msgId": 1937,
+    "stopOrderId": "1e58ec47-90a7-4b5e-bd14-df6326f42fe3",
+    "hardStopPrice": 2.05,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 361.575,
+      "regime": "bullish",
+      "emaFast": 356.9592,
+      "emaSlow": 352.391,
+      "breakoutHigh": 364.86,
+      "breakoutLow": 345.2861,
+      "volRatio": 4.73,
+      "lastClose": 365.055,
+      "lastVolume": 3311098,
+      "barTime": "2026-08-31T14:30:00Z",
+      "entryTimeUTC": "2026-08-31T15:02:51.547Z"
+    }
   }
 }
