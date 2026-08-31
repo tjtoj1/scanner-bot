@@ -75,26 +75,5 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN260831P00260000",
-    "strike": "260",
-    "entryPremium": 0.96,
-    "qty": 5,
-    "entryTime": 1788185733010,
-    "level": 261.26,
-    "msgId": 1813,
-    "stopOrderId": "ed557638-6fb8-4d2d-829f-6faedef7ca76",
-    "hardStopPrice": 0.62,
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 14.583333333333348
   }
 }
