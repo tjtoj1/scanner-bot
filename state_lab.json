@@ -65,7 +65,7 @@
       "barTime": "2026-08-31T13:45:00Z",
       "entryTimeUTC": "2026-08-31T14:30:00.049Z"
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "NVDA": {
     "active": true,
@@ -98,6 +98,6 @@
       "barTime": "2026-08-31T14:00:00Z",
       "entryTimeUTC": "2026-08-31T14:30:03.328Z"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10
   }
 }
