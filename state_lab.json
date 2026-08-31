@@ -34,8 +34,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 49.29577464788734,
-    "lastReportedThreshold": 40,
+    "peakPct": 52.112676056338046,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -102,6 +102,7 @@
       "lastVolume": 3627994,
       "barTime": "2026-08-31T14:15:00Z",
       "entryTimeUTC": "2026-08-31T14:53:09.964Z"
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
