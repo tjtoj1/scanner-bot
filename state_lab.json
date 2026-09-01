@@ -1,4 +1,39 @@
 {
   "_lastDay": "2026-09-01",
-  "_lastLearnedDay": "2026-08-31"
+  "_lastLearnedDay": "2026-08-31",
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260901P00761000",
+    "strike": "761",
+    "entryPremium": 0.665,
+    "qty": 7,
+    "entryTime": 1788289226102,
+    "msgId": 2105,
+    "stopOrderId": "1f3647c4-a559-4cb2-8af7-a77d1aa32f2e",
+    "hardStopPrice": 0.47,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 760.97,
+      "regime": "bearish",
+      "emaFast": 761.4889,
+      "emaSlow": 762.2109,
+      "breakoutHigh": 764.34,
+      "breakoutLow": 760.73,
+      "volRatio": 1.84,
+      "lastClose": 759.74,
+      "lastVolume": 1863102,
+      "barTime": "2026-09-01T18:30:00Z",
+      "entryTimeUTC": "2026-09-01T19:00:26.102Z",
+      "vwapAtEntry": 762.4511,
+      "rsiAtEntry": 29.2,
+      "signalType": "breakout"
+    }
+  }
 }
