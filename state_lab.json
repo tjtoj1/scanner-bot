@@ -71,5 +71,40 @@
       "signalType": "breakout"
     },
     "lastReportedThreshold": 10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260901P00707000",
+    "strike": "707",
+    "entryPremium": 1.5550000000000002,
+    "qty": 3,
+    "entryTime": 1788271237830,
+    "msgId": 2002,
+    "stopOrderId": "55e2dea2-4af5-4f3e-9e75-b6bec703d017",
+    "hardStopPrice": 1.09,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 707.055,
+      "regime": "bearish",
+      "emaFast": 707.908,
+      "emaSlow": 709.4873,
+      "breakoutHigh": 717.297,
+      "breakoutLow": 706.7,
+      "volRatio": 44.27,
+      "lastClose": 706.69,
+      "lastVolume": 3387756,
+      "barTime": "2026-09-01T13:30:00Z",
+      "entryTimeUTC": "2026-09-01T14:00:37.830Z",
+      "vwapAtEntry": 707.8251,
+      "rsiAtEntry": 22.89,
+      "signalType": "breakout"
+    }
   }
 }
