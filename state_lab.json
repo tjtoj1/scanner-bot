@@ -34,7 +34,8 @@
       "vwapAtEntry": 762.7776,
       "rsiAtEntry": 26.24,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
@@ -80,7 +81,7 @@
     "qty": 6,
     "entryTime": 1788269521004,
     "msgId": 1965,
-    "stopOrderId": "a72a9563-9491-482e-8c39-1f3d52aa58b8",
+    "stopOrderId": "fb375725-99f7-44eb-8dca-41fe75595d69",
     "hardStopPrice": 0.53,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -104,6 +105,12 @@
       "vwapAtEntry": 292.4047,
       "rsiAtEntry": 32.64,
       "signalType": "breakout"
-    }
+    },
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 29.605263157894733,
+    "lastReportedThreshold": 20
   }
 }
