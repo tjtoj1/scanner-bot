@@ -75,7 +75,7 @@
       "rsiAtEntry": 28.21,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": -20,
+    "lastReportedThreshold": -10,
     "nearStopWarned": true
   }
 }
