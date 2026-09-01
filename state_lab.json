@@ -77,10 +77,10 @@
       "rsiAtEntry": 28.21,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 30.379746835443033,
+    "peakPct": 34.177215189873415,
     "nearStopWarned": true,
     "ladder2": true,
     "trailPct": 8
