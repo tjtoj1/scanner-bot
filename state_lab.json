@@ -35,7 +35,7 @@
       "rsiAtEntry": 37.56,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "nearStopWarned": true,
     "ladder1": true,
     "stopPct": 5,
