@@ -34,7 +34,8 @@
       "vwapAtEntry": 217.7996,
       "rsiAtEntry": 29.56,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
@@ -105,6 +106,7 @@
       "vwapAtEntry": 707.8251,
       "rsiAtEntry": 22.89,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": -20
   }
 }
