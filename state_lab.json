@@ -69,6 +69,7 @@
       "vwapAtEntry": 362.8871,
       "rsiAtEntry": 29.3,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": 10
   }
 }
