@@ -46,7 +46,7 @@
     "qty": 3,
     "entryTime": 1788277523884,
     "msgId": 2038,
-    "stopOrderId": null,
+    "stopOrderId": "b695e69b-2914-4c6f-80a3-886fd82291ac",
     "hardStopPrice": 0.98,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -71,6 +71,9 @@
       "rsiAtEntry": 58.27,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.217081850533813
   }
 }
