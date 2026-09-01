@@ -56,7 +56,7 @@
     "entryTime": 1788273056749,
     "level": 762.3999,
     "msgId": 2019,
-    "stopOrderId": "ea3f0366-9948-49d1-b0fa-5114e3385296",
+    "stopOrderId": "3c86db34-67ac-428f-af8c-d1bf90fee209",
     "hardStopPrice": 0.69,
     "entryStockPrice": 764.085,
     "vwapAtEntry": 762.2082,
@@ -66,7 +66,11 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 16.113744075829377,
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
