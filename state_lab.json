@@ -10,7 +10,7 @@
     "qty": 1,
     "entryTime": 1788270686877,
     "msgId": 2000,
-    "stopOrderId": null,
+    "stopOrderId": "65a9a6f5-c051-43d1-88f7-dc9a97704298",
     "hardStopPrice": 5.4,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -35,7 +35,10 @@
       "rsiAtEntry": 29.3,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 18.7945560596241
   },
   "NVDA": {
     "active": true,
