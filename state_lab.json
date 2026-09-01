@@ -34,7 +34,8 @@
       "vwapAtEntry": 762.9718,
       "rsiAtEntry": 37.56,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
@@ -69,6 +70,7 @@
       "vwapAtEntry": 291.8389,
       "rsiAtEntry": 27.15,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
