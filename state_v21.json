@@ -58,9 +58,6 @@
       "low": 251.93
     }
   },
-  "SPY": {
-    "active": true
-  },
   "NVDA": {
     "active": true,
     "signal": "CALL",
