@@ -80,7 +80,8 @@
     "lastReportedThreshold": 20,
     "ladder1": true,
     "stopPct": 5,
-    "peakPct": 21.518987341772142
+    "peakPct": 21.518987341772142,
+    "nearStopWarned": true
   },
   "SPY": {
     "active": true,
