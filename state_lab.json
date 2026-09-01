@@ -70,7 +70,8 @@
       "vwapAtEntry": 710.0855,
       "rsiAtEntry": 20.26,
       "signalType": "breakout"
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
@@ -110,7 +111,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 29.605263157894733,
-    "lastReportedThreshold": 20
+    "peakPct": 55.263157894736835,
+    "lastReportedThreshold": 50
   }
 }
