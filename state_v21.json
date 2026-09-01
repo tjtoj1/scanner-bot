@@ -12,6 +12,12 @@
       "symbol": "NVDA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-01",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -46,33 +52,6 @@
       "low": 251.93
     }
   },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260901C00764000",
-    "strike": "764",
-    "entryPremium": 1.0550000000000002,
-    "qty": 4,
-    "entryTime": 1788273056749,
-    "level": 762.3999,
-    "msgId": 2019,
-    "stopOrderId": "3c86db34-67ac-428f-af8c-d1bf90fee209",
-    "hardStopPrice": 0.69,
-    "entryStockPrice": 764.085,
-    "vwapAtEntry": 762.2082,
-    "rsiAtEntry": 46.62,
-    "volumeRatio": 4.828049296611712,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 16.113744075829377,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
-  },
   "NVDA": {
     "active": true,
     "signal": "CALL",
@@ -89,6 +68,28 @@
     "vwapAtEntry": 216.7402,
     "rsiAtEntry": 49.96,
     "volumeRatio": 4.9186225434136395,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260901C00764000",
+    "strike": "764",
+    "entryPremium": 1.1349999999999998,
+    "qty": 4,
+    "entryTime": 1788273398754,
+    "level": 762.3999,
+    "msgId": 2025,
+    "stopOrderId": "7794670a-346a-4087-a242-2bfd57b0c002",
+    "hardStopPrice": 0.74,
+    "entryStockPrice": 764.2249999999999,
+    "vwapAtEntry": 762.2082,
+    "rsiAtEntry": 46.62,
+    "volumeRatio": 4.828049296611712,
     "signalType": "breakout",
     "tp1Stock": null,
     "tp2Stock": null,
