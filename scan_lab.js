@@ -695,22 +695,173 @@ function buildTemplate2(change, old, next, n, wr, netPnl, records, today) {
 
   if (change.param === "volumeMultiplier") {
     observed = `${change.reason}\nأسوأ الأمثلة من الصفقات الخاسرة:\n${fmtExamples(losers)}`;
-    cause = "الدخول يحدث عند تأكيد حجم ضعيف نسبياً، ما يزيد احتمال الدخول في اختراقات كاذبة تصطدم بوقف الخسارة بسرعة.";
+    cause = "الدخول يحدث عند تأكيد حجم ضعيف نسبياً، ما يزيد احتمال الدخول في اختراقات كاذبة تصطدم بوقف الخسارة بسرعة — تحقّقت هذه الفرضية فعلياً من بيانات حجم صفقات الوقف قبل هذا التعديل.";
     whatChanged = `رفع عتبة تأكيد الحجم (volumeMultiplier) من ${old} إلى ${next} — يتطلب حجم تداول أقوى نسبياً قبل قبول أي إشارة دخول، لتصفية الإشارات الضعيفة.`;
-    expected = "عدد صفقات أقل لكن بجودة دخول أعلى، وانخفاض تدريجي متوقع في نسبة الخروج عبر وقف الخسارة. سيُعاد تقييم الأثر الفعلي في دورة التعلم القادمة على عينة جديدة.";
+    expected = "عدد صفقات أقل لكن بجودة دخول أعلى، وانخفاض تدريجي متوقع في نسبة الخروج عبر وقف الخسارة. سيُقاس الأثر الفعلي (لا افتراضاً) في دورة التعلم القادمة قبل أي تعديل آخر على نفس البارامتر.";
   } else if (change.param === "takeProfit2Pct") {
     observed = `${change.reason}\nأفضل الأمثلة من الصفقات الرابحة:\n${fmtExamples(winners)}`;
-    cause = "تحركات قوية ومتجهة يبدو أنها تُقطع مبكراً عند هدف الربح الثاني الحالي، ما يحد من الاستفادة القصوى من الاتجاهات الجيدة.";
+    cause = "تحركات قوية ومتجهة يبدو أنها تُقطع مبكراً عند هدف الربح الثاني الحالي — تحقّقت هذه الفرضية فعلياً من أن أغلب الصفقات الرابحة عبر السلم وصلت قرب سقف الهدف الحالي قبل هذا التعديل.";
     whatChanged = `رفع هدف الربح الثاني (takeProfit2Pct) من ${old} إلى ${next} — يمنح الصفقات الرابحة مساحة أكبر للاستمرار قبل الإغلاق الجزئي.`;
-    expected = "متوسط ربح أعلى محتمل للصفقات الرابحة القوية، مع احتمال تقلب أكبر إن انعكس السعر قبل بلوغ الهدف الجديد. سيُعاد تقييم الأثر في دورة التعلم القادمة.";
-  } else {
+    expected = "متوسط ربح أعلى محتمل للصفقات الرابحة القوية، مع احتمال تقلب أكبر إن انعكس السعر قبل بلوغ الهدف الجديد. سيُقاس الأثر الفعلي في دورة التعلم القادمة قبل أي تعديل آخر على نفس البارامتر.";
+  } else if (change.param === "stopLossPct") {
     observed = `${change.reason}\nأسوأ الأمثلة من العينة الكاملة:\n${fmtExamples(losers)}`;
-    cause = "مزيج من جودة إشارات غير مثالية وخسائر تتجاوز حجم الأرباح المقابلة لكل صفقة رابحة، ما يضغط على صافي الأداء الكلي.";
-    whatChanged = `تضييق وقف الخسارة (stopLossPct) من ${old} إلى ${next} — يقلل حجم الخسارة لكل صفقة خاسرة ريثما تُعالَج جودة الإشارات في دورات لاحقة.`;
-    expected = "انخفاض متوقع في متوسط حجم الخسارة لكل صفقة، دون بالضرورة تحسّن فوري في نسبة الربح نفسها. سيُعاد تقييم الأثر في دورة التعلم القادمة.";
+    cause = "الخسائر الكبيرة تصل فعلياً قرب مستوى الوقف الحالي (تحقّق من البيانات) بدل الانعكاس قبله بكثير — أي الوقف هو القيد الفعلي على حجم الخسارة، وليس افتراضاً.";
+    whatChanged = `تضييق وقف الخسارة (stopLossPct) من ${old} إلى ${next} — يقلل حجم الخسارة لكل صفقة خاسرة.`;
+    expected = "انخفاض متوقع في متوسط حجم الخسارة لكل صفقة، دون بالضرورة تحسّن فوري في نسبة الربح نفسها. سيُقاس الأثر الفعلي في دورة التعلم القادمة قبل أي تعديل آخر على نفس البارامتر.";
+  } else if (change.param === "emaSlow") {
+    observed = `${change.reason}\nأسوأ الأمثلة من الصفقات الخاسرة عبر الوقف الصلب:\n${fmtExamples(losers)}`;
+    cause = "نسبة كبيرة من صفقات وقف الخسارة الصلب دخلت عند نطاق ضعيف/متردد (فارق ضئيل بين المتوسطين المتحركين السريع والبطيء وقت الدخول) — تحقّقت هذه الفرضية فعلياً من بيانات فارق EMA المسجَّلة، وليست افتراضاً.";
+    whatChanged = `توسيع EMA البطيء (emaSlow) من ${old} إلى ${next} — يتطلب فصلاً أوضح بين الاتجاه الصاعد والهابط قبل قبول أي إشارة، لتفادي الدخول عند نطاقات متذبذبة.`;
+    expected = "إشارات أقل لكن أكثر وضوحاً في اتجاه النطاق، وانخفاض متوقع في نسبة الدخول عند نطاقات ضعيفة. سيُقاس الأثر الفعلي في دورة التعلم القادمة قبل أي تعديل آخر على نفس البارامتر.";
+  } else if (change.param === "breakoutLookback") {
+    observed = `${change.reason}\nأسوأ الأمثلة من الصفقات الخاسرة عبر الوقف الصلب:\n${fmtExamples(losers)}`;
+    cause = "نسبة كبيرة من صفقات وقف الخسارة الصلب دخلت عند اختراق هامشي بالكاد تجاوز المستوى — تحقّقت هذه الفرضية فعلياً من مسافة الإغلاق عن المستوى وقت الدخول، وليست افتراضاً.";
+    whatChanged = `رفع نافذة الاختراق (breakoutLookback) من ${old} إلى ${next} — يتطلب اختراقاً أوضح (نطاقاً أطول) قبل قبول الإشارة، لتفادي الاختراقات الهامشية.`;
+    expected = "إشارات أقل لكن أكثر حسماً، وانخفاض متوقع في نسبة الاختراقات الهامشية التي ترتد بسرعة. سيُقاس الأثر الفعلي في دورة التعلم القادمة قبل أي تعديل آخر على نفس البارامتر.";
+  } else {
+    observed = `${change.reason}`;
+    cause = "—";
+    whatChanged = `${change.param}: ${old} → ${next}.`;
+    expected = "سيُقاس الأثر الفعلي في دورة التعلم القادمة قبل أي تعديل آخر على نفس البارامتر.";
   }
 
-  return `🧪 <b>تعديل استراتيجية تلقائي</b> (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\n\n📊 ما لوحظ:\n${observed}\n\n🔍 السبب المحتمل:\n${cause}\n\n⚙️ التغيير ولماذا:\n${whatChanged}\n\n📈 الأثر المتوقع:\n${expected}\n\nصافي $${netPnl} على العينة الكاملة (${n} صفقة).`;
+  return `🧪 <b>تعديل استراتيجية تلقائي</b> (${today})\nالبارامتر: <b>${change.param}</b>: ${old} → ${next}\n\n📊 ما لوحظ:\n${observed}\n\n🔍 السبب المحتمل (مُتحقَّق منه بالبيانات):\n${cause}\n\n⚙️ التغيير ولماذا:\n${whatChanged}\n\n📈 الأثر المتوقع:\n${expected}\n\nصافي $${netPnl} على العينة الكاملة (${n} صفقة).`;
+}
+
+// ─── LEARNING MEMORY: metrics, effect evaluation, hypothesis verification ──
+// Design summary (measure → verify → diversify → remember):
+//   1. Before proposing anything new, evaluate the most recent PENDING
+//      changelog entry against fresh post-change data. No new change is
+//      proposed until either that evaluation completes or there simply
+//      isn't a pending one — this is what stops the same param from being
+//      re-adjusted on stale/repeated evidence.
+//   2. Every candidate hypothesis is checked against actual per-trade data
+//      (e.g. was the losing trade's volume really near the threshold?)
+//      before being accepted — not assumed from an aggregate ratio alone.
+//   3. A param with MAX_FAILED_ATTEMPTS consecutive non-improvements is
+//      excluded from consideration until a later change (or an explicit
+//      correction) resets it, so the tuner is forced to diversify instead
+//      of fixating.
+//   4. Every changelog entry now carries metricName/metricBefore/
+//      metricAfter/effect — a persistent ledger of what was tried and
+//      whether it actually worked, read back by steps 1 and 3 above.
+// PARAM_BOUNDS / MAX_PARAM_STEP_FRACTION / MIN_SAMPLE_FOR_LEARNING above
+// are untouched — this only changes which change (if any) gets proposed.
+const MIN_POST_CHANGE_SAMPLE = 15;    // trades needed after a change before judging its effect
+const HYPOTHESIS_PASS_FRACTION = 0.4; // >=40% of the flagged trades must actually support the hypothesis
+const MAX_FAILED_ATTEMPTS = 2;        // exclude a param after this many consecutive non-improvements
+const IMPROVEMENT_THRESHOLDS = {
+  hardStopRatio: 0.05, // must drop by >=5 percentage points to count as "improved"
+  avgLadderWin:  1,    // avg ladder-win pnlPct must rise by >=1 point
+  avgLossSize:   1,    // avg loss pnlPct must rise (become less negative) by >=1 point
+};
+// Bucket by *functional* stop type, not the literal reason string.
+// "alpaca_stop"/"alpaca_stop_est" fire when Alpaca's own resting stop
+// order fills before our live monitorPosition() poll catches the same
+// breach itself (see the reconciliation pass in the main loop below) —
+// by construction the only resting stop order at any moment is either
+// the original hard stop-loss or the ladder-tightened stop after a
+// profit lock, so a loss through that path is functionally a hard stop
+// and a win is functionally a ladder stop, same as when
+// monitorPosition() catches the breach itself and logs "hard_stop" /
+// "ladder_stop" directly. Without this, hard_stop/ladder_stop stayed
+// almost always empty and no tuning rule below could ever fire.
+function tuningBucket(r) {
+  if (r.reason === "alpaca_stop" || r.reason === "alpaca_stop_est") return r.win ? "ladder_stop" : "hard_stop";
+  return r.reason;
+}
+
+function medianOf(values) {
+  if (!values.length) return null;
+  const sorted = values.slice().sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)];
+}
+
+function computeMetric(metricName, records) {
+  if (!records.length) return null;
+  if (metricName === "hardStopRatio") {
+    const hs = records.filter(r => tuningBucket(r) === "hard_stop").length;
+    return hs / records.length;
+  }
+  if (metricName === "avgLadderWin") {
+    const wins = records.filter(r => tuningBucket(r) === "ladder_stop" && r.win);
+    return wins.length ? wins.reduce((a, r) => a + r.pnlPct, 0) / wins.length : null;
+  }
+  if (metricName === "avgLossSize") {
+    const losses = records.filter(r => !r.win);
+    return losses.length ? losses.reduce((a, r) => a + r.pnlPct, 0) / losses.length : null;
+  }
+  return null;
+}
+
+// hardStopRatio: lower is better. avgLadderWin/avgLossSize: higher (less
+// negative, for avgLossSize) is better.
+function classifyEffect(metricName, before, after) {
+  if (before == null || after == null) return "pending";
+  const threshold = IMPROVEMENT_THRESHOLDS[metricName] ?? 0;
+  const better = metricName === "hardStopRatio" ? before - after : after - before;
+  if (better >= threshold) return "improved";
+  if (-better >= threshold) return "worsened";
+  return "no_improvement";
+}
+
+function fmtMetric(metricName, value) {
+  if (value == null) return "—";
+  return metricName === "hardStopRatio" ? `${(value * 100).toFixed(0)}%` : `${value.toFixed(1)}%`;
+}
+
+// A "correction" entry (type: "correction") or an "improved" result resets
+// the streak — only consecutive no_improvement/worsened entries count.
+function countConsecutiveFailures(changelog, param) {
+  let count = 0;
+  for (let i = changelog.length - 1; i >= 0; i--) {
+    const entry = changelog[i];
+    if (entry.param !== param) continue;
+    if (entry.type === "correction" || entry.effect === "improved") break;
+    if (entry.effect === "no_improvement" || entry.effect === "worsened") { count++; continue; }
+    break; // pending / inconclusive / undefined (legacy entry) — stop conservatively
+  }
+  return count;
+}
+
+// Evaluates the most recent PENDING changelog entry, if any. Returns
+// false when a new change should NOT be proposed this cycle (either
+// evaluation is still waiting on more post-change data). Returns true
+// when it's safe to proceed to candidate-building — either nothing was
+// pending, or an evaluation just completed.
+async function evaluatePendingChange(strategy, records) {
+  const changelog = strategy.changelog;
+  if (!changelog.length) return true;
+  const last = changelog[changelog.length - 1];
+  if (last.effect && last.effect !== "pending") return true;
+
+  if (!last.appliedAt || !last.metricName) {
+    // Legacy entry from before this redesign — no precise timestamp to
+    // isolate "trades after", so it can never be measured. Mark it
+    // inconclusive (not "improved") so it stops blocking new decisions
+    // without being silently counted as a success.
+    last.effect = "inconclusive";
+    saveStrategy(strategy);
+    return true;
+  }
+
+  const appliedAtMs = new Date(last.appliedAt).getTime();
+  const after = records.filter(r => new Date(r.exitTime).getTime() > appliedAtMs);
+  if (after.length < MIN_POST_CHANGE_SAMPLE) {
+    console.log(`Learning: waiting for more post-change data for ${last.param} (${after.length}/${MIN_POST_CHANGE_SAMPLE}) — no new change today.`);
+    return false;
+  }
+
+  const metricAfter = computeMetric(last.metricName, after);
+  const effect = classifyEffect(last.metricName, last.metricBefore, metricAfter);
+  last.metricAfter = metricAfter != null ? +metricAfter.toFixed(4) : null;
+  last.tradesAfter = after.length;
+  last.effect = effect;
+  saveStrategy(strategy);
+
+  const verdictAr = { improved: "تحسّن ✅", no_improvement: "لم يتحسّن ⚠️", worsened: "تراجع ❌" }[effect] || effect;
+  await tg(`📋 <b>تقييم التعديل السابق</b> (${last.param}: ${last.oldValue} → ${last.newValue})\nالمقياس (${last.metricName}): ${fmtMetric(last.metricName, last.metricBefore)} → ${fmtMetric(last.metricName, metricAfter)}\nالنتيجة: ${verdictAr} (على ${after.length} صفقة بعد التعديل)`);
+  return true;
 }
 
 // ─── DAILY SELF-TUNING (rule-based, bounded, single param/day) ──
@@ -737,52 +888,118 @@ async function runDailyLearning(state, strategy) {
   const wr = wins / n;
   const netPnl = records.reduce((a, r) => a + r.pnl, 0);
 
-  // Bucket by *functional* stop type, not the literal reason string.
-  // "alpaca_stop"/"alpaca_stop_est" fire when Alpaca's own resting stop
-  // order fills before our live monitorPosition() poll catches the same
-  // breach itself (see the reconciliation pass in the main loop below) —
-  // by construction the only resting stop order at any moment is either
-  // the original hard stop-loss or the ladder-tightened stop after a
-  // profit lock, so a loss through that path is functionally a hard stop
-  // and a win is functionally a ladder stop, same as when
-  // monitorPosition() catches the breach itself and logs "hard_stop" /
-  // "ladder_stop" directly. Without this, hard_stop/ladder_stop stayed
-  // almost always empty and no tuning rule below could ever fire.
-  function tuningBucket(r) {
-    if (r.reason === "alpaca_stop" || r.reason === "alpaca_stop_est") return r.win ? "ladder_stop" : "hard_stop";
-    return r.reason;
-  }
+  // Step 1: evaluate the previous change's actual effect before proposing
+  // anything new. If there's a pending entry still waiting on more
+  // post-change data, stop here — no new change today.
+  const canProceed = await evaluatePendingChange(strategy, records);
+  if (!canProceed) return;
+
   const byReason = {};
   for (const r of records) {
     const bucket = tuningBucket(r);
-    byReason[bucket] = byReason[bucket] || { n: 0, wins: 0, pnl: 0 };
+    byReason[bucket] = byReason[bucket] || { n: 0, wins: 0, pnl: 0, records: [] };
     byReason[bucket].n++;
     if (r.win) byReason[bucket].wins++;
     byReason[bucket].pnl += r.pnl;
+    byReason[bucket].records.push(r);
   }
-
-  let change = null;
   const hardStop = byReason["hard_stop"];
   const ladder = byReason["ladder_stop"];
 
+  // Step 2: build every data-justified candidate, each gated behind a
+  // verification check against actual per-trade evidence — not accepted
+  // on the aggregate ratio alone.
+  const candidates = [];
+
   if (hardStop && hardStop.n >= MIN_SAMPLE_FOR_LEARNING * 0.5 && (hardStop.n / n) > 0.4) {
-    change = {
-      param: "volumeMultiplier", direction: +1,
-      reason: `${hardStop.n}/${n} صفقة (${(hardStop.n/n*100).toFixed(0)}%) خرجت عبر وقف الخسارة الصلب — رفع عتبة تأكيد الحجم لتقليل الإشارات الضعيفة.`,
-    };
-  } else if (ladder && ladder.n >= MIN_SAMPLE_FOR_LEARNING * 0.3 && (ladder.wins / ladder.n) > 0.6 && wr > 0.5) {
-    change = {
-      param: "takeProfit2Pct", direction: +1,
-      reason: `${ladder.wins}/${ladder.n} من صفقات سلم الأرباح رابحة (${(ladder.wins/ladder.n*100).toFixed(0)}%) ونسبة الربح الكلية ${(wr*100).toFixed(0)}% — رفع هدف الربح الثاني للاستفادة من الاتجاهات القوية.`,
-    };
-  } else if (wr < 0.4) {
-    change = {
-      param: "stopLossPct", direction: +1,
-      reason: `نسبة الربح الكلية ${(wr*100).toFixed(0)}% على ${n} صفقة أقل من 40% — تضييق وقف الخسارة لتقليل حجم الخسارة لكل صفقة ريثما تتحسن جودة الإشارات.`,
-    };
+    const withVol = hardStop.records.filter(r => r.entryConditions?.volRatio != null);
+    const threshold = strategy.params.volumeMultiplier;
+    const nearThreshold = withVol.filter(r => r.entryConditions.volRatio <= threshold * 1.3);
+    const passFraction = withVol.length ? nearThreshold.length / withVol.length : 0;
+    if (passFraction >= HYPOTHESIS_PASS_FRACTION) {
+      candidates.push({
+        param: "volumeMultiplier", direction: +1, metricName: "hardStopRatio",
+        metricBefore: hardStop.n / n, evidence: passFraction,
+        reason: `${hardStop.n}/${n} صفقة (${(hardStop.n/n*100).toFixed(0)}%) خرجت عبر وقف الخسارة الصلب، و${(passFraction*100).toFixed(0)}% منها كان حجمها قريباً فعلاً من العتبة الحالية (${threshold}×) — رفع العتبة لتقليل الإشارات الضعيفة.`,
+      });
+    } else {
+      const median = medianOf(withVol.map(r => r.entryConditions.volRatio));
+      console.log(`Learning: volumeMultiplier hypothesis rejected — only ${(passFraction*100).toFixed(0)}% of hard_stop losers near threshold (median volRatio ${median?.toFixed(2)} vs threshold ${threshold}×) — volume is not the driver.`);
+    }
   }
 
-  if (!change) { console.log("No clear data-justified change today."); return; }
+  if (ladder && ladder.n >= MIN_SAMPLE_FOR_LEARNING * 0.3 && (ladder.wins / ladder.n) > 0.6 && wr > 0.5) {
+    const ladderWins = ladder.records.filter(r => r.win);
+    const ceiling = strategy.params.takeProfit2Pct;
+    const nearCeiling = ladderWins.filter(r => r.pnlPct >= ceiling * 0.85);
+    const passFraction = ladderWins.length ? nearCeiling.length / ladderWins.length : 0;
+    if (passFraction >= HYPOTHESIS_PASS_FRACTION) {
+      candidates.push({
+        param: "takeProfit2Pct", direction: +1, metricName: "avgLadderWin",
+        metricBefore: computeMetric("avgLadderWin", records), evidence: passFraction,
+        reason: `${ladder.wins}/${ladder.n} من صفقات سلم الأرباح رابحة (${(ladder.wins/ladder.n*100).toFixed(0)}%)، و${(passFraction*100).toFixed(0)}% منها وصلت قرب سقف هدف الربح الثاني الحالي (${ceiling}%) — رفعه للاستفادة من الاتجاهات القوية.`,
+      });
+    } else {
+      console.log(`Learning: takeProfit2Pct hypothesis rejected — only ${(passFraction*100).toFixed(0)}% of ladder wins near the ${ceiling}% ceiling.`);
+    }
+  }
+
+  if (wr < 0.4) {
+    const losses = records.filter(r => !r.win);
+    const stopLevel = strategy.params.stopLossPct;
+    const nearStop = losses.filter(r => r.pnlPct <= stopLevel * 0.85);
+    const passFraction = losses.length ? nearStop.length / losses.length : 0;
+    if (passFraction >= HYPOTHESIS_PASS_FRACTION) {
+      candidates.push({
+        param: "stopLossPct", direction: +1, metricName: "avgLossSize",
+        metricBefore: computeMetric("avgLossSize", records), evidence: passFraction,
+        reason: `نسبة الربح الكلية ${(wr*100).toFixed(0)}% على ${n} صفقة أقل من 40%، و${(passFraction*100).toFixed(0)}% من الخسائر وصلت فعلياً قرب مستوى الوقف الحالي (${stopLevel}%) — تضييقه لتقليل حجم الخسارة لكل صفقة.`,
+      });
+    } else {
+      console.log(`Learning: stopLossPct hypothesis rejected — only ${(passFraction*100).toFixed(0)}% of losses reach near the ${stopLevel}% stop (most reverse well before it).`);
+    }
+  }
+
+  if (hardStop && hardStop.n >= MIN_SAMPLE_FOR_LEARNING * 0.4) {
+    const withEma = hardStop.records.filter(r => r.entryConditions?.emaFast != null && r.entryConditions?.emaSlow != null);
+    const weakGap = withEma.filter(r => Math.abs(r.entryConditions.emaFast - r.entryConditions.emaSlow) / r.entryConditions.emaSlow < 0.0015);
+    const passFraction = withEma.length ? weakGap.length / withEma.length : 0;
+    if (passFraction >= HYPOTHESIS_PASS_FRACTION) {
+      candidates.push({
+        param: "emaSlow", direction: +1, metricName: "hardStopRatio",
+        metricBefore: hardStop.n / n, evidence: passFraction,
+        reason: `${(passFraction*100).toFixed(0)}% من صفقات وقف الخسارة الصلب دخلت عند نطاق ضعيف/متردد (فارق EMA سريع/بطيء أقل من 0.15%) — توسيع emaSlow لتطلّب فصلاً أوضح بين الاتجاهين.`,
+      });
+    }
+  }
+
+  if (hardStop && hardStop.n >= MIN_SAMPLE_FOR_LEARNING * 0.4) {
+    const withLevels = hardStop.records.filter(r => r.entryConditions?.breakoutHigh != null && r.entryConditions?.lastClose != null);
+    const marginal = withLevels.filter(r => {
+      const ec = r.entryConditions;
+      const level = r.signal === "CALL" ? ec.breakoutHigh : ec.breakoutLow;
+      return level > 0 && Math.abs(ec.lastClose - level) / level < 0.001;
+    });
+    const passFraction = withLevels.length ? marginal.length / withLevels.length : 0;
+    if (passFraction >= HYPOTHESIS_PASS_FRACTION) {
+      candidates.push({
+        param: "breakoutLookback", direction: +1, metricName: "hardStopRatio",
+        metricBefore: hardStop.n / n, evidence: passFraction,
+        reason: `${(passFraction*100).toFixed(0)}% من صفقات وقف الخسارة الصلب دخلت عند اختراق هامشي بالكاد تجاوز المستوى — رفع نافذة الاختراق (breakoutLookback) لتطلّب اختراقاً أوضح.`,
+      });
+    }
+  }
+
+  // Step 3: diversify — drop any param on cooldown after repeated
+  // non-improvement, then take the strongest surviving evidence.
+  const eligible = candidates.filter(c => countConsecutiveFailures(strategy.changelog, c.param) < MAX_FAILED_ATTEMPTS);
+  if (!eligible.length) {
+    if (candidates.length) console.log(`Learning: ${candidates.length} candidate(s) found but all on cooldown after repeated non-improvement — no change today.`);
+    else console.log("No clear data-justified change today.");
+    return;
+  }
+  eligible.sort((a, b) => b.evidence - a.evidence);
+  const change = eligible[0];
 
   const [lo, hi] = PARAM_BOUNDS[change.param];
   const old = strategy.params[change.param];
@@ -791,8 +1008,18 @@ async function runDailyLearning(state, strategy) {
 
   if (next === old) { console.log(`${change.param} already at bound (${old}) — no change applied.`); return; }
 
+  // Step 4: remember — every entry now carries the metric baseline that
+  // evaluatePendingChange() will compare against once enough post-change
+  // trades accumulate.
   strategy.params[change.param] = next;
-  strategy.changelog.push({ date: today, param: change.param, oldValue: old, newValue: next, reason: change.reason, sampleSize: n, winRate: +(wr * 100).toFixed(1), netPnl });
+  strategy.changelog.push({
+    date: today, appliedAt: new Date().toISOString(),
+    param: change.param, oldValue: old, newValue: next, reason: change.reason,
+    sampleSize: n, winRate: +(wr * 100).toFixed(1), netPnl,
+    metricName: change.metricName,
+    metricBefore: change.metricBefore != null ? +change.metricBefore.toFixed(4) : null,
+    metricAfter: null, tradesAfter: null, effect: "pending",
+  });
   saveStrategy(strategy);
 
   await tg(buildTemplate2(change, old, next, n, wr, netPnl, records, today));
