@@ -35,7 +35,7 @@
       "rsiAtEntry": 26.24,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
@@ -71,7 +71,7 @@
       "rsiAtEntry": 20.26,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -111,8 +111,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 55.263157894736835,
-    "lastReportedThreshold": 40,
+    "peakPct": 59.210526315789465,
+    "lastReportedThreshold": 50,
     "nearStopWarned": true
   }
 }
