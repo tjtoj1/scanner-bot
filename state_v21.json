@@ -18,6 +18,12 @@
       "symbol": "SPY",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-01",
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -52,19 +58,22 @@
       "low": 251.93
     }
   },
+  "SPY": {
+    "active": true
+  },
   "NVDA": {
     "active": true,
     "signal": "CALL",
     "optionSymbol": "NVDA260902C00217500",
     "strike": "217.5",
-    "entryPremium": 1.89,
+    "entryPremium": 1.865,
     "qty": 2,
-    "entryTime": 1788273058882,
+    "entryTime": 1788273512274,
     "level": 217.3,
-    "msgId": 2020,
-    "stopOrderId": "3d63d996-580b-49c5-b498-992650eb5f94",
-    "hardStopPrice": 1.23,
-    "entryStockPrice": 217.81,
+    "msgId": 2033,
+    "stopOrderId": "fe2f7b04-79f9-459c-b0c4-900a1e4fa481",
+    "hardStopPrice": 1.21,
+    "entryStockPrice": 217.755,
     "vwapAtEntry": 216.7402,
     "rsiAtEntry": 49.96,
     "volumeRatio": 4.9186225434136395,
@@ -73,8 +82,5 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null
-  },
-  "SPY": {
-    "active": true
   }
 }
