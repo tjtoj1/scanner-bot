@@ -10,7 +10,7 @@
     "qty": 1,
     "entryTime": 1788270686877,
     "msgId": 2000,
-    "stopOrderId": "65a9a6f5-c051-43d1-88f7-dc9a97704298",
+    "stopOrderId": "c97d06c0-cfc5-46d8-ac37-b643211d3f65",
     "hardStopPrice": 5.4,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -35,11 +35,13 @@
       "rsiAtEntry": 29.3,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 18.7945560596241,
-    "nearStopWarned": true
+    "stopPct": 12,
+    "peakPct": 25.405055087491913,
+    "nearStopWarned": true,
+    "ladder2": true,
+    "trailPct": 8
   },
   "IWM": {
     "active": true,
@@ -50,7 +52,7 @@
     "qty": 12,
     "entryTime": 1788281752752,
     "msgId": 2072,
-    "stopOrderId": "735bbdbc-a4f0-4d38-a330-050d5b90e3bb",
+    "stopOrderId": "7370f2f9-5d23-4fdc-97e4-b872ae7b0404",
     "hardStopPrice": 0.28,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -75,7 +77,10 @@
       "rsiAtEntry": 28.21,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 21.518987341772142
   },
   "SPY": {
     "active": true,
