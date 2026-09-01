@@ -71,7 +71,7 @@
       "rsiAtEntry": 28.84,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
