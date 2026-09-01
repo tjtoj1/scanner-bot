@@ -36,5 +36,40 @@
       "signalType": "breakout"
     },
     "lastReportedThreshold": -10
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260902C00220000",
+    "strike": "220",
+    "entryPremium": 1.4049999999999998,
+    "qty": 3,
+    "entryTime": 1788277523884,
+    "msgId": 2038,
+    "stopOrderId": null,
+    "hardStopPrice": 0.98,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 219.485,
+      "regime": "bullish",
+      "emaFast": 217.8508,
+      "emaSlow": 217.8299,
+      "breakoutHigh": 218.58,
+      "breakoutLow": 215.1,
+      "volRatio": 1.41,
+      "lastClose": 218.8,
+      "lastVolume": 2518816,
+      "barTime": "2026-09-01T15:15:00Z",
+      "entryTimeUTC": "2026-09-01T15:45:23.884Z",
+      "vwapAtEntry": 217.2302,
+      "rsiAtEntry": 58.27,
+      "signalType": "breakout"
+    }
   }
 }
