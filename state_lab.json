@@ -1,40 +1,4 @@
 {
   "_lastDay": "2026-09-01",
-  "_lastLearnedDay": "2026-08-31",
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260901P00291000",
-    "strike": "291",
-    "entryPremium": 0.5,
-    "qty": 10,
-    "entryTime": 1788282563505,
-    "msgId": 2093,
-    "stopOrderId": "500fd9fb-6033-40dc-9a57-e366dc114c54",
-    "hardStopPrice": 0.35,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 290.755,
-      "regime": "bearish",
-      "emaFast": 291.5675,
-      "emaSlow": 291.9324,
-      "breakoutHigh": 292.82,
-      "breakoutLow": 290.73,
-      "volRatio": 1.72,
-      "lastClose": 290.7201,
-      "lastVolume": 897624,
-      "barTime": "2026-09-01T16:30:00Z",
-      "entryTimeUTC": "2026-09-01T17:09:23.505Z",
-      "vwapAtEntry": 291.8389,
-      "rsiAtEntry": 27.15,
-      "signalType": "breakout"
-    },
-    "lastReportedThreshold": -10
-  }
+  "_lastLearnedDay": "2026-08-31"
 }
