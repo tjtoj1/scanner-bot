@@ -35,7 +35,7 @@
       "rsiAtEntry": 29.3,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
@@ -71,6 +71,6 @@
       "rsiAtEntry": 58.27,
       "signalType": "breakout"
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
