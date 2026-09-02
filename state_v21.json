@@ -84,34 +84,7 @@
     "peakPct": 55.29411764705884,
     "lastReportedThreshold": 50,
     "ladder2": true,
-    "trailPct": 10
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "AMZN260902C00255000",
-    "strike": "255",
-    "entryPremium": 1.15,
-    "qty": 4,
-    "entryTime": 1788358791073,
-    "level": 254.81,
-    "msgId": 2133,
-    "stopOrderId": "89459feb-33cb-4118-84ef-d1042d6d7ea9",
-    "hardStopPrice": 0.75,
-    "entryStockPrice": 255.325,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 35.15,
-    "volumeRatio": 18.501784868661908,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 25.652173913043473,
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "trailPct": 10
+    "trailPct": 10,
+    "nearStopWarned": true
   }
 }
