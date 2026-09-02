@@ -634,10 +634,21 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   const spot = await getLatestPrice(symbol);
   if (!spot) return;
 
+  // ── COMBO-BASED POSITION SIZING ──────────────────────────────
+  // Replaces global-parameter tuning (see runComboLearning() /
+  // computeCombos() below): sizes THIS trade by how its own
+  // (symbol × trend-direction[× RSI]) combo has actually performed,
+  // instead of a single param that would scale every trade at once.
+  // calcQty() already clamps to MAX_TRADE_BUDGET internally, so this can
+  // never exceed the hard cap even at the ×1.5 tier.
+  const trendDir = trendDirection(spot, vwapAtEntry, sig.signal);
+  const { comboKey, sizeMultiplier } = lookupComboMultiplier(strategy.combos, symbol, trendDir, rsiAtEntry);
+  const effectiveBudget = strategy.params.tradeBudget * sizeMultiplier;
+
   const opt = await findOption(symbol, sig.signal, spot);
   if (!opt) { console.log(`${symbol}: no option within ${MAX_DTE} DTE`); return; }
 
-  const qty = calcQty(opt.premium, strategy.params.tradeBudget);
+  const qty = calcQty(opt.premium, effectiveBudget);
   const order = await alpaca("/orders", "POST", { symbol: opt.symbol, qty: String(qty), side: "buy", type: "market", time_in_force: "day" });
   if (!order.id) { console.log(`${symbol}: entry order failed`, order); return; }
 
@@ -666,10 +677,11 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
       breakoutHigh: sig.breakoutHigh, breakoutLow: sig.breakoutLow, volRatio: +sig.volRatio.toFixed(2),
       lastClose: sig.lastClose, lastVolume: sig.lastVolume, barTime: sig.barTime, entryTimeUTC: new Date().toISOString(),
       vwapAtEntry, rsiAtEntry, signalType: "breakout",
+      trendDir, comboKey, sizeMultiplier,
     },
   };
   saveState(state);
-  console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty}`);
+  console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty} (combo ${comboKey || "n/a"} ×${sizeMultiplier})`);
 }
 
 // ─── RICH EXPLANATORY NOTIFICATION (sent for every self-adjustment) ──
@@ -864,7 +876,16 @@ async function evaluatePendingChange(strategy, records) {
   return true;
 }
 
-// ─── DAILY SELF-TUNING (rule-based, bounded, single param/day) ──
+// ─── LEGACY: DAILY SELF-TUNING (global-parameter, rule-based) ──
+// No longer auto-invoked (see main loop below, which now calls
+// runComboLearning() instead) — replaced by the combo-based position
+// sizing system further down. A global-parameter change here (e.g. the
+// emaSlow widening on 2026-09-01) affects every single trade at once and
+// can throttle entries to zero across the board while evidence
+// accumulates, which is exactly what combo-based sizing avoids: a
+// combo's size is scaled individually, trading never stops entirely.
+// Kept intact, unused, as a manual fallback (call it by hand if ever
+// needed) — not deleted, not wired into the main loop.
 async function runDailyLearning(state, strategy) {
   const today = getToday();
   if (state._lastLearnedDay === today) return;
@@ -1026,6 +1047,198 @@ async function runDailyLearning(state, strategy) {
   console.log(`Applied change: ${change.param} ${old} -> ${next}`);
 }
 
+// ─── COMBO-BASED POSITION SIZING (active learning system) ──────
+// Replaces the global-parameter tuner above. Instead of changing one
+// param for every trade, this learns which (symbol × trend-direction)
+// combinations perform well or poorly and scales ONLY that combo's
+// position size accordingly — a weak combo trades smaller, never zero,
+// so the experiment (and data collection) never stalls the way a global
+// param change could.
+//
+// Design:
+//   depth 2: symbol × trend ("with"/"against" VWAP) — 12 combos max.
+//   depth 3: once a depth-2 combo has proven itself (big enough sample,
+//     a clear tier), it "deepens" into 3 RSI-bucketed sub-combos, tested
+//     independently — but only for that one proven combo, never all 12
+//     at once, so this never explodes combinatorially.
+//   Combo stats are recomputed from scratch from outcomes_lab.jsonl every
+//   cycle (same pattern as the legacy tuner above) — outcomes_lab.jsonl
+//   stays the single source of truth; strategy.combos is a derived,
+//   persisted cache read synchronously at trade entry.
+const MIN_COMBO_SAMPLE = 8;      // trades needed before a combo is judged at all
+const DEEPEN_MIN_SAMPLE = 16;    // trades needed before a combo may split into a 3rd factor
+const COMBO_TIER_MARGIN_PP = 8;  // avg pnlPct must differ from the overall average by this many points
+const COMBO_SIZE_MULTIPLIER = { above_avg: 1.5, average: 1.0, below_avg: 0.5, insufficient: 1.0 };
+
+// CALL above VWAP / PUT below VWAP = "with" the trend the entry is
+// betting on; the opposite = "against". Same convention analyze.js (the
+// old v20 report) used. Returns null when vwapAtEntry isn't recorded yet
+// (older trades, or a session with too little intraday data) — callers
+// treat null as "can't classify, default size".
+function trendDirection(spot, vwapAtEntry, signal) {
+  if (spot == null || vwapAtEntry == null) return null;
+  const aboveVwap = spot > vwapAtEntry;
+  if (signal === "CALL") return aboveVwap ? "with" : "against";
+  return aboveVwap ? "against" : "with";
+}
+
+function rsiBucket(rsi) {
+  if (rsi == null) return null;
+  if (rsi < 40) return "<40";
+  if (rsi > 60) return ">60";
+  return "40-60";
+}
+
+// Rebuilds every combo's stats from the full outcomes history. Only
+// trades with both spot and vwapAtEntry recorded can be classified —
+// trades from before that field existed are simply excluded, not
+// mis-bucketed.
+function computeCombos(records, previousCombos) {
+  const withTrend = records
+    .map(r => ({ r, trend: trendDirection(r.entryConditions?.spot, r.entryConditions?.vwapAtEntry, r.signal) }))
+    .filter(x => x.trend);
+
+  const overallAvgPnlPct = withTrend.length
+    ? withTrend.reduce((a, x) => a + x.r.pnlPct, 0) / withTrend.length
+    : null;
+
+  function tierFor(n, avgPnlPct) {
+    if (n < MIN_COMBO_SAMPLE || avgPnlPct == null || overallAvgPnlPct == null) return "insufficient";
+    const diff = avgPnlPct - overallAvgPnlPct;
+    if (diff >= COMBO_TIER_MARGIN_PP) return "above_avg";
+    if (diff <= -COMBO_TIER_MARGIN_PP) return "below_avg";
+    return "average";
+  }
+
+  function makeEntry(key, factors, depth, parentKey, subset) {
+    const n = subset.length;
+    const wins = subset.filter(x => x.r.win).length;
+    const pnl = subset.reduce((a, x) => a + x.r.pnl, 0);
+    const avgPnlPct = n ? subset.reduce((a, x) => a + x.r.pnlPct, 0) / n : null;
+    const tier = tierFor(n, avgPnlPct);
+    const prev = previousCombos?.[key];
+    return {
+      factors, depth, parentKey: parentKey || null,
+      n, wins, pnl: Math.round(pnl),
+      avgPnlPct: avgPnlPct != null ? +avgPnlPct.toFixed(2) : null,
+      tier, previousTier: prev?.tier ?? null,
+      sizeMultiplier: COMBO_SIZE_MULTIPLIER[tier],
+      deepened: prev?.deepened || false,
+      lastUpdated: new Date().toISOString(),
+    };
+  }
+
+  const combos = {};
+  for (const symbol of ALLOWED_TICKERS) {
+    for (const trend of ["with", "against"]) {
+      const key = `${symbol}|trend:${trend}`;
+      const subset = withTrend.filter(x => x.r.symbol === symbol && x.trend === trend);
+      const entry = makeEntry(key, { symbol, trend }, 2, null, subset);
+      combos[key] = entry;
+
+      // Deepening is a one-way ratchet: once split, a combo stays split
+      // even if its tier later drifts back toward "average" on new data.
+      const alreadyDeepened = previousCombos?.[key]?.deepened;
+      const shouldDeepen = alreadyDeepened ||
+        (entry.n >= DEEPEN_MIN_SAMPLE && entry.tier !== "average" && entry.tier !== "insufficient");
+      if (shouldDeepen) {
+        entry.deepened = true;
+        for (const bucket of ["<40", "40-60", ">60"]) {
+          const childKey = `${key}|rsi:${bucket}`;
+          const childSubset = subset.filter(x => rsiBucket(x.r.entryConditions?.rsiAtEntry) === bucket);
+          combos[childKey] = makeEntry(childKey, { symbol, trend, rsi: bucket }, 3, key, childSubset);
+        }
+      }
+    }
+  }
+
+  return { combos, overallAvgPnlPct };
+}
+
+// Entry-time lookup: most specific proven match wins. A deepened parent
+// whose matching child isn't yet at MIN_COMBO_SAMPLE falls back to the
+// parent's own multiplier (its evidence is still better than nothing) —
+// never resets to 1.0 just because the child is still young.
+function lookupComboMultiplier(combos, symbol, trendDir, rsiAtEntry) {
+  if (!combos || !trendDir) return { comboKey: null, sizeMultiplier: 1.0 };
+  const parentKey = `${symbol}|trend:${trendDir}`;
+  const parent = combos[parentKey];
+
+  if (parent?.deepened) {
+    const bucket = rsiBucket(rsiAtEntry);
+    const childKey = bucket ? `${parentKey}|rsi:${bucket}` : null;
+    const child = childKey ? combos[childKey] : null;
+    if (child && child.n >= MIN_COMBO_SAMPLE) {
+      return { comboKey: childKey, sizeMultiplier: child.sizeMultiplier };
+    }
+  }
+  if (parent && parent.n >= MIN_COMBO_SAMPLE) {
+    return { comboKey: parentKey, sizeMultiplier: parent.sizeMultiplier };
+  }
+  return { comboKey: parentKey, sizeMultiplier: 1.0 };
+}
+
+const COMBO_TIER_AR = { above_avg: "أعلى من المتوسط", average: "متوسط", below_avg: "أقل من المتوسط" };
+const COMBO_TREND_AR = { with: "مع الترند", against: "ضد الترند" };
+
+function buildComboTemplate(combo, overallAvgPnlPct) {
+  const label = combo.depth === 3
+    ? `${combo.factors.symbol} × ${COMBO_TREND_AR[combo.factors.trend]} × RSI ${combo.factors.rsi}`
+    : `${combo.factors.symbol} × ${COMBO_TREND_AR[combo.factors.trend]}`;
+  const prevMultiplier = combo.previousTier ? COMBO_SIZE_MULTIPLIER[combo.previousTier] : 1.0;
+  const wr = combo.n ? Math.round(combo.wins / combo.n * 100) : 0;
+  const diff = overallAvgPnlPct != null && combo.avgPnlPct != null ? combo.avgPnlPct - overallAvgPnlPct : null;
+  const tierAr = COMBO_TIER_AR[combo.tier] || combo.tier;
+  // "average" only ever reaches here via a downgrade from above_avg/below_avg
+  // (see the sizeMultiplier-change gate in runComboLearning below) — never
+  // claim a clear margin for it, since by definition it doesn't have one.
+  const causeAr = combo.tier === "above_avg"
+    ? `يتفوّق على أداء LAB العام بفارق واضح (≥${COMBO_TIER_MARGIN_PP}pp)`
+    : combo.tier === "below_avg"
+    ? `أضعف من أداء LAB العام بفارق واضح (≥${COMBO_TIER_MARGIN_PP}pp)`
+    : `عاد قريباً من أداء LAB العام (الفارق تحت ${COMBO_TIER_MARGIN_PP}pp الآن)`;
+
+  return `🧪 <b>تعلّم توليفة</b>: ${label}\n`
+    + `الحجم: ×${prevMultiplier} → <b>×${combo.sizeMultiplier}</b> (${tierAr})\n`
+    + `العيّنة: ${combo.n} صفقة | WR ${wr}% | متوسط الربح ${combo.avgPnlPct}%`
+    + (diff != null ? ` (المتوسط العام ${overallAvgPnlPct.toFixed(1)}%، فارق ${diff >= 0 ? "+" : ""}${diff.toFixed(1)}pp)` : "") + `\n`
+    + `السبب: أداء هذه التوليفة ${causeAr}.`;
+}
+
+// Runs once per day (after force-exit, same timing the legacy tuner
+// used). Rebuilds every combo from outcomes_lab.jsonl and notifies only
+// on an actual SIZE change ("رفع/خفض حجمها" per spec) — not merely a tier
+// label change. insufficient -> average is a real first judgment but a
+// 1.0x -> 1.0x no-op, so it stays silent; only a multiplier that actually
+// moves is worth a message, and this also naturally skips "still
+// insufficient data" (which never has a multiplier to change from 1.0).
+async function runComboLearning(state, strategy) {
+  const today = getToday();
+  if (state._lastComboLearnedDay === today) return;
+  state._lastComboLearnedDay = today;
+  saveState(state);
+
+  let records = [];
+  try {
+    records = fs.readFileSync("outcomes_lab.jsonl", "utf8").split("\n").filter(Boolean)
+      .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  } catch { records = []; }
+
+  const { combos, overallAvgPnlPct } = computeCombos(records, strategy.combos);
+
+  const changed = Object.values(combos).filter(c => {
+    const prevMultiplier = c.previousTier ? COMBO_SIZE_MULTIPLIER[c.previousTier] : 1.0;
+    return c.tier !== "insufficient" && c.sizeMultiplier !== prevMultiplier;
+  });
+  for (const combo of changed) {
+    await tg(buildComboTemplate(combo, overallAvgPnlPct));
+  }
+
+  strategy.combos = combos;
+  saveStrategy(strategy);
+  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, ${changed.length} tier change(s) today.`);
+}
+
 // ─── MAIN ───────────────────────────────────────────────────
 (async () => {
   console.log(`=== LAB bot started ${new Date().toISOString()} ===`);
@@ -1088,7 +1301,7 @@ async function runDailyLearning(state, strategy) {
       }
     }
     if (utcMin() >= FORCE_EXIT_UTC + 5) {
-      await runDailyLearning(state, strategy);
+      await runComboLearning(state, strategy);
     }
   } else {
     for (const sym of ALLOWED_TICKERS) {

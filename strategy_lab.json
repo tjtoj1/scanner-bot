@@ -4,7 +4,7 @@
   "description": "EMA(fast)/EMA(slow) trend regime + rolling N-bar breakout with volume confirmation, on 15-min bars. Exits: hard stop, 2-tier profit ladder with trailing stop, regime flip, force exit.",
   "params": {
     "emaFast": 9,
-    "emaSlow": 24.15,
+    "emaSlow": 21,
     "breakoutLookback": 10,
     "volAvgLookback": 20,
     "volumeMultiplier": 1.3,
@@ -16,6 +16,7 @@
     "takeProfit2LockPct": 12,
     "trailingPct": 8
   },
+  "combos": {},
   "changelog": [
     {
       "date": "2026-08-28",
@@ -69,6 +70,18 @@
       "metricAfter": null,
       "tradesAfter": null,
       "effect": "pending"
+    },
+    {
+      "date": "2026-09-02",
+      "appliedAt": "2026-09-02T20:28:40Z",
+      "type": "correction",
+      "param": "emaSlow",
+      "oldValue": 24.15,
+      "newValue": 21,
+      "reason": "تراجع عن توسيع emaSlow — بارامتر عالمي يؤثر على كل صفقة دفعة واحدة، وقد أوقف الدخول تماماً (0 صفقة منذ تطبيقه في 2026-09-01، رغم بقاء السوق مفتوحاً وعدم بلوغ أي حد أمان). هذا تصحيح فلسفي وليس رفضاً لفرضية محددة: ننتقل من تعديل بارامترات عالمية (التي تُخنق التداول بالكامل ريثما تُجمع أدلة كافية) إلى نظام توزيع حجم الصفقة حسب توليفة (الرمز × اتجاه الترند)، الذي يُصغّر أو يُكبّر حجم كل توليفة على حدة دون إيقاف أي صفقة كلياً. حلقة التعلّم العالمية (runDailyLearning) عُطِّلت تلقائياً بعد هذا التصحيح — تبقى في الكود كخيار يدوي فقط.",
+      "sampleSize": 136,
+      "winRate": 52.9,
+      "netPnl": -171
     }
   ]
 }
