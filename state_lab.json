@@ -1,4 +1,42 @@
 {
   "_lastDay": "2026-09-03",
-  "_lastLearnedDay": "2026-09-02"
+  "_lastLearnedDay": "2026-09-02",
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260904C00227500",
+    "strike": "227.5",
+    "entryPremium": 2.17,
+    "qty": 2,
+    "entryTime": 1788442968392,
+    "msgId": 2166,
+    "stopOrderId": "680faa5e-f5e5-496d-a00e-5c059213f90c",
+    "hardStopPrice": 1.52,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 227.505,
+      "regime": "bullish",
+      "emaFast": 225.08,
+      "emaSlow": 224.8877,
+      "breakoutHigh": 226.07,
+      "breakoutLow": 223.01,
+      "volRatio": 2.29,
+      "lastClose": 226.1999,
+      "lastVolume": 434050,
+      "barTime": "2026-09-03T13:00:00Z",
+      "entryTimeUTC": "2026-09-03T13:42:48.392Z",
+      "vwapAtEntry": 224.8243,
+      "rsiAtEntry": 64.96,
+      "signalType": "breakout",
+      "trendDir": "with",
+      "comboKey": "NVDA|trend:with",
+      "sizeMultiplier": 1
+    }
+  }
 }
