@@ -71,8 +71,8 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 36.03603603603602,
-    "lastReportedThreshold": 30,
+    "peakPct": 49.54954954954953,
+    "lastReportedThreshold": 40,
     "nearStopWarned": true
   },
   "TSLA": {
