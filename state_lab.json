@@ -45,12 +45,12 @@
     "signal": "CALL",
     "optionSymbol": "QQQ260903C00718000",
     "strike": "718",
-    "entryPremium": 1.2149999999999999,
-    "qty": 4,
-    "entryTime": 1788449409105,
-    "msgId": 2277,
-    "stopOrderId": "497e15b5-f985-42fd-a249-b57f5944ea4b",
-    "hardStopPrice": 0.85,
+    "entryPremium": 1.2650000000000001,
+    "qty": 3,
+    "entryTime": 1788449564703,
+    "msgId": 2281,
+    "stopOrderId": "a4e0fd3c-baa2-41d7-81f5-13795726d76a",
+    "hardStopPrice": 0.89,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -59,7 +59,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 717.635,
+      "spot": 717.615,
       "regime": "bullish",
       "emaFast": 712.7121,
       "emaSlow": 711.1652,
@@ -69,17 +69,13 @@
       "lastClose": 716,
       "lastVolume": 1896651,
       "barTime": "2026-09-03T15:00:00Z",
-      "entryTimeUTC": "2026-09-03T15:30:09.105Z",
+      "entryTimeUTC": "2026-09-03T15:32:44.703Z",
       "vwapAtEntry": 712.4572,
       "rsiAtEntry": 72.14,
       "signalType": "breakout",
       "trendDir": "with",
       "comboKey": "QQQ|trend:with",
       "sizeMultiplier": 1
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 17.28395061728395,
-    "lastReportedThreshold": 10
+    }
   }
 }
