@@ -1,50 +1,6 @@
 {
   "_lastDay": "2026-09-03",
   "_lastLearnedDay": "2026-09-02",
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260903C00768000",
-    "strike": "768",
-    "entryPremium": 1.085,
-    "qty": 4,
-    "entryTime": 1788444678074,
-    "msgId": 2209,
-    "stopOrderId": null,
-    "hardStopPrice": 0.76,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 767.75,
-      "regime": "bullish",
-      "emaFast": 767.2101,
-      "emaSlow": 766.2661,
-      "breakoutHigh": 768,
-      "breakoutLow": 764.21,
-      "volRatio": 109.09,
-      "lastClose": 769.79,
-      "lastVolume": 2749574,
-      "barTime": "2026-09-03T13:30:00Z",
-      "entryTimeUTC": "2026-09-03T14:11:18.074Z",
-      "vwapAtEntry": 768.677,
-      "rsiAtEntry": 79.66,
-      "signalType": "breakout",
-      "trendDir": "against",
-      "comboKey": "SPY|trend:against",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": 30,
-    "ladder1": true,
-    "stopPct": 12,
-    "peakPct": 31.336405529953904,
-    "ladder2": true,
-    "trailPct": 8
-  },
   "QQQ": {
     "active": true,
     "signal": "CALL",
@@ -82,9 +38,11 @@
       "comboKey": "QQQ|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 30,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 21.090909090909093
+    "stopPct": 12,
+    "peakPct": 35.63636363636365,
+    "ladder2": true,
+    "trailPct": 8
   }
 }
