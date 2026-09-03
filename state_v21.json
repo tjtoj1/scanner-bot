@@ -57,33 +57,5 @@
       "high": 259.4299,
       "low": 256
     }
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260903P00294000",
-    "strike": "294",
-    "entryPremium": 0.41000000000000003,
-    "qty": 12,
-    "entryTime": 1788446899836,
-    "level": 294.77,
-    "msgId": 2266,
-    "stopOrderId": "ed940154-8835-4881-be43-f220889c0511",
-    "hardStopPrice": 0.27,
-    "entryStockPrice": 294.175,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 41.27,
-    "volumeRatio": 2.7634218377162534,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 25.60975609756097
   }
 }
