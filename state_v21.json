@@ -74,28 +74,5 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260903P00294000",
-    "strike": "294",
-    "entryPremium": 0.74,
-    "qty": 6,
-    "entryTime": 1788446171324,
-    "level": 294.77,
-    "msgId": 2261,
-    "stopOrderId": null,
-    "hardStopPrice": 0.48,
-    "entryStockPrice": 293.63,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 40.4,
-    "volumeRatio": 11.252767525535461,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
   }
 }
