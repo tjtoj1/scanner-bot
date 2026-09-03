@@ -38,10 +38,10 @@
       "comboKey": "NVDA|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 36.923076923076934,
+    "peakPct": 48.000000000000014,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
