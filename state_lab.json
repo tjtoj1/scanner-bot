@@ -43,7 +43,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 25.00000000000001
+    "peakPct": 26.640271493212676
   },
   "QQQ": {
     "active": true,
@@ -121,6 +121,6 @@
       "comboKey": "SPY|trend:against",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   }
 }
