@@ -79,6 +79,7 @@
       "trendDir": "with",
       "comboKey": "SPY|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": 10
   }
 }
