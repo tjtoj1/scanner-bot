@@ -10,7 +10,7 @@
     "qty": 1,
     "entryTime": 1788446747454,
     "msgId": 2264,
-    "stopOrderId": null,
+    "stopOrderId": "647f9f64-5985-471b-960e-e56250845eff",
     "hardStopPrice": 4.23,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -38,6 +38,9 @@
       "comboKey": "TSLA|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.397350993377493
   }
 }
