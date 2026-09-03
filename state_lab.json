@@ -38,10 +38,10 @@
       "comboKey": "QQQ|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 35.63636363636365,
+    "peakPct": 48.72727272727273,
     "ladder2": true,
     "trailPct": 8
   }
