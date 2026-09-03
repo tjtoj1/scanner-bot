@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-09-03T20:40:38.322Z",
+  "summary": {
+    "totalTrades": 147,
+    "blockedLegs": 12,
+    "allowedLegs": 6,
+    "blockedPnl": -387,
+    "allowedPnl": -457,
+    "improvement": 387,
+    "originalPortfolio": -144,
+    "withCooldown": 243,
+    "fullyCoveredChains": 2
+  },
+  "blockedLegs": [
+    {
+      "tradeId": "IWM_1787837742833",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": -132,
+      "pnlPct": -27.5,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-08-27T13:35:42.833Z",
+      "exitTime": "2026-08-27T13:37:00.137Z",
+      "chainKey": "IWM_PUT_0"
+    },
+    {
+      "tradeId": "IWM_1787837821637",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 4,
+      "pnlPct": 0.9,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-08-27T13:37:01.637Z",
+      "exitTime": "2026-08-27T13:40:39.463Z",
+      "chainKey": "IWM_PUT_0"
+    },
+    {
+      "tradeId": "AMZN_1787924862352",
+      "symbol": "AMZN",
+      "signal": "CALL",
+      "pnl": 87,
+      "pnlPct": 19.9,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-08-28T13:47:42.352Z",
+      "exitTime": "2026-08-28T13:50:01.404Z",
+      "chainKey": "AMZN_CALL_1"
+    },
+    {
+      "tradeId": "TSLA_1787925091298",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 46,
+      "pnlPct": 11.5,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-08-28T13:51:31.298Z",
+      "exitTime": "2026-08-28T13:53:55.538Z",
+      "chainKey": "TSLA_CALL_2"
+    },
+    {
+      "tradeId": "QQQ_1787927742765",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": -95,
+      "pnlPct": -28,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-08-28T14:35:42.765Z",
+      "exitTime": "2026-08-28T14:43:12.859Z",
+      "chainKey": "QQQ_PUT_3"
+    },
+    {
+      "tradeId": "QQQ_1787928194066",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": -90,
+      "pnlPct": -18.3,
+      "reason": "regime_flip",
+      "entryTime": "2026-08-28T14:43:14.066Z",
+      "exitTime": "2026-08-28T14:45:16.921Z",
+      "chainKey": "QQQ_PUT_3"
+    },
+    {
+      "tradeId": "NVDA_1787938477747",
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "pnl": 31,
+      "pnlPct": 7.7,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-08-28T17:34:37.747Z",
+      "exitTime": "2026-08-28T17:43:42.097Z",
+      "chainKey": "NVDA_PUT_4"
+    },
+    {
+      "tradeId": "AMZN_1788184339430",
+      "symbol": "AMZN",
+      "signal": "PUT",
+      "pnl": 195,
+      "pnlPct": 49.1,
+      "reason": "ladder_stop",
+      "entryTime": "2026-08-31T13:52:19.430Z",
+      "exitTime": "2026-08-31T14:02:23.540Z",
+      "chainKey": "AMZN_PUT_5"
+    },
+    {
+      "tradeId": "SPY_1788289456941",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": -112,
+      "pnlPct": -23.1,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-09-01T19:04:16.941Z",
+      "exitTime": "2026-09-01T19:11:53.563Z",
+      "chainKey": "SPY_PUT_6"
+    },
+    {
+      "tradeId": "SPY_1788289914634",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": -80,
+      "pnlPct": -17.2,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-09-01T19:11:54.634Z",
+      "exitTime": "2026-09-01T19:16:14.424Z",
+      "chainKey": "SPY_PUT_6"
+    },
+    {
+      "tradeId": "SPY_1788443894923",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": -136,
+      "pnlPct": -27.5,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-09-03T13:58:14.923Z",
+      "exitTime": "2026-09-03T14:02:54.864Z",
+      "chainKey": "SPY_CALL_7"
+    },
+    {
+      "tradeId": "SPY_1788444175892",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": -105,
+      "pnlPct": -25.3,
+      "reason": "alpaca_stop",
+      "entryTime": "2026-09-03T14:02:55.892Z",
+      "exitTime": "2026-09-03T14:11:16.914Z",
+      "chainKey": "SPY_CALL_7"
+    }
+  ]
+}

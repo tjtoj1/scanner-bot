@@ -59,6 +59,10 @@ const MARKET_CLOSE_UTC   = 20 * 60 + 30; // 3:30 PM CDT
 const FORCE_EXIT_UTC     = 19 * 60 + 55; // 2:55 PM CDT
 const LAST_ENTRY_UTC     = FORCE_EXIT_UTC - 25; // 2:30 PM CDT
 
+// Re-entry cooldown: blocks immediate re-entry of (symbol × direction) after losing stops
+const STOP_REASONS       = new Set(["hard_stop", "alpaca_stop", "alpaca_stop_est"]);
+const COOLDOWN_DURATION  = 30 * 60 * 1000; // 30 minutes in ms
+
 // Bounds the daily self-tuner may adjust learnable params within —
 // separate guardrail from the hard limits above, prevents drift.
 const PARAM_BOUNDS = {
@@ -449,6 +453,14 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
   logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
   await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
+
+  // Set re-entry cooldown: block this (symbol × signal × direction) for 30 min after losing stops
+  if (STOP_REASONS.has(reason) && pnlPct < 0) {
+    state._cooldowns = state._cooldowns || {};
+    state._cooldowns[`${symbol}_${pos.signal}`] = Date.now() + COOLDOWN_DURATION;
+    console.log(`⏸️  Re-entry cooldown: ${symbol} ${pos.signal} blocked for 30min (${reason}, ${pnlPct.toFixed(1)}%)`);
+  }
+
   delete state[symbol];
   saveState(state);
 }
@@ -624,6 +636,16 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   const bars = await getBars(symbol, "15Min", 5);
   const sig = computeSignal(bars, strategy.params);
   if (!sig || !sig.signal) return;
+
+  // Check re-entry cooldown: block immediate re-entry of same (symbol × direction) after losing stops
+  state._cooldowns = state._cooldowns || {};
+  const cooldownKey = `${symbol}_${sig.signal}`;
+  if (state._cooldowns[cooldownKey] && state._cooldowns[cooldownKey] > Date.now()) {
+    const remainMin = Math.ceil((state._cooldowns[cooldownKey] - Date.now()) / 60000);
+    console.log(`⏸️  ${symbol} ${sig.signal}: cooldown active (${remainMin}min remaining) — skipping entry`);
+    return;
+  }
+  delete state._cooldowns[cooldownKey]; // Clear expired cooldown
 
   // Entry-snapshot indicators for later analysis only (see
   // computeVWAP/computeRSI above) — reuses bars, no extra fetch.
