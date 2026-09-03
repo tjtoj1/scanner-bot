@@ -10,7 +10,7 @@
     "qty": 3,
     "entryTime": 1788442219207,
     "msgId": 2148,
-    "stopOrderId": null,
+    "stopOrderId": "1d1c1051-afb6-4ba0-b7bb-83ff413621c8",
     "hardStopPrice": 1.05,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -38,7 +38,10 @@
       "comboKey": "NVDA|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
+    "lastReportedThreshold": 10,
+    "nearStopWarned": true,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 18.000000000000004
   }
 }
