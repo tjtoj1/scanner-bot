@@ -1,0 +1,1421 @@
+{
+  "timestamp": "2026-09-03T20:47:21.705Z",
+  "within30minCount": 43,
+  "after30minCount": 20,
+  "withinCooldownPnL": 579,
+  "afterCooldownPnL": 127,
+  "gapDistribution": {
+    "0-5min": {
+      "count": 40,
+      "pnl": 878
+    },
+    "5-10min": {
+      "count": 1,
+      "pnl": -182
+    },
+    "10-20min": {
+      "count": 2,
+      "pnl": -117
+    },
+    "20-30min": {
+      "count": 0,
+      "pnl": 0
+    },
+    "30-60min": {
+      "count": 2,
+      "pnl": 40
+    },
+    "60+min": {
+      "count": 18,
+      "pnl": 87
+    }
+  },
+  "reentries": [
+    {
+      "chainIndex": 0,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -156,
+        "pnlPct": -33.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-25T15:51:01.531Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -168,
+        "pnlPct": -35.7,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T16:45:32.299Z"
+      },
+      "gapMs": 262470768,
+      "gapMin": 4375,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 2,
+      "precedingTrade": {
+        "symbol": "AMZN",
+        "signal": "PUT",
+        "pnl": -96,
+        "pnlPct": -35,
+        "reason": "alpaca_stop_est",
+        "exitTime": "2026-08-27T13:33:00.346Z"
+      },
+      "reentryTrade": {
+        "symbol": "AMZN",
+        "signal": "PUT",
+        "pnl": 44,
+        "pnlPct": 11.6,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-27T13:45:02.977Z"
+      },
+      "gapMs": 722631,
+      "gapMin": 12,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 3,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -9,
+        "pnlPct": -1.9,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T13:35:41.365Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -132,
+        "pnlPct": -27.5,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-27T13:35:42.833Z"
+      },
+      "gapMs": 1468,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 4,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -132,
+        "pnlPct": -27.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T13:37:00.137Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 4,
+        "pnlPct": 0.9,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-27T13:37:01.637Z"
+      },
+      "gapMs": 1500,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 10,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": -2,
+        "pnlPct": -0.4,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T14:25:04.146Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": 16,
+        "pnlPct": 4.6,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-27T15:15:38.654Z"
+      },
+      "gapMs": 3034508,
+      "gapMin": 51,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 12,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -165,
+        "pnlPct": -35.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T14:45:49.085Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 57,
+        "pnlPct": 12.4,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:02:08.984Z"
+      },
+      "gapMs": 83779899,
+      "gapMin": 1396,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 14,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -150,
+        "pnlPct": -32.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T15:30:04.613Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -132,
+        "pnlPct": -28.8,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-27T15:30:05.976Z"
+      },
+      "gapMs": 1363,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 16,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -132,
+        "pnlPct": -28.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T15:45:03.851Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -90,
+        "pnlPct": -21.5,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:00:17.344Z"
+      },
+      "gapMs": 80113493,
+      "gapMin": 1335,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 17,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -132,
+        "pnlPct": -29.1,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-27T15:46:18.526Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -105,
+        "pnlPct": -28.5,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:01:33.735Z"
+      },
+      "gapMs": 80115209,
+      "gapMin": 1335,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 21,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": -146,
+        "pnlPct": -35.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T13:45:40.985Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": 0,
+        "pnlPct": 0,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-31T14:30:03.328Z"
+      },
+      "gapMs": 261862343,
+      "gapMin": 4364,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 22,
+      "precedingTrade": {
+        "symbol": "AMZN",
+        "signal": "CALL",
+        "pnl": -125,
+        "pnlPct": -26.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T13:47:40.470Z"
+      },
+      "reentryTrade": {
+        "symbol": "AMZN",
+        "signal": "CALL",
+        "pnl": 87,
+        "pnlPct": 19.9,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T13:47:42.352Z"
+      },
+      "gapMs": 1882,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 24,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": -122,
+        "pnlPct": -28.9,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T13:51:29.730Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": 46,
+        "pnlPct": 11.5,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T13:51:31.298Z"
+      },
+      "gapMs": 1568,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 27,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": -110,
+        "pnlPct": -25.4,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:02:07.815Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": 22,
+        "pnlPct": 6.7,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-31T14:02:24.536Z"
+      },
+      "gapMs": 259216721,
+      "gapMin": 4320,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 28,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -90,
+        "pnlPct": -21.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:02:46.430Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -153,
+        "pnlPct": -31.2,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:02:47.747Z"
+      },
+      "gapMs": 1317,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 29,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -105,
+        "pnlPct": -28.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:04:27.432Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -116,
+        "pnlPct": -26.3,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:04:28.533Z"
+      },
+      "gapMs": 1101,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 31,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -153,
+        "pnlPct": -31.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:06:19.146Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -159,
+        "pnlPct": -33,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:06:20.725Z"
+      },
+      "gapMs": 1579,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 33,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -116,
+        "pnlPct": -26.3,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:12:01.729Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": 185,
+        "pnlPct": 43.9,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-28T14:12:02.944Z"
+      },
+      "gapMs": 1215,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 34,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -159,
+        "pnlPct": -33,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:13:47.212Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": 306,
+        "pnlPct": 65.8,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-28T14:13:48.404Z"
+      },
+      "gapMs": 1192,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 39,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -153,
+        "pnlPct": -34.9,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:35:04.576Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -119,
+        "pnlPct": -24.5,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:35:06.052Z"
+      },
+      "gapMs": 1476,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 40,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -85,
+        "pnlPct": -25.4,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:35:41.326Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -95,
+        "pnlPct": -28,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T14:35:42.765Z"
+      },
+      "gapMs": 1439,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 41,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -119,
+        "pnlPct": -24.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:38:26.072Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 67,
+        "pnlPct": 14.3,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-28T14:38:27.157Z"
+      },
+      "gapMs": 1085,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 42,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -95,
+        "pnlPct": -28,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T14:43:12.859Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -90,
+        "pnlPct": -18.3,
+        "reason": "regime_flip",
+        "entryTime": "2026-08-28T14:43:14.066Z"
+      },
+      "gapMs": 1207,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 44,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "PUT",
+        "pnl": -129,
+        "pnlPct": -34.1,
+        "reason": "hard_stop",
+        "exitTime": "2026-08-28T14:51:08.031Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "PUT",
+        "pnl": 30,
+        "pnlPct": 6.2,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T16:00:14.895Z"
+      },
+      "gapMs": 4146864,
+      "gapMin": 69,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 49,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -132,
+        "pnlPct": -30.7,
+        "reason": "hard_stop",
+        "exitTime": "2026-08-28T15:08:29.942Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": 26,
+        "pnlPct": 5.4,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T15:09:04.519Z"
+      },
+      "gapMs": 34577,
+      "gapMin": 1,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 51,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -118,
+        "pnlPct": -26.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T15:10:05.964Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": 27,
+        "pnlPct": 7,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T15:10:07.097Z"
+      },
+      "gapMs": 1133,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 57,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -120,
+        "pnlPct": -28.1,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T15:35:24.487Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -124,
+        "pnlPct": -29.7,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T13:45:36.310Z"
+      },
+      "gapMs": 511811823,
+      "gapMin": 8530,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 58,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -141,
+        "pnlPct": -34.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T15:37:29.840Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -104,
+        "pnlPct": -30.1,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T14:00:35.504Z"
+      },
+      "gapMs": 512585664,
+      "gapMin": 8543,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 69,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -192,
+        "pnlPct": -39.3,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T16:36:48.493Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -182,
+        "pnlPct": -36.6,
+        "reason": "hard_stop",
+        "entryTime": "2026-08-28T16:45:33.960Z"
+      },
+      "gapMs": 525467,
+      "gapMin": 9,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 70,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": -123,
+        "pnlPct": -26.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T16:37:54.496Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": 14,
+        "pnlPct": 2.9,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T16:37:56.093Z"
+      },
+      "gapMs": 1597,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 71,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "PUT",
+        "pnl": -113,
+        "pnlPct": -33.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T16:37:54.632Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "PUT",
+        "pnl": -143,
+        "pnlPct": -29.6,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T13:45:54.127Z"
+      },
+      "gapMs": 335279495,
+      "gapMin": 5588,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 74,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -149,
+        "pnlPct": -30.4,
+        "reason": "hard_stop",
+        "exitTime": "2026-08-28T16:49:22.152Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": 113,
+        "pnlPct": 28.6,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-28T16:51:59.178Z"
+      },
+      "gapMs": 157026,
+      "gapMin": 3,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 75,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -182,
+        "pnlPct": -36.6,
+        "reason": "hard_stop",
+        "exitTime": "2026-08-28T16:51:58.135Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 270,
+        "pnlPct": 56.2,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-28T16:52:31.735Z"
+      },
+      "gapMs": 33600,
+      "gapMin": 1,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 77,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -168,
+        "pnlPct": -35.7,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T16:53:02.141Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": 150,
+        "pnlPct": 30.1,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-28T16:53:03.612Z"
+      },
+      "gapMs": 1471,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 83,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": -74,
+        "pnlPct": -21.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T17:34:36.213Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": 31,
+        "pnlPct": 7.7,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-28T17:34:37.747Z"
+      },
+      "gapMs": 1534,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 85,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": -112,
+        "pnlPct": -26.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-28T17:48:27.593Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": -159,
+        "pnlPct": -33.2,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T13:38:50.474Z"
+      },
+      "gapMs": 330622881,
+      "gapMin": 5510,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 86,
+      "precedingTrade": {
+        "symbol": "AMZN",
+        "signal": "PUT",
+        "pnl": -99,
+        "pnlPct": -26.9,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T13:52:17.611Z"
+      },
+      "reentryTrade": {
+        "symbol": "AMZN",
+        "signal": "PUT",
+        "pnl": 195,
+        "pnlPct": 49.1,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-31T13:52:19.430Z"
+      },
+      "gapMs": 1819,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 90,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -156,
+        "pnlPct": -31.3,
+        "reason": "hard_stop",
+        "exitTime": "2026-08-31T14:18:40.250Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 112,
+        "pnlPct": 23.2,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-31T14:19:17.211Z"
+      },
+      "gapMs": 36961,
+      "gapMin": 1,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 97,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -150,
+        "pnlPct": -31.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T14:36:45.993Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -91,
+        "pnlPct": -18.8,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-31T14:36:47.253Z"
+      },
+      "gapMs": 1260,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 99,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -91,
+        "pnlPct": -18.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T14:42:09.893Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 59,
+        "pnlPct": 12,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-31T14:42:11.235Z"
+      },
+      "gapMs": 1342,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 100,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": -148,
+        "pnlPct": -36.1,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T14:51:55.520Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": 117,
+        "pnlPct": 27.8,
+        "reason": "ladder_stop",
+        "entryTime": "2026-09-01T15:45:23.884Z"
+      },
+      "gapMs": 89608364,
+      "gapMin": 1493,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 101,
+      "precedingTrade": {
+        "symbol": "AMZN",
+        "signal": "PUT",
+        "pnl": -122,
+        "pnlPct": -26.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T14:53:08.626Z"
+      },
+      "reentryTrade": {
+        "symbol": "AMZN",
+        "signal": "PUT",
+        "pnl": 100,
+        "pnlPct": 21.1,
+        "reason": "ladder_stop",
+        "entryTime": "2026-08-31T18:30:58.854Z"
+      },
+      "gapMs": 13070228,
+      "gapMin": 218,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 103,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -132,
+        "pnlPct": -27.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T14:58:11.944Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": 95,
+        "pnlPct": 22.2,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-08-31T14:58:12.995Z"
+      },
+      "gapMs": 1051,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 104,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -48,
+        "pnlPct": -10.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T15:00:32.691Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 525,
+        "pnlPct": 115.1,
+        "reason": "ladder_stop",
+        "entryTime": "2026-09-01T13:32:01.004Z"
+      },
+      "gapMs": 81088313,
+      "gapMin": 1351,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 109,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": -104,
+        "pnlPct": -23.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-08-31T15:24:38.051Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": 84,
+        "pnlPct": 13.4,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T13:45:37.331Z"
+      },
+      "gapMs": 253259280,
+      "gapMin": 4221,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 112,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -92,
+        "pnlPct": -20.4,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T13:36:17.426Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": 87,
+        "pnlPct": 23.6,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T13:36:18.508Z"
+      },
+      "gapMs": 1082,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 115,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -127,
+        "pnlPct": -34.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T13:45:52.863Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -161,
+        "pnlPct": -34.4,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T14:00:37.830Z"
+      },
+      "gapMs": 884967,
+      "gapMin": 15,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 116,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -129,
+        "pnlPct": -26.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T13:45:55.063Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": 54,
+        "pnlPct": 11.2,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T17:00:15.911Z"
+      },
+      "gapMs": 11660848,
+      "gapMin": 194,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 117,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": -159,
+        "pnlPct": -33.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T13:51:24.363Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "PUT",
+        "pnl": -130,
+        "pnlPct": -29.3,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T13:51:26.054Z"
+      },
+      "gapMs": 1691,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 118,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "PUT",
+        "pnl": -143,
+        "pnlPct": -29.6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T13:51:24.669Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "PUT",
+        "pnl": 118,
+        "pnlPct": 15.3,
+        "reason": "ladder_stop",
+        "entryTime": "2026-09-01T13:51:26.877Z"
+      },
+      "gapMs": 2208,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 119,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": -161,
+        "pnlPct": -34.4,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T14:07:23.675Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "PUT",
+        "pnl": 54,
+        "pnlPct": 12.7,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T14:07:25.111Z"
+      },
+      "gapMs": 1436,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 122,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -178,
+        "pnlPct": -39.2,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T14:15:35.529Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -136,
+        "pnlPct": -30.1,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T16:45:14.342Z"
+      },
+      "gapMs": 8978813,
+      "gapMin": 150,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 125,
+      "precedingTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": -101,
+        "pnlPct": -28.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T16:45:13.027Z"
+      },
+      "reentryTrade": {
+        "symbol": "NVDA",
+        "signal": "CALL",
+        "pnl": 127,
+        "pnlPct": 28.3,
+        "reason": "ladder_stop",
+        "entryTime": "2026-09-03T13:30:19.207Z"
+      },
+      "gapMs": 161106180,
+      "gapMin": 2685,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 126,
+      "precedingTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": -136,
+        "pnlPct": -30.1,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T16:55:51.441Z"
+      },
+      "reentryTrade": {
+        "symbol": "IWM",
+        "signal": "PUT",
+        "pnl": 132,
+        "pnlPct": 27.8,
+        "reason": "ladder_stop",
+        "entryTime": "2026-09-01T16:55:52.752Z"
+      },
+      "gapMs": 1311,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 133,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -28,
+        "pnlPct": -6,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T19:04:15.823Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -112,
+        "pnlPct": -23.1,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T19:04:16.941Z"
+      },
+      "gapMs": 1118,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 134,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -112,
+        "pnlPct": -23.1,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-01T19:11:53.563Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "PUT",
+        "pnl": -80,
+        "pnlPct": -17.2,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-01T19:11:54.634Z"
+      },
+      "gapMs": 1071,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 140,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -124,
+        "pnlPct": -29.7,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T13:58:13.929Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -136,
+        "pnlPct": -27.5,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T13:58:14.923Z"
+      },
+      "gapMs": 994,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 141,
+      "precedingTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": -188,
+        "pnlPct": -31.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T13:58:54.339Z"
+      },
+      "reentryTrade": {
+        "symbol": "TSLA",
+        "signal": "CALL",
+        "pnl": 155,
+        "pnlPct": 17.6,
+        "reason": "ladder_stop",
+        "entryTime": "2026-09-03T13:58:55.677Z"
+      },
+      "gapMs": 1338,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 142,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -104,
+        "pnlPct": -30.1,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T14:02:08.601Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": 37,
+        "pnlPct": 10.6,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T14:02:09.647Z"
+      },
+      "gapMs": 1046,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 143,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -136,
+        "pnlPct": -27.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T14:02:54.864Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -105,
+        "pnlPct": -25.3,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T14:02:55.892Z"
+      },
+      "gapMs": 1028,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 144,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -105,
+        "pnlPct": -25.3,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T14:11:16.914Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": 132,
+        "pnlPct": 30.4,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T14:11:18.074Z"
+      },
+      "gapMs": 1160,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 149,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -6,
+        "pnlPct": -1.5,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T14:34:43.099Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": 24,
+        "pnlPct": 4.9,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T15:30:09.105Z"
+      },
+      "gapMs": 3326006,
+      "gapMin": 55,
+      "blockedBy30minCooldown": false
+    },
+    {
+      "chainIndex": 152,
+      "precedingTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": -120,
+        "pnlPct": -27.9,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T15:38:33.869Z"
+      },
+      "reentryTrade": {
+        "symbol": "SPY",
+        "signal": "CALL",
+        "pnl": 15,
+        "pnlPct": 3.8,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T15:38:35.080Z"
+      },
+      "gapMs": 1211,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    },
+    {
+      "chainIndex": 153,
+      "precedingTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": -117,
+        "pnlPct": -30.8,
+        "reason": "alpaca_stop",
+        "exitTime": "2026-09-03T15:41:27.340Z"
+      },
+      "reentryTrade": {
+        "symbol": "QQQ",
+        "signal": "CALL",
+        "pnl": 11,
+        "pnlPct": 2.6,
+        "reason": "alpaca_stop",
+        "entryTime": "2026-09-03T15:41:28.344Z"
+      },
+      "gapMs": 1004,
+      "gapMin": 0,
+      "blockedBy30minCooldown": true
+    }
+  ]
+}
