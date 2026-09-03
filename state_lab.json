@@ -39,5 +39,43 @@
       "sizeMultiplier": 1
     },
     "lastReportedThreshold": 10
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260903C00773000",
+    "strike": "773",
+    "entryPremium": 1.0150000000000001,
+    "qty": 4,
+    "entryTime": 1788450897882,
+    "msgId": 2298,
+    "stopOrderId": "e8e7b718-a719-4388-afb0-7e84f0fb77d6",
+    "hardStopPrice": 0.71,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 773.14,
+      "regime": "bullish",
+      "emaFast": 769.7301,
+      "emaSlow": 768.102,
+      "breakoutHigh": 771.52,
+      "breakoutLow": 766.47,
+      "volRatio": 2.92,
+      "lastClose": 772.94,
+      "lastVolume": 1912459,
+      "barTime": "2026-09-03T15:15:00Z",
+      "entryTimeUTC": "2026-09-03T15:54:57.882Z",
+      "vwapAtEntry": 769.5193,
+      "rsiAtEntry": 78.38,
+      "signalType": "breakout",
+      "trendDir": "with",
+      "comboKey": "SPY|trend:with",
+      "sizeMultiplier": 1
+    }
   }
 }
