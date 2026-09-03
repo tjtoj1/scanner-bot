@@ -16,7 +16,212 @@
     "takeProfit2LockPct": 12,
     "trailingPct": 8
   },
-  "combos": {},
+  "combos": {
+    "SPY|trend:with": {
+      "factors": {
+        "symbol": "SPY",
+        "trend": "with"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 13,
+      "wins": 5,
+      "pnl": -633,
+      "avgPnlPct": -10.65,
+      "tier": "average",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "SPY|trend:against": {
+      "factors": {
+        "symbol": "SPY",
+        "trend": "against"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 2,
+      "wins": 1,
+      "pnl": 27,
+      "avgPnlPct": 2.55,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "QQQ|trend:with": {
+      "factors": {
+        "symbol": "QQQ",
+        "trend": "with"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 11,
+      "wins": 4,
+      "pnl": -589,
+      "avgPnlPct": -12.64,
+      "tier": "average",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "QQQ|trend:against": {
+      "factors": {
+        "symbol": "QQQ",
+        "trend": "against"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 1,
+      "wins": 1,
+      "pnl": 54,
+      "avgPnlPct": 12.7,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "IWM|trend:with": {
+      "factors": {
+        "symbol": "IWM",
+        "trend": "with"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 4,
+      "wins": 1,
+      "pnl": -312,
+      "avgPnlPct": -16.88,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "IWM|trend:against": {
+      "factors": {
+        "symbol": "IWM",
+        "trend": "against"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 1,
+      "wins": 1,
+      "pnl": 525,
+      "avgPnlPct": 115.1,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "NVDA|trend:with": {
+      "factors": {
+        "symbol": "NVDA",
+        "trend": "with"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 9,
+      "wins": 5,
+      "pnl": 39,
+      "avgPnlPct": 0.14,
+      "tier": "average",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "NVDA|trend:against": {
+      "factors": {
+        "symbol": "NVDA",
+        "trend": "against"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 0,
+      "wins": 0,
+      "pnl": 0,
+      "avgPnlPct": null,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "TSLA|trend:with": {
+      "factors": {
+        "symbol": "TSLA",
+        "trend": "with"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 5,
+      "wins": 3,
+      "pnl": -70,
+      "avgPnlPct": -5.36,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "TSLA|trend:against": {
+      "factors": {
+        "symbol": "TSLA",
+        "trend": "against"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 1,
+      "wins": 1,
+      "pnl": 118,
+      "avgPnlPct": 15.3,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "AMZN|trend:with": {
+      "factors": {
+        "symbol": "AMZN",
+        "trend": "with"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 0,
+      "wins": 0,
+      "pnl": 0,
+      "avgPnlPct": null,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    },
+    "AMZN|trend:against": {
+      "factors": {
+        "symbol": "AMZN",
+        "trend": "against"
+      },
+      "depth": 2,
+      "parentKey": null,
+      "n": 0,
+      "wins": 0,
+      "pnl": 0,
+      "avgPnlPct": null,
+      "tier": "insufficient",
+      "previousTier": null,
+      "sizeMultiplier": 1,
+      "deepened": false,
+      "lastUpdated": "2026-09-03T20:00:17.149Z"
+    }
+  },
   "changelog": [
     {
       "date": "2026-08-28",
