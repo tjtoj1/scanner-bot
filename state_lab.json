@@ -38,7 +38,8 @@
       "comboKey": "SPY|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
@@ -77,6 +78,6 @@
       "comboKey": "TSLA|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
