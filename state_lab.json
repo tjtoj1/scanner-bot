@@ -38,7 +38,7 @@
       "comboKey": "TSLA|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10
   },
   "QQQ": {
     "active": true,
