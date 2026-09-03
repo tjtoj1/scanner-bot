@@ -38,7 +38,7 @@
       "comboKey": "QQQ|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10
   },
   "SPY": {
     "active": true,
@@ -76,7 +76,8 @@
       "trendDir": "against",
       "comboKey": "SPY|trend:against",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
