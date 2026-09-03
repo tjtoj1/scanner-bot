@@ -1,6 +1,19 @@
 {
   "_lastDay": "2026-09-03",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-09-03",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-03",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-09-03",
@@ -32,5 +45,49 @@
       "high": 259.4299,
       "low": 256
     }
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260903P00294000",
+    "strike": "294",
+    "entryPremium": 0.555,
+    "qty": 9,
+    "entryTime": 1788445854898,
+    "level": 294.77,
+    "msgId": 2244,
+    "stopOrderId": null,
+    "hardStopPrice": 0.36,
+    "entryStockPrice": 293.84000000000003,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 40.4,
+    "volumeRatio": 11.252767525535461,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA260904C00380000",
+    "strike": "380",
+    "entryPremium": 5.869999999999999,
+    "qty": 1,
+    "entryTime": 1788445857089,
+    "level": 375.18,
+    "msgId": 2245,
+    "stopOrderId": "4dc089f2-dd69-47ff-9bc9-2a2630615bbb",
+    "hardStopPrice": 3.82,
+    "entryStockPrice": 378.5,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 43.76,
+    "volumeRatio": 5.570992490206418,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
