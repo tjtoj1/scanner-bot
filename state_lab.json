@@ -37,7 +37,8 @@
       "trendDir": "with",
       "comboKey": "SPY|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": 10
   },
   "QQQ": {
     "active": true,
@@ -48,7 +49,7 @@
     "qty": 4,
     "entryTime": 1788449409105,
     "msgId": 2277,
-    "stopOrderId": "b3a225d9-365d-4f98-8bc8-5ae63e8948da",
+    "stopOrderId": "497e15b5-f985-42fd-a249-b57f5944ea4b",
     "hardStopPrice": 0.85,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -75,6 +76,10 @@
       "trendDir": "with",
       "comboKey": "QQQ|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 17.28395061728395,
+    "lastReportedThreshold": 10
   }
 }
