@@ -38,7 +38,7 @@
       "comboKey": "SPY|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
@@ -76,6 +76,7 @@
       "trendDir": "with",
       "comboKey": "QQQ|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
