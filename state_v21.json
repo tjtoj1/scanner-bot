@@ -72,7 +72,8 @@
     "stopPct": 10,
     "trailPct": 10,
     "peakPct": 33.33333333333332,
-    "lastReportedThreshold": 30
+    "lastReportedThreshold": 20,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
