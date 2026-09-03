@@ -58,32 +58,6 @@
       "low": 256
     }
   },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA260904C00380000",
-    "strike": "380",
-    "entryPremium": 5.869999999999999,
-    "qty": 1,
-    "entryTime": 1788445857089,
-    "level": 375.18,
-    "msgId": 2245,
-    "stopOrderId": "21b501ca-86d3-4544-b615-d538acd5c0fd",
-    "hardStopPrice": 3.82,
-    "entryStockPrice": 378.5,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 43.76,
-    "volumeRatio": 5.570992490206418,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 11.243611584327091
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -94,7 +68,7 @@
     "entryTime": 1788446899836,
     "level": 294.77,
     "msgId": 2266,
-    "stopOrderId": null,
+    "stopOrderId": "ed940154-8835-4881-be43-f220889c0511",
     "hardStopPrice": 0.27,
     "entryStockPrice": 294.175,
     "vwapAtEntry": null,
@@ -105,6 +79,11 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 25.60975609756097
   }
 }
