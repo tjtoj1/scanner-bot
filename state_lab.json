@@ -54,7 +54,7 @@
     "qty": 2,
     "entryTime": 1788444681186,
     "msgId": 2211,
-    "stopOrderId": null,
+    "stopOrderId": "ded2dc0b-3196-4a1d-9c63-eca781f31319",
     "hardStopPrice": 1.66,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
