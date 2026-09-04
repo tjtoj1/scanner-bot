@@ -43,7 +43,7 @@
       "comboKey": "NVDA|trend:with",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20,
+    "lastReportedThreshold": -10,
     "nearStopWarned": true
   }
 }
