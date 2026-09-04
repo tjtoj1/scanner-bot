@@ -3,9 +3,46 @@
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-09-03",
   "_cooldowns": {
-    "AMZN_PUT": 1788532496010,
     "TSLA_PUT": 1788534216839,
     "NVDA_CALL": 1788535455438,
     "SPY_PUT": 1788536626288
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "AMZN260904P00257500",
+    "strike": "257.5",
+    "entryPremium": 2.05,
+    "qty": 2,
+    "entryTime": 1788534935354,
+    "msgId": 2381,
+    "stopOrderId": null,
+    "hardStopPrice": 1.43,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 255.625,
+      "regime": "bearish",
+      "emaFast": 257.9833,
+      "emaSlow": 258.8708,
+      "breakoutHigh": 261.12,
+      "breakoutLow": 256.81,
+      "volRatio": 2.86,
+      "lastClose": 256.53,
+      "lastVolume": 1061138,
+      "barTime": "2026-09-04T14:45:00Z",
+      "entryTimeUTC": "2026-09-04T15:15:35.354Z",
+      "vwapAtEntry": 258.1831,
+      "rsiAtEntry": 22.35,
+      "signalType": "breakout",
+      "trendDir": "with",
+      "comboKey": "AMZN|trend:with",
+      "sizeMultiplier": 1
+    }
   }
 }
