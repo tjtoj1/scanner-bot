@@ -2,44 +2,7 @@
   "_lastDay": "2026-09-04",
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-09-03",
-  "_cooldowns": {},
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA260904P00357500",
-    "strike": "357.5",
-    "entryPremium": 3.2199999999999998,
-    "qty": 1,
-    "entryTime": 1788529519424,
-    "msgId": 2325,
-    "stopOrderId": "8417f919-5665-477b-b468-9250dea7c7bd",
-    "hardStopPrice": 2.25,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 356.63,
-      "regime": "bearish",
-      "emaFast": 365.005,
-      "emaSlow": 367.3905,
-      "breakoutHigh": 369,
-      "breakoutLow": 363.16,
-      "volRatio": 2.67,
-      "lastClose": 361.94,
-      "lastVolume": 321054,
-      "barTime": "2026-09-04T13:15:00Z",
-      "entryTimeUTC": "2026-09-04T13:45:19.424Z",
-      "vwapAtEntry": 366.3424,
-      "rsiAtEntry": 23.35,
-      "signalType": "breakout",
-      "trendDir": "with",
-      "comboKey": "TSLA|trend:with",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -20
+  "_cooldowns": {
+    "TSLA_PUT": 1788531971252
   }
 }
