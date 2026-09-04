@@ -79,6 +79,8 @@
       "trendDir": "with",
       "comboKey": "AMZN|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "nearStopWarned": true,
+    "lastReportedThreshold": -20
   }
 }
