@@ -18,6 +18,12 @@
       "symbol": "AMZN",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-04",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -51,29 +57,6 @@
       "high": 261.12,
       "low": 258.385
     }
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260904C00720000",
-    "strike": "720",
-    "entryPremium": 1.7,
-    "qty": 2,
-    "entryTime": 1788531351781,
-    "level": 720.71,
-    "msgId": 2342,
-    "stopOrderId": "5dde0959-70b3-4356-9ab6-697bb39eb1b4",
-    "hardStopPrice": 1.1,
-    "entryStockPrice": 720.46,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 53.51,
-    "volumeRatio": 7.11665894797893,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
@@ -131,5 +114,27 @@
     "nearStopWarned": true,
     "ladder2": true,
     "trailPct": 10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260904C00720000",
+    "strike": "720",
+    "entryPremium": 1.225,
+    "qty": 4,
+    "entryTime": 1788531649690,
+    "level": 720.71,
+    "msgId": 2355,
+    "stopOrderId": "a07ea08b-f6ca-4db5-ae93-2536e1b3ac08",
+    "hardStopPrice": 0.8,
+    "entryStockPrice": 719.565,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 53.51,
+    "volumeRatio": 7.11665894797893,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
