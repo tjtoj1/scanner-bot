@@ -1,6 +1,25 @@
 {
   "_lastDay": "2026-09-04",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-09-04",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-04",
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-04",
+      "symbol": "AMZN",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-09-04",
@@ -32,5 +51,71 @@
       "high": 261.12,
       "low": 258.385
     }
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260904C00720000",
+    "strike": "720",
+    "entryPremium": 1.7,
+    "qty": 2,
+    "entryTime": 1788531351781,
+    "level": 720.71,
+    "msgId": 2342,
+    "stopOrderId": "5dde0959-70b3-4356-9ab6-697bb39eb1b4",
+    "hardStopPrice": 1.1,
+    "entryStockPrice": 720.46,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 53.51,
+    "volumeRatio": 7.11665894797893,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260904C00235000",
+    "strike": "235",
+    "entryPremium": 0.705,
+    "qty": 7,
+    "entryTime": 1788531353655,
+    "level": 233.77,
+    "msgId": 2343,
+    "stopOrderId": "b894a460-92f3-4d45-a0a7-97e4df5e87ec",
+    "hardStopPrice": 0.46,
+    "entryStockPrice": 233.83499999999998,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 54.67,
+    "volumeRatio": 11.972873990430935,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "AMZN260904P00257500",
+    "strike": "257.5",
+    "entryPremium": 0.62,
+    "qty": 8,
+    "entryTime": 1788531355113,
+    "level": 258.385,
+    "msgId": 2344,
+    "stopOrderId": "d0ffc17f-2f89-4f27-99cc-d32674aeeb18",
+    "hardStopPrice": 0.4,
+    "entryStockPrice": 258.09000000000003,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 66.34,
+    "volumeRatio": 10.484945385261346,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
