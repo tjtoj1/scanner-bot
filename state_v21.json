@@ -57,34 +57,5 @@
       "high": 261.12,
       "low": 258.385
     }
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN260904P00257500",
-    "strike": "257.5",
-    "entryPremium": 0.62,
-    "qty": 8,
-    "entryTime": 1788531355113,
-    "level": 258.385,
-    "msgId": 2344,
-    "stopOrderId": "dc720865-4eda-4087-9709-d48b471ec93b",
-    "hardStopPrice": 0.4,
-    "entryStockPrice": 258.09000000000003,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 66.34,
-    "volumeRatio": 10.484945385261346,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 37.903225806451616,
-    "lastReportedThreshold": 30,
-    "nearStopWarned": true,
-    "ladder2": true,
-    "trailPct": 10
   }
 }
