@@ -79,10 +79,10 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 26.95035460992909,
+    "peakPct": 32.62411347517732,
     "ladder2": true,
     "trailPct": 10
   },
@@ -110,7 +110,7 @@
     "ladder1": true,
     "stopPct": 10,
     "peakPct": 36.29032258064516,
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 20,
     "nearStopWarned": true,
     "ladder2": true,
     "trailPct": 10
@@ -125,7 +125,7 @@
     "entryTime": 1788531649690,
     "level": 720.71,
     "msgId": 2355,
-    "stopOrderId": "a07ea08b-f6ca-4db5-ae93-2536e1b3ac08",
+    "stopOrderId": "a1736fcf-14ec-42fa-aeac-99078e3c1ec1",
     "hardStopPrice": 0.8,
     "entryStockPrice": 719.565,
     "vwapAtEntry": null,
@@ -135,6 +135,10 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.612244897959174,
+    "lastReportedThreshold": 10
   }
 }
