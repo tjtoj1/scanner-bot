@@ -4,45 +4,7 @@
   "_lastComboLearnedDay": "2026-09-03",
   "_cooldowns": {
     "AMZN_PUT": 1788532496010,
-    "TSLA_PUT": 1788534216839
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "NVDA260904C00232500",
-    "strike": "232.5",
-    "entryPremium": 1.635,
-    "qty": 3,
-    "entryTime": 1788533117843,
-    "msgId": 2372,
-    "stopOrderId": "eee3de7e-f3c6-4e16-a3fe-e275df2c8a35",
-    "hardStopPrice": 1.14,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 233.47500000000002,
-      "regime": "bullish",
-      "emaFast": 232.9308,
-      "emaSlow": 231.9002,
-      "breakoutHigh": 234.66,
-      "breakoutLow": 229.82,
-      "volRatio": 3.46,
-      "lastClose": 234.7161,
-      "lastVolume": 6845622,
-      "barTime": "2026-09-04T14:15:00Z",
-      "entryTimeUTC": "2026-09-04T14:45:17.843Z",
-      "vwapAtEntry": 233.087,
-      "rsiAtEntry": 73.04,
-      "signalType": "breakout",
-      "trendDir": "with",
-      "comboKey": "NVDA|trend:with",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -20
+    "TSLA_PUT": 1788534216839,
+    "NVDA_CALL": 1788535455438
   }
 }
