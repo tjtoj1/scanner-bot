@@ -41,7 +41,8 @@
       "trendDir": "with",
       "comboKey": "NVDA|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "AMZN": {
     "active": true,
