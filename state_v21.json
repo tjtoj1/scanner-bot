@@ -73,7 +73,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
@@ -85,7 +85,7 @@
     "entryTime": 1788531353655,
     "level": 233.77,
     "msgId": 2343,
-    "stopOrderId": "1ac09d8f-2fa2-4f2b-9795-c79112ee93bc",
+    "stopOrderId": "77bf40b2-9345-4a9d-bc3f-cbd281529f94",
     "hardStopPrice": 0.46,
     "entryStockPrice": 233.83499999999998,
     "vwapAtEntry": null,
@@ -96,10 +96,12 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 14.184397163120579
+    "stopPct": 10,
+    "peakPct": 26.95035460992909,
+    "ladder2": true,
+    "trailPct": 10
   },
   "AMZN": {
     "active": true,
@@ -124,7 +126,7 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 33.8709677419355,
+    "peakPct": 36.29032258064516,
     "lastReportedThreshold": 30,
     "nearStopWarned": true,
     "ladder2": true,
