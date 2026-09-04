@@ -42,6 +42,7 @@
       "trendDir": "with",
       "comboKey": "TSLA|trend:with",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
