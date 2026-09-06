@@ -657,14 +657,12 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   if (!spot) return;
 
   // ── COMBO-BASED POSITION SIZING ──────────────────────────────
-  // Replaces global-parameter tuning (see runComboLearning() /
-  // computeCombos() below): sizes THIS trade by how its own
-  // (symbol × trend-direction[× RSI]) combo has actually performed,
-  // instead of a single param that would scale every trade at once.
+  // Sizes THIS trade by how its (signal × position) combo has performed.
+  // Simpler than symbol-based: pools all symbols so learns faster (n=8 in 1-2 days).
   // calcQty() already clamps to MAX_TRADE_BUDGET internally, so this can
   // never exceed the hard cap even at the ×1.5 tier.
-  const trendDir = trendDirection(spot, vwapAtEntry, sig.signal);
-  const { comboKey, sizeMultiplier } = lookupComboMultiplier(strategy.combos, symbol, trendDir, rsiAtEntry);
+  const positionBkt = positionBucket(spot, sig.breakoutHigh, sig.breakoutLow);
+  const { comboKey, sizeMultiplier } = lookupComboMultiplier(strategy.combos, sig.signal, positionBkt);
   const effectiveBudget = strategy.params.tradeBudget * sizeMultiplier;
 
   const opt = await findOption(symbol, sig.signal, spot);
@@ -699,7 +697,7 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
       breakoutHigh: sig.breakoutHigh, breakoutLow: sig.breakoutLow, volRatio: +sig.volRatio.toFixed(2),
       lastClose: sig.lastClose, lastVolume: sig.lastVolume, barTime: sig.barTime, entryTimeUTC: new Date().toISOString(),
       vwapAtEntry, rsiAtEntry, signalType: "breakout",
-      trendDir, comboKey, sizeMultiplier,
+      positionBucket: positionBkt, comboKey, sizeMultiplier,
     },
   };
   saveState(state);
@@ -1111,17 +1109,30 @@ function rsiBucket(rsi) {
   return "40-60";
 }
 
-// Rebuilds every combo's stats from the full outcomes history. Only
-// trades with both spot and vwapAtEntry recorded can be classified —
-// trades from before that field existed are simply excluded, not
-// mis-bucketed.
-function computeCombos(records, previousCombos) {
-  const withTrend = records
-    .map(r => ({ r, trend: trendDirection(r.entryConditions?.spot, r.entryConditions?.vwapAtEntry, r.signal) }))
-    .filter(x => x.trend);
+function positionBucket(spot, breakoutHigh, breakoutLow) {
+  if (spot == null || breakoutHigh == null || breakoutLow == null) return null;
+  const range = breakoutHigh - breakoutLow;
+  if (range === 0) return null;
 
-  const overallAvgPnlPct = withTrend.length
-    ? withTrend.reduce((a, x) => a + x.r.pnlPct, 0) / withTrend.length
+  const position = (spot - breakoutLow) / range;
+  if (position < 0.33) return "near_low";
+  if (position > 0.67) return "near_high";
+  return "mid";
+}
+
+// Rebuilds combo stats from full outcomes history. Simplified to 6 combos:
+// signal (CALL/PUT) × position (near_low/mid/near_high), no per-symbol deepening.
+// Reaches MIN_COMBO_SAMPLE faster by pooling all symbols.
+function computeCombos(records, previousCombos) {
+  const withPosition = records
+    .map(r => ({
+      r,
+      position: positionBucket(r.entryConditions?.spot, r.entryConditions?.breakoutHigh, r.entryConditions?.breakoutLow)
+    }))
+    .filter(x => x.position);
+
+  const overallAvgPnlPct = withPosition.length
+    ? withPosition.reduce((a, x) => a + x.r.pnlPct, 0) / withPosition.length
     : null;
 
   function tierFor(n, avgPnlPct) {
@@ -1145,75 +1156,61 @@ function computeCombos(records, previousCombos) {
       avgPnlPct: avgPnlPct != null ? +avgPnlPct.toFixed(2) : null,
       tier, previousTier: prev?.tier ?? null,
       sizeMultiplier: COMBO_SIZE_MULTIPLIER[tier],
-      deepened: prev?.deepened || false,
       lastUpdated: new Date().toISOString(),
     };
   }
 
   const combos = {};
-  for (const symbol of ALLOWED_TICKERS) {
-    for (const trend of ["with", "against"]) {
-      const key = `${symbol}|trend:${trend}`;
-      const subset = withTrend.filter(x => x.r.symbol === symbol && x.trend === trend);
-      const entry = makeEntry(key, { symbol, trend }, 2, null, subset);
-      combos[key] = entry;
-
-      // Deepening is a one-way ratchet: once split, a combo stays split
-      // even if its tier later drifts back toward "average" on new data.
-      const alreadyDeepened = previousCombos?.[key]?.deepened;
-      const shouldDeepen = alreadyDeepened ||
-        (entry.n >= DEEPEN_MIN_SAMPLE && entry.tier !== "average" && entry.tier !== "insufficient");
-      if (shouldDeepen) {
-        entry.deepened = true;
-        for (const bucket of ["<40", "40-60", ">60"]) {
-          const childKey = `${key}|rsi:${bucket}`;
-          const childSubset = subset.filter(x => rsiBucket(x.r.entryConditions?.rsiAtEntry) === bucket);
-          combos[childKey] = makeEntry(childKey, { symbol, trend, rsi: bucket }, 3, key, childSubset);
-        }
-      }
+  // Create exactly 6 combos: 2 signals × 3 positions. NO SEEDING.
+  for (const signal of ["CALL", "PUT"]) {
+    for (const position of ["near_low", "mid", "near_high"]) {
+      const key = `${signal}|position:${position}`;
+      const subset = withPosition.filter(x =>
+        x.r.signal === signal && x.position === position
+      );
+      combos[key] = makeEntry(key, { signal, position }, 1.5, null, subset);
     }
   }
 
   return { combos, overallAvgPnlPct };
 }
 
-// Entry-time lookup: most specific proven match wins. A deepened parent
-// whose matching child isn't yet at MIN_COMBO_SAMPLE falls back to the
-// parent's own multiplier (its evidence is still better than nothing) —
-// never resets to 1.0 just because the child is still young.
-function lookupComboMultiplier(combos, symbol, trendDir, rsiAtEntry) {
-  if (!combos || !trendDir) return { comboKey: null, sizeMultiplier: 1.0 };
-  const parentKey = `${symbol}|trend:${trendDir}`;
-  const parent = combos[parentKey];
+// Entry-time lookup: direct signal|position match. If the combo is
+// still insufficient (n < MIN_COMBO_SAMPLE), returns 1.0× (conservative).
+function lookupComboMultiplier(combos, signal, positionBkt) {
+  if (!combos || !signal || !positionBkt) return { comboKey: null, sizeMultiplier: 1.0 };
 
-  if (parent?.deepened) {
-    const bucket = rsiBucket(rsiAtEntry);
-    const childKey = bucket ? `${parentKey}|rsi:${bucket}` : null;
-    const child = childKey ? combos[childKey] : null;
-    if (child && child.n >= MIN_COMBO_SAMPLE) {
-      return { comboKey: childKey, sizeMultiplier: child.sizeMultiplier };
-    }
+  const key = `${signal}|position:${positionBkt}`;
+  const combo = combos[key];
+
+  if (combo && combo.n >= MIN_COMBO_SAMPLE) {
+    return { comboKey: key, sizeMultiplier: combo.sizeMultiplier };
   }
-  if (parent && parent.n >= MIN_COMBO_SAMPLE) {
-    return { comboKey: parentKey, sizeMultiplier: parent.sizeMultiplier };
-  }
-  return { comboKey: parentKey, sizeMultiplier: 1.0 };
+
+  // Return position combo even if insufficient (returns mult=1.0)
+  return { comboKey: key, sizeMultiplier: 1.0 };
 }
 
 const COMBO_TIER_AR = { above_avg: "أعلى من المتوسط", average: "متوسط", below_avg: "أقل من المتوسط" };
 const COMBO_TREND_AR = { with: "مع الترند", against: "ضد الترند" };
 
 function buildComboTemplate(combo, overallAvgPnlPct) {
-  const label = combo.depth === 3
-    ? `${combo.factors.symbol} × ${COMBO_TREND_AR[combo.factors.trend]} × RSI ${combo.factors.rsi}`
-    : `${combo.factors.symbol} × ${COMBO_TREND_AR[combo.factors.trend]}`;
+  // Handle both old format (symbol×trend) and new format (signal×position)
+  let label;
+  if (combo.factors.symbol && combo.factors.trend) {
+    label = combo.factors.rsi
+      ? `${combo.factors.symbol} × ${COMBO_TREND_AR[combo.factors.trend]} × RSI ${combo.factors.rsi}`
+      : `${combo.factors.symbol} × ${COMBO_TREND_AR[combo.factors.trend]}`;
+  } else if (combo.factors.signal && combo.factors.position) {
+    label = `${combo.factors.signal} × موقع:${combo.factors.position}`;
+  } else {
+    label = "توليفة غير معروفة";
+  }
+
   const prevMultiplier = combo.previousTier ? COMBO_SIZE_MULTIPLIER[combo.previousTier] : 1.0;
   const wr = combo.n ? Math.round(combo.wins / combo.n * 100) : 0;
   const diff = overallAvgPnlPct != null && combo.avgPnlPct != null ? combo.avgPnlPct - overallAvgPnlPct : null;
   const tierAr = COMBO_TIER_AR[combo.tier] || combo.tier;
-  // "average" only ever reaches here via a downgrade from above_avg/below_avg
-  // (see the sizeMultiplier-change gate in runComboLearning below) — never
-  // claim a clear margin for it, since by definition it doesn't have one.
   const causeAr = combo.tier === "above_avg"
     ? `يتفوّق على أداء LAB العام بفارق واضح (≥${COMBO_TIER_MARGIN_PP}pp)`
     : combo.tier === "below_avg"
