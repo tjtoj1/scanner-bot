@@ -17,209 +17,101 @@
     "trailingPct": 8
   },
   "combos": {
-    "SPY|trend:with": {
+    "CALL|position:near_low": {
       "factors": {
-        "symbol": "SPY",
-        "trend": "with"
+        "signal": "CALL",
+        "position": "near_low"
       },
-      "depth": 2,
+      "depth": 1.5,
       "parentKey": null,
-      "n": 14,
-      "wins": 5,
-      "pnl": -768,
-      "avgPnlPct": -12.06,
-      "tier": "average",
-      "previousTier": "average",
+      "n": 7,
+      "wins": 4,
+      "pnl": 255,
+      "avgPnlPct": 9.1,
+      "tier": "insufficient",
+      "previousTier": null,
       "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.798Z"
+      "lastUpdated": "2026-09-07T20:00:04.011Z"
     },
-    "SPY|trend:against": {
+    "CALL|position:mid": {
       "factors": {
-        "symbol": "SPY",
-        "trend": "against"
+        "signal": "CALL",
+        "position": "mid"
       },
-      "depth": 2,
+      "depth": 1.5,
       "parentKey": null,
       "n": 2,
       "wins": 1,
-      "pnl": 27,
-      "avgPnlPct": 2.55,
+      "pnl": -98,
+      "avgPnlPct": -11.7,
       "tier": "insufficient",
-      "previousTier": "insufficient",
+      "previousTier": null,
       "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.798Z"
+      "lastUpdated": "2026-09-07T20:00:04.011Z"
     },
-    "QQQ|trend:with": {
+    "CALL|position:near_high": {
       "factors": {
-        "symbol": "QQQ",
-        "trend": "with"
+        "signal": "CALL",
+        "position": "near_high"
       },
-      "depth": 2,
+      "depth": 1.5,
       "parentKey": null,
-      "n": 11,
-      "wins": 4,
-      "pnl": -589,
-      "avgPnlPct": -12.64,
+      "n": 65,
+      "wins": 35,
+      "pnl": -36,
+      "avgPnlPct": -0.67,
       "tier": "average",
-      "previousTier": "average",
+      "previousTier": null,
       "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
+      "lastUpdated": "2026-09-07T20:00:04.011Z"
     },
-    "QQQ|trend:against": {
+    "PUT|position:near_low": {
       "factors": {
-        "symbol": "QQQ",
-        "trend": "against"
+        "signal": "PUT",
+        "position": "near_low"
       },
-      "depth": 2,
+      "depth": 1.5,
       "parentKey": null,
-      "n": 1,
-      "wins": 1,
-      "pnl": 54,
-      "avgPnlPct": 12.7,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
+      "n": 80,
+      "wins": 39,
+      "pnl": -1787,
+      "avgPnlPct": -5.03,
+      "tier": "average",
+      "previousTier": null,
       "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
+      "lastUpdated": "2026-09-07T20:00:04.011Z"
     },
-    "IWM|trend:with": {
+    "PUT|position:mid": {
       "factors": {
-        "symbol": "IWM",
-        "trend": "with"
+        "signal": "PUT",
+        "position": "mid"
       },
-      "depth": 2,
+      "depth": 1.5,
       "parentKey": null,
       "n": 4,
       "wins": 1,
-      "pnl": -312,
-      "avgPnlPct": -16.88,
+      "pnl": -131,
+      "avgPnlPct": -8.15,
       "tier": "insufficient",
-      "previousTier": "insufficient",
+      "previousTier": null,
       "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
+      "lastUpdated": "2026-09-07T20:00:04.011Z"
     },
-    "IWM|trend:against": {
+    "PUT|position:near_high": {
       "factors": {
-        "symbol": "IWM",
-        "trend": "against"
+        "signal": "PUT",
+        "position": "near_high"
       },
-      "depth": 2,
+      "depth": 1.5,
       "parentKey": null,
-      "n": 1,
-      "wins": 1,
-      "pnl": 525,
-      "avgPnlPct": 115.1,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
-    },
-    "NVDA|trend:with": {
-      "factors": {
-        "symbol": "NVDA",
-        "trend": "with"
-      },
-      "depth": 2,
-      "parentKey": null,
-      "n": 11,
+      "n": 8,
       "wins": 5,
-      "pnl": -264,
-      "avgPnlPct": -5.47,
-      "tier": "average",
-      "previousTier": "average",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
-    },
-    "NVDA|trend:against": {
-      "factors": {
-        "symbol": "NVDA",
-        "trend": "against"
-      },
-      "depth": 2,
-      "parentKey": null,
-      "n": 0,
-      "wins": 0,
-      "pnl": 0,
-      "avgPnlPct": null,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
-    },
-    "TSLA|trend:with": {
-      "factors": {
-        "symbol": "TSLA",
-        "trend": "with"
-      },
-      "depth": 2,
-      "parentKey": null,
-      "n": 7,
-      "wins": 3,
-      "pnl": -311,
-      "avgPnlPct": -12.99,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
-    },
-    "TSLA|trend:against": {
-      "factors": {
-        "symbol": "TSLA",
-        "trend": "against"
-      },
-      "depth": 2,
-      "parentKey": null,
-      "n": 1,
-      "wins": 1,
-      "pnl": 118,
-      "avgPnlPct": 15.3,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
-    },
-    "AMZN|trend:with": {
-      "factors": {
-        "symbol": "AMZN",
-        "trend": "with"
-      },
-      "depth": 2,
-      "parentKey": null,
-      "n": 2,
-      "wins": 0,
-      "pnl": -316,
-      "avgPnlPct": -35,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
-    },
-    "AMZN|trend:against": {
-      "factors": {
-        "symbol": "AMZN",
-        "trend": "against"
-      },
-      "depth": 2,
-      "parentKey": null,
-      "n": 0,
-      "wins": 0,
-      "pnl": 0,
-      "avgPnlPct": null,
-      "tier": "insufficient",
-      "previousTier": "insufficient",
-      "sizeMultiplier": 1,
-      "deepened": false,
-      "lastUpdated": "2026-09-04T20:00:54.799Z"
+      "pnl": 497,
+      "avgPnlPct": 11.44,
+      "tier": "above_avg",
+      "previousTier": null,
+      "sizeMultiplier": 1.5,
+      "lastUpdated": "2026-09-07T20:00:04.011Z"
     }
   },
   "changelog": [
