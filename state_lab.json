@@ -5,46 +5,8 @@
   "_cooldowns": {
     "TSLA_PUT": 1788534216839,
     "SPY_PUT": 1788536626288,
-    "AMZN_PUT": 1788540238042
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260908C00721000",
-    "strike": "721",
-    "entryPremium": 1.915,
-    "qty": 2,
-    "entryTime": 1788874264532,
-    "msgId": 2395,
-    "stopOrderId": "ddd3c604-eb45-4a95-9e3b-2c049d270ae5",
-    "hardStopPrice": 1.34,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 721.45,
-      "regime": "bullish",
-      "emaFast": 719.9739,
-      "emaSlow": 719.3017,
-      "breakoutHigh": 721.1,
-      "breakoutLow": 718.27,
-      "volRatio": 1.33,
-      "lastClose": 721.24,
-      "lastVolume": 65432,
-      "barTime": "2026-09-08T13:00:00Z",
-      "entryTimeUTC": "2026-09-08T13:31:04.532Z",
-      "vwapAtEntry": 719.3984,
-      "rsiAtEntry": 65.39,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -20
+    "AMZN_PUT": 1788540238042,
+    "QQQ_CALL": 1788876143214
   },
   "NVDA": {
     "active": true,
@@ -82,7 +44,8 @@
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
