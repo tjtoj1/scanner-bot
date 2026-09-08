@@ -57,31 +57,5 @@
       "high": 257.69,
       "low": 254.95
     }
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260908P00767000",
-    "strike": "767",
-    "entryPremium": 1.0950000000000002,
-    "qty": 4,
-    "entryTime": 1788877964999,
-    "level": 767.09,
-    "msgId": 2430,
-    "stopOrderId": "69786cdf-bc5d-4755-90d1-93e4b38f0e25",
-    "hardStopPrice": 0.71,
-    "entryStockPrice": 766.76,
-    "vwapAtEntry": 767.6309,
-    "rsiAtEntry": 40.29,
-    "volumeRatio": 5.44900118893578,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.045662100456608,
-    "lastReportedThreshold": 10
   }
 }
