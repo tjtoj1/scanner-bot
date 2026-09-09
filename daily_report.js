@@ -26,8 +26,6 @@ function readJSONL(path) {
 function readJSON(path, fallback) {
   try { return JSON.parse(fs.readFileSync(path, "utf8")); } catch { return fallback; }
 }
-function getTodayStr() { return new Date().toISOString().split("T")[0]; }
-
 function loadReportState() {
   try { return JSON.parse(fs.readFileSync("report_state.json", "utf8")); } catch { return {}; }
 }
@@ -150,8 +148,15 @@ function buildLabChangesSection(strategy, today) {
 }
 
 (async () => {
-  const today = getTodayStr();
   const rs = loadReportState();
+  const labState = readJSON("state_lab.json", {});
+  const today = labState._lastDay;
+
+  if (!today) {
+    console.log("[daily_report] no trading day recorded in state_lab.json — skipping");
+    return;
+  }
+
   if (rs.lastSentDay === today) {
     console.log(`[daily_report] already sent for ${today} — skipping`);
     return;
@@ -164,9 +169,14 @@ function buildLabChangesSection(strategy, today) {
 
   const labOutcomes = readJSONL("outcomes_lab.jsonl");
   const labToday = labOutcomes.filter(r => r.day === today);
-  const labState = readJSON("state_lab.json", {});
   const labActive = Object.keys(labState).filter(k => !k.startsWith("_") && labState[k]?.active);
   const strategy = readJSON("strategy_lab.json", { params: {}, changelog: [] });
+
+  const hasData = v21Today.length > 0 || labToday.length > 0;
+  if (!hasData) {
+    console.log(`[daily_report] no trades found for ${today} — skipping to avoid empty report`);
+    return;
+  }
 
   let msg = `📊 <b>التقرير اليومي — ${today}</b>\n`;
   msg += buildBotSection("v21 ORB", v21Today, v21Active);
