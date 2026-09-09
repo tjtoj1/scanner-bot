@@ -67,7 +67,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -94,7 +94,7 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 27.586206896551737,
-    "lastReportedThreshold": 20
+    "peakPct": 39.31034482758621,
+    "lastReportedThreshold": 30
   }
 }
