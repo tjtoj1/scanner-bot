@@ -18,6 +18,12 @@
       "symbol": "IWM",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-09",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -58,16 +64,16 @@
   "IWM": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "IWM260909P00292000",
-    "strike": "292",
-    "entryPremium": 0.535,
-    "qty": 9,
-    "entryTime": 1788963825741,
+    "optionSymbol": "IWM260909P00293000",
+    "strike": "293",
+    "entryPremium": 0.795,
+    "qty": 6,
+    "entryTime": 1788964030894,
     "level": 292.84,
-    "msgId": 2532,
-    "stopOrderId": "f594c1fa-9baa-43e7-b18c-282047ad06a1",
-    "hardStopPrice": 0.35,
-    "entryStockPrice": 292.17,
+    "msgId": 2544,
+    "stopOrderId": null,
+    "hardStopPrice": 0.52,
+    "entryStockPrice": 292.55,
     "vwapAtEntry": 293.2121,
     "rsiAtEntry": 34.67,
     "volumeRatio": 13.069515752849984,
@@ -75,7 +81,6 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
+    "slStock": null
   }
 }
