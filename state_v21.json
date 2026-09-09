@@ -1,6 +1,19 @@
 {
   "_lastDay": "2026-09-09",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-09-09",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-09",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-09-09",
@@ -32,5 +45,49 @@
       "high": 254.69,
       "low": 250.89
     }
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260909C00718000",
+    "strike": "718",
+    "entryPremium": 1.6749999999999998,
+    "qty": 2,
+    "entryTime": 1788963337460,
+    "level": 717.55,
+    "msgId": 2503,
+    "stopOrderId": null,
+    "hardStopPrice": 1.09,
+    "entryStockPrice": 718.31,
+    "vwapAtEntry": 716.8446,
+    "rsiAtEntry": 64.11,
+    "volumeRatio": 11.587559065272336,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260909P00293000",
+    "strike": "293",
+    "entryPremium": 0.725,
+    "qty": 6,
+    "entryTime": 1788963338609,
+    "level": 292.84,
+    "msgId": 2504,
+    "stopOrderId": "6f9a6309-119a-4088-9b6c-896fd46d0270",
+    "hardStopPrice": 0.47,
+    "entryStockPrice": 292.685,
+    "vwapAtEntry": 293.2121,
+    "rsiAtEntry": 34.67,
+    "volumeRatio": 13.069515752849984,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
