@@ -8,5 +8,43 @@
     "NVDA_CALL": 1788876206239,
     "SPY_PUT": 1788880760149,
     "QQQ_CALL": 1788965401971
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA260909P00225000",
+    "strike": "225",
+    "entryPremium": 1.205,
+    "qty": 4,
+    "entryTime": 1788964853200,
+    "msgId": 2584,
+    "stopOrderId": null,
+    "hardStopPrice": 0.84,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 224.39,
+      "regime": "bearish",
+      "emaFast": 224.6836,
+      "emaSlow": 224.8624,
+      "breakoutHigh": 226.18,
+      "breakoutLow": 224.28,
+      "volRatio": 7.02,
+      "lastClose": 224.25,
+      "lastVolume": 4449736,
+      "barTime": "2026-09-09T14:00:00Z",
+      "entryTimeUTC": "2026-09-09T14:40:53.200Z",
+      "vwapAtEntry": 224.8493,
+      "rsiAtEntry": 39.23,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
   }
 }
