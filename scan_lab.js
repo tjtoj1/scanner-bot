@@ -1249,13 +1249,49 @@ async function runComboLearning(state, strategy) {
     const prevMultiplier = c.previousTier ? COMBO_SIZE_MULTIPLIER[c.previousTier] : 1.0;
     return c.tier !== "insufficient" && c.sizeMultiplier !== prevMultiplier;
   });
+
+  // ===== تسجيل tier changes في changelog =====
+  const tierChanges = [];
+  for (const [key, combo] of Object.entries(combos)) {
+    const prevCombo = strategy.combos[key];
+    const prevTier = prevCombo?.tier;
+
+    if (prevTier && prevTier !== combo.tier) {
+      tierChanges.push({ key, prevTier, newTier: combo.tier, combo, prevCombo });
+    }
+  }
+
+  if (tierChanges.length > 0) {
+    for (const { key, prevTier, newTier, combo, prevCombo } of tierChanges) {
+      const oldMultiplier = COMBO_SIZE_MULTIPLIER[prevTier] || 1.0;
+      const newMultiplier = COMBO_SIZE_MULTIPLIER[newTier] || 1.0;
+
+      const entry = {
+        date: today,
+        appliedAt: new Date().toISOString(),
+        type: "combo_tier_change",
+        comboKey: key,
+        oldTier: prevTier,
+        newTier: newTier,
+        oldMultiplier: oldMultiplier,
+        newMultiplier: newMultiplier,
+        sampleSize: combo.n,
+        winRate: combo.wins && combo.n ? Math.round(combo.wins / combo.n * 100) : 0,
+        netPnl: combo.pnl,
+        avgPnlPct: combo.avgPnlPct.toFixed(2),
+        reason: `توليفة ${key}: تغيّرت من tier ${prevTier}(×${oldMultiplier}) إلى ${newTier}(×${newMultiplier}) بناءً على ${combo.n} صفقة حقيقية (WR ${Math.round(combo.wins / combo.n * 100)}%, net $${combo.pnl})`
+      };
+      strategy.changelog.push(entry);
+    }
+  }
+
   for (const combo of changed) {
     await tg(buildComboTemplate(combo, overallAvgPnlPct));
   }
 
   strategy.combos = combos;
   saveStrategy(strategy);
-  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, ${changed.length} tier change(s) today.`);
+  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, ${changed.length} size change(s), ${tierChanges.length} tier change(s) logged today.`);
 }
 
 // ─── MAIN ───────────────────────────────────────────────────
