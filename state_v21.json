@@ -72,7 +72,10 @@
     "stopPct": 10,
     "trailPct": 10,
     "peakPct": 59.31034482758618,
-    "lastReportedThreshold": 40,
+    "lastReportedThreshold": 50,
     "nearStopWarned": true
+  },
+  "QQQ": {
+    "active": true
   }
 }
