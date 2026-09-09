@@ -58,9 +58,6 @@
       "low": 250.89
     }
   },
-  "QQQ": {
-    "active": true
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -84,7 +81,7 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 23.270440251572317,
+    "peakPct": 25.15723270440251,
     "lastReportedThreshold": 20,
     "nearStopWarned": true,
     "ladder2": true,
