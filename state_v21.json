@@ -46,29 +46,6 @@
       "low": 250.89
     }
   },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260909C00718000",
-    "strike": "718",
-    "entryPremium": 1.6749999999999998,
-    "qty": 2,
-    "entryTime": 1788963337460,
-    "level": 717.55,
-    "msgId": 2503,
-    "stopOrderId": null,
-    "hardStopPrice": 1.09,
-    "entryStockPrice": 718.31,
-    "vwapAtEntry": 716.8446,
-    "rsiAtEntry": 64.11,
-    "volumeRatio": 11.587559065272336,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -95,6 +72,7 @@
     "stopPct": 10,
     "trailPct": 10,
     "peakPct": 59.31034482758618,
-    "lastReportedThreshold": 50
+    "lastReportedThreshold": 40,
+    "nearStopWarned": true
   }
 }
