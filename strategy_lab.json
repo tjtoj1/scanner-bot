@@ -31,7 +31,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-09T20:00:49.310Z"
+      "lastUpdated": "2026-09-10T20:00:25.838Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -47,7 +47,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-09T20:00:49.310Z"
+      "lastUpdated": "2026-09-10T20:00:25.838Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -63,7 +63,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-09T20:00:49.310Z"
+      "lastUpdated": "2026-09-10T20:00:25.838Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -72,14 +72,14 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 91,
+      "n": 93,
       "wins": 45,
-      "pnl": -2125,
-      "avgPnlPct": -5.17,
+      "pnl": -2433,
+      "avgPnlPct": -5.78,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-09T20:00:49.310Z"
+      "lastUpdated": "2026-09-10T20:00:25.838Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -88,14 +88,14 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 4,
+      "n": 5,
       "wins": 1,
-      "pnl": -131,
-      "avgPnlPct": -8.15,
+      "pnl": -207,
+      "avgPnlPct": -12.08,
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-09T20:00:49.310Z"
+      "lastUpdated": "2026-09-10T20:00:25.838Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -111,7 +111,7 @@
       "tier": "above_avg",
       "previousTier": "above_avg",
       "sizeMultiplier": 1.5,
-      "lastUpdated": "2026-09-09T20:00:49.310Z"
+      "lastUpdated": "2026-09-10T20:00:25.839Z"
     }
   },
   "changelog": [
