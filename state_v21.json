@@ -79,7 +79,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
@@ -91,7 +91,7 @@
     "entryTime": 1789049729544,
     "level": 365.389,
     "msgId": 2628,
-    "stopOrderId": "2da92c6f-43a1-4837-a66f-97583bc56552",
+    "stopOrderId": "c14b834d-de0e-4dff-9f39-887da1189984",
     "hardStopPrice": 2.44,
     "entryStockPrice": 365.9,
     "vwapAtEntry": null,
@@ -101,6 +101,10 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.516644474034614,
+    "lastReportedThreshold": 10
   }
 }
