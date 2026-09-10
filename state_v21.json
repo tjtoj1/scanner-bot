@@ -79,7 +79,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "TSLA": {
     "active": true,
@@ -102,28 +102,5 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260910P00758000",
-    "strike": "758",
-    "entryPremium": 1.255,
-    "qty": 3,
-    "entryTime": 1789050060828,
-    "level": 757.55,
-    "msgId": 2638,
-    "stopOrderId": null,
-    "hardStopPrice": 0.82,
-    "entryStockPrice": 758.225,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 42.57,
-    "volumeRatio": 15.917382108523306,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -10
   }
 }
