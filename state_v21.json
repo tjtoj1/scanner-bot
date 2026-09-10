@@ -18,6 +18,12 @@
       "symbol": "TSLA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-10",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -51,30 +57,6 @@
       "high": 251.85,
       "low": 249.58
     }
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY260910P00757000",
-    "strike": "757",
-    "entryPremium": 1.3050000000000002,
-    "qty": 3,
-    "entryTime": 1789049725604,
-    "level": 757.55,
-    "msgId": 2626,
-    "stopOrderId": "d5a69195-66f3-4ca2-bf65-0f3360694d31",
-    "hardStopPrice": 0.85,
-    "entryStockPrice": 757.24,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 42.57,
-    "volumeRatio": 15.917382108523306,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
   },
   "NVDA": {
     "active": true,
@@ -114,6 +96,28 @@
     "vwapAtEntry": null,
     "rsiAtEntry": 53.86,
     "volumeRatio": 11.303683844284427,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260910P00758000",
+    "strike": "758",
+    "entryPremium": 1.255,
+    "qty": 3,
+    "entryTime": 1789050060828,
+    "level": 757.55,
+    "msgId": 2638,
+    "stopOrderId": null,
+    "hardStopPrice": 0.82,
+    "entryStockPrice": 758.225,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 42.57,
+    "volumeRatio": 15.917382108523306,
     "signalType": "breakout",
     "tp1Stock": null,
     "tp2Stock": null,
