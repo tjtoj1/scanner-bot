@@ -47,7 +47,7 @@
       "comboKey": "PUT|position:mid",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10,
+    "lastReportedThreshold": -20,
     "nearStopWarned": true
   }
 }
