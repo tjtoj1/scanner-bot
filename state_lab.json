@@ -47,5 +47,43 @@
       "sizeMultiplier": 1
     },
     "lastReportedThreshold": -10
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA260911P00217500",
+    "strike": "217.5",
+    "entryPremium": 2.125,
+    "qty": 2,
+    "entryTime": 1789048853799,
+    "msgId": 2623,
+    "stopOrderId": "37875766-2bf8-483b-8afc-d61647d4838b",
+    "hardStopPrice": 1.49,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 217.51,
+      "regime": "bearish",
+      "emaFast": 220.7513,
+      "emaSlow": 221.8169,
+      "breakoutHigh": 223.67,
+      "breakoutLow": 220.22,
+      "volRatio": 43.83,
+      "lastClose": 218.305,
+      "lastVolume": 10799805,
+      "barTime": "2026-09-10T13:30:00Z",
+      "entryTimeUTC": "2026-09-10T14:00:53.799Z",
+      "vwapAtEntry": 220.0017,
+      "rsiAtEntry": 11.88,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
   }
 }
