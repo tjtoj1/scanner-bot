@@ -79,6 +79,6 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   }
 }
