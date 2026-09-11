@@ -83,7 +83,7 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 32.38866396761133,
+    "peakPct": 34.8178137651822,
     "lastReportedThreshold": 30
   },
   "QQQ": {
@@ -107,10 +107,10 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 24.927536231884066,
+    "peakPct": 36.521739130434774,
     "ladder2": true,
     "trailPct": 10
   }
