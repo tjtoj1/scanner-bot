@@ -94,7 +94,8 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastReportedThreshold": -10
   },
   "NVDA": {
     "active": true,
@@ -116,6 +117,7 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastReportedThreshold": -10
   }
 }
