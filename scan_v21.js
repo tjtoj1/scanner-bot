@@ -56,6 +56,9 @@ const LADDER_2_STOP     = 10;
 const TRAIL_PCT         = 10;
 const HARD_STOP_PCT     = -35;
 
+// Cooldown: prevent re-entry on same symbol×signal within 30 min after losing close
+const COOLDOWN_MINUTES  = 30;
+
 // Range building window: 8:30-8:45 AM CDT = 13:30-13:45 UTC
 const RANGE_START_UTC   = 13 * 60 + 30;
 const RANGE_END_UTC     = 13 * 60 + 45;
@@ -459,6 +462,16 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
   const pnl = Math.round((exitPremium - pos.entryPremium) * soldQty * 100);
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
   logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
+
+  // ─── REGISTER COOLDOWN (on losing hard_stop or alpaca_stop) ────────
+  if ((reason === "hard_stop" || reason === "alpaca_stop") && pnl < 0) {
+    const cooldownKey = `${symbol}_${pos.signal}`;
+    state._cooldowns = state._cooldowns || {};
+    state._cooldowns[cooldownKey] = new Date().toISOString();
+    console.log(`Cooldown registered: ${cooldownKey} until ${new Date(Date.now() + COOLDOWN_MINUTES * 60 * 1000).toISOString()}`);
+  }
+  // ─── END COOLDOWN REGISTRATION ────────────────────────────────────
+
   await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
   delete state[symbol];
   saveState(state);
@@ -651,6 +664,29 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   if (isPastLastEntry()) return;
   if (isRangeBuilding()) return;
 
+  // ─── COOLDOWN CHECK (prevent re-entry chains) ───────────────
+  // Compute signal first to check cooldown for this symbol×signal
+  const breakout = await checkBreakout(state, symbol);
+  if (!breakout) return;
+
+  const cooldownKey = `${symbol}_${breakout.signal}`;
+  if (state._cooldowns?.[cooldownKey]) {
+    const cooldownTime = new Date(state._cooldowns[cooldownKey]);
+    const nowTime = new Date();
+    const elapsedMs = nowTime - cooldownTime;
+
+    if (elapsedMs < COOLDOWN_MINUTES * 60 * 1000) {
+      const remainingMin = Math.round((COOLDOWN_MINUTES * 60 * 1000 - elapsedMs) / 60000);
+      console.log(`${symbol} ${breakout.signal}: BLOCKED by cooldown (${remainingMin}m remaining)`);
+      return;
+    } else {
+      // Cooldown expired, clean it up
+      delete state._cooldowns[cooldownKey];
+      saveState(state);
+    }
+  }
+  // ─── END COOLDOWN CHECK ────────────────────────────────────
+
   // Daily trade limit
   const today = getToday();
   const todayTrades = (state._dailyTrades || []).filter(t => t.day === today).length;
@@ -671,9 +707,7 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
     return;
   }
 
-  // Check breakout
-  const breakout = await checkBreakout(state, symbol);
-  if (!breakout) return;
+  // breakout already computed in cooldown check above
 
   const spot = await getLatestPrice(symbol);
   if (!spot) return;
