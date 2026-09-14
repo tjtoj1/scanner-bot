@@ -12,5 +12,43 @@
     "AMZN_PUT": 1789394730999,
     "SPY_CALL": 1789403723374,
     "QQQ_CALL": 1789403723653
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM260914C00289000",
+    "strike": "289",
+    "entryPremium": 0.355,
+    "qty": 14,
+    "entryTime": 1789404312473,
+    "msgId": 2786,
+    "stopOrderId": "a8d6b15a-4a54-46d9-801e-1336e84c9da9",
+    "hardStopPrice": 0.25,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 288.96000000000004,
+      "regime": "bullish",
+      "emaFast": 288.3449,
+      "emaSlow": 288.1267,
+      "breakoutHigh": 288.95,
+      "breakoutLow": 287.055,
+      "volRatio": 1.71,
+      "lastClose": 289.06,
+      "lastVolume": 1059193,
+      "barTime": "2026-09-14T16:15:00Z",
+      "entryTimeUTC": "2026-09-14T16:45:12.473Z",
+      "vwapAtEntry": 288.1855,
+      "rsiAtEntry": 61.35,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
   }
 }
