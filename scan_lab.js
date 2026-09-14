@@ -663,6 +663,13 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
   // never exceed the hard cap even at the ×1.5 tier.
   const positionBkt = positionBucket(spot, sig.breakoutHigh, sig.breakoutLow);
   const { comboKey, sizeMultiplier } = lookupComboMultiplier(strategy.combos, sig.signal, positionBkt);
+
+  // TEMPORARY: Exclude PUT|near_low combo — pending comprehensive sizeMultiplier solution
+  if (comboKey === "PUT|position:near_low") {
+    console.log(`${symbol}: ${sig.signal} @ ${positionBkt} — PUT|near_low excluded (temporary hold pending data review)`);
+    return;
+  }
+
   const effectiveBudget = strategy.params.tradeBudget * sizeMultiplier;
 
   const opt = await findOption(symbol, sig.signal, spot);
