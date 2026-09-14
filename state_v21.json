@@ -18,6 +18,12 @@
       "symbol": "QQQ",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-14",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -68,6 +74,28 @@
     "vwapAtEntry": 704.3635,
     "rsiAtEntry": 51.38,
     "volumeRatio": 9.588103754431478,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260914C00759000",
+    "strike": "759",
+    "entryPremium": 1.355,
+    "qty": 3,
+    "entryTime": 1789395729711,
+    "level": 759.52,
+    "msgId": 2746,
+    "stopOrderId": null,
+    "hardStopPrice": 0.88,
+    "entryStockPrice": 759.27,
+    "vwapAtEntry": 759.3902,
+    "rsiAtEntry": 48.97,
+    "volumeRatio": 8.465679395312767,
     "signalType": "breakout",
     "tp1Stock": null,
     "tp2Stock": null,
