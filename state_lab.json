@@ -95,7 +95,8 @@
     "stopPct": 12,
     "peakPct": 37.79527559055118,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
