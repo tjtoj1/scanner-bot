@@ -84,7 +84,8 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 30.27888446215139
+    "peakPct": 30.27888446215139,
+    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
