@@ -88,12 +88,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 29.702970297029687
+    "peakPct": 33.33333333333333
   },
   "AMZN": {
     "active": true,
