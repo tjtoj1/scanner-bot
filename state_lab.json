@@ -46,12 +46,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 37.87128712871288
+    "peakPct": 42.574257425742566
   },
   "IWM": {
     "active": true,
@@ -95,7 +95,8 @@
     "stopPct": 12,
     "peakPct": 37.79527559055118,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
