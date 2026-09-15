@@ -95,7 +95,7 @@
     "qty": 10,
     "entryTime": 1789482660629,
     "msgId": 2875,
-    "stopOrderId": null,
+    "stopOrderId": "b63449bf-3d29-4369-a475-a0249805ca64",
     "hardStopPrice": 0.35,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -123,6 +123,11 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 26.262626262626267
   }
 }
