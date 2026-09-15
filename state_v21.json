@@ -79,12 +79,12 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 22.310756972111577
+    "peakPct": 30.27888446215139
   },
   "IWM": {
     "active": true,
@@ -107,10 +107,10 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 34.40860215053764,
+    "peakPct": 49.46236559139785,
     "ladder2": true,
     "trailPct": 10
   },
