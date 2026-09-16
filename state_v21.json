@@ -58,33 +58,6 @@
       "low": 246.69
     }
   },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY260916C00759000",
-    "strike": "759",
-    "entryPremium": 2.5599999999999996,
-    "qty": 1,
-    "entryTime": 1789568123079,
-    "level": 759.705,
-    "msgId": 3057,
-    "stopOrderId": "8193440e-f5b8-4a10-9a77-29da5e841c43",
-    "hardStopPrice": 1.66,
-    "entryStockPrice": 759.405,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 43.03,
-    "volumeRatio": 9.862558632872233,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 11.914062500000025,
-    "nearStopWarned": true
-  },
   "IWM": {
     "active": true,
     "signal": "CALL",
