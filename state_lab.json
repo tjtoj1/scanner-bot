@@ -49,51 +49,6 @@
     },
     "lastReportedThreshold": -10
   },
-  "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "NVDA260916C00217500",
-    "strike": "217.5",
-    "entryPremium": 0.425,
-    "qty": 11,
-    "entryTime": 1789571703018,
-    "msgId": 3114,
-    "stopOrderId": "4b1a1dd0-e4c6-4f30-bc2d-6c3d925863d3",
-    "hardStopPrice": 0.3,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 216.01999999999998,
-      "regime": "bullish",
-      "emaFast": 214.6919,
-      "emaSlow": 214.1113,
-      "breakoutHigh": 215.35,
-      "breakoutLow": 213.31,
-      "volRatio": 1.99,
-      "lastClose": 215.45,
-      "lastVolume": 2327146,
-      "barTime": "2026-09-16T14:45:00Z",
-      "entryTimeUTC": "2026-09-16T15:15:03.018Z",
-      "vwapAtEntry": 214.4397,
-      "rsiAtEntry": 70.72,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": 20,
-    "nearStopWarned": true,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 28.23529411764707
-  },
   "SPY": {
     "active": true,
     "signal": "CALL",
@@ -134,6 +89,6 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 20.952380952380945,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 10
   }
 }
