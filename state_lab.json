@@ -1,7 +1,7 @@
 {
   "_lastDay": "2026-09-16",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-09-15",
+  "_lastComboLearnedDay": "2026-09-16",
   "_cooldowns": {
     "AMZN_CALL": 1789137717729,
     "IWM_CALL": 1789570521578,
@@ -11,5 +11,6 @@
     "QQQ_PUT": 1789588216650,
     "SPY_PUT": 1789588693027,
     "IWM_PUT": 1789588693317
-  }
+  },
+  "_lastComboLearnedFinal": true
 }
