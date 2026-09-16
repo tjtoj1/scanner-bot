@@ -102,6 +102,7 @@ function isMarketOpen()   { const m = utcMin(); return m >= MARKET_OPEN_UTC && m
 function isPastLastEntry(){ return utcMin() >= LAST_ENTRY_UTC; }
 function isForceExit()    { return utcMin() >= FORCE_EXIT_UTC; }
 function getToday() { return new Date().toISOString().split("T")[0]; }
+function daysAgoUTC(n) { return new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; }
 
 function loadStrategy() {
   let s;
@@ -1085,9 +1086,28 @@ async function runDailyLearning(state, strategy) {
 //   cycle (same pattern as the legacy tuner above) — outcomes_lab.jsonl
 //   stays the single source of truth; strategy.combos is a derived,
 //   persisted cache read synchronously at trade entry.
-const MIN_COMBO_SAMPLE = 8;      // trades needed before a combo is judged at all
-const DEEPEN_MIN_SAMPLE = 16;    // trades needed before a combo may split into a 3rd factor
-const COMBO_TIER_MARGIN_PP = 8;  // avg pnlPct must differ from the overall average by this many points
+// Tiering is anchored at ZERO, not at LAB's own average. Grading a combo
+// against LAB's mean is self-referential: while that mean is negative, a
+// combo that merely loses less than the rest scores "average" and keeps
+// full size — the system can then never conclude that something is bad in
+// absolute terms, only that it is bad relative to its own bad. Anchoring
+// at 0 makes the question "does this combo make or lose money per trade".
+//
+// On top of the anchor, a tier needs the sample to actually support it:
+// pnlPct on these options runs a ~30pp standard deviation, so an 8-trade
+// mean is indistinguishable from noise (the one combo ever promoted to
+// x1.5 had a single +115% trade carrying 8 samples; without it the mean
+// was -3.4%). COMBO_CONF_Z requires the one-sided 90% bound to stay on
+// the same side of zero as the mean before acting.
+//
+// The two sample gates are deliberately ASYMMETRIC: sizing down is cheap
+// insurance against a combo that may be bad, sizing up puts 50% more
+// capital at risk on a combo that may only look good. A missed
+// opportunity is cheaper than a leveraged loss.
+const MIN_COMBO_SAMPLE_DOWN = 20; // sample needed before a combo may be sized DOWN
+const MIN_COMBO_SAMPLE_UP   = 30; // sizing UP demands more evidence than sizing down
+const COMBO_ABS_MARGIN_PP   = 5;  // |avg pnlPct| must clear this before any judgment
+const COMBO_CONF_Z          = 1.28; // one-sided 90% confidence bound
 const COMBO_SIZE_MULTIPLIER = { above_avg: 1.5, average: 1.0, below_avg: 0.5, insufficient: 1.0 };
 
 // CALL above VWAP / PUT below VWAP = "with" the trend the entry is
@@ -1122,7 +1142,7 @@ function positionBucket(spot, breakoutHigh, breakoutLow) {
 
 // Rebuilds combo stats from full outcomes history. Simplified to 6 combos:
 // signal (CALL/PUT) × position (near_low/mid/near_high), no per-symbol deepening.
-// Reaches MIN_COMBO_SAMPLE faster by pooling all symbols.
+// Reaches a judgeable sample faster by pooling all symbols.
 function computeCombos(records, previousCombos) {
   const withPosition = records
     .map(r => ({
@@ -1135,11 +1155,22 @@ function computeCombos(records, previousCombos) {
     ? withPosition.reduce((a, x) => a + x.r.pnlPct, 0) / withPosition.length
     : null;
 
-  function tierFor(n, avgPnlPct) {
-    if (n < MIN_COMBO_SAMPLE || avgPnlPct == null || overallAvgPnlPct == null) return "insufficient";
-    const diff = avgPnlPct - overallAvgPnlPct;
-    if (diff >= COMBO_TIER_MARGIN_PP) return "above_avg";
-    if (diff <= -COMBO_TIER_MARGIN_PP) return "below_avg";
+  // Standard error of the mean pnlPct. null below 2 samples, where the
+  // sample variance is undefined.
+  function standardError(pcts) {
+    const n = pcts.length;
+    if (n < 2) return null;
+    const mean = pcts.reduce((a, b) => a + b, 0) / n;
+    const variance = pcts.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1);
+    return Math.sqrt(variance) / Math.sqrt(n);
+  }
+
+  function tierFor(n, avgPnlPct, se) {
+    if (n < MIN_COMBO_SAMPLE_DOWN || avgPnlPct == null || se == null) return "insufficient";
+    // Size down: mean clears the margin AND its upper 90% bound stays below 0.
+    if (avgPnlPct <= -COMBO_ABS_MARGIN_PP && avgPnlPct + COMBO_CONF_Z * se < 0) return "below_avg";
+    // Size up: the same test mirrored, behind the larger sample gate.
+    if (n >= MIN_COMBO_SAMPLE_UP && avgPnlPct >= COMBO_ABS_MARGIN_PP && avgPnlPct - COMBO_CONF_Z * se > 0) return "above_avg";
     return "average";
   }
 
@@ -1147,13 +1178,18 @@ function computeCombos(records, previousCombos) {
     const n = subset.length;
     const wins = subset.filter(x => x.r.win).length;
     const pnl = subset.reduce((a, x) => a + x.r.pnl, 0);
-    const avgPnlPct = n ? subset.reduce((a, x) => a + x.r.pnlPct, 0) / n : null;
-    const tier = tierFor(n, avgPnlPct);
+    const pcts = subset.map(x => x.r.pnlPct);
+    const avgPnlPct = n ? pcts.reduce((a, b) => a + b, 0) / n : null;
+    const se = standardError(pcts);
+    const tier = tierFor(n, avgPnlPct, se);
     const prev = previousCombos?.[key];
     return {
       factors, depth, parentKey: parentKey || null,
       n, wins, pnl: Math.round(pnl),
       avgPnlPct: avgPnlPct != null ? +avgPnlPct.toFixed(2) : null,
+      // Persisted so the notification and the changelog can show exactly
+      // how far the judgment was from the zero anchor.
+      se: se != null ? +se.toFixed(2) : null,
       tier, previousTier: prev?.tier ?? null,
       sizeMultiplier: COMBO_SIZE_MULTIPLIER[tier],
       lastUpdated: new Date().toISOString(),
@@ -1175,20 +1211,16 @@ function computeCombos(records, previousCombos) {
   return { combos, overallAvgPnlPct };
 }
 
-// Entry-time lookup: direct signal|position match. If the combo is
-// still insufficient (n < MIN_COMBO_SAMPLE), returns 1.0× (conservative).
+// Entry-time lookup: direct signal|position match. An unjudged combo
+// carries tier "insufficient", which maps to 1.0× — so the tier alone is
+// authoritative here and no separate sample check is needed.
 function lookupComboMultiplier(combos, signal, positionBkt) {
   if (!combos || !signal || !positionBkt) return { comboKey: null, sizeMultiplier: 1.0 };
 
   const key = `${signal}|position:${positionBkt}`;
   const combo = combos[key];
-
-  if (combo && combo.n >= MIN_COMBO_SAMPLE) {
-    return { comboKey: key, sizeMultiplier: combo.sizeMultiplier };
-  }
-
-  // Return position combo even if insufficient (returns mult=1.0)
-  return { comboKey: key, sizeMultiplier: 1.0 };
+  const mult = COMBO_SIZE_MULTIPLIER[combo?.tier] ?? 1.0;
+  return { comboKey: key, sizeMultiplier: mult };
 }
 
 const COMBO_TIER_AR = { above_avg: "أعلى من المتوسط", average: "متوسط", below_avg: "أقل من المتوسط" };
@@ -1209,95 +1241,147 @@ function buildComboTemplate(combo, overallAvgPnlPct) {
 
   const prevMultiplier = combo.previousTier ? COMBO_SIZE_MULTIPLIER[combo.previousTier] : 1.0;
   const wr = combo.n ? Math.round(combo.wins / combo.n * 100) : 0;
-  const diff = overallAvgPnlPct != null && combo.avgPnlPct != null ? combo.avgPnlPct - overallAvgPnlPct : null;
   const tierAr = COMBO_TIER_AR[combo.tier] || combo.tier;
+  // The 90% one-sided bound on the far side of the mean from zero — the
+  // number the tier decision actually turned on.
+  const bound = combo.se != null && combo.avgPnlPct != null
+    ? (combo.tier === "below_avg" ? combo.avgPnlPct + COMBO_CONF_Z * combo.se
+      : combo.tier === "above_avg" ? combo.avgPnlPct - COMBO_CONF_Z * combo.se
+      : null)
+    : null;
   const causeAr = combo.tier === "above_avg"
-    ? `يتفوّق على أداء LAB العام بفارق واضح (≥${COMBO_TIER_MARGIN_PP}pp)`
+    ? `متوسط ربحها ≥ +${COMBO_ABS_MARGIN_PP}% ويبقى موجباً عند حدّ الثقة 90% (${bound.toFixed(1)}%)، على عيّنة ≥${MIN_COMBO_SAMPLE_UP} صفقة`
     : combo.tier === "below_avg"
-    ? `أضعف من أداء LAB العام بفارق واضح (≥${COMBO_TIER_MARGIN_PP}pp)`
-    : `عاد قريباً من أداء LAB العام (الفارق تحت ${COMBO_TIER_MARGIN_PP}pp الآن)`;
+    ? `متوسط خسارتها ≤ -${COMBO_ABS_MARGIN_PP}% ويبقى سالباً عند حدّ الثقة 90% (${bound.toFixed(1)}%)، على عيّنة ≥${MIN_COMBO_SAMPLE_DOWN} صفقة`
+    : `لم تعد تجتاز عتبة الدلالة مقابل الصفر — لا يمكن تمييز أدائها عن التعادل بثقة كافية`;
 
   return `🧪 <b>تعلّم توليفة</b>: ${label}\n`
     + `الحجم: ×${prevMultiplier} → <b>×${combo.sizeMultiplier}</b> (${tierAr})\n`
     + `العيّنة: ${combo.n} صفقة | WR ${wr}% | متوسط الربح ${combo.avgPnlPct}%`
-    + (diff != null ? ` (المتوسط العام ${overallAvgPnlPct.toFixed(1)}%، فارق ${diff >= 0 ? "+" : ""}${diff.toFixed(1)}pp)` : "") + `\n`
-    + `السبب: أداء هذه التوليفة ${causeAr}.`;
+    + (combo.se != null ? ` (الخطأ المعياري ±${combo.se}pp)` : "")
+    + (overallAvgPnlPct != null ? `\nللسياق فقط — متوسط LAB العام ${overallAvgPnlPct.toFixed(1)}% (لا يدخل في القرار)` : "") + `\n`
+    + `السبب: ${causeAr}.`;
 }
 
-// Runs once per day (after force-exit, same timing the legacy tuner
-// used). Rebuilds every combo from outcomes_lab.jsonl and notifies only
-// on an actual SIZE change ("رفع/خفض حجمها" per spec) — not merely a tier
-// label change. insufficient -> average is a real first judgment but a
-// 1.0x -> 1.0x no-op, so it stays silent; only a multiplier that actually
-// moves is worth a message, and this also naturally skips "still
-// insufficient data" (which never has a multiplier to change from 1.0).
+// Decides whether this cycle should run combo learning. The learning
+// itself is idempotent — it rebuilds every combo from the full
+// outcomes_lab.jsonl each time — so an extra call costs nothing and a
+// LATE call is still correct, which is what makes catch-up safe.
+//
+// The normal run is just after the close. Before this existed, that was
+// the ONLY run: gated on MODE=monitor and a ~30-minute window before
+// isMarketOpen() stops the process, with no retry. A single network
+// failure or a missed runner cycle in that window silently cost a whole
+// day of learning.
+function shouldRunComboLearning(state) {
+  const today = getToday();
+  const pastClose = utcMin() >= FORCE_EXIT_UTC + 5;
+
+  if (state._lastComboLearnedDay === today) {
+    // Already ran today. Re-run only if that was a mid-day catch-up for
+    // an earlier day: today's own trades weren't complete then, and
+    // without this the catch-up would consume today's slot.
+    return pastClose && !state._lastComboLearnedFinal;
+  }
+  if (pastClose) return true;
+  // Catch-up: a previous day never got learned at all.
+  return !state._lastComboLearnedDay || state._lastComboLearnedDay < daysAgoUTC(1);
+}
+
+// Rebuilds every combo from outcomes_lab.jsonl and notifies on an actual
+// SIZE change, plus the first real judgment of a combo (see below).
+//
+// The day is marked as learned only AFTER strategy_lab.json is
+// successfully written. Previously the marker was set first, so any throw
+// after it — a malformed log line, a null avgPnlPct — burned that day
+// permanently and silently: the retry was blocked by a marker claiming
+// work that never happened.
 async function runComboLearning(state, strategy) {
   const today = getToday();
-  if (state._lastComboLearnedDay === today) return;
-  state._lastComboLearnedDay = today;
-  saveState(state);
+  const pastClose = utcMin() >= FORCE_EXIT_UTC + 5;
 
-  let records = [];
+  let combos, overallAvgPnlPct, changed;
   try {
-    records = fs.readFileSync("outcomes_lab.jsonl", "utf8").split("\n").filter(Boolean)
-      .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
-  } catch { records = []; }
+    let records = [];
+    try {
+      records = fs.readFileSync("outcomes_lab.jsonl", "utf8").split("\n").filter(Boolean)
+        .map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+    } catch { records = []; }
 
-  const { combos, overallAvgPnlPct } = computeCombos(records, strategy.combos);
+    ({ combos, overallAvgPnlPct } = computeCombos(records, strategy.combos));
 
-  const changed = Object.values(combos).filter(c => {
-    const prevMultiplier = c.previousTier ? COMBO_SIZE_MULTIPLIER[c.previousTier] : 1.0;
-    return c.tier !== "insufficient" && c.sizeMultiplier !== prevMultiplier;
-  });
+    // A combo's effective size is 1.0x until it is judged, so compare
+    // multipliers rather than tier labels — that is what actually changes
+    // LAB's behaviour, and it handles previousTier === null correctly.
+    // Without this, a factor-set migration (every key new, so every
+    // previousTier null) would apply new multipliers with nothing written
+    // to the changelog at all.
+    const isFirstJudgment = c => c.previousTier == null && c.tier !== "insufficient";
+    const multiplierOf = tier => COMBO_SIZE_MULTIPLIER[tier] ?? 1.0;
 
-  // ===== تسجيل tier changes في changelog =====
-  const tierChanges = [];
-  for (const [key, combo] of Object.entries(combos)) {
-    const prevCombo = strategy.combos[key];
-    const prevTier = prevCombo?.tier;
+    changed = Object.values(combos).filter(c =>
+      c.sizeMultiplier !== multiplierOf(c.previousTier) || isFirstJudgment(c)
+    );
 
-    if (prevTier && prevTier !== combo.tier) {
-      tierChanges.push({ key, prevTier, newTier: combo.tier, combo, prevCombo });
-    }
-  }
+    for (const [key, combo] of Object.entries(combos)) {
+      const prevTier = combo.previousTier;
+      const oldMultiplier = multiplierOf(prevTier);
+      const newMultiplier = combo.sizeMultiplier;
+      if (oldMultiplier === newMultiplier && !isFirstJudgment(combo)) continue;
 
-  if (tierChanges.length > 0) {
-    for (const { key, prevTier, newTier, combo, prevCombo } of tierChanges) {
-      const oldMultiplier = COMBO_SIZE_MULTIPLIER[prevTier] || 1.0;
-      const newMultiplier = COMBO_SIZE_MULTIPLIER[newTier] || 1.0;
-
-      const entry = {
+      strategy.changelog.push({
         date: today,
         appliedAt: new Date().toISOString(),
         type: "combo_tier_change",
         comboKey: key,
-        oldTier: prevTier,
-        newTier: newTier,
-        oldMultiplier: oldMultiplier,
-        newMultiplier: newMultiplier,
+        oldTier: prevTier ?? null,
+        newTier: combo.tier,
+        oldMultiplier,
+        newMultiplier,
         sampleSize: combo.n,
-        winRate: combo.wins && combo.n ? Math.round(combo.wins / combo.n * 100) : 0,
+        winRate: combo.n ? Math.round(combo.wins / combo.n * 100) : 0,
         netPnl: combo.pnl,
-        avgPnlPct: combo.avgPnlPct.toFixed(2),
-        reason: `توليفة ${key}: تغيّرت من tier ${prevTier}(×${oldMultiplier}) إلى ${newTier}(×${newMultiplier}) بناءً على ${combo.n} صفقة حقيقية (WR ${Math.round(combo.wins / combo.n * 100)}%, net $${combo.pnl})`
-      };
-      strategy.changelog.push(entry);
+        // toFixed() on a null avgPnlPct used to throw here and abort the
+        // whole run — with the day already marked as learned.
+        avgPnlPct: combo.avgPnlPct != null ? combo.avgPnlPct.toFixed(2) : null,
+        se: combo.se ?? null,
+        reason: `توليفة ${key}: ${prevTier ? `تغيّرت من tier ${prevTier}(×${oldMultiplier})` : "أول تصنيف"} إلى ${combo.tier}(×${newMultiplier}) بناءً على ${combo.n} صفقة حقيقية (WR ${combo.n ? Math.round(combo.wins / combo.n * 100) : 0}%, net $${combo.pnl}, متوسط ${combo.avgPnlPct ?? "—"}% ± ${combo.se ?? "—"}pp)`
+      });
     }
+
+    strategy.combos = combos;
+    saveStrategy(strategy);
+  } catch (e) {
+    // Leave _lastComboLearnedDay untouched so the next cycle retries.
+    console.error("Combo learning failed — day left unmarked, will retry:", e.message);
+    return;
   }
 
+  state._lastComboLearnedDay = today;
+  state._lastComboLearnedFinal = pastClose;
+  saveState(state);
+
+  // After the marker: a Telegram outage must not re-run the whole cycle.
   for (const combo of changed) {
     await tg(buildComboTemplate(combo, overallAvgPnlPct));
   }
-
-  strategy.combos = combos;
-  saveStrategy(strategy);
-  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, ${changed.length} size change(s), ${tierChanges.length} tier change(s) logged today.`);
+  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, ${changed.length} change(s)${pastClose ? "" : " [catch-up run]"}.`);
 }
 
 // ─── MAIN ───────────────────────────────────────────────────
 (async () => {
   console.log(`=== LAB bot started ${new Date().toISOString()} ===`);
-  if (!isMarketOpen()) { console.log("Market closed"); process.exit(0); }
+  if (!isMarketOpen()) {
+    // Market-closed cycles are the safety net for combo learning: if the
+    // post-close window was missed, recover the day here rather than lose
+    // it. Stats rebuild from the whole log, so a late run is still exact.
+    const closedState = loadState();
+    if (shouldRunComboLearning(closedState)) {
+      await runComboLearning(closedState, loadStrategy());
+    }
+    console.log("Market closed");
+    process.exit(0);
+  }
 
   const state = loadState();
   const strategy = loadStrategy();
@@ -1355,14 +1439,19 @@ async function runComboLearning(state, strategy) {
         if (!state[sym]?.active && !liveInAlpaca.has(sym)) await scanEntry(state, strategy, sym, liveInAlpaca);
       }
     }
-    if (utcMin() >= FORCE_EXIT_UTC + 5) {
-      await runComboLearning(state, strategy);
-    }
   } else {
     for (const sym of ALLOWED_TICKERS) {
       if (!state[sym]?.active && !liveInAlpaca.has(sym)) await scanEntry(state, strategy, sym, liveInAlpaca);
     }
   }
+
+  // Runs in BOTH modes now. It used to sit inside the monitor branch, so a
+  // day whose post-close cycles all happened to run in scan mode learned
+  // nothing at all.
+  if (shouldRunComboLearning(state)) {
+    await runComboLearning(state, strategy);
+  }
+
   saveState(state);
   console.log("Done.");
 })();
