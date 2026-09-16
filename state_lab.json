@@ -90,8 +90,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 47.527472527472526,
-    "lastReportedThreshold": 40
+    "peakPct": 61.263736263736256,
+    "lastReportedThreshold": 60
   },
   "AMZN": {
     "active": true,
