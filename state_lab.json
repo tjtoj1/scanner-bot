@@ -88,5 +88,43 @@
     },
     "lastReportedThreshold": -10,
     "nearStopWarned": true
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260916C00760000",
+    "strike": "760",
+    "entryPremium": 2.625,
+    "qty": 1,
+    "entryTime": 1789572628846,
+    "msgId": 3124,
+    "stopOrderId": "fde6a86c-3bb6-44fd-9a95-3258e98940a7",
+    "hardStopPrice": 1.84,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 760.455,
+      "regime": "bullish",
+      "emaFast": 759.8999,
+      "emaSlow": 759.5869,
+      "breakoutHigh": 760.43,
+      "breakoutLow": 758.723,
+      "volRatio": 4,
+      "lastClose": 760.7401,
+      "lastVolume": 1527496,
+      "barTime": "2026-09-16T15:00:00Z",
+      "entryTimeUTC": "2026-09-16T15:30:28.846Z",
+      "vwapAtEntry": 759.696,
+      "rsiAtEntry": 61.17,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
   }
 }
