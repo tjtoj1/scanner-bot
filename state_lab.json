@@ -10,50 +10,6 @@
     "TSLA_PUT": 1789587056580,
     "QQQ_PUT": 1789588216650
   },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260916P00282000",
-    "strike": "282",
-    "entryPremium": 0.52,
-    "qty": 9,
-    "entryTime": 1789586261022,
-    "msgId": 3163,
-    "stopOrderId": "f4e518ea-0bd2-46d4-a140-19b6ab7cba61",
-    "hardStopPrice": 0.36,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 282.12,
-      "regime": "bearish",
-      "emaFast": 285.5204,
-      "emaSlow": 285.8893,
-      "breakoutHigh": 287.0199,
-      "breakoutLow": 284.46,
-      "volRatio": 2.53,
-      "lastClose": 283.155,
-      "lastVolume": 1566031,
-      "barTime": "2026-09-16T18:45:00Z",
-      "entryTimeUTC": "2026-09-16T19:17:41.022Z",
-      "vwapAtEntry": 285.9736,
-      "rsiAtEntry": 22.26,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 84.6153846153846,
-    "lastReportedThreshold": 80
-  },
   "SPY": {
     "active": true,
     "signal": "PUT",
@@ -96,6 +52,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 38.914027149321285
+    "peakPct": 38.914027149321285,
+    "nearStopWarned": true
   }
 }
