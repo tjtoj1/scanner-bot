@@ -8,46 +8,7 @@
     "SPY_PUT": 1789486467481,
     "IWM_PUT": 1789488325043,
     "IWM_CALL": 1789570521578,
-    "TSLA_CALL": 1789571210214
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260916C00711000",
-    "strike": "711",
-    "entryPremium": 3.02,
-    "qty": 1,
-    "entryTime": 1789571701987,
-    "msgId": 3113,
-    "stopOrderId": "79ae1ff3-ee83-4606-867a-fb2bb579eedc",
-    "hardStopPrice": 2.11,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 711.3,
-      "regime": "bullish",
-      "emaFast": 709.4511,
-      "emaSlow": 708.6356,
-      "breakoutHigh": 710.3,
-      "breakoutLow": 707.45,
-      "volRatio": 2.43,
-      "lastClose": 710.6579,
-      "lastVolume": 751419,
-      "barTime": "2026-09-16T14:45:00Z",
-      "entryTimeUTC": "2026-09-16T15:15:01.987Z",
-      "vwapAtEntry": 709.0572,
-      "rsiAtEntry": 68.45,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
+    "TSLA_CALL": 1789571210214,
+    "QQQ_CALL": 1789579874016
   }
 }
