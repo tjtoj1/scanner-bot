@@ -1,6 +1,31 @@
 {
   "_lastDay": "2026-09-16",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-09-16",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-16",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-16",
+      "symbol": "IWM",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-16",
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-09-16",
@@ -32,5 +57,93 @@
       "high": 249.26,
       "low": 246.69
     }
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260916C00759000",
+    "strike": "759",
+    "entryPremium": 2.5599999999999996,
+    "qty": 1,
+    "entryTime": 1789568123079,
+    "level": 759.705,
+    "msgId": 3057,
+    "stopOrderId": "38367920-964c-4cfa-8ca3-cca0ed83cc61",
+    "hardStopPrice": 1.66,
+    "entryStockPrice": 759.405,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 43.03,
+    "volumeRatio": 9.862558632872233,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260916C00709000",
+    "strike": "709",
+    "entryPremium": 2.9050000000000002,
+    "qty": 1,
+    "entryTime": 1789568124051,
+    "level": 708.81,
+    "msgId": 3058,
+    "stopOrderId": "4fbec4f5-ada8-42c2-bf37-626e81eed3d4",
+    "hardStopPrice": 1.89,
+    "entryStockPrice": 709.47,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 39.99,
+    "volumeRatio": 9.370997145000697,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM260916C00286000",
+    "strike": "286",
+    "entryPremium": 1.545,
+    "qty": 3,
+    "entryTime": 1789568124939,
+    "level": 286.54,
+    "msgId": 3059,
+    "stopOrderId": null,
+    "hardStopPrice": 1,
+    "entryStockPrice": 286.15999999999997,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 42.59,
+    "volumeRatio": 14.39870824671716,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260916C00215000",
+    "strike": "215",
+    "entryPremium": 0.965,
+    "qty": 5,
+    "entryTime": 1789568126606,
+    "level": 214.36,
+    "msgId": 3063,
+    "stopOrderId": "4bbdc8a0-d3cd-45f9-b733-3bd0c79926c4",
+    "hardStopPrice": 0.63,
+    "entryStockPrice": 214.8,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 45.31,
+    "volumeRatio": 10.014972197620777,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
