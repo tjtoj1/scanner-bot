@@ -137,13 +137,43 @@ function buildBotSection(title, todayRows, activeSymbols) {
   return msg;
 }
 
+// strategy_lab.json's changelog holds two entry shapes: combo tier changes
+// (comboKey/oldTier/newTier/oldMultiplier/newMultiplier) and the older
+// global-parameter entries (param/oldValue/newValue) from the tuner retired
+// on 2026-09-02. Rendering everything with the parameter fields printed
+// "undefined: undefined → undefined" for the first combo entry that ever
+// fired — the combo path had existed for a while but had never produced an
+// entry, so the mismatch stayed hidden.
+function formatLabChange(c) {
+  const reason = c.reason ? `  السبب: ${c.reason}\n` : "";
+
+  if (c.type === "combo_tier_change") {
+    const stats = [
+      c.sampleSize != null ? `${c.sampleSize} صفقة` : null,
+      c.winRate != null ? `WR ${c.winRate}%` : null,
+      c.netPnl != null ? `صافي $${c.netPnl}` : null,
+      c.avgPnlPct != null ? `متوسط ${c.avgPnlPct}%${c.se != null ? ` ± ${c.se}pp` : ""}` : null,
+    ].filter(Boolean).join(" | ");
+    return `- <b>${c.comboKey}</b>: ${c.oldTier ?? "أول تصنيف"} → ${c.newTier} `
+      + `(الحجم ×${c.oldMultiplier} → ×${c.newMultiplier})\n`
+      + (stats ? `  العيّنة: ${stats}\n` : "")
+      + reason;
+  }
+
+  if (c.param !== undefined) {
+    return `- <b>${c.param}</b>: ${c.oldValue} → ${c.newValue}\n` + reason;
+  }
+
+  // Any future entry type: show what it is and let the reason explain it,
+  // rather than printing undefined fields.
+  return `- <b>${c.type || "تعديل"}</b>\n` + reason;
+}
+
 function buildLabChangesSection(strategy, today) {
   const todayChanges = (strategy.changelog || []).filter(c => c.date === today);
   if (!todayChanges.length) return `\n<b>🧪 تعديلات LAB اليوم:</b> لا تعديل اليوم.\n`;
   let msg = `\n<b>🧪 تعديلات LAB اليوم (تلقائية — مُوافَق عليها مسبقاً):</b>\n`;
-  for (const c of todayChanges) {
-    msg += `- <b>${c.param}</b>: ${c.oldValue} → ${c.newValue}\n  السبب: ${c.reason}\n`;
-  }
+  for (const c of todayChanges) msg += formatLabChange(c);
   return msg;
 }
 
