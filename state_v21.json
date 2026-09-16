@@ -57,32 +57,5 @@
       "high": 249.26,
       "low": 246.69
     }
-  },
-  "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "IWM260916C00286000",
-    "strike": "286",
-    "entryPremium": 1.545,
-    "qty": 3,
-    "entryTime": 1789568124939,
-    "level": 286.54,
-    "msgId": 3059,
-    "stopOrderId": "9daf366f-6caf-44c1-baf3-5278246e8710",
-    "hardStopPrice": 1,
-    "entryStockPrice": 286.15999999999997,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 42.59,
-    "volumeRatio": 14.39870824671716,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 16.504854368932047,
-    "nearStopWarned": true
   }
 }
