@@ -58,7 +58,7 @@
     "qty": 1,
     "entryTime": 1789567221225,
     "msgId": 3035,
-    "stopOrderId": null,
+    "stopOrderId": "9f5a5ed9-48b3-479a-aa82-2043ed740639",
     "hardStopPrice": 1.87,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -86,7 +86,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 21.535580524344578
   },
   "AMZN": {
     "active": true,
