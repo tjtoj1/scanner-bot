@@ -79,7 +79,8 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -30,
+    "nearStopWarned": true
   },
   "_cooldowns": {
     "TSLA_CALL": "2026-09-17T15:02:56.236Z"
