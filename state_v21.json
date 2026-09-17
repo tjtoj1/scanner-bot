@@ -6,6 +6,12 @@
       "symbol": "NVDA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-17",
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -45,14 +51,14 @@
     "signal": "CALL",
     "optionSymbol": "NVDA260918C00220000",
     "strike": "220",
-    "entryPremium": 1.545,
+    "entryPremium": 1.645,
     "qty": 3,
-    "entryTime": 1789654539623,
+    "entryTime": 1789655163609,
     "level": 218.7,
-    "msgId": 3201,
-    "stopOrderId": "cbdc279f-3b26-40de-ae1c-4efee6030cc0",
-    "hardStopPrice": 1,
-    "entryStockPrice": 219.39,
+    "msgId": 3206,
+    "stopOrderId": "7c6cb418-8a57-42ae-b7e0-cfba4cd2bd19",
+    "hardStopPrice": 1.07,
+    "entryStockPrice": 219.51999999999998,
     "vwapAtEntry": null,
     "rsiAtEntry": 53.11,
     "volumeRatio": 8.73120221935636,
@@ -60,11 +66,6 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.355987055016191,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
+    "slStock": null
   }
 }
