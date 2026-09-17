@@ -86,6 +86,7 @@
       "positionBucket": "mid",
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
