@@ -1,6 +1,13 @@
 {
   "_lastDay": "2026-09-17",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-09-17",
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-09-17",
@@ -32,5 +39,27 @@
       "high": 251.9,
       "low": 250.25
     }
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260918C00220000",
+    "strike": "220",
+    "entryPremium": 1.545,
+    "qty": 3,
+    "entryTime": 1789654539623,
+    "level": 218.7,
+    "msgId": 3201,
+    "stopOrderId": "50d7e4ea-dc6e-4d23-9a0e-baef23be50d2",
+    "hardStopPrice": 1,
+    "entryStockPrice": 219.39,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 53.11,
+    "volumeRatio": 8.73120221935636,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
