@@ -81,28 +81,7 @@
     "slStock": null,
     "lastReportedThreshold": -10
   },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA260918C00367500",
-    "strike": "367.5",
-    "entryPremium": 5.92,
-    "qty": 1,
-    "entryTime": 1789655429603,
-    "level": 371.29,
-    "msgId": 3207,
-    "stopOrderId": "a955786b-3e68-4134-aadf-4dd6879dadf4",
-    "hardStopPrice": 3.85,
-    "entryStockPrice": 367.6,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 39.63,
-    "volumeRatio": 10.469731234711041,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
+  "_cooldowns": {
+    "TSLA_CALL": "2026-09-17T15:02:56.236Z"
   }
 }
