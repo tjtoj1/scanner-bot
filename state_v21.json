@@ -58,31 +58,8 @@
       "low": 250.25
     }
   },
-  "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "NVDA260918C00220000",
-    "strike": "220",
-    "entryPremium": 1.645,
-    "qty": 3,
-    "entryTime": 1789655163609,
-    "level": 218.7,
-    "msgId": 3206,
-    "stopOrderId": "7c6cb418-8a57-42ae-b7e0-cfba4cd2bd19",
-    "hardStopPrice": 1.07,
-    "entryStockPrice": 219.51999999999998,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 53.11,
-    "volumeRatio": 8.73120221935636,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
-  },
   "_cooldowns": {
-    "TSLA_CALL": "2026-09-17T15:02:56.236Z"
+    "TSLA_CALL": "2026-09-17T15:02:56.236Z",
+    "NVDA_CALL": "2026-09-17T16:05:58.944Z"
   }
 }
