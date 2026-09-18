@@ -49,5 +49,43 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     }
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "TSLA260918P00365000",
+    "strike": "365",
+    "entryPremium": 2.5250000000000004,
+    "qty": 1,
+    "entryTime": 1789742018061,
+    "msgId": 3314,
+    "stopOrderId": null,
+    "hardStopPrice": 1.77,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 364.235,
+      "regime": "bearish",
+      "emaFast": 366.3636,
+      "emaSlow": 367.1007,
+      "breakoutHigh": 370.9,
+      "breakoutLow": 365.42,
+      "volRatio": 6.85,
+      "lastClose": 361.175,
+      "lastVolume": 2982425,
+      "barTime": "2026-09-18T14:00:00Z",
+      "entryTimeUTC": "2026-09-18T14:33:38.061Z",
+      "vwapAtEntry": 366.746,
+      "rsiAtEntry": 23.37,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
   }
 }
