@@ -59,30 +59,8 @@
     }
   },
   "_cooldowns": {
-    "TSLA_CALL": "2026-09-17T15:02:56.236Z"
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260918P00283000",
-    "strike": "283",
-    "entryPremium": 0.595,
-    "qty": 8,
-    "entryTime": 1789740926269,
-    "level": 283.495,
-    "msgId": 3294,
-    "stopOrderId": "9ef7d015-64e6-4de9-a9ed-2ac31e6bc6bd",
-    "hardStopPrice": 0.39,
-    "entryStockPrice": 282.96000000000004,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 49.76,
-    "volumeRatio": 8.00074216690909,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
+    "TSLA_CALL": "2026-09-17T15:02:56.236Z",
+    "IWM_PUT": "2026-09-18T14:23:17.832Z"
   },
   "SPY": {
     "active": true,
@@ -105,6 +83,6 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
