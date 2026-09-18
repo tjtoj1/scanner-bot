@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-17T20:00:57.434Z"
+      "lastUpdated": "2026-09-18T20:00:35.386Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-17T20:00:57.434Z"
+      "lastUpdated": "2026-09-18T20:00:35.386Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -66,7 +66,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-17T20:00:57.434Z"
+      "lastUpdated": "2026-09-18T20:00:35.386Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -75,15 +75,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 119,
-      "wins": 61,
-      "pnl": -1260,
-      "avgPnlPct": -2.18,
-      "se": 2.78,
+      "n": 124,
+      "wins": 64,
+      "pnl": -1254,
+      "avgPnlPct": -2.23,
+      "se": 2.71,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-17T20:00:57.434Z"
+      "lastUpdated": "2026-09-18T20:00:35.386Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-17T20:00:57.434Z"
+      "lastUpdated": "2026-09-18T20:00:35.386Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-17T20:00:57.434Z"
+      "lastUpdated": "2026-09-18T20:00:35.386Z"
     }
   },
   "changelog": [
