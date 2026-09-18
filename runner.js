@@ -56,6 +56,7 @@ const IDLE_INTERVAL_MS  = 5 * 60 * 1000;  // 5 min outside market hours
 const STATE_FILES = [
   "state_v21.json", "outcomes_v21.jsonl",
   "state_lab.json", "strategy_lab.json", "outcomes_lab.jsonl",
+  "state_wvad.json", "outcomes_wvad.jsonl",
   "report_state.json",
 ];
 
@@ -439,6 +440,7 @@ function runNode(script, extraEnv = {}) {
 }
 
 async function runBotCycle(name, script) {
+  const started = Date.now();
   try {
     console.log(`[runner] ${name}: scan`);
     await runNode(script, {});
@@ -446,6 +448,12 @@ async function runBotCycle(name, script) {
     await runNode(script, { MODE: "monitor" });
   } catch (e) {
     console.error(`[runner] ${name} cycle threw:`, e.message);
+  } finally {
+    // Timing matters now that three bots share one 60s cycle: each bot
+    // runs twice (scan + monitor) with a 90s watchdog per run, so the
+    // worst case per bot is 180s. If these numbers creep up, position
+    // monitoring is being starved — visible here before it costs money.
+    console.log(`[runner] ${name}: done in ${((Date.now() - started) / 1000).toFixed(1)}s`);
   }
 }
 
@@ -460,14 +468,21 @@ async function main() {
   while (true) {
     try {
       if (isMarketHours()) {
+        const cycleStarted = Date.now();
         console.log(`[runner] cycle start ${new Date().toISOString()}`);
         await runBotCycle("v21", "scan_v21.js");
         await runBotCycle("lab", "scan_lab.js");
+        await runBotCycle("wvad", "scan_wvad.js");
         if (utcMin() >= REPORT_WINDOW_START_UTC) {
           console.log("[runner] daily report window — checking");
           await runNode("daily_report.js", {});
         }
         syncToGitHub();
+        const cycleSec = (Date.now() - cycleStarted) / 1000;
+        console.log(`[runner] cycle total ${cycleSec.toFixed(1)}s (interval ${CYCLE_INTERVAL_MS / 1000}s)`);
+        if (cycleSec > CYCLE_INTERVAL_MS / 1000) {
+          console.warn(`[runner] WARNING: cycle overran its ${CYCLE_INTERVAL_MS / 1000}s interval by ${(cycleSec - CYCLE_INTERVAL_MS / 1000).toFixed(1)}s — monitoring is falling behind`);
+        }
         await sleep(CYCLE_INTERVAL_MS);
       } else {
         console.log(`[runner] outside market hours, idling (${new Date().toISOString()})`);

@@ -111,7 +111,26 @@ function suggestV21Improvement(todayRows, allRows) {
   return `نسبة الربح الحالية ${wr}% على عينة ${n} صفقة — لا يوجد نمط حاد واحد يبرر تغييراً محدداً اليوم؛ يُنصح بمتابعة تراكم البيانات.`;
 }
 
-function buildBotSection(title, todayRows, activeSymbols) {
+// Net PnL as a share of (a) the account and (b) the capital actually
+// put at risk. On a ~$99k paper account the first number is near zero
+// for any realistic day, so it alone says nothing about whether the
+// strategy worked; costBasis is the option premium actually spent
+// (recorded per trade by scan_wvad.js). Older v21/LAB rows have no
+// costBasis — that line is simply omitted for them.
+function pctLine(rows, portfolioValue) {
+  const net = rows.reduce((a, r) => a + r.pnl, 0);
+  const parts = [];
+  if (portfolioValue > 0) {
+    parts.push(`${(net / portfolioValue * 100).toFixed(2)}% من المحفظة`);
+  }
+  const deployed = rows.reduce((a, r) => a + (r.costBasis || 0), 0);
+  if (deployed > 0) {
+    parts.push(`${(net / deployed * 100).toFixed(1)}% من رأس المال المنشور ($${deployed})`);
+  }
+  return parts.length ? `📐 ${parts.join(" | ")}\n` : "";
+}
+
+function buildBotSection(title, todayRows, activeSymbols, portfolioValue = 0) {
   let msg = `\n<b>━━ ${title} ━━</b>\n`;
   if (!todayRows.length) {
     msg += `لا صفقات مغلقة اليوم.\n`;
@@ -120,6 +139,7 @@ function buildBotSection(title, todayRows, activeSymbols) {
     const best = todayRows.reduce((a, r) => (!a || r.pnlPct > a.pnlPct) ? r : a, null);
     const worst = todayRows.reduce((a, r) => (!a || r.pnlPct < a.pnlPct) ? r : a, null);
     msg += `📋 ${s.n} صفقة | WR ${s.wr}% | صافي ${s.net>=0?"+":""}$${s.net}\n`;
+    msg += pctLine(todayRows, portfolioValue);
     msg += `🥇 أفضل: ${best.symbol} ${best.signal} ${best.pnlPct.toFixed(1)}% (${best.pnl>=0?"+":""}$${best.pnl})\n`;
     msg += `🥉 أسوأ: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}% (${worst.pnl>=0?"+":""}$${worst.pnl})\n`;
 
@@ -177,13 +197,32 @@ function buildLabChangesSection(strategy, today) {
   return msg;
 }
 
+// Equity of the WVAD account (the original ALPACA_KEY pair) — used
+// only to express that bot's net PnL as a share of the account.
+// Never fails the report: on any error the percentage line is simply
+// dropped, leaving the section exactly as it would have been.
+async function wvadPortfolioValue() {
+  const key = process.env.ALPACA_KEY, secret = process.env.ALPACA_SECRET;
+  if (!key || !secret) return 0;
+  try {
+    const res = await fetch("https://paper-api.alpaca.markets/v2/account", {
+      headers: { "APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret },
+    });
+    const d = await res.json();
+    return parseFloat(d.portfolio_value) || 0;
+  } catch (e) { console.error("[daily_report] wvad account fetch failed:", e.message); return 0; }
+}
+
 (async () => {
   const rs = loadReportState();
   const labState = readJSON("state_lab.json", {});
-  const today = labState._lastDay;
+  const wvadState = readJSON("state_wvad.json", {});
+  // LAB stays the primary clock (unchanged); the other two are
+  // fallbacks so the report still fires on a day only they traded.
+  const today = labState._lastDay || readJSON("state_v21.json", {})._lastDay || wvadState._lastDay;
 
   if (!today) {
-    console.log("[daily_report] no trading day recorded in state_lab.json — skipping");
+    console.log("[daily_report] no trading day recorded in any state file — skipping");
     return;
   }
 
@@ -202,7 +241,11 @@ function buildLabChangesSection(strategy, today) {
   const labActive = Object.keys(labState).filter(k => !k.startsWith("_") && labState[k]?.active);
   const strategy = readJSON("strategy_lab.json", { params: {}, changelog: [] });
 
-  const hasData = v21Today.length > 0 || labToday.length > 0;
+  const wvadOutcomes = readJSONL("outcomes_wvad.jsonl");
+  const wvadToday = wvadOutcomes.filter(r => r.day === today);
+  const wvadActive = Object.keys(wvadState).filter(k => !k.startsWith("_") && wvadState[k]?.active);
+
+  const hasData = v21Today.length > 0 || labToday.length > 0 || wvadToday.length > 0;
   if (!hasData) {
     console.log(`[daily_report] no trades found for ${today} — skipping to avoid empty report`);
     return;
@@ -213,6 +256,7 @@ function buildLabChangesSection(strategy, today) {
   msg += `\n💡 <b>اقتراح تحسين v21 — للمراجعة فقط، لا يُنفَّذ إلا بموافقة المستخدم و Claude معاً:</b>\n${suggestV21Improvement(v21Today, v21Outcomes)}\n`;
   msg += buildBotSection("LAB", labToday, labActive);
   msg += buildLabChangesSection(strategy, today);
+  msg += buildBotSection("WVAD (SPY/QQQ)", wvadToday, wvadActive, await wvadPortfolioValue());
 
   const result = await tg(msg);
   if (result && result.ok) {
