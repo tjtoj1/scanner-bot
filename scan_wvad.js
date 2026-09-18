@@ -1,6 +1,8 @@
 // ============================================================
 // BOT WVAD — WILLIAMS VARIABLE A/D PRESSURE STRATEGY
-// Uses ALPACA_KEY / ALPACA_SECRET (the original idle paper account)
+// Reads ABDULLAH_TJ_KEY / ABDULLAH_TJ_SECRET (the original idle paper
+// account — the credentials, not the variable names, are the same ones
+// the retired scan.js used under ALPACA_KEY/ALPACA_SECRET)
 // Third bot — completely independent of scan_v21.js and scan_lab.js:
 // its own state file, its own outcomes file, its own Alpaca account.
 //
@@ -25,8 +27,15 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const ALPACA_KEY   = process.env.ALPACA_KEY;
-const ALPACA_SECRET = process.env.ALPACA_SECRET;
+// Deliberately NOT named ALPACA_KEY/ALPACA_SECRET. Those two names
+// exist elsewhere in this Railway project but never reached this
+// process (confirmed in the logs: "NOT PRESENT in process.env", while
+// ALPACA_KEY_2/_3 arrived in the same breath). These fresh names are
+// created directly on the service that runs runner.js, so there is no
+// pre-existing name to collide with and no "already exists" prompt to
+// mistake for a save.
+const API_KEY    = process.env.ABDULLAH_TJ_KEY;
+const API_SECRET = process.env.ABDULLAH_TJ_SECRET;
 const TG_TOKEN      = process.env.TG_TOKEN;
 const PERSONAL_CHAT = "810642442";
 const MODE          = process.env.MODE || "scan";
@@ -137,8 +146,8 @@ async function alertOps(text) {
 async function alpaca(path, method = "GET", body = null) {
   const res = await fetchWithTimeout(`${TRADING_BASE}${path}`, {
     method, headers: {
-      "APCA-API-KEY-ID": ALPACA_KEY,
-      "APCA-API-SECRET-KEY": ALPACA_SECRET,
+      "APCA-API-KEY-ID": API_KEY,
+      "APCA-API-SECRET-KEY": API_SECRET,
       "Content-Type": "application/json"
     }, body: body ? JSON.stringify(body) : null
   });
@@ -178,7 +187,7 @@ async function getBars(symbol, tf = BAR_TF, daysBack = BARS_DAYS_BACK) {
       let url = `${DATA_BASE}/stocks/${symbol}/bars?timeframe=${tf}&start=${start}&limit=${BARS_LIMIT}&adjustment=raw`;
       if (pageToken) url += `&page_token=${encodeURIComponent(pageToken)}`;
       const res = await fetchWithTimeout(url, {
-        headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+        headers: { "APCA-API-KEY-ID": API_KEY, "APCA-API-SECRET-KEY": API_SECRET }
       });
       const text = await res.text();
       let d;
@@ -195,7 +204,7 @@ async function getBars(symbol, tf = BAR_TF, daysBack = BARS_DAYS_BACK) {
 async function getLatestPrice(symbol) {
   try {
     const r = await fetchWithTimeout(`${DATA_BASE}/stocks/${symbol}/quotes/latest`, {
-      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+      headers: { "APCA-API-KEY-ID": API_KEY, "APCA-API-SECRET-KEY": API_SECRET }
     });
     const d = await r.json();
     return d.quote ? (d.quote.ap + d.quote.bp) / 2 : null;
@@ -205,7 +214,7 @@ async function getLatestPrice(symbol) {
 async function getQuote(optSym) {
   try {
     const res = await fetchWithTimeout(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, {
-      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+      headers: { "APCA-API-KEY-ID": API_KEY, "APCA-API-SECRET-KEY": API_SECRET }
     });
     const d = await res.json();
     const q = d.quotes?.[optSym];
@@ -357,7 +366,7 @@ async function resolveExpiry(symbol) {
   try {
     const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date_gte=${today}&status=active&limit=50&type=call`;
     const res = await fetchWithTimeout(url, {
-      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+      headers: { "APCA-API-KEY-ID": API_KEY, "APCA-API-SECRET-KEY": API_SECRET }
     });
     const d = await res.json();
     const dates = [...new Set((d?.option_contracts || []).map(c => c.expiration_date))].sort();
@@ -387,7 +396,7 @@ async function findOption(symbol, signal, spotPrice) {
     try {
       const url = `${TRADING_BASE}/options/contracts?underlying_symbols=${symbol}&expiration_date=${exp.expiry}&type=${type}&strike_price_gte=${strike - 0.5}&strike_price_lte=${strike + 0.5}&status=active&limit=5`;
       const res = await fetchWithTimeout(url, {
-        headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+        headers: { "APCA-API-KEY-ID": API_KEY, "APCA-API-SECRET-KEY": API_SECRET }
       });
       const d = await res.json();
       const contracts = d?.option_contracts || [];
@@ -747,13 +756,17 @@ export { computeWVAD, computeATR, filterRTH, etMinutes,
 if (IS_MAIN) (async () => {
   console.log(`=== WVAD Bot started ${new Date().toISOString()} (mode=${MODE}) ===`);
   // TEMPORARY DIAGNOSTIC — remove once the env delivery question is settled.
-  // Prints only the NAMES of every ALPACA* variable that actually reached
-  // this process, never a value. Placed before every guard below so it
-  // prints even when the bot is disabled, the market is closed, or the
+  // Prints only the NAMES of every ALPACA*/ABDULLAH* variable that actually
+  // reached this process, never a value. Placed before every guard below so
+  // it prints even when the bot is disabled, the market is closed, or the
   // keys arrived fine — the last case is what confirms a fix worked.
-  console.log('[wvad] env keys with ALPACA:', Object.keys(process.env).filter(k => k.includes('ALPACA')).join(', '));
+  // ALPACA is kept in the filter alongside ABDULLAH so the two lists can be
+  // compared in one log line: the old names arriving while the new ones do
+  // not would mean the rename, not the service, was the problem.
+  console.log('[wvad] env keys with ALPACA/ABDULLAH:',
+    Object.keys(process.env).filter(k => k.includes('ALPACA') || k.includes('ABDULLAH')).sort().join(', ') || '(none)');
   if (!ENABLED) { console.log("WVAD_ENABLED=0 — bot disabled, exiting"); process.exit(0); }
-  if (!ALPACA_KEY || !ALPACA_SECRET) {
+  if (!API_KEY || !API_SECRET) {
     // Same diagnostic approach runner.js already uses for GH_PUSH_TOKEN:
     // the bare "missing" message cannot distinguish a variable Railway
     // never delivered from one delivered with an empty value, and those
@@ -767,15 +780,16 @@ if (IS_MAIN) (async () => {
       if (v === "") return `${name}: PRESENT but EMPTY STRING`;
       return `${name}: present, length=${v.length}, trimmedLength=${v.trim().length}`;
     };
-    console.error("ALPACA_KEY / ALPACA_SECRET missing — exiting without trading");
-    console.error(`  ${describe("ALPACA_KEY")}`);
-    console.error(`  ${describe("ALPACA_SECRET")}`);
-    // Which ALPACA_* names DID arrive? If _2/_3 are here but the bare
-    // names are not, the variables exist in Railway but were not added
-    // to THIS service/environment (or the deploy predates them — a plain
-    // restart may not reload env vars; a full redeploy does).
-    const seen = Object.keys(process.env).filter(k => k.startsWith("ALPACA")).sort();
-    console.error(`  ALPACA_* visible to this process: ${seen.length ? seen.join(", ") : "(none)"}`);
+    console.error("ABDULLAH_TJ_KEY / ABDULLAH_TJ_SECRET missing — exiting without trading");
+    console.error(`  ${describe("ABDULLAH_TJ_KEY")}`);
+    console.error(`  ${describe("ABDULLAH_TJ_SECRET")}`);
+    // Which related names DID arrive? Both prefixes are listed: seeing
+    // ALPACA_KEY_2/_3 here but no ABDULLAH_* means the new variables were
+    // never added to THIS service/environment (or the deploy predates them
+    // — a plain restart may not reload env vars; a full redeploy does).
+    const seen = Object.keys(process.env)
+      .filter(k => k.startsWith("ALPACA") || k.startsWith("ABDULLAH")).sort();
+    console.error(`  ALPACA_*/ABDULLAH_* visible to this process: ${seen.length ? seen.join(", ") : "(none)"}`);
     process.exit(0);
   }
   if (!isMarketOpen()) { console.log("Market closed"); process.exit(0); }
