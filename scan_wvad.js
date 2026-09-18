@@ -746,9 +746,36 @@ export { computeWVAD, computeATR, filterRTH, etMinutes,
 
 if (IS_MAIN) (async () => {
   console.log(`=== WVAD Bot started ${new Date().toISOString()} (mode=${MODE}) ===`);
+  // TEMPORARY DIAGNOSTIC — remove once the env delivery question is settled.
+  // Prints only the NAMES of every ALPACA* variable that actually reached
+  // this process, never a value. Placed before every guard below so it
+  // prints even when the bot is disabled, the market is closed, or the
+  // keys arrived fine — the last case is what confirms a fix worked.
+  console.log('[wvad] env keys with ALPACA:', Object.keys(process.env).filter(k => k.includes('ALPACA')).join(', '));
   if (!ENABLED) { console.log("WVAD_ENABLED=0 — bot disabled, exiting"); process.exit(0); }
   if (!ALPACA_KEY || !ALPACA_SECRET) {
+    // Same diagnostic approach runner.js already uses for GH_PUSH_TOKEN:
+    // the bare "missing" message cannot distinguish a variable Railway
+    // never delivered from one delivered with an empty value, and those
+    // two need opposite fixes. process.env is read once at module load
+    // and nothing here shadows it (no dotenv, no .env file), so what
+    // prints below IS what this process sees.
+    const describe = (name) => {
+      const has = Object.prototype.hasOwnProperty.call(process.env, name);
+      const v = process.env[name];
+      if (!has) return `${name}: NOT PRESENT in process.env`;
+      if (v === "") return `${name}: PRESENT but EMPTY STRING`;
+      return `${name}: present, length=${v.length}, trimmedLength=${v.trim().length}`;
+    };
     console.error("ALPACA_KEY / ALPACA_SECRET missing — exiting without trading");
+    console.error(`  ${describe("ALPACA_KEY")}`);
+    console.error(`  ${describe("ALPACA_SECRET")}`);
+    // Which ALPACA_* names DID arrive? If _2/_3 are here but the bare
+    // names are not, the variables exist in Railway but were not added
+    // to THIS service/environment (or the deploy predates them — a plain
+    // restart may not reload env vars; a full redeploy does).
+    const seen = Object.keys(process.env).filter(k => k.startsWith("ALPACA")).sort();
+    console.error(`  ALPACA_* visible to this process: ${seen.length ? seen.join(", ") : "(none)"}`);
     process.exit(0);
   }
   if (!isMarketOpen()) { console.log("Market closed"); process.exit(0); }
