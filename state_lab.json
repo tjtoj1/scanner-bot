@@ -54,7 +54,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 31.08808290155442
+    "peakPct": 39.37823834196894
   },
   "SPY": {
     "active": true,
@@ -93,10 +93,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 40,
+    "lastReportedThreshold": 50,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 40.64171122994651,
+    "peakPct": 51.33689839572192,
     "ladder2": true,
     "trailPct": 8
   }
