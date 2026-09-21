@@ -49,7 +49,7 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 130,
+    "lastReportedThreshold": 120,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
