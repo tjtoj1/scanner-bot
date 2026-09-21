@@ -46,7 +46,5 @@
       "low": 254.55
     }
   },
-  "_cooldowns": {
-    "TSLA_CALL": "2026-09-17T15:02:56.236Z"
-  }
+  "_cooldowns": {}
 }
