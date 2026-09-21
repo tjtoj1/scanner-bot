@@ -48,34 +48,5 @@
   },
   "_cooldowns": {
     "TSLA_CALL": "2026-09-17T15:02:56.236Z"
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260921C00733000",
-    "strike": "733",
-    "entryPremium": 1.165,
-    "qty": 4,
-    "entryTime": 1790000103260,
-    "level": 730.785,
-    "msgId": 3352,
-    "stopOrderId": null,
-    "hardStopPrice": 0.76,
-    "entryStockPrice": 733.0550000000001,
-    "vwapAtEntry": 730.1491,
-    "rsiAtEntry": 81.18,
-    "volumeRatio": 8.344780155587472,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 169.95708154506437,
-    "lastReportedThreshold": 160,
-    "nearStopWarned": true
   }
 }
