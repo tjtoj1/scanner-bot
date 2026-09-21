@@ -75,7 +75,7 @@
     "stopPct": 10,
     "trailPct": 10,
     "peakPct": 134.07407407407408,
-    "lastReportedThreshold": 120,
+    "lastReportedThreshold": 130,
     "nearStopWarned": true
   },
   "QQQ": {
@@ -103,8 +103,8 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 115.87982832618022,
-    "lastReportedThreshold": 100,
+    "peakPct": 123.60515021459226,
+    "lastReportedThreshold": 120,
     "nearStopWarned": true
   }
 }
