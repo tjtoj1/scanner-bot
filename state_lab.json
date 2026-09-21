@@ -12,5 +12,43 @@
     "TSLA_CALL": 1790001441189,
     "QQQ_CALL": 1790003358002
   },
-  "_lastComboLearnedFinal": false
+  "_lastComboLearnedFinal": false,
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260921C00769000",
+    "strike": "769",
+    "entryPremium": 0.765,
+    "qty": 6,
+    "entryTime": 1790002226791,
+    "msgId": 3473,
+    "stopOrderId": "705e28bd-1ea4-426d-bcd4-65771ab717af",
+    "hardStopPrice": 0.54,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 768.9000000000001,
+      "regime": "bullish",
+      "emaFast": 767.4272,
+      "emaSlow": 766.6934,
+      "breakoutHigh": 767.92,
+      "breakoutLow": 761.69,
+      "volRatio": 10.67,
+      "lastClose": 769.0333,
+      "lastVolume": 3367634,
+      "barTime": "2026-09-21T14:15:00Z",
+      "entryTimeUTC": "2026-09-21T14:50:26.791Z",
+      "vwapAtEntry": 767.5457,
+      "rsiAtEntry": 78.6,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
+  }
 }
