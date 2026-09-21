@@ -104,7 +104,7 @@
     "stopPct": 10,
     "trailPct": 10,
     "peakPct": 123.60515021459226,
-    "lastReportedThreshold": 110,
+    "lastReportedThreshold": 120,
     "nearStopWarned": true
   }
 }
