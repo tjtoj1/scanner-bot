@@ -8,9 +8,46 @@
     "IWM_PUT": 1789742467022,
     "TSLA_PUT": 1789744320869,
     "TSLA_CALL": 1790001441189,
-    "NVDA_CALL": 1790005973529,
     "SPY_CALL": 1790010625840,
     "AMZN_CALL": 1790011430236
   },
-  "_lastComboLearnedFinal": false
+  "_lastComboLearnedFinal": false,
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA260921C00227500",
+    "strike": "227.5",
+    "entryPremium": 0.165,
+    "qty": 30,
+    "entryTime": 1790010015311,
+    "msgId": 3538,
+    "stopOrderId": null,
+    "hardStopPrice": 0.12,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 226.3,
+      "regime": "bullish",
+      "emaFast": 225.2038,
+      "emaSlow": 224.6283,
+      "breakoutHigh": 225.7985,
+      "breakoutLow": 222.58,
+      "volRatio": 1.37,
+      "lastClose": 226.1199,
+      "lastVolume": 3306241,
+      "barTime": "2026-09-21T16:30:00Z",
+      "entryTimeUTC": "2026-09-21T17:00:15.311Z",
+      "vwapAtEntry": 224.4593,
+      "rsiAtEntry": 68.93,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
+  }
 }
