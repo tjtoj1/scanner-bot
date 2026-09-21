@@ -54,7 +54,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 42.666666666666664,
+    "peakPct": 48.88888888888887,
     "nearStopWarned": true
   },
   "SPY": {
@@ -96,8 +96,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 45.255474452554736,
-    "lastReportedThreshold": 40,
+    "peakPct": 54.014598540146,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "trailPct": 8
   }
