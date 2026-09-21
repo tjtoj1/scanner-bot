@@ -49,12 +49,12 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 39.37823834196894
+    "peakPct": 46.632124352331616
   },
   "SPY": {
     "active": true,
@@ -93,10 +93,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 50,
+    "lastReportedThreshold": 60,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 51.33689839572192,
+    "peakPct": 64.1711229946524,
     "ladder2": true,
     "trailPct": 8
   }
