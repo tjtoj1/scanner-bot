@@ -132,6 +132,7 @@
       "positionBucket": "near_low",
       "comboKey": "CALL|position:near_low",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
