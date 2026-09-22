@@ -16,14 +16,14 @@
   "TSLA": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "TSLA260923C00375000",
-    "strike": "375",
-    "entryPremium": 4.449999999999999,
+    "optionSymbol": "TSLA260923C00377500",
+    "strike": "377.5",
+    "entryPremium": 3.3600000000000003,
     "qty": 1,
-    "entryTime": 1790084728955,
-    "msgId": 3563,
-    "stopOrderId": "e7e394fb-67ea-4172-8fee-723698c53b53",
-    "hardStopPrice": 3.11,
+    "entryTime": 1790085452167,
+    "msgId": 3569,
+    "stopOrderId": null,
+    "hardStopPrice": 2.35,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -32,7 +32,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 374.5,
+      "spot": 376.35,
       "regime": "bullish",
       "emaFast": 377.9865,
       "emaSlow": 377.3619,
@@ -42,18 +42,13 @@
       "lastClose": 379.01,
       "lastVolume": 131334,
       "barTime": "2026-09-22T13:15:00Z",
-      "entryTimeUTC": "2026-09-22T13:45:28.955Z",
+      "entryTimeUTC": "2026-09-22T13:57:32.167Z",
       "vwapAtEntry": 377.5714,
       "rsiAtEntry": 68.61,
       "signalType": "breakout",
       "positionBucket": "near_low",
       "comboKey": "CALL|position:near_low",
       "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.955056179775303,
-    "nearStopWarned": true
+    }
   }
 }
