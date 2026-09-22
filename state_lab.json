@@ -48,5 +48,43 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     }
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260922C00746000",
+    "strike": "746",
+    "entryPremium": 1.2650000000000001,
+    "qty": 3,
+    "entryTime": 1790086502807,
+    "msgId": 3601,
+    "stopOrderId": "c6f8a0d4-f499-4439-8648-79aa5d11f1c9",
+    "hardStopPrice": 0.89,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 745.6949999999999,
+      "regime": "bullish",
+      "emaFast": 742.4454,
+      "emaSlow": 741.8922,
+      "breakoutHigh": 744.94,
+      "breakoutLow": 740.52,
+      "volRatio": 10.04,
+      "lastClose": 745.035,
+      "lastVolume": 1610716,
+      "barTime": "2026-09-22T13:45:00Z",
+      "entryTimeUTC": "2026-09-22T14:15:02.807Z",
+      "vwapAtEntry": 743.305,
+      "rsiAtEntry": 69.86,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
   }
 }
