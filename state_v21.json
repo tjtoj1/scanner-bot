@@ -82,11 +82,12 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 10,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 23.788546255506617
+    "peakPct": 23.788546255506617,
+    "nearStopWarned": true
   }
 }
