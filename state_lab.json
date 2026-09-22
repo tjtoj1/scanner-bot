@@ -48,7 +48,10 @@
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 22.00956937799043
   },
   "QQQ": {
     "active": true,
@@ -92,7 +95,8 @@
     "stopPct": 12,
     "peakPct": 28.474576271186436,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "NVDA": {
     "active": true,
