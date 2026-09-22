@@ -87,6 +87,45 @@
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
+    },
+    "lastReportedThreshold": 10
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM260922C00288000",
+    "strike": "288",
+    "entryPremium": 0.245,
+    "qty": 20,
+    "entryTime": 1790101303937,
+    "msgId": 3684,
+    "stopOrderId": "92286da3-c5f6-400f-80d1-f1dbe93b7032",
+    "hardStopPrice": 0.17,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 287.84000000000003,
+      "regime": "bullish",
+      "emaFast": 287.1088,
+      "emaSlow": 286.9984,
+      "breakoutHigh": 287.21,
+      "breakoutLow": 286.1484,
+      "volRatio": 1.58,
+      "lastClose": 287.97,
+      "lastVolume": 1060263,
+      "barTime": "2026-09-22T17:45:00Z",
+      "entryTimeUTC": "2026-09-22T18:21:43.937Z",
+      "vwapAtEntry": 287.1887,
+      "rsiAtEntry": 61.77,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
     }
   }
 }
