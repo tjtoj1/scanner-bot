@@ -51,5 +51,8 @@
     },
     "lastReportedThreshold": -10,
     "nearStopWarned": true
+  },
+  "QQQ": {
+    "active": true
   }
 }
