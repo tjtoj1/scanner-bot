@@ -50,12 +50,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 25.153374233128844,
+    "peakPct": 29.447852760736225,
     "nearStopWarned": true
   }
 }
