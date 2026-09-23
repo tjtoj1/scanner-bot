@@ -58,7 +58,9 @@
       "low": 251.24
     }
   },
-  "_cooldowns": {},
+  "_cooldowns": {
+    "TSLA_CALL": "2026-09-23T14:23:21.339Z"
+  },
   "SPY": {
     "active": true,
     "signal": "PUT",
@@ -85,58 +87,6 @@
     "stopPct": 10,
     "trailPct": 10,
     "peakPct": 71.30801687763714,
-    "lastReportedThreshold": 70
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM260923P00284000",
-    "strike": "284",
-    "entryPremium": 0.555,
-    "qty": 9,
-    "entryTime": 1790172952231,
-    "level": 284.33,
-    "msgId": 3821,
-    "stopOrderId": "62521b29-10ff-466e-9106-b862f4dc7aed",
-    "hardStopPrice": 0.36,
-    "entryStockPrice": 284.11,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 49.53,
-    "volumeRatio": 10.459718039602377,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 40,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 49.54954954954953,
-    "ladder2": true,
-    "trailPct": 10
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA260923C00382500",
-    "strike": "382.5",
-    "entryPremium": 1.975,
-    "qty": 2,
-    "entryTime": 1790172954405,
-    "level": 384.76,
-    "msgId": 3822,
-    "stopOrderId": "e2f21215-69b8-420f-a52e-a936139ec24c",
-    "hardStopPrice": 1.28,
-    "entryStockPrice": 381.53999999999996,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 53.66,
-    "volumeRatio": 16.21313620580297,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
+    "lastReportedThreshold": 60
   }
 }
