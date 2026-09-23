@@ -47,7 +47,7 @@
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20,
+    "lastReportedThreshold": -10,
     "nearStopWarned": true
   },
   "QQQ": {
@@ -86,9 +86,13 @@
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "AMZN": {
+    "active": true
+  },
+  "SPY": {
     "active": true
   }
 }
