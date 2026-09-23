@@ -55,10 +55,45 @@
     "trailPct": 8,
     "nearStopWarned": true
   },
-  "IWM": {
-    "active": true
-  },
   "SPY": {
     "active": true
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260923P00284000",
+    "strike": "284",
+    "entryPremium": 0.705,
+    "qty": 7,
+    "entryTime": 1790172830311,
+    "msgId": 3814,
+    "stopOrderId": "6419b4bc-8b46-47e8-927c-aea1ce9dd4ce",
+    "hardStopPrice": 0.49,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 283.85,
+      "regime": "bearish",
+      "emaFast": 285.5933,
+      "emaSlow": 285.9924,
+      "breakoutHigh": 286.35,
+      "breakoutLow": 285.47,
+      "volRatio": 67.9,
+      "lastClose": 284.46,
+      "lastVolume": 1574332,
+      "barTime": "2026-09-23T13:30:00Z",
+      "entryTimeUTC": "2026-09-23T14:13:50.311Z",
+      "vwapAtEntry": 285.2205,
+      "rsiAtEntry": 24.26,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
   }
 }
