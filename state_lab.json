@@ -19,7 +19,7 @@
     "qty": 3,
     "entryTime": 1790172884993,
     "msgId": 3817,
-    "stopOrderId": "44d24bd8-1c2c-4e23-9d70-55f6e03c9aec",
+    "stopOrderId": "9f5747a5-2387-425b-9d88-51471ff7c557",
     "hardStopPrice": 0.93,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -47,10 +47,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 50,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 18.490566037735835
+    "stopPct": 12,
+    "peakPct": 58.11320754716978,
+    "ladder2": true,
+    "trailPct": 8
   },
   "TSLA": {
     "active": true,
@@ -88,7 +90,8 @@
       "positionBucket": "mid",
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -20
   },
   "AMZN": {
     "active": true,
@@ -99,7 +102,7 @@
     "qty": 11,
     "entryTime": 1790173282478,
     "msgId": 3847,
-    "stopOrderId": "4ee7ecb6-2dc8-4303-93cd-ddb310f7e3c4",
+    "stopOrderId": "8c7f1c0d-af8b-4a3a-bd10-602f4d294646",
     "hardStopPrice": 0.3,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -126,6 +129,12 @@
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    }
+    },
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 36.046511627906966,
+    "lastReportedThreshold": 30
   }
 }
