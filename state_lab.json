@@ -47,7 +47,7 @@
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10,
+    "lastReportedThreshold": -20,
     "nearStopWarned": true
   },
   "QQQ": {
@@ -88,9 +88,6 @@
       "sizeMultiplier": 1
     },
     "lastReportedThreshold": -10
-  },
-  "AMZN": {
-    "active": true
   },
   "SPY": {
     "active": true
