@@ -91,7 +91,7 @@
     "entryTime": 1790172951345,
     "level": 744.45,
     "msgId": 3820,
-    "stopOrderId": "386d94c2-6767-47ee-a2e7-f3cd71eb6cb7",
+    "stopOrderId": "ef0051f8-36b1-496b-852a-23db3f36339f",
     "hardStopPrice": 0.94,
     "entryStockPrice": 740.405,
     "vwapAtEntry": null,
@@ -101,7 +101,11 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.726643598615935,
+    "lastReportedThreshold": 10
   },
   "IWM": {
     "active": true,
@@ -123,7 +127,8 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
@@ -145,6 +150,7 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "lastReportedThreshold": -10
   }
 }
