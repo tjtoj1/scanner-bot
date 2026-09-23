@@ -84,8 +84,8 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 33.75527426160337,
-    "lastReportedThreshold": 30
+    "peakPct": 43.881856540084385,
+    "lastReportedThreshold": 40
   },
   "IWM": {
     "active": true,
@@ -111,7 +111,7 @@
     "lastReportedThreshold": 20,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 21.62162162162162,
+    "peakPct": 24.324324324324305,
     "ladder2": true,
     "trailPct": 10
   },
@@ -136,6 +136,6 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
