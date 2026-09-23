@@ -52,7 +52,8 @@
     "stopPct": 12,
     "peakPct": 58.11320754716978,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
@@ -91,19 +92,20 @@
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
-  "AMZN": {
+  "QQQ": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "AMZN260923P00247500",
-    "strike": "247.5",
-    "entryPremium": 0.43,
-    "qty": 11,
-    "entryTime": 1790173282478,
-    "msgId": 3847,
-    "stopOrderId": "8c7f1c0d-af8b-4a3a-bd10-602f4d294646",
-    "hardStopPrice": 0.3,
+    "optionSymbol": "QQQ260923P00739000",
+    "strike": "739",
+    "entryPremium": 1.99,
+    "qty": 2,
+    "entryTime": 1790173408802,
+    "msgId": 3867,
+    "stopOrderId": null,
+    "hardStopPrice": 1.39,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -112,29 +114,23 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 248.44,
+      "spot": 738.73,
       "regime": "bearish",
-      "emaFast": 253.2819,
-      "emaSlow": 254.3864,
-      "breakoutHigh": 256.13,
-      "breakoutLow": 251.24,
-      "volRatio": 11.57,
-      "lastClose": 250.41,
-      "lastVolume": 2309351,
+      "emaFast": 745.3252,
+      "emaSlow": 746.0187,
+      "breakoutHigh": 747.13,
+      "breakoutLow": 744.45,
+      "volRatio": 17.8,
+      "lastClose": 743.12,
+      "lastVolume": 2072576,
       "barTime": "2026-09-23T13:45:00Z",
-      "entryTimeUTC": "2026-09-23T14:21:22.478Z",
-      "vwapAtEntry": 252.1851,
-      "rsiAtEntry": 14.68,
+      "entryTimeUTC": "2026-09-23T14:23:28.802Z",
+      "vwapAtEntry": 744.8615,
+      "rsiAtEntry": 31.03,
       "signalType": "breakout",
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    },
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 36.046511627906966,
-    "lastReportedThreshold": 30
+    }
   }
 }
