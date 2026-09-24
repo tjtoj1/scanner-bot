@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-23T20:00:34.375Z"
+      "lastUpdated": "2026-09-24T20:00:21.809Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-23T20:00:34.375Z"
+      "lastUpdated": "2026-09-24T20:00:21.809Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 124,
-      "wins": 66,
-      "pnl": 663,
-      "avgPnlPct": 0.84,
-      "se": 3.1,
+      "n": 132,
+      "wins": 70,
+      "pnl": 626,
+      "avgPnlPct": 0.75,
+      "se": 2.97,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-23T20:00:34.375Z"
+      "lastUpdated": "2026-09-24T20:00:21.809Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -75,15 +75,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 140,
-      "wins": 71,
-      "pnl": -938,
-      "avgPnlPct": -1.46,
-      "se": 2.73,
+      "n": 145,
+      "wins": 75,
+      "pnl": -894,
+      "avgPnlPct": -1.33,
+      "se": 2.65,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-23T20:00:34.378Z"
+      "lastUpdated": "2026-09-24T20:00:21.809Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-23T20:00:34.379Z"
+      "lastUpdated": "2026-09-24T20:00:21.809Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-09-23T20:00:34.379Z"
+      "lastUpdated": "2026-09-24T20:00:21.809Z"
     }
   },
   "changelog": [
