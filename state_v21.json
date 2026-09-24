@@ -58,28 +58,5 @@
       "low": 245.7301
     }
   },
-  "_cooldowns": {},
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN260925P00247500",
-    "strike": "247.5",
-    "entryPremium": 2.8,
-    "qty": 1,
-    "entryTime": 1790259366691,
-    "level": 245.7301,
-    "msgId": 3991,
-    "stopOrderId": "d40f22bc-60d2-4b15-b9e8-0eb037b83b4f",
-    "hardStopPrice": 1.82,
-    "entryStockPrice": 245.82,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 51.49,
-    "volumeRatio": 8.901825310982858,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -10
-  }
+  "_cooldowns": {}
 }
