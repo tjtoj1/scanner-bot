@@ -48,7 +48,7 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "SPY": {
     "active": true,
@@ -59,7 +59,7 @@
     "qty": 4,
     "entryTime": 1790259370923,
     "msgId": 3993,
-    "stopOrderId": "de5d7f0d-109c-46c2-a2c1-47ad21257aa3",
+    "stopOrderId": "9b60bcf7-f286-4175-ae2d-2d3d3121f5bb",
     "hardStopPrice": 0.77,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -87,6 +87,11 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 25.11415525114154
   }
 }
