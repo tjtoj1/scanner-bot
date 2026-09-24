@@ -48,7 +48,8 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
