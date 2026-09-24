@@ -98,7 +98,7 @@
     "entryTime": 1790259363267,
     "level": 280.61,
     "msgId": 3989,
-    "stopOrderId": null,
+    "stopOrderId": "7461fa91-96db-4977-8f67-d19d8a2f40f5",
     "hardStopPrice": 0.51,
     "entryStockPrice": 280.625,
     "vwapAtEntry": null,
