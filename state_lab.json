@@ -50,9 +50,6 @@
     },
     "lastReportedThreshold": 10
   },
-  "QQQ": {
-    "active": true
-  },
   "AMZN": {
     "active": true,
     "signal": "CALL",
