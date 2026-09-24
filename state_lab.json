@@ -48,12 +48,12 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 40,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 49.402390438247025
+    "peakPct": 56.97211155378488
   },
   "TSLA": {
     "active": true,
@@ -91,7 +91,8 @@
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": 10
   },
   "SPY": {
     "active": true,
@@ -133,6 +134,6 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 20.220588235294095,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 10
   }
 }
