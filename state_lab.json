@@ -11,5 +11,8 @@
     "TSLA_CALL": 1790261592853,
     "SPY_CALL": 1790262928913
   },
-  "_lastComboLearnedFinal": true
+  "_lastComboLearnedFinal": true,
+  "IWM": {
+    "active": true
+  }
 }
