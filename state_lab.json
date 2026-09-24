@@ -11,5 +11,43 @@
     "TSLA_CALL": 1790261592853,
     "SPY_CALL": 1790262928913
   },
-  "_lastComboLearnedFinal": true
+  "_lastComboLearnedFinal": true,
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260924P00280000",
+    "strike": "280",
+    "entryPremium": 0.655,
+    "qty": 7,
+    "entryTime": 1790263477736,
+    "msgId": 4078,
+    "stopOrderId": "119324c3-536d-4f59-8544-2380449180ec",
+    "hardStopPrice": 0.46,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 279.73,
+      "regime": "bearish",
+      "emaFast": 280.5811,
+      "emaSlow": 280.8388,
+      "breakoutHigh": 281.73,
+      "breakoutLow": 280.261,
+      "volRatio": 3.38,
+      "lastClose": 279.99,
+      "lastVolume": 974772,
+      "barTime": "2026-09-24T14:45:00Z",
+      "entryTimeUTC": "2026-09-24T15:24:37.736Z",
+      "vwapAtEntry": 280.704,
+      "rsiAtEntry": 32.63,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
+  }
 }
