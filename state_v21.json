@@ -6,6 +6,24 @@
       "symbol": "QQQ",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-25",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-25",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-09-25",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -42,5 +60,71 @@
   },
   "_cooldowns": {
     "QQQ_CALL": "2026-09-25T14:17:31.516Z"
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260925P00768000",
+    "strike": "768",
+    "entryPremium": 1.685,
+    "qty": 2,
+    "entryTime": 1790346667617,
+    "level": 767.75,
+    "msgId": 4296,
+    "stopOrderId": null,
+    "hardStopPrice": 1.1,
+    "entryStockPrice": 767.53,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 36.31,
+    "volumeRatio": 8.852793456005253,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260925P00741000",
+    "strike": "741",
+    "entryPremium": 1.875,
+    "qty": 2,
+    "entryTime": 1790346668495,
+    "level": 741.66,
+    "msgId": 4298,
+    "stopOrderId": "d3a7cf8d-90ea-42dd-831b-aa3c32094fa7",
+    "hardStopPrice": 1.22,
+    "entryStockPrice": 740.9549999999999,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 47.26,
+    "volumeRatio": 7.797088098104455,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM260925P00281000",
+    "strike": "281",
+    "entryPremium": 0.72,
+    "qty": 6,
+    "entryTime": 1790346669714,
+    "level": 281.65,
+    "msgId": 4299,
+    "stopOrderId": "58d6b90f-7469-4544-bbf5-ef8a51d95660",
+    "hardStopPrice": 0.47,
+    "entryStockPrice": 280.9,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 30.62,
+    "volumeRatio": 6.761692912377208,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
