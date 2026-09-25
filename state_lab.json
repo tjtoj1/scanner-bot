@@ -47,7 +47,13 @@
       "positionBucket": "near_low",
       "comboKey": "CALL|position:near_low",
       "sizeMultiplier": 1
-    }
+    },
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 33.90928725701943,
+    "lastReportedThreshold": 30
   },
   "AMZN": {
     "active": true,
