@@ -18,6 +18,12 @@
       "symbol": "AMZN",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-25",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -64,6 +70,25 @@
     "active": true
   },
   "QQQ": {
-    "active": true
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ260925P00742000",
+    "strike": "742",
+    "entryPremium": 1.5550000000000002,
+    "qty": 3,
+    "entryTime": 1790347108363,
+    "level": 741.66,
+    "msgId": 4448,
+    "stopOrderId": "b358d10f-c2a8-4575-9a62-42ab23239ba1",
+    "hardStopPrice": 1.01,
+    "entryStockPrice": 742.26,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 47.26,
+    "volumeRatio": 7.797088098104455,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
