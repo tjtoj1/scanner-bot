@@ -1,62 +1,6 @@
 {
-  "_lastDay": "2026-09-24",
-  "_dailyTrades": [
-    {
-      "day": "2026-09-24",
-      "symbol": "SPY",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-09-24",
-      "symbol": "IWM",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-09-24",
-      "symbol": "TSLA",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-09-24",
-      "symbol": "AMZN",
-      "signal": "PUT",
-      "pnl": 0
-    }
-  ],
-  "range": {
-    "SPY": {
-      "day": "2026-09-24",
-      "high": 765.06,
-      "low": 763.62
-    },
-    "QQQ": {
-      "day": "2026-09-24",
-      "high": 737.38,
-      "low": 734.62
-    },
-    "IWM": {
-      "day": "2026-09-24",
-      "high": 281.73,
-      "low": 280.61
-    },
-    "NVDA": {
-      "day": "2026-09-24",
-      "high": 223.2299,
-      "low": 221.09
-    },
-    "TSLA": {
-      "day": "2026-09-24",
-      "high": 378.7499,
-      "low": 376.13
-    },
-    "AMZN": {
-      "day": "2026-09-24",
-      "high": 247.52,
-      "low": 245.7301
-    }
-  },
+  "_lastDay": "2026-09-25",
+  "_dailyTrades": [],
+  "range": {},
   "_cooldowns": {}
 }
