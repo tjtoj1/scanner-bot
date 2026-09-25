@@ -79,7 +79,8 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -30,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
@@ -102,7 +103,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true
