@@ -40,31 +40,7 @@
       "low": 247.71
     }
   },
-  "_cooldowns": {},
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ260925C00740000",
-    "strike": "740",
-    "entryPremium": 2.21,
-    "qty": 2,
-    "entryTime": 1790345710044,
-    "level": 744.58,
-    "msgId": 4290,
-    "stopOrderId": "cb966483-17d0-49e1-aa72-25fc2ecdd66d",
-    "hardStopPrice": 1.44,
-    "entryStockPrice": 740.3050000000001,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 50.84,
-    "volumeRatio": 7.938887774128978,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.837104072398194,
-    "lastReportedThreshold": 10
+  "_cooldowns": {
+    "QQQ_CALL": "2026-09-25T14:17:31.516Z"
   }
 }
