@@ -66,9 +66,6 @@
   "SPY": {
     "active": true
   },
-  "IWM": {
-    "active": true
-  },
   "QQQ": {
     "active": true,
     "signal": "PUT",
@@ -94,7 +91,7 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 33.7620578778135,
-    "lastReportedThreshold": 30
+    "peakPct": 43.086816720257225,
+    "lastReportedThreshold": 40
   }
 }
