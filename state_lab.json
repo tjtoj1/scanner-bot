@@ -87,5 +87,8 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     }
+  },
+  "SPY": {
+    "active": true
   }
 }
