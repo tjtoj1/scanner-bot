@@ -743,6 +743,35 @@ async function scanEntry(state, symbol, liveInAlpaca) {
   console.log(`ENTRY [wvad]: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} x ${qty} | SL(stock) $${slStock.toFixed(2)}`);
 }
 
+// Halts the bot loudly: alerts Ops, then exits NON-ZERO so runner.js can
+// tell this apart from a healthy cycle that simply found no signal.
+//
+// A silent process.exit(0) on the env-check path is what let this bot sit
+// dead for five trading days while v21 and LAB traded normally: the runner
+// read exit 0 as success and moved on, and nothing reached Telegram.
+//
+// Throttled to one alert per UTC day via the state file, because these
+// guards run on every scan and monitor pass — unthrottled that would be
+// roughly 800 identical messages a day during market hours. `detail` must
+// never carry a secret's value; callers pass presence/length only.
+async function haltWithAlert(reason, detail = "") {
+  const today = getToday();
+  let state = {};
+  try { state = loadState(); } catch {}
+  if (state._haltAlertedDay !== today) {
+    state._haltAlertedDay = today;
+    state._haltReason = reason;
+    try { saveState(state); } catch (e) {
+      console.error(`could not persist halt marker: ${e.message}`);
+    }
+    await alertOps(`🚨 <b>WVAD متوقف — لا صفقات اليوم</b>\n${reason}`
+      + (detail ? `\n<code>${detail}</code>` : "")
+      + `\n\n(تنبيه واحد يومياً؛ يتكرر الفحص كل دورة)`);
+  }
+  console.error(`WVAD halted: ${reason}${detail ? ` | ${detail}` : ""}`);
+  process.exit(1);
+}
+
 // ─── MAIN ────────────────────────────────────────────────────
 // Guarded so test_wvad.js can import the pure math functions
 // (computeWVAD / computeATR / filterRTH) without this file placing a
@@ -765,7 +794,9 @@ if (IS_MAIN) (async () => {
   // not would mean the rename, not the service, was the problem.
   console.log('[wvad] env keys with ALPACA/ABDULLAH:',
     Object.keys(process.env).filter(k => k.includes('ALPACA') || k.includes('ABDULLAH')).sort().join(', ') || '(none)');
-  if (!ENABLED) { console.log("WVAD_ENABLED=0 — bot disabled, exiting"); process.exit(0); }
+  if (!ENABLED) {
+    await haltWithAlert("WVAD_ENABLED=0 — مفتاح الإيقاف مفعّل في إعدادات Railway");
+  }
   if (!API_KEY || !API_SECRET) {
     // Same diagnostic approach runner.js already uses for GH_PUSH_TOKEN:
     // the bare "missing" message cannot distinguish a variable Railway
@@ -790,7 +821,13 @@ if (IS_MAIN) (async () => {
     const seen = Object.keys(process.env)
       .filter(k => k.startsWith("ALPACA") || k.startsWith("ABDULLAH")).sort();
     console.error(`  ALPACA_*/ABDULLAH_* visible to this process: ${seen.length ? seen.join(", ") : "(none)"}`);
-    process.exit(0);
+    // Names and presence/length only — never a value.
+    await haltWithAlert(
+      "بيانات اعتماد Alpaca لم تصل إلى العملية (ABDULLAH_TJ_KEY / ABDULLAH_TJ_SECRET)",
+      `${describe("ABDULLAH_TJ_KEY")}\n${describe("ABDULLAH_TJ_SECRET")}\n`
+      + `visible: ${seen.length ? seen.join(", ") : "(none)"}\n`
+      + `ملاحظة: إعادة التشغيل لا تُحمّل متغيرات جديدة — يلزم redeploy كامل.`
+    );
   }
   if (!isMarketOpen()) { console.log("Market closed"); process.exit(0); }
 

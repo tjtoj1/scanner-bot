@@ -8,7 +8,7 @@
     "breakoutLookback": 10,
     "volAvgLookback": 20,
     "volumeMultiplier": 1.3,
-    "tradeBudget": 500,
+    "tradeBudget": 300,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,

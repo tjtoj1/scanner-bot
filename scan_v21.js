@@ -46,8 +46,13 @@ const TICKERS       = [...TICKERS_0DTE, ...TICKERS_NEXT];
 // Config
 const TRADE_BUDGET      = 500;   // $ per trade
 const MAX_DAILY_TRADES  = 4;
-const DAILY_TARGET_MIN  = 0.03;  // 3% of portfolio
 const DAILY_TARGET_MAX  = 0.05;  // 5% of portfolio
+// Hard daily loss floor, in absolute dollars on realised P&L. v21 ran with
+// no loss limit at all while LAB (-$1000) and WVAD (-$600) both had one, so
+// a cascading day here could run unchecked. -600 matches WVAD, which shares
+// v21's $500 budget and 4-trade cap: four trades stopping out at -35% is
+// about -$700, so this trips only on a genuinely bad day, not a normal one.
+const DAILY_LOSS_LIMIT  = -600;
 const VOL_SURGE_RATIO   = 1.2;   // high volume threshold
 const LADDER_1_PCT      = 10;
 const LADDER_1_STOP     = 5;
@@ -99,6 +104,22 @@ async function getNextExpiry(symbol) {
 function loadState() {
   try { return JSON.parse(fs.readFileSync("state_v21.json","utf8")); }
   catch { return {}; }
+}
+
+// Realised P&L booked today, from the outcomes log — the same source and
+// shape LAB's breaker uses, so the two bots measure the day identically.
+// A missing or unreadable log reads as 0, which fails open (keeps trading)
+// rather than halting the bot on a filesystem hiccup.
+function getTodayRealizedPnl() {
+  const today = getToday();
+  let total = 0;
+  try {
+    const lines = fs.readFileSync("outcomes_v21.jsonl", "utf8").split("\n").filter(Boolean);
+    for (const line of lines) {
+      try { const r = JSON.parse(line); if (r.day === today) total += r.pnl; } catch {}
+    }
+  } catch {}
+  return total;
 }
 function saveState(s) { fs.writeFileSync("state_v21.json", JSON.stringify(s,null,2)); }
 
@@ -394,6 +415,7 @@ function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
     case "hard_stop":       return `🛑 <b>وقف خسارة ${symbol}</b>\n${tail}`;
     case "ladder_stop":     return `💰 <b>وقف ربح ${symbol}</b>\n${tail}`;
     case "structural_stop": return `🔄 <b>وقف بنيوي ${symbol}</b>\nالاختراق فشل (حجم عادي) | ${tail}`;
+    case "daily_loss_breaker": return `🚨 <b>${symbol} إغلاق طارئ — تجاوز حد الخسارة اليومي</b>\n${tail}`;
     case "alpaca_stop":
     case "alpaca_stop_est": return `🛑 <b>${symbol} أُقفلت (Alpaca)</b>\n${tail}`;
     default:                return `${symbol} أُغلقت (${reason})\n${tail}`;
@@ -562,6 +584,14 @@ async function monitorPosition(state, symbol) {
   const elapsed = Math.round((Date.now() - pos.entryTime) / 60000);
   console.log(`${symbol} [v21]: ${pos.signal} | ${pnlPct.toFixed(1)}% | ${elapsed}m`);
 
+  // Daily loss circuit breaker — checked before every other exit so a
+  // breached day flattens immediately rather than waiting for this
+  // position's own stop. Mirrors LAB's ordering.
+  if (getTodayRealizedPnl() <= DAILY_LOSS_LIMIT) {
+    await closePosition(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill");
+    return;
+  }
+
   // Force exit
   if (isForceExit()) {
     await closePosition(state, symbol, pos, currentPremium, "force_exit", "order_fill");
@@ -663,6 +693,14 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   if (liveInAlpaca.has(symbol)) return;
   if (isPastLastEntry()) return;
   if (isRangeBuilding()) return;
+
+  // Daily loss breaker, checked before any network call so a breached day
+  // costs nothing to re-evaluate each cycle.
+  const realizedToday = getTodayRealizedPnl();
+  if (realizedToday <= DAILY_LOSS_LIMIT) {
+    console.log(`${symbol}: daily loss limit hit ($${realizedToday} <= $${DAILY_LOSS_LIMIT}) — no new entries today`);
+    return;
+  }
 
   // ─── COOLDOWN CHECK (prevent re-entry chains) ───────────────
   // Compute signal first to check cooldown for this symbol×signal
@@ -870,6 +908,15 @@ ${slLine}`);
     portfolio = parseFloat(acctInfo.portfolio_value) || 5000;
     console.log(`Account: $${portfolio.toFixed(0)}`);
   } catch(e) { console.error("Account fetch failed:", e.message); }
+
+  // Daily loss breaker — one-time alert, so a breached day is visible
+  // immediately rather than inferred from a silent absence of entries.
+  const dailyPnlNow = getTodayRealizedPnl();
+  if (dailyPnlNow <= DAILY_LOSS_LIMIT && state._lossBreakerAlerted !== today) {
+    state._lossBreakerAlerted = today;
+    saveState(state);
+    await tg(`🚨 <b>v21: تم بلوغ حد الخسارة اليومي</b>\n($${dailyPnlNow} ≤ $${DAILY_LOSS_LIMIT}) — إيقاف كل دخول جديد وإغلاق المراكز المفتوحة لبقية اليوم.`);
+  }
 
   if (MODE === "monitor") {
     for (const sym of TICKERS) {

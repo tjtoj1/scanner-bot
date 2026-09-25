@@ -20,6 +20,7 @@
 // deploy never runs on stale baked-in state.
 // ============================================================
 import { spawn, execSync } from "child_process";
+import fs from "fs";
 
 const REPO_URL_PLAIN = "https://github.com/tjtoj1/scanner-bot.git"; // public repo — no auth needed to read
 const GH_PUSH_TOKEN = process.env.GH_PUSH_TOKEN; // needed only to push
@@ -439,13 +440,78 @@ function runNode(script, extraEnv = {}) {
   });
 }
 
+// ─── BOT LIVENESS WATCH ──────────────────────────────────────
+// A bot that dies on a startup guard looks exactly like a healthy bot with
+// no signal: exit 0, no output the runner reads, no Telegram. WVAD sat dead
+// for five trading days that way while v21 and LAB traded normally. Two
+// independent detectors close that gap.
+const STALE_CYCLES_BEFORE_ALERT = 3;
+const BOT_STATE_FILE = { v21: "state_v21.json", lab: "state_lab.json", wvad: "state_wvad.json" };
+const lastStateMtime = {};   // bot -> mtimeMs at the previous observation
+const staleCycles = {};      // bot -> consecutive cycles with an untouched state file
+const alertedOn = {};        // `${key}:${YYYY-MM-DD}` -> true
+
+function today() { return new Date().toISOString().split("T")[0]; }
+
+// One alert per key per UTC day. Without this, a persistent fault fires on
+// every 60s cycle — roughly 400 messages a session.
+async function alertOnce(key, text) {
+  const stamp = `${key}:${today()}`;
+  if (alertedOn[stamp]) return;
+  alertedOn[stamp] = true;
+  await alertTelegram(text);
+}
+
+// Detector 2: the state file's mtime. Every bot rewrites its state file on
+// every completed cycle, so an untouched mtime means the process never got
+// far enough to do any work — regardless of what it exited with. mtime, not
+// content: an idle bot writes byte-identical JSON, which is exactly why
+// git sees no diff to commit on quiet cycles.
+async function checkStateFreshness(name) {
+  const file = BOT_STATE_FILE[name];
+  if (!file) return;
+  let mtime = null;
+  try { mtime = fs.statSync(file).mtimeMs; } catch { mtime = null; }
+
+  if (mtime === null) {
+    staleCycles[name] = (staleCycles[name] ?? 0) + 1;
+  } else if (lastStateMtime[name] === undefined) {
+    lastStateMtime[name] = mtime;   // first observation — nothing to compare yet
+    return;
+  } else if (mtime === lastStateMtime[name]) {
+    staleCycles[name] = (staleCycles[name] ?? 0) + 1;
+  } else {
+    lastStateMtime[name] = mtime;
+    staleCycles[name] = 0;
+    return;
+  }
+
+  if (staleCycles[name] === STALE_CYCLES_BEFORE_ALERT) {
+    console.error(`[runner] ALERT: ${name} has not written ${file} for ${staleCycles[name]} cycles`);
+    await alertOnce(`stale:${name}`, `🚨 <b>[ALERT] Bot ${name} stopped updating state!</b>\n`
+      + `لم يُكتب <code>${file}</code> خلال ${staleCycles[name]} دورات متتالية داخل ساعات السوق.\n`
+      + `يعني أن العملية تخرج قبل أداء أي عمل — راجع Deploy Logs.`);
+  }
+}
+
 async function runBotCycle(name, script) {
   const started = Date.now();
   try {
     console.log(`[runner] ${name}: scan`);
-    await runNode(script, {});
+    const scanCode = await runNode(script, {});
     console.log(`[runner] ${name}: monitor`);
-    await runNode(script, { MODE: "monitor" });
+    const monitorCode = await runNode(script, { MODE: "monitor" });
+
+    // Detector 1: a non-zero exit. Bots use it deliberately for "halted,
+    // not idle" (see haltWithAlert in scan_wvad.js); the watchdog also
+    // resolves 1 when it has to kill a hung child.
+    const bad = [["scan", scanCode], ["monitor", monitorCode]].filter(([, c]) => c !== 0);
+    if (bad.length) {
+      const detail = bad.map(([m, c]) => `${m}=${c}`).join(", ");
+      console.error(`[runner] ALERT: ${name} exited non-zero (${detail})`);
+      await alertOnce(`exit:${name}`, `🚨 <b>[ALERT] Bot ${name} stopped updating state!</b>\n`
+        + `خرجت العملية بكود غير صفري (${detail}) — توقف مقصود أو انهيار، لا دورة عادية.`);
+    }
   } catch (e) {
     console.error(`[runner] ${name} cycle threw:`, e.message);
   } finally {
@@ -473,6 +539,7 @@ async function main() {
         await runBotCycle("v21", "scan_v21.js");
         await runBotCycle("lab", "scan_lab.js");
         await runBotCycle("wvad", "scan_wvad.js");
+        for (const bot of ["v21", "lab", "wvad"]) await checkStateFreshness(bot);
         if (utcMin() >= REPORT_WINDOW_START_UTC) {
           console.log("[runner] daily report window — checking");
           await runNode("daily_report.js", {});
