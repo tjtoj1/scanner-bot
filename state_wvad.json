@@ -1,4 +1,28 @@
 {
   "_lastDay": "2026-09-30",
-  "_dailyTrades": []
+  "_dailyTrades": [
+    {
+      "day": "2026-09-30",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY260930P00768000",
+    "strike": "768",
+    "entryPremium": 0.9450000000000001,
+    "qty": 5,
+    "entryTime": 1790786756212,
+    "stopOrderId": "ccb50ff4-0f72-4c08-88a6-b8c8af9f38ae",
+    "hardStopPrice": 0.61,
+    "entryStockPrice": 768.1,
+    "wvadSumAtEntry": 2860043.56,
+    "signalLineAtEntry": 2940999.37,
+    "atrAtEntry": 1.1711,
+    "slStock": 769.86,
+    "dte": 0
+  }
 }
