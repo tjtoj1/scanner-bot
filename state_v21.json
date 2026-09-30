@@ -1,64 +1,96 @@
 {
-  "_lastDay": "2026-09-25",
+  "_lastDay": "2026-09-30",
   "_dailyTrades": [
     {
-      "day": "2026-09-25",
-      "symbol": "QQQ",
+      "day": "2026-09-30",
+      "symbol": "SPY",
       "signal": "CALL",
       "pnl": 0
     },
     {
-      "day": "2026-09-25",
-      "symbol": "NVDA",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-09-25",
+      "day": "2026-09-30",
       "symbol": "AMZN",
-      "signal": "PUT",
-      "pnl": 0
-    },
-    {
-      "day": "2026-09-25",
-      "symbol": "QQQ",
-      "signal": "PUT",
+      "signal": "CALL",
       "pnl": 0
     }
   ],
   "range": {
     "SPY": {
-      "day": "2026-09-25",
-      "high": 770.055,
-      "low": 767.75
+      "day": "2026-09-30",
+      "high": 767.29,
+      "low": 766
     },
     "QQQ": {
-      "day": "2026-09-25",
-      "high": 744.58,
-      "low": 741.66
+      "day": "2026-09-30",
+      "high": 742.7493,
+      "low": 739.76
     },
     "IWM": {
-      "day": "2026-09-25",
-      "high": 282.69,
-      "low": 281.65
+      "day": "2026-09-30",
+      "high": 280.32,
+      "low": 279.4
     },
     "NVDA": {
-      "day": "2026-09-25",
-      "high": 226.94,
-      "low": 224.66
+      "day": "2026-09-30",
+      "high": 231.43,
+      "low": 228.79
     },
     "TSLA": {
-      "day": "2026-09-25",
-      "high": 386.83,
-      "low": 369.7766
+      "day": "2026-09-30",
+      "high": 352.5,
+      "low": 346.42
     },
     "AMZN": {
-      "day": "2026-09-25",
-      "high": 250.1599,
-      "low": 247.71
+      "day": "2026-09-30",
+      "high": 247.5,
+      "low": 246.08
     }
   },
   "_cooldowns": {
     "AMZN_PUT": "2026-09-25T14:36:12.205Z"
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY260930C00768000",
+    "strike": "768",
+    "entryPremium": 1.4649999999999999,
+    "qty": 3,
+    "entryTime": 1790782585261,
+    "level": 767.29,
+    "msgId": 4820,
+    "stopOrderId": "76071d66-4300-41af-9d5d-dd13f1f89fda",
+    "hardStopPrice": 0.95,
+    "entryStockPrice": 768.485,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 32.71,
+    "volumeRatio": 1.984614389041167,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN261002C00252500",
+    "strike": "252.5",
+    "entryPremium": 2.145,
+    "qty": 2,
+    "entryTime": 1790782587641,
+    "level": 247.5,
+    "msgId": 4821,
+    "stopOrderId": "3e42d8db-fdf7-4a32-9017-e050e726cd5e",
+    "hardStopPrice": 1.39,
+    "entryStockPrice": 251.44,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 58.2,
+    "volumeRatio": 2.4393793344680708,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
