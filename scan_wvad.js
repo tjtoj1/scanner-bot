@@ -864,7 +864,10 @@ if (IS_MAIN) (async () => {
           if (pos.optionSymbol && pos.entryPremium) {
             const exitPrem = await getQuote(pos.optionSymbol);
             if (exitPrem !== null) {
-              await closePosition(state, sym, pos, exitPrem, "alpaca_stop", "order_fill", true);
+              // NOT an order fill: exitPrem is a market quote sampled at the
+              // moment reconciliation noticed the position was gone. The real
+              // fill happened earlier, at Alpaca, at a price nothing here read.
+              await closePosition(state, sym, pos, exitPrem, "alpaca_stop", "quote_at_detection", true);
             } else {
               await closePosition(state, sym, pos, pos.entryPremium * 0.65, "alpaca_stop_est", "quote_estimate", true);
             }
