@@ -38,7 +38,7 @@
     "dte": 0,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 66.66666666666667,
+    "peakPct": 72.82051282051283,
     "ladder2": true,
     "trailPct": 10
   },
@@ -62,6 +62,6 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 60.33898305084746
+    "peakPct": 64.40677966101693
   }
 }
