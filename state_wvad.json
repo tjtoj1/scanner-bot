@@ -18,6 +18,29 @@
       "symbol": "QQQ",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-30",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
-  ]
+  ],
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260930C00743000",
+    "strike": "743",
+    "entryPremium": 1.645,
+    "qty": 3,
+    "entryTime": 1790793050919,
+    "stopOrderId": "6b95639e-14e3-42dd-832e-a257fe29f53b",
+    "hardStopPrice": 1.07,
+    "entryStockPrice": 743.31,
+    "wvadSumAtEntry": 2984478.51,
+    "signalLineAtEntry": 2910734.65,
+    "atrAtEntry": 1.3596,
+    "slStock": 741.27,
+    "dte": 0
+  }
 }
