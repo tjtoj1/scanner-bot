@@ -12,6 +12,12 @@
       "symbol": "AMZN",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-09-30",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -70,7 +76,7 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "AMZN": {
     "active": true,
@@ -88,6 +94,28 @@
     "vwapAtEntry": null,
     "rsiAtEntry": 58.2,
     "volumeRatio": 2.4393793344680708,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ260930C00743000",
+    "strike": "743",
+    "entryPremium": 1.975,
+    "qty": 2,
+    "entryTime": 1790783130916,
+    "level": 742.7493,
+    "msgId": 4824,
+    "stopOrderId": "90d7b49c-daff-412f-9359-538ce80d2bad",
+    "hardStopPrice": 1.28,
+    "entryStockPrice": 743.26,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 38.91,
+    "volumeRatio": 1.7471079877109275,
     "signalType": "breakout",
     "tp1Stock": null,
     "tp2Stock": null,
