@@ -1,6 +1,19 @@
 {
   "_lastDay": "2026-10-01",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-10-01",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-01",
+      "symbol": "AMZN",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-10-01",
@@ -33,7 +46,49 @@
       "low": 248.9417
     }
   },
-  "_cooldowns": {
-    "AMZN_PUT": "2026-09-25T14:36:12.205Z"
+  "_cooldowns": {},
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261001P00761000",
+    "strike": "761",
+    "entryPremium": 1.8,
+    "qty": 2,
+    "entryTime": 1790864115558,
+    "level": 763.21,
+    "msgId": 4871,
+    "stopOrderId": "dd2b8f3a-4fec-4896-bcb3-b41b77f2abb0",
+    "hardStopPrice": 1.17,
+    "entryStockPrice": 760.96,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 58.95,
+    "volumeRatio": 8.258105761277545,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "AMZN261002P00247500",
+    "strike": "247.5",
+    "entryPremium": 2.13,
+    "qty": 2,
+    "entryTime": 1790864117127,
+    "level": 248.9417,
+    "msgId": 4872,
+    "stopOrderId": "bf0dc7c7-c01f-4d33-a4c2-2c4277ea8ebd",
+    "hardStopPrice": 1.38,
+    "entryStockPrice": 247.28,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 44.63,
+    "volumeRatio": 6.466807992192368,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
