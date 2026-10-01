@@ -55,8 +55,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 46.54731457800512,
-    "lastReportedThreshold": 40
+    "peakPct": 52.68542199488492,
+    "lastReportedThreshold": 50
   },
   "NVDA": {
     "active": true,
