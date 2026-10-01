@@ -58,7 +58,9 @@
       "low": 248.9417
     }
   },
-  "_cooldowns": {},
+  "_cooldowns": {
+    "SPY_PUT": "2026-10-01T14:35:01.125Z"
+  },
   "AMZN": {
     "active": true,
     "signal": "PUT",
@@ -80,28 +82,5 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261001P00760000",
-    "strike": "760",
-    "entryPremium": 1.5550000000000002,
-    "qty": 3,
-    "entryTime": 1790864642372,
-    "level": 763.21,
-    "msgId": 4886,
-    "stopOrderId": "6b427015-5467-400a-bc02-5ece87fb30d1",
-    "hardStopPrice": 1.01,
-    "entryStockPrice": 760.375,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 58.95,
-    "volumeRatio": 8.258105761277545,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
   }
 }
