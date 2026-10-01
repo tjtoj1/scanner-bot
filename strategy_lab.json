@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "name": "momentum_breakout_ema",
+  "description": "EMA(fast)/EMA(slow) trend regime + rolling N-bar breakout with volume confirmation, on 15-min bars. Exits: hard stop, 2-tier profit ladder with trailing stop, regime flip, force exit.",
+  "params": {
+    "emaFast": 9,
+    "emaSlow": 21,
+    "breakoutLookback": 10,
+    "volAvgLookback": 20,
+    "volumeMultiplier": 1.3,
+    "tradeBudget": 300,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8
+  },
+  "combos": {
+    "CALL|position:near_low": {
+      "factors": {
+        "signal": "CALL",
+        "position": "near_low"
+      },
+      "depth": 1.5,
+      "parentKey": null,
+      "n": 12,
+      "wins": 7,
+      "pnl": 164,
+      "avgPnlPct": 3.57,
+      "se": 9.85,
+      "tier": "insufficient",
+      "previousTier": "insufficient",
+      "sizeMultiplier": 1,
+      "lastUpdated": "2026-09-30T20:00:15.552Z"
+    },
+    "CALL|position:mid": {
+      "factors": {
+        "signal": "CALL",
+        "position": "mid"
+      },
+      "depth": 1.5,
+      "parentKey": null,
+      "n": 8,
+      "wins": 3,
+      "pnl": -309,
+      "avgPnlPct": -8.51,
+      "se": 10.01,
+      "tier": "insufficient",
+      "previousTier": "insufficient",
+      "sizeMultiplier": 1,
+      "lastUpdated": "2026-09-30T20:00:15.552Z"
+    },
+    "CALL|position:near_high": {
+      "factors": {
+        "signal": "CALL",
+        "position": "near_high"
+      },
+      "depth": 1.5,
+      "parentKey": null,
+      "n": 135,
+      "wins": 71,
+      "pnl": 454,
+      "avgPnlPct": 0.42,
+      "se": 2.92,
+      "tier": "average",
+      "previousTier": "average",
+      "sizeMultiplier": 1,
+      "lastUpdated": "2026-09-30T20:00:15.552Z"
+    },
+    "PUT|position:near_low": {
+      "factors": {
+        "signal": "PUT",
+        "position": "near_low"
+      },
+      "depth": 1.5,
+      "parentKey": null,
+      "n": 153,
+      "wins": 77,
+      "pnl": -1563,
+      "avgPnlPct": -2.26,
+      "se": 2.56,
+      "tier": "average",
+      "previousTier": "average",
+      "sizeMultiplier": 1,
+      "lastUpdated": "2026-09-30T20:00:15.552Z"
+    },
+    "PUT|position:mid": {
+      "factors": {
+        "signal": "PUT",
+        "position": "mid"
+      },
+      "depth": 1.5,
+      "parentKey": null,
+      "n": 7,
+      "wins": 2,
+      "pnl": -317,
+      "avgPnlPct": -14.71,
+      "se": 8.7,
+      "tier": "insufficient",
+      "previousTier": "insufficient",
+      "sizeMultiplier": 1,
+      "lastUpdated": "2026-09-30T20:00:15.552Z"
+    },
+    "PUT|position:near_high": {
+      "factors": {
+        "signal": "PUT",
+        "position": "near_high"
+      },
+      "depth": 1.5,
+      "parentKey": null,
+      "n": 8,
+      "wins": 5,
+      "pnl": 497,
+      "avgPnlPct": 11.44,
+      "se": 15.61,
+      "tier": "insufficient",
+      "previousTier": "insufficient",
+      "sizeMultiplier": 1,
+      "lastUpdated": "2026-09-30T20:00:15.552Z"
+    }
+  },
+  "changelog": [
+    {
+      "date": "2026-08-28",
+      "param": "volumeMultiplier",
+      "oldValue": 1.3,
+      "newValue": 1.495,
+      "reason": "36/86 صفقة (42%) خرجت عبر وقف الخسارة الصلب — رفع عتبة تأكيد الحجم لتقليل الإشارات الضعيفة.",
+      "sampleSize": 86,
+      "winRate": 55.8,
+      "netPnl": 617
+    },
+    {
+      "date": "2026-08-31",
+      "param": "volumeMultiplier",
+      "oldValue": 1.495,
+      "newValue": 1.719,
+      "reason": "47/112 صفقة (42%) خرجت عبر وقف الخسارة الصلب — رفع عتبة تأكيد الحجم لتقليل الإشارات الضعيفة.",
+      "sampleSize": 112,
+      "winRate": 56.3,
+      "netPnl": 536
+    },
+    {
+      "date": "2026-09-01",
+      "appliedAt": "2026-09-01T03:12:38Z",
+      "type": "correction",
+      "param": "volumeMultiplier",
+      "oldValue": 1.719,
+      "newValue": 1.3,
+      "reason": "تراجع عن تعديلَي الحجم السابقين (1.3 → 1.495 → 1.719) — الفرضية التي بُنيا عليها ('الحجم الضعيف يسبب الخروج عبر وقف الخسارة الصلب') مرفوضة بالبيانات الفعلية: من أصل 47 صفقة خرجت عبر الوقف الصلب (42% من 112 صفقة)، 26% فقط كان حجمها قريباً من العتبة القديمة (1.719×) — متوسط حجم هذه الخسائر 11.97× ووسيطها 4.65×، بعيد جداً عن العتبة. والصفقات الرابحة حجمها أعلى من الخاسرة في المتوسط (24.34× مقابل 11.97×)، أي أن الحجم ليس العامل المميّز بين الرابح والخاسر. التعديلان السابقان لم يقيسا أثرهما الفعلي قبل تكرار نفس المنطق على نفس الأدلة تقريباً. هذا تصحيح يدوي صريح، وليس تعلّماً تلقائياً جديداً.",
+      "sampleSize": 112,
+      "winRate": 56.3,
+      "netPnl": 536,
+      "metricName": "hardStopRatio",
+      "metricBefore": 0.4196,
+      "metricAfter": 0.625,
+      "tradesAfter": 24,
+      "effect": "worsened"
+    },
+    {
+      "date": "2026-09-01",
+      "appliedAt": "2026-09-01T20:00:35.071Z",
+      "param": "emaSlow",
+      "oldValue": 21,
+      "newValue": 24.15,
+      "reason": "63% من صفقات وقف الخسارة الصلب دخلت عند نطاق ضعيف/متردد (فارق EMA سريع/بطيء أقل من 0.15%) — توسيع emaSlow لتطلّب فصلاً أوضح بين الاتجاهين.",
+      "sampleSize": 136,
+      "winRate": 52.9,
+      "netPnl": -171,
+      "metricName": "hardStopRatio",
+      "metricBefore": 0.4559,
+      "metricAfter": null,
+      "tradesAfter": null,
+      "effect": "pending"
+    },
+    {
+      "date": "2026-09-02",
+      "appliedAt": "2026-09-02T20:28:40Z",
+      "type": "correction",
+      "param": "emaSlow",
+      "oldValue": 24.15,
+      "newValue": 21,
+      "reason": "تراجع عن توسيع emaSlow — بارامتر عالمي يؤثر على كل صفقة دفعة واحدة، وقد أوقف الدخول تماماً (0 صفقة منذ تطبيقه في 2026-09-01، رغم بقاء السوق مفتوحاً وعدم بلوغ أي حد أمان). هذا تصحيح فلسفي وليس رفضاً لفرضية محددة: ننتقل من تعديل بارامترات عالمية (التي تُخنق التداول بالكامل ريثما تُجمع أدلة كافية) إلى نظام توزيع حجم الصفقة حسب توليفة (الرمز × اتجاه الترند)، الذي يُصغّر أو يُكبّر حجم كل توليفة على حدة دون إيقاف أي صفقة كلياً. حلقة التعلّم العالمية (runDailyLearning) عُطِّلت تلقائياً بعد هذا التصحيح — تبقى في الكود كخيار يدوي فقط.",
+      "sampleSize": 136,
+      "winRate": 52.9,
+      "netPnl": -171
+    },
+    {
+      "date": "2026-09-16",
+      "appliedAt": "2026-09-16T20:01:01.056Z",
+      "type": "combo_tier_change",
+      "comboKey": "PUT|position:near_high",
+      "oldTier": "above_avg",
+      "newTier": "insufficient",
+      "oldMultiplier": 1.5,
+      "newMultiplier": 1,
+      "sampleSize": 8,
+      "winRate": 63,
+      "netPnl": 497,
+      "avgPnlPct": "11.44",
+      "se": 15.61,
+      "reason": "توليفة PUT|position:near_high: تغيّرت من tier above_avg(×1.5) إلى insufficient(×1) بناءً على 8 صفقة حقيقية (WR 63%, net $497, متوسط 11.44% ± 15.61pp)"
+    }
+  ]
+}

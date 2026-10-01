@@ -1,0 +1,18 @@
+{
+  "_lastDay": "2026-10-01",
+  "_lastLearnedDay": "2026-09-02",
+  "_lastComboLearnedDay": "2026-09-30",
+  "_cooldowns": {
+    "IWM_CALL": 1790103385828,
+    "TSLA_CALL": 1790345977897,
+    "NVDA_PUT": 1790348605963,
+    "TSLA_PUT": 1790350494990,
+    "SPY_CALL": 1790355880805,
+    "AMZN_CALL": 1790784390673,
+    "IWM_PUT": 1790864700883,
+    "NVDA_CALL": 1790866445959,
+    "SPY_PUT": 1790867058362,
+    "QQQ_PUT": 1790867104709
+  },
+  "_lastComboLearnedFinal": true
+}
