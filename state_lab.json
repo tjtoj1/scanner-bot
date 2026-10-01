@@ -50,7 +50,8 @@
       "comboKey": "CALL|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "SPY": {
     "active": true,
@@ -61,7 +62,7 @@
     "qty": 1,
     "entryTime": 1790864121098,
     "msgId": 4874,
-    "stopOrderId": "bf95211f-0067-4e81-bd68-3e6bc62949e2",
+    "stopOrderId": "4e1bda74-1a25-4ea4-98c2-f2578716b620",
     "hardStopPrice": 1.28,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -89,7 +90,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 25.068119891008173
   },
   "AMZN": {
     "active": true,
