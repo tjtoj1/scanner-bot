@@ -26,22 +26,5 @@
       "pnl": 0
     }
   ],
-  "_cooldowns": {},
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261001C00738000",
-    "strike": "738",
-    "entryPremium": 1.8050000000000002,
-    "qty": 2,
-    "entryTime": 1790871562874,
-    "stopOrderId": "31edf695-719f-439d-b5d0-961aa0f4b090",
-    "hardStopPrice": 1.17,
-    "entryStockPrice": 738.45,
-    "wvadSumAtEntry": -6857023.99,
-    "signalLineAtEntry": -7116890.92,
-    "atrAtEntry": 2.0296,
-    "slStock": 735.41,
-    "dte": 0
-  }
+  "_cooldowns": {}
 }
