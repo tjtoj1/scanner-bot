@@ -60,32 +60,5 @@
   },
   "_cooldowns": {
     "SPY_PUT": "2026-10-01T14:35:00.754Z"
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN261002P00247500",
-    "strike": "247.5",
-    "entryPremium": 2.13,
-    "qty": 2,
-    "entryTime": 1790864117127,
-    "level": 248.9417,
-    "msgId": 4872,
-    "stopOrderId": "4ee4ea30-dc83-406d-8903-ab903f449b2b",
-    "hardStopPrice": 1.38,
-    "entryStockPrice": 247.28,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 44.63,
-    "volumeRatio": 6.466807992192368,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 18.544600938967136,
-    "nearStopWarned": true
   }
 }
