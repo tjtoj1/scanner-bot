@@ -12,6 +12,12 @@
       "symbol": "QQQ",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-02",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -52,14 +58,14 @@
     "signal": "CALL",
     "optionSymbol": "QQQ261002C00754000",
     "strike": "754",
-    "entryPremium": 1.6749999999999998,
+    "entryPremium": 1.895,
     "qty": 2,
-    "entryTime": 1790950977847,
+    "entryTime": 1790951190844,
     "level": 752.09,
-    "msgId": 4967,
-    "stopOrderId": "c85f3058-b847-4ce2-8150-483a1a8818dc",
-    "hardStopPrice": 1.09,
-    "entryStockPrice": 753.935,
+    "msgId": 4971,
+    "stopOrderId": "dc753cc7-7f6e-4a28-a219-707a0a183dc1",
+    "hardStopPrice": 1.23,
+    "entryStockPrice": 754.38,
     "vwapAtEntry": null,
     "rsiAtEntry": 49.57,
     "volumeRatio": 6.8939410929614855,
@@ -67,10 +73,6 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 11.641791044776138,
-    "lastReportedThreshold": 10
+    "slStock": null
   }
 }
