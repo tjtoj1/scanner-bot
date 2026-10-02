@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-01T20:00:58.863Z"
+      "lastUpdated": "2026-10-02T20:00:00.517Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -41,15 +41,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 8,
-      "wins": 3,
-      "pnl": -309,
-      "avgPnlPct": -8.51,
-      "se": 10.01,
+      "n": 10,
+      "wins": 4,
+      "pnl": -244,
+      "avgPnlPct": -5.27,
+      "se": 10.33,
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-01T20:00:58.863Z"
+      "lastUpdated": "2026-10-02T20:00:00.517Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 137,
-      "wins": 71,
-      "pnl": 320,
-      "avgPnlPct": 0.02,
-      "se": 2.89,
+      "n": 145,
+      "wins": 75,
+      "pnl": 614,
+      "avgPnlPct": 0.54,
+      "se": 2.81,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-01T20:00:58.863Z"
+      "lastUpdated": "2026-10-02T20:00:00.517Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -83,7 +83,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-01T20:00:58.863Z"
+      "lastUpdated": "2026-10-02T20:00:00.517Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-01T20:00:58.863Z"
+      "lastUpdated": "2026-10-02T20:00:00.517Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-01T20:00:58.863Z"
+      "lastUpdated": "2026-10-02T20:00:00.517Z"
     }
   },
   "changelog": [
