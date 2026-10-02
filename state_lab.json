@@ -21,7 +21,7 @@
     "qty": 2,
     "entryTime": 1790949636873,
     "msgId": 4942,
-    "stopOrderId": "9d10b703-385c-45bc-8e26-74d49f8da13d",
+    "stopOrderId": "f16ac8fc-40ef-4530-9791-8722d9fa0757",
     "hardStopPrice": 0.71,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -48,7 +48,11 @@
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 16.336633663366317,
+    "lastReportedThreshold": 10
   },
   "TSLA": {
     "active": true,
@@ -59,7 +63,7 @@
     "qty": 1,
     "entryTime": 1790949637825,
     "msgId": 4943,
-    "stopOrderId": null,
+    "stopOrderId": "d09c0b95-1f1c-4ec3-bde3-4aa52b117f3f",
     "hardStopPrice": 1.32,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -86,7 +90,13 @@
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 58.3554376657825,
+    "lastReportedThreshold": 50
   },
   "AMZN": {
     "active": true,
@@ -97,7 +107,7 @@
     "qty": 4,
     "entryTime": 1790949638868,
     "msgId": 4944,
-    "stopOrderId": "de44fa9e-b564-4836-ab9c-a37a78b90973",
+    "stopOrderId": "1b108761-151c-4a0f-a1d4-47b7ebbbcd55",
     "hardStopPrice": 0.48,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -124,6 +134,10 @@
       "positionBucket": "mid",
       "comboKey": "CALL|position:mid",
       "sizeMultiplier": 1
-    }
+    },
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 24.26470588235295,
+    "lastReportedThreshold": 20
   }
 }
