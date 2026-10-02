@@ -22,7 +22,7 @@
     "qty": 1,
     "entryTime": 1790950065051,
     "msgId": 4953,
-    "stopOrderId": "723dfc4d-f74d-44bf-ac92-0bfe1dca7b5b",
+    "stopOrderId": "bd4b2981-b61d-495f-9a1e-9c49fec52267",
     "hardStopPrice": 1.38,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -51,9 +51,11 @@
       "sizeMultiplier": 1
     },
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 16.284987277353704,
-    "lastReportedThreshold": 10
+    "stopPct": 12,
+    "peakPct": 26.208651399491124,
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "trailPct": 8
   },
   "AMZN": {
     "active": true,
