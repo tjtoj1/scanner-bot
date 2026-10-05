@@ -50,12 +50,12 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 40,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 26.999999999999986,
+    "peakPct": 45.66666666666667,
     "nearStopWarned": true
   },
   "TSLA": {
