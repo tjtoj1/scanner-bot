@@ -49,11 +49,11 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 70,
+    "lastReportedThreshold": 130,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 73.6842105263158
+    "peakPct": 136.8421052631579
   }
 }
