@@ -58,9 +58,7 @@
       "low": 250.17
     }
   },
-  "_cooldowns": {
-    "TSLA_CALL": "2026-10-05T14:26:02.396Z"
-  },
+  "_cooldowns": {},
   "SPY": {
     "active": true,
     "signal": "CALL",
