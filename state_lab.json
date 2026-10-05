@@ -11,5 +11,43 @@
     "IWM_PUT": 1791210839488,
     "TSLA_CALL": 1791212165900
   },
-  "_lastComboLearnedFinal": false
+  "_lastComboLearnedFinal": false,
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN261005C00255000",
+    "strike": "255",
+    "entryPremium": 0.31,
+    "qty": 9,
+    "entryTime": 1791222344922,
+    "msgId": 5093,
+    "stopOrderId": null,
+    "hardStopPrice": 0.22,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 254.475,
+      "regime": "bullish",
+      "emaFast": 252.5833,
+      "emaSlow": 252.0665,
+      "breakoutHigh": 253.55,
+      "breakoutLow": 251.34,
+      "volRatio": 1.58,
+      "lastClose": 253.58,
+      "lastVolume": 1232426,
+      "barTime": "2026-10-05T17:15:00Z",
+      "entryTimeUTC": "2026-10-05T17:45:44.922Z",
+      "vwapAtEntry": 251.9885,
+      "rsiAtEntry": 65.31,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
+  }
 }
