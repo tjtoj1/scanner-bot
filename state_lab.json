@@ -51,7 +51,7 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10
   },
   "QQQ": {
     "active": true,
@@ -92,8 +92,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 25.096525096525113,
-    "lastReportedThreshold": 20,
+    "peakPct": 37.06563706563706,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "trailPct": 8
   }
