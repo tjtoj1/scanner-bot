@@ -50,10 +50,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 80,
+    "lastReportedThreshold": 90,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 86.85714285714286,
+    "peakPct": 97.14285714285715,
     "ladder2": true,
     "trailPct": 8
   },
@@ -94,10 +94,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 38.54166666666668,
+    "peakPct": 42.70833333333335,
     "ladder2": true,
     "trailPct": 8
   }
