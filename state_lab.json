@@ -22,7 +22,7 @@
     "qty": 3,
     "entryTime": 1791216029078,
     "msgId": 5060,
-    "stopOrderId": "f4365c93-db93-4bc5-8da1-af00cceeff75",
+    "stopOrderId": "cfe3e8ef-d525-4bd0-bab8-6d45711727ef",
     "hardStopPrice": 0.61,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -50,7 +50,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 16.000000000000014
   },
   "IWM": {
     "active": true,
@@ -61,7 +64,7 @@
     "qty": 8,
     "entryTime": 1791216923980,
     "msgId": 5062,
-    "stopOrderId": "46e1570a-6a4e-4e28-a391-8ab335819b5e",
+    "stopOrderId": "7e453f0a-3ceb-47e8-b2ec-e809aff6d7e6",
     "hardStopPrice": 0.25,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -90,8 +93,10 @@
       "sizeMultiplier": 1
     },
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 19.71830985915495,
-    "lastReportedThreshold": 10
+    "stopPct": 12,
+    "peakPct": 25.35211267605635,
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "trailPct": 8
   }
 }
