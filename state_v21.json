@@ -6,6 +6,12 @@
       "symbol": "TSLA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-05",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -42,5 +48,27 @@
   },
   "_cooldowns": {
     "TSLA_CALL": "2026-10-05T14:26:02.396Z"
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY261005C00772000",
+    "strike": "772",
+    "entryPremium": 1.245,
+    "qty": 4,
+    "entryTime": 1791210640663,
+    "level": 770.98,
+    "msgId": 5024,
+    "stopOrderId": "197de3bd-0b3f-4f9d-a200-152401d4bf86",
+    "hardStopPrice": 0.81,
+    "entryStockPrice": 772.4549999999999,
+    "vwapAtEntry": 770.5443,
+    "rsiAtEntry": 70.81,
+    "volumeRatio": 8.10573330514752,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
