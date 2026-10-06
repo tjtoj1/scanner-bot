@@ -8,12 +8,17 @@
 // trades rests on that quote. This script asks Alpaca what the fills
 // really were and writes the comparison to its OWN file.
 //
+// Entry side too: entryPremium is the mid of the option quote read
+// just before the buy order went out (findOption/getQuote), not the
+// buy's fill price either. So a fully repriced pnl needs BOTH sides,
+// and the exit-only figure still carries the entry's error.
+//
 // It never writes to outcomes_*, state_*, strategy_lab.json or any
 // other repo file. It never prints or stores the API keys.
 //
 // Usage:
-//   ALPACA_KEY_2=... ALPACA_SECRET_2=... node reprice_audit.js
-//   node reprice_audit.js --dry-run     # no network, logic check only
+//   ALPACA_KEY_2=... ALPACA_SECRET_2=... node reprice_audit.mjs
+//   node reprice_audit.mjs --dry-run    # no network, logic check only
 // ============================================================
 import fs from "fs";
 
@@ -32,9 +37,10 @@ const ALPACA_KEY    = process.env.ALPACA_KEY_2;
 const ALPACA_SECRET = process.env.ALPACA_SECRET_2;
 const TRADING_BASE  = "https://paper-api.alpaca.markets/v2";
 
-const DRY_RUN       = process.argv.includes("--dry-run");
+const DRY_RUN        = process.argv.includes("--dry-run");
 const RETENTION_FROM = "2026-08-24T00:00:00Z"; // day of v21's first logged trade
-const MATCH_GRACE_MS = 10 * 60 * 1000;         // exitTime + 10 min, per the audit spec
+const EXIT_GRACE_MS  = 10 * 60 * 1000;         // exitTime + 10 min
+const ENTRY_WINDOW_MS = 3 * 60 * 1000;         // entryTime ± 3 min
 const PAGE_SIZE      = 100;                    // Alpaca's max for this endpoint
 const MAX_PAGES      = 200;                    // circuit breaker; 200×100 = 20k fills
 const PAGE_DELAY_MS  = 120;                    // stay well under Alpaca's rate limit
@@ -75,6 +81,14 @@ async function alpaca(path) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const money = n => (n >= 0 ? "+$" : "-$") + Math.abs(Math.round(n));
+const ms = s => new Date(s).getTime();
+
+function median(arr) {
+  if (!arr.length) return null;
+  const a = [...arr].sort((x, y) => x - y);
+  const m = Math.floor(a.length / 2);
+  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+}
 
 function readOutcomes() {
   let raw;
@@ -173,21 +187,22 @@ async function fetchAllFills() {
   return fills;
 }
 
-// ─── STEP 4: match each logged trade to its sell fills ───
-// Index by option symbol first — matching is per-contract, and the
-// contract symbol already encodes underlying + expiry + type + strike,
-// so it is close to a unique key per trade.
+// ─── STEP 4a: index fills by contract, keeping BOTH sides ───
+// Matching is per-contract, and the contract symbol already encodes
+// underlying + expiry + type + strike, so it is close to a unique key
+// per trade. Both sides are kept: entry needs buys, exit needs sells.
 function indexFills(fills) {
   const bySymbol = new Map();
   for (const f of fills) {
     const side = String(f.side || "");
-    if (!side.startsWith("sell")) continue;      // only exits; covers sell / sell_short
+    if (!side.startsWith("buy") && !side.startsWith("sell")) continue;
     const sym = f.symbol;
     if (!sym) continue;
     if (!bySymbol.has(sym)) bySymbol.set(sym, []);
     bySymbol.get(sym).push({
       id: f.id,
       orderId: f.order_id,
+      side: side.startsWith("buy") ? "buy" : "sell",
       price: parseFloat(f.price),
       qty: parseFloat(f.qty),
       t: new Date(f.transaction_time).getTime(),
@@ -198,6 +213,33 @@ function indexFills(fills) {
   return bySymbol;
 }
 
+// ─── STEP 4b: the trade chain per contract ───
+// 33 of 105 v21 trades share an option symbol with another trade, and
+// the next entry often lands 1-3 SECONDS after the previous exit. With
+// a ±3 min entry window and a +10 min exit grace, those windows
+// overlap their neighbours and every one of them would come back
+// ambiguous. This chain gives each trade its neighbours' boundaries so
+// the retry pass can clamp the windows instead of guessing.
+// (Verified on the log: zero trades on one contract overlap in time,
+// so the chain is strictly sequential and the clamps are well defined.)
+function buildChain(rows) {
+  const byContract = new Map();
+  rows.forEach(r => {
+    if (!byContract.has(r.optionSymbol)) byContract.set(r.optionSymbol, []);
+    byContract.get(r.optionSymbol).push(r);
+  });
+  const bounds = new Map(); // tradeId -> { prevExitMs, nextEntryMs, siblings }
+  for (const list of byContract.values()) {
+    list.sort((a, b) => ms(a.entryTime) - ms(b.entryTime));
+    list.forEach((r, i) => bounds.set(r.tradeId, {
+      prevExitMs:  i > 0 ? ms(list[i - 1].exitTime) : null,
+      nextEntryMs: i < list.length - 1 ? ms(list[i + 1].entryTime) : null,
+      siblings: list.length,
+    }));
+  }
+  return bounds;
+}
+
 function weightedAvg(group) {
   const totQty = group.reduce((a, f) => a + f.qty, 0);
   if (!totQty) return null;
@@ -206,14 +248,16 @@ function weightedAvg(group) {
 
 // Classification is deliberately strict: anything the data does not
 // settle unambiguously is labelled, never guessed. A wrong "exact" is
-// worse than an honest "ambiguous".
-function matchTrade(rec, bySymbol) {
+// worse than an honest "ambiguous". Shared by the entry and exit
+// passes — the only difference between them is side and window.
+function matchSide(rec, bySymbol, side, from, to) {
   const list = bySymbol.get(rec.optionSymbol) || [];
-  const from = new Date(rec.entryTime).getTime();
-  const to   = new Date(rec.exitTime).getTime() + MATCH_GRACE_MS;
-  const cands = list.filter(f => f.t >= from && f.t <= to && Number.isFinite(f.price) && Number.isFinite(f.qty));
+  const cands = list.filter(f =>
+    f.side === side && f.t >= from && f.t <= to &&
+    Number.isFinite(f.price) && Number.isFinite(f.qty));
 
-  if (!cands.length) return { confidence: "unresolved", fillPrice: null, note: "لا تنفيذ بيع في النافذة" };
+  const win = `${new Date(from).toISOString().slice(11, 19)}→${new Date(to).toISOString().slice(11, 19)}`;
+  if (!cands.length) return { confidence: "unresolved", fillPrice: null, note: `لا تنفيذ ${side} في النافذة ${win}` };
 
   const byOrder = new Map();
   for (const f of cands) {
@@ -225,7 +269,7 @@ function matchTrade(rec, bySymbol) {
   if (byOrder.size > 1) {
     return {
       confidence: "ambiguous", fillPrice: null,
-      note: `${byOrder.size} أوامر بيع مختلفة في النافذة (${cands.length} تنفيذ)`,
+      note: `${byOrder.size} أوامر ${side} مختلفة في النافذة ${win} (${cands.length} تنفيذ)`,
     };
   }
 
@@ -244,10 +288,57 @@ function matchTrade(rec, bySymbol) {
   return { confidence: "partial", fillPrice: +price.toFixed(4), note: `${group.length} تنفيذ جزئي، متوسط مرجَّح` };
 }
 
+// Two passes per side. Pass 1 uses the plain windows. Pass 2 runs ONLY
+// on an ambiguous pass-1 result and ONLY narrows the window to the
+// neighbouring trade's boundary on the same contract — it never widens
+// anything and never picks a candidate by preference. If narrowing is
+// impossible (no neighbour), the ambiguous verdict stands.
+function resolveTrade(rec, bySymbol, bounds) {
+  const b = bounds.get(rec.tradeId) || { prevExitMs: null, nextEntryMs: null, siblings: 1 };
+  const entryMs = ms(rec.entryTime);
+  const exitMs  = ms(rec.exitTime);
+
+  // ── exit side ──
+  let exit = matchSide(rec, bySymbol, "sell", entryMs, exitMs + EXIT_GRACE_MS);
+  let exitRetried = false;
+  if (exit.confidence === "ambiguous" && b.nextEntryMs != null) {
+    const to = Math.min(exitMs + EXIT_GRACE_MS, b.nextEntryMs - 1);
+    if (to > entryMs) {
+      const second = matchSide(rec, bySymbol, "sell", entryMs, to);
+      exitRetried = true;
+      exit = { ...second, note: `${second.note} [ضُيّقت حتى دخول الصفقة التالية]` };
+    }
+  }
+
+  // ── entry side ──
+  let entry = matchSide(rec, bySymbol, "buy", entryMs - ENTRY_WINDOW_MS, entryMs + ENTRY_WINDOW_MS);
+  let entryRetried = false;
+  if (entry.confidence === "ambiguous") {
+    // Symmetric clamp: a buy for THIS trade cannot precede the previous
+    // trade's exit on the same contract, nor follow this trade's own exit.
+    const from = b.prevExitMs != null
+      ? Math.max(entryMs - ENTRY_WINDOW_MS, b.prevExitMs + 1)
+      : entryMs - ENTRY_WINDOW_MS;
+    const to = Math.min(entryMs + ENTRY_WINDOW_MS, exitMs);
+    if (to > from && (from !== entryMs - ENTRY_WINDOW_MS || to !== entryMs + ENTRY_WINDOW_MS)) {
+      const second = matchSide(rec, bySymbol, "buy", from, to);
+      entryRetried = true;
+      entry = { ...second, note: `${second.note} [ضُيّقت بحدود الصفقة المجاورة]` };
+    }
+  }
+
+  return { exit, entry, exitRetried, entryRetried, siblings: b.siblings };
+}
+
 function buildRecord(rec, m) {
-  const fp = m.fillPrice;
-  const deltaPct = fp != null && rec.exitPremium ? (fp - rec.exitPremium) / rec.exitPremium * 100 : null;
-  const pnlRepriced = fp != null ? Math.round((fp - rec.entryPremium) * rec.qty * 100) : null;
+  const xp = m.exit.fillPrice;
+  const ep = m.entry.fillPrice;
+  const exitDeltaPct  = xp != null && rec.exitPremium  ? (xp - rec.exitPremium)  / rec.exitPremium  * 100 : null;
+  const entryDeltaPct = ep != null && rec.entryPremium ? (ep - rec.entryPremium) / rec.entryPremium * 100 : null;
+  const pnlRepriced     = xp != null ? Math.round((xp - rec.entryPremium) * rec.qty * 100) : null;
+  const pnlFullRepriced = xp != null && ep != null ? Math.round((xp - ep) * rec.qty * 100) : null;
+  const solid = c => c === "exact" || c === "partial";
+
   return {
     tradeId: rec.tradeId,
     day: rec.day,
@@ -257,15 +348,28 @@ function buildRecord(rec, m) {
     reason: rec.reason,
     fillSource: rec.fillSource ?? null,
     qty: rec.qty,
-    entryPremium: rec.entryPremium,
-    exitPremium: rec.exitPremium,          // as recorded (the quote)
-    fillPrice: fp,                          // what Alpaca says, or null
-    deltaPct: deltaPct == null ? null : +deltaPct.toFixed(2),
+    siblingsOnContract: m.siblings,          // >1 means the windows had neighbours
+
+    entryPremium: rec.entryPremium,          // as recorded (quote before the buy)
+    entryFillPrice: ep,                      // what Alpaca says the buy filled at
+    entryDeltaPct: entryDeltaPct == null ? null : +entryDeltaPct.toFixed(2),
+    entryConfidence: m.entry.confidence,
+    entryNote: m.entry.note,
+    entryRetried: m.entryRetried,
+
+    exitPremium: rec.exitPremium,            // as recorded (quote at detection)
+    fillPrice: xp,                           // what Alpaca says the sell filled at
+    deltaPct: exitDeltaPct == null ? null : +exitDeltaPct.toFixed(2),
+    confidence: m.exit.confidence,           // exit-side confidence (original field)
+    note: m.exit.note,
+    exitRetried: m.exitRetried,
+
     pnlRecorded: rec.pnl,
-    pnlRepriced,
-    pnlDelta: pnlRepriced == null ? null : pnlRepriced - rec.pnl,
-    confidence: m.confidence,
-    note: m.note,
+    pnlRepriced,                             // exit repriced, entry as recorded
+    pnlFullRepriced,                         // both sides from Alpaca
+    pnlDelta:     pnlRepriced     == null ? null : pnlRepriced - rec.pnl,
+    pnlFullDelta: pnlFullRepriced == null ? null : pnlFullRepriced - rec.pnl,
+    fullyResolved: solid(m.exit.confidence) && solid(m.entry.confidence),
   };
 }
 
@@ -278,61 +382,108 @@ function writeOut(records) {
   console.log(`✔ كُتب ${records.length} سجلاً في ${OUT_FILE} (ولم يُلمس أي ملف آخر)`);
 }
 
+// ─── Static integrity check — no network needed ───
+// Two v21 records carry byte-identical premiums, qty and pnl a week
+// apart. Either the log double-counted something, or it is a rounding
+// coincidence. The contract symbol and tradeId settle it without
+// asking Alpaca anything.
+function checkLookalikes(rows) {
+  console.log(`\n-- فحص التكرار: 09-01 SPY CALL مقابل 09-08 SPY PUT --`);
+  const hits = rows.filter(r => r.qty === 4 && r.pnl === 32 &&
+    Math.abs(r.entryPremium - 1.055) < 0.001 && Math.abs(r.exitPremium - 1.13) < 0.001);
+  if (hits.length < 2) { console.log(`  وُجد ${hits.length} سجلاً فقط بهذه القيم — لا مقارنة.`); return; }
+  hits.forEach(r => console.log(`  ${r.day}  ${r.symbol} ${r.signal.padEnd(4)}  ${r.optionSymbol}  in=${r.entryTime}  out=${r.exitTime}  id=${r.tradeId}`));
+  const uniq = k => new Set(hits.map(r => r[k])).size === hits.length;
+  const diffs = ["day", "signal", "optionSymbol", "tradeId", "entryTime", "exitTime"].filter(uniq);
+  console.log(`  تختلف في: ${diffs.join(", ")}`);
+  console.log(`  الحكم: ${diffs.includes("optionSymbol") && diffs.includes("tradeId")
+    ? "✔ صفقتان مختلفتان — تطابق القيم محض تقريب، لا تكرار"
+    : "⚠ تحتاج فحصاً يدوياً"}`);
+}
+
 // ─── STEP 6: summary ───
-function summarize(records) {
-  const byConf = {};
-  records.forEach(r => byConf[r.confidence] = (byConf[r.confidence] || 0) + 1);
-
-  console.log(`\n${"=".repeat(62)}\nالملخص`);
-  console.log(`  الإجمالي: ${records.length}`);
-  for (const k of ["exact", "partial", "ambiguous", "unresolved"]) {
-    const n = byConf[k] || 0;
-    console.log(`  ${k.padEnd(11)} ${String(n).padStart(4)}  (${records.length ? (n / records.length * 100).toFixed(0) : 0}%)`);
-  }
-
-  const ex = records.filter(r => r.confidence === "exact");
-  console.log(`\n-- الصافي على الصفقات exact فقط (${ex.length} صفقة) --`);
-  if (!ex.length) {
-    console.log("  لا صفقات exact — لا يمكن قياس الانحياز.");
-  } else {
-    const rec = ex.reduce((a, r) => a + r.pnlRecorded, 0);
-    const rep = ex.reduce((a, r) => a + r.pnlRepriced, 0);
-    console.log(`  المسجّل:        ${money(rec)}`);
-    console.log(`  المعاد تسعيره:  ${money(rep)}`);
-    console.log(`  الفرق:          ${money(rep - rec)}  (${rec ? ((rep - rec) / Math.abs(rec) * 100).toFixed(1) : "—"}%)`);
-    const d = ex.map(r => r.deltaPct).filter(x => x != null).sort((a, b) => a - b);
-    if (d.length) {
-      console.log(`  انحياز deltaPct: الوسيط ${d[Math.floor(d.length / 2)].toFixed(2)}%  |  المدى ${d[0].toFixed(2)}% → ${d[d.length - 1].toFixed(2)}%`);
-      console.log(`  (سالب = السعر المسجّل كان متفائلاً، أي الربح الحقيقي أقل)`);
+function summarize(records, rows) {
+  const tally = key => {
+    const c = {};
+    records.forEach(r => c[r[key]] = (c[r[key]] || 0) + 1);
+    return c;
+  };
+  const show = (label, c) => {
+    console.log(`  ${label}`);
+    for (const k of ["exact", "partial", "ambiguous", "unresolved"]) {
+      const n = c[k] || 0;
+      console.log(`    ${k.padEnd(11)} ${String(n).padStart(4)}  (${records.length ? (n / records.length * 100).toFixed(0) : 0}%)`);
     }
+  };
+
+  console.log(`\n${"=".repeat(64)}\nالملخص   (الإجمالي: ${records.length})`);
+  show("الخروج (sell):", tally("confidence"));
+  show("الدخول (buy):", tally("entryConfidence"));
+
+  const noBuy = records.filter(r => r.entryConfidence === "unresolved").length;
+  const retriedX = records.filter(r => r.exitRetried).length;
+  const retriedE = records.filter(r => r.entryRetried).length;
+  const rescuedX = records.filter(r => r.exitRetried && (r.confidence === "exact" || r.confidence === "partial")).length;
+  const rescuedE = records.filter(r => r.entryRetried && (r.entryConfidence === "exact" || r.entryConfidence === "partial")).length;
+  console.log(`\n  صفقات بلا تنفيذ شراء مطابق: ${noBuy}`);
+  console.log(`  أُعيدت المحاولة بنافذة مضيّقة — خروج: ${retriedX} (حُسم ${rescuedX}) | دخول: ${retriedE} (حُسم ${rescuedE})`);
+  console.log(`  صفقات تشارك عقدها صفقة أخرى: ${records.filter(r => r.siblingsOnContract > 1).length}`);
+
+  // Three nets, each on the population it is actually valid for.
+  const exitOk = records.filter(r => r.fillPrice != null);
+  const full   = records.filter(r => r.fullyResolved && r.pnlFullRepriced != null);
+  console.log(`\n-- الصافي، كل رقم على مجموعته الصحيحة --`);
+  console.log(`  المسجّل (كل ${records.length} صفقة):            ${money(records.reduce((a, r) => a + r.pnlRecorded, 0))}`);
+  if (exitOk.length) {
+    console.log(`  خروج محسوم فقط (${exitOk.length} صفقة):`);
+    console.log(`     المسجّل لها:        ${money(exitOk.reduce((a, r) => a + r.pnlRecorded, 0))}`);
+    console.log(`     بالخروج المعاد:     ${money(exitOk.reduce((a, r) => a + r.pnlRepriced, 0))}`);
+  } else console.log(`  لا صفقة بخروج محسوم.`);
+  if (full.length) {
+    console.log(`  الجانبان محسومان (${full.length} صفقة):`);
+    console.log(`     المسجّل لها:        ${money(full.reduce((a, r) => a + r.pnlRecorded, 0))}`);
+    console.log(`     بالخروج المعاد:     ${money(full.reduce((a, r) => a + r.pnlRepriced, 0))}`);
+    console.log(`     بالجانبين (كامل):   ${money(full.reduce((a, r) => a + r.pnlFullRepriced, 0))}`);
+    console.log(`     فرق الكامل عن المسجّل: ${money(full.reduce((a, r) => a + r.pnlFullDelta, 0))}`);
+  } else console.log(`  لا صفقة محسومة الجانبين — لا يمكن حساب الصافي الكامل.`);
+
+  const ed = records.map(r => r.entryDeltaPct).filter(x => x != null);
+  const xd = records.map(r => r.deltaPct).filter(x => x != null);
+  console.log(`\n-- انحراف السعر المسجّل عن التنفيذ --`);
+  for (const [label, arr] of [["الدخول", ed], ["الخروج", xd]]) {
+    if (!arr.length) { console.log(`  ${label}: لا بيانات`); continue; }
+    const a = [...arr].sort((x, y) => x - y);
+    console.log(`  ${label}: n=${a.length}  الوسيط ${median(a).toFixed(2)}%  المدى ${a[0].toFixed(2)}% → ${a[a.length - 1].toFixed(2)}%`);
   }
+  console.log(`  (الدخول: موجب = دفعنا أكثر من المسجّل. الخروج: سالب = قبضنا أقل. كلاهما يقلّل الربح الحقيقي.)`);
 
   // The two 2026-09-21 trades carry 152% of v21's entire net profit.
-  // If they are not confirmed, nothing about v21's profitability is known.
   const key = records.filter(r => r.day === "2026-09-21");
   console.log(`\n-- صفقتا 2026-09-21 (تمثّلان 152% من صافي v21) --`);
-  if (!key.length) {
-    console.log("  لا سجلات بهذا التاريخ في الملف.");
-  } else {
+  if (!key.length) console.log("  لا سجلات بهذا التاريخ في الملف.");
+  else {
     key.forEach(r => console.log(
       `  ${r.symbol} ${r.signal}  مسجّل ${money(r.pnlRecorded)}  →  ` +
-      (r.pnlRepriced == null ? `غير محسوم (${r.confidence}: ${r.note})`
-        : `معاد ${money(r.pnlRepriced)}  فرق ${money(r.pnlDelta)}  (${r.confidence})`)
+      (r.pnlFullRepriced != null ? `كامل ${money(r.pnlFullRepriced)} (فرق ${money(r.pnlFullDelta)})`
+        : r.pnlRepriced != null ? `خروج فقط ${money(r.pnlRepriced)} — الدخول ${r.entryConfidence}`
+        : `غير محسوم (خروج ${r.confidence} / دخول ${r.entryConfidence})`)
     ));
-    const confirmed = key.filter(r => r.confidence === "exact" || r.confidence === "partial");
-    console.log(`  النتيجة: ${confirmed.length === key.length && key.length === 2
-      ? "✔ الصفقتان مؤكَّدتان — ربح v21 الظاهر قائم على سعر حقيقي"
-      : `✖ غير مؤكَّدتين (${confirmed.length}/${key.length}) — ربح v21 الظاهر ما يزال غير متحقَّق منه`}`);
+    const done = key.filter(r => r.fullyResolved);
+    console.log(`  النتيجة: ${done.length === key.length && key.length === 2
+      ? "✔ الصفقتان مؤكَّدتان الجانبين — ربح v21 الظاهر قائم على سعرَي تنفيذ حقيقيين"
+      : `✖ غير مؤكَّدتين بالكامل (${done.length}/${key.length}) — ربح v21 الظاهر ما يزال غير متحقَّق منه`}`);
   }
 
   const unres = records.filter(r => r.confidence === "unresolved");
   if (unres.length) {
     const days = [...new Set(unres.map(r => r.day))].sort();
-    console.log(`\n-- unresolved: ${unres.length} صفقة على ${days.length} يوم (${days[0]} → ${days[days.length - 1]}) --`);
+    console.log(`\n-- خروج unresolved: ${unres.length} صفقة على ${days.length} يوم (${days[0]} → ${days[days.length - 1]}) --`);
     console.log(`  أسباب محتملة: حدّ احتفاظ Alpaca، أو إغلاق بانتهاء صلاحية 0DTE`);
     console.log(`  (نشاط EXP/OPASN لا FILL)، أو تصفية من الوسيط. لا تُخمَّن أسعارها.`);
   }
-  console.log(`${"=".repeat(62)}`);
+
+  checkLookalikes(rows);
+  console.log(`${"=".repeat(64)}`);
 }
 
 // ─── MAIN ───
@@ -342,21 +493,24 @@ async function main() {
 
   const rows = readOutcomes();
   console.log(`✔ قُرئ ${rows.length} سجلاً${rows.length ? ` (${rows[0].day} → ${rows[rows.length - 1].day})` : ""}`);
+  const bounds = buildChain(rows);
+  const shared = rows.filter(r => (bounds.get(r.tradeId)?.siblings || 1) > 1).length;
+  console.log(`  صفقات تشارك عقدها صفقة أخرى: ${shared} — نوافذها ستُضيَّق عند أي التباس`);
 
   if (DRY_RUN) {
     console.log("\n⚠ --dry-run: لا اتصال بالشبكة، لا مفاتيح، لا كتابة.");
     console.log("  يُشغّل منطق المطابقة على مجموعة تنفيذات فارغة للتحقق من المسارات فقط.");
     const empty = indexFills([]);
-    const records = rows.map(r => buildRecord(r, matchTrade(r, empty)));
-    summarize(records);
-    console.log("\n✔ dry-run انتهى. كل سجل unresolved كما هو متوقَّع بلا بيانات.");
+    const records = rows.map(r => buildRecord(r, resolveTrade(r, empty, bounds)));
+    summarize(records, rows);
+    console.log("\n✔ dry-run انتهى. كل سجل unresolved على الجانبين كما هو متوقَّع بلا بيانات.");
     return;
   }
 
   if (!ALPACA_KEY || !ALPACA_SECRET) {
     console.error("\n✖ ALPACA_KEY_2 و/أو ALPACA_SECRET_2 غير معرّفين في البيئة — توقّف.");
     console.error("  شغّله حيث المتغيّران موجودان (Console الحاوية أو جهازك).");
-    console.error("  لفحص الصياغة والمنطق بلا مفاتيح: node reprice_audit.js --dry-run");
+    console.error("  لفحص الصياغة والمنطق بلا مفاتيح: node reprice_audit.mjs --dry-run");
     process.exit(1);
   }
 
@@ -369,15 +523,17 @@ async function main() {
   console.log("\n--- 3) جلب كل التنفيذات ---");
   const fills = await fetchAllFills();
 
-  console.log("\n--- 4) المطابقة ---");
+  console.log("\n--- 4) المطابقة (دخول وخروج، مع إعادة محاولة مضيّقة) ---");
   const bySymbol = indexFills(fills);
-  console.log(`  تنفيذات بيع على ${bySymbol.size} عقد مختلف`);
-  const records = rows.map(r => buildRecord(r, matchTrade(r, bySymbol)));
+  const sides = { buy: 0, sell: 0 };
+  for (const list of bySymbol.values()) list.forEach(f => sides[f.side]++);
+  console.log(`  تنفيذات على ${bySymbol.size} عقد مختلف — شراء ${sides.buy} / بيع ${sides.sell}`);
+  const records = rows.map(r => buildRecord(r, resolveTrade(r, bySymbol, bounds)));
 
   console.log("\n--- 5) الكتابة ---");
   writeOut(records);
 
-  summarize(records);
+  summarize(records, rows);
 }
 
 main().catch(e => {
