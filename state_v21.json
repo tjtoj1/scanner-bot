@@ -53,34 +53,6 @@
     }
   },
   "_cooldowns": {},
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261006P00283000",
-    "strike": "283",
-    "entryPremium": 0.735,
-    "qty": 6,
-    "entryTime": 1791296126270,
-    "level": 283.5,
-    "msgId": 5129,
-    "stopOrderId": "5dc57eb7-a021-48cd-9d44-538ccb5998f8",
-    "hardStopPrice": 0.48,
-    "entryStockPrice": 282.78999999999996,
-    "vwapAtEntry": 283.8041,
-    "rsiAtEntry": 41.15,
-    "volumeRatio": 10.517709103193164,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 71.42857142857143,
-    "lastReportedThreshold": 70
-  },
   "SPY": {
     "active": true,
     "signal": "CALL",
@@ -102,6 +74,6 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   }
 }
