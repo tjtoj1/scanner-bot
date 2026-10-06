@@ -78,8 +78,8 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 40.816326530612265,
-    "lastReportedThreshold": 40
+    "peakPct": 53.06122448979592,
+    "lastReportedThreshold": 50
   },
   "SPY": {
     "active": true,
