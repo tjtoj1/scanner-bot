@@ -24,14 +24,36 @@ import fs from "fs";
 
 const IN_FILE  = "outcomes_v21.jsonl";
 const OUT_FILE = "reprice_audit_v21.jsonl";
+const ORPHAN_FILE = "reconstructed_orphans_v21.jsonl";
+
+// The two files this script owns and is allowed to overwrite.
+const OWN_FILES = new Set([OUT_FILE, ORPHAN_FILE]);
 
 // Hard guard: this script must never be able to write over live data,
 // however the constants above are later edited. Checked before any write.
+// The two outputs are listed here as well, so that redirecting one of
+// them onto the other — or onto a data file — is caught; assertWritable
+// admits a path only as the output of the step that declared it.
 const PROTECTED = new Set([
   "outcomes.jsonl", "outcomes_v21.jsonl", "outcomes_lab.jsonl", "outcomes_wvad.jsonl",
   "state.json", "state2.json", "state_v21.json", "state_lab.json", "state_wvad.json",
   "strategy_lab.json", "report_state.json", "research_log.json", "research_log2.json",
+  OUT_FILE, ORPHAN_FILE,
 ]);
+
+// `target` is the path about to be written; `declared` is the constant
+// this step is supposed to be writing. They must be the same path, and
+// it must be one of this script's own files.
+function assertWritable(target, declared) {
+  if (target !== declared) {
+    console.error(`✖ هدف الكتابة (${target}) ليس الملف المُصرَّح به لهذه الخطوة (${declared}) — أرفض.`);
+    process.exit(1);
+  }
+  if (!OWN_FILES.has(target) || (PROTECTED.has(target) && !OWN_FILES.has(target))) {
+    console.error(`✖ ${target} ليس من ملفات هذا السكربت (أو ملف بيانات محمي) — أرفض الكتابة.`);
+    process.exit(1);
+  }
+}
 
 const ALPACA_KEY    = process.env.ALPACA_KEY_2;
 const ALPACA_SECRET = process.env.ALPACA_SECRET_2;
@@ -257,7 +279,7 @@ function matchSide(rec, bySymbol, side, from, to) {
     Number.isFinite(f.price) && Number.isFinite(f.qty));
 
   const win = `${new Date(from).toISOString().slice(11, 19)}→${new Date(to).toISOString().slice(11, 19)}`;
-  if (!cands.length) return { confidence: "unresolved", fillPrice: null, note: `لا تنفيذ ${side} في النافذة ${win}` };
+  if (!cands.length) return { confidence: "unresolved", fillPrice: null, fillIds: [], note: `لا تنفيذ ${side} في النافذة ${win}` };
 
   const byOrder = new Map();
   for (const f of cands) {
@@ -268,24 +290,25 @@ function matchSide(rec, bySymbol, side, from, to) {
 
   if (byOrder.size > 1) {
     return {
-      confidence: "ambiguous", fillPrice: null,
+      confidence: "ambiguous", fillPrice: null, fillIds: [],
       note: `${byOrder.size} أوامر ${side} مختلفة في النافذة ${win} (${cands.length} تنفيذ)`,
     };
   }
 
   const group = [...byOrder.values()][0];
+  const ids = group.map(f => f.id);
   const qty = group.reduce((a, f) => a + f.qty, 0);
   const price = weightedAvg(group);
-  if (price == null) return { confidence: "ambiguous", fillPrice: null, note: "كمية صفرية" };
+  if (price == null) return { confidence: "ambiguous", fillPrice: null, fillIds: [], note: "كمية صفرية" };
 
   if (qty !== rec.qty) {
     return {
-      confidence: "ambiguous", fillPrice: +price.toFixed(4),
+      confidence: "ambiguous", fillPrice: +price.toFixed(4), fillIds: [],
       note: `الكمية لا تطابق: التنفيذ ${qty} مقابل السجل ${rec.qty}`,
     };
   }
-  if (group.length === 1) return { confidence: "exact", fillPrice: +price.toFixed(4), note: "تنفيذ واحد كامل" };
-  return { confidence: "partial", fillPrice: +price.toFixed(4), note: `${group.length} تنفيذ جزئي، متوسط مرجَّح` };
+  if (group.length === 1) return { confidence: "exact", fillPrice: +price.toFixed(4), fillIds: ids, note: "تنفيذ واحد كامل" };
+  return { confidence: "partial", fillPrice: +price.toFixed(4), fillIds: ids, note: `${group.length} تنفيذ جزئي، متوسط مرجَّح` };
 }
 
 // Two passes per side. Pass 1 uses the plain windows. Pass 2 runs ONLY
@@ -373,13 +396,168 @@ function buildRecord(rec, m) {
   };
 }
 
-function writeOut(records) {
-  if (PROTECTED.has(OUT_FILE)) {
-    console.error(`✖ OUT_FILE (${OUT_FILE}) ملف بيانات محمي — أرفض الكتابة.`);
-    process.exit(1);
+function writeJsonl(rows, target, declared, label) {
+  assertWritable(target, declared);
+  fs.writeFileSync(target, rows.map(r => JSON.stringify(r)).join("\n") + "\n");
+  console.log(`✔ كُتب ${rows.length} ${label} في ${target}`);
+}
+
+// ─── STEP 7a: which Alpaca fills did no logged trade claim? ───
+// Only a RESOLVED match (exact/partial) consumes its fills. An
+// ambiguous verdict decided nothing, so its real fills stay in the
+// orphan pool — which means the pool is "not attributed to any
+// resolved trade", NOT "proof of an untracked trade". The summary
+// prints how many logged trades are unresolved so the contamination
+// is visible rather than implied.
+function collectConsumed(resolutions) {
+  const consumed = new Set();
+  for (const { m } of resolutions) {
+    for (const side of [m.exit, m.entry]) {
+      if (side.confidence === "exact" || side.confidence === "partial") {
+        (side.fillIds || []).forEach(id => consumed.add(id));
+      }
+    }
   }
-  fs.writeFileSync(OUT_FILE, records.map(r => JSON.stringify(r)).join("\n") + "\n");
-  console.log(`✔ كُتب ${records.length} سجلاً في ${OUT_FILE} (ولم يُلمس أي ملف آخر)`);
+  return consumed;
+}
+
+function collectOrphans(bySymbol, consumed) {
+  const orphans = [];
+  for (const [sym, list] of bySymbol) {
+    for (const f of list) if (!consumed.has(f.id)) orphans.push({ ...f, symbol: sym });
+  }
+  orphans.sort((a, b) => a.t - b.t);
+  return orphans;
+}
+
+// ─── STEP 7b: FIFO reconstruction of the missing trades ───
+// Per contract, in time order: a buy pushes a lot, a sell consumes
+// from the front of the queue. Each (lot, sell) overlap is one
+// reconstructed round trip, priced from two real fills. Anything that
+// does not pair is reported as itself — a sell with no inventory, or a
+// lot that was never sold inside the fetched range — and never
+// guessed at. The day is the EXIT date, because that is when the cash
+// actually moves, which is what the equity comparison below needs.
+function reconstructFifo(orphans) {
+  const byContract = new Map();
+  for (const f of orphans) {
+    if (!byContract.has(f.symbol)) byContract.set(f.symbol, []);
+    byContract.get(f.symbol).push(f);
+  }
+  const out = [];
+  for (const [sym, list] of byContract) {
+    list.sort((a, b) => a.t - b.t);
+    const lots = [];                                  // FIFO queue of open buys
+    for (const f of list) {
+      if (f.side === "buy") { lots.push({ ...f, left: f.qty }); continue; }
+      let remaining = f.qty;
+      while (remaining > 0 && lots.length) {
+        const lot = lots[0];
+        const take = Math.min(lot.left, remaining);
+        out.push({
+          kind: "reconstructed_trade",
+          optionSymbol: sym,
+          day: new Date(f.t).toISOString().slice(0, 10),   // exit date
+          entryTime: new Date(lot.t).toISOString(),
+          exitTime:  new Date(f.t).toISOString(),
+          qty: take,
+          entryPrice: +lot.price.toFixed(4),
+          exitPrice:  +f.price.toFixed(4),
+          pnl: Math.round((f.price - lot.price) * take * 100),
+          holdSec: Math.round((f.t - lot.t) / 1000),
+          buyFillId: lot.id, sellFillId: f.id,
+          buyOrderId: lot.orderId, sellOrderId: f.orderId,
+          split: take !== lot.qty || take !== f.qty,
+          note: take === lot.qty && take === f.qty
+            ? "ازدواج كامل buy↔sell"
+            : `ازدواج جزئي: ${take} من lot ${lot.qty} ومن sell ${f.qty}`,
+        });
+        lot.left -= take; remaining -= take;
+        if (lot.left === 0) lots.shift();
+      }
+      if (remaining > 0) out.push({
+        kind: "unpaired_sell",
+        optionSymbol: sym,
+        day: new Date(f.t).toISOString().slice(0, 10),
+        time: new Date(f.t).toISOString(),
+        qty: remaining, price: +f.price.toFixed(4),
+        fillId: f.id, orderId: f.orderId,
+        note: "بيع بلا مخزون شراء مقابل — لا يُحسب له pnl",
+      });
+    }
+    for (const lot of lots) if (lot.left > 0) out.push({
+      kind: "open_lot",
+      optionSymbol: sym,
+      day: new Date(lot.t).toISOString().slice(0, 10),
+      time: new Date(lot.t).toISOString(),
+      qty: lot.left, price: +lot.price.toFixed(4),
+      fillId: lot.id, orderId: lot.orderId,
+      note: "شراء لم يُقابله بيع داخل المدى المجلوب — لا يُحسب له pnl",
+    });
+  }
+  out.sort((a, b) => (a.exitTime || a.time).localeCompare(b.exitTime || b.time));
+  return out;
+}
+
+// ─── STEP 7c: Alpaca's equity curve ───
+// NOTE on profit_loss: at timeframe=1D it is CUMULATIVE against
+// base_value and never resets, so it is NOT a per-day change and must
+// not be compared to a daily net. The per-day measure used everywhere
+// below is eqDelta = equity[i] - equity[i-1]; profit_loss is carried
+// only as a labelled reference column.
+// The first bar has no predecessor, so its eqDelta is null and any day
+// landing on it is reported as "—" and never counted as conclusive.
+// The last bar is the PREVIOUS session's close, so today has no bar yet.
+// Dates come from unix timestamps read as UTC, which is where a one-day
+// shift appears — so the offset is MEASURED below, never assumed.
+async function fetchPortfolioHistory() {
+  const r = await alpaca("/account/portfolio/history?period=3M&timeframe=1D");
+  if (!r.ok || !r.data || !Array.isArray(r.data.timestamp)) {
+    console.warn(`⚠ portfolio/history فشل (status ${r.status}${r.error ? ` / ${r.error}` : ""}) — تُتخطّى مقارنة الرصيد.`);
+    return null;
+  }
+  const { timestamp: ts, equity: eq = [], profit_loss: pl = [], base_value: base } = r.data;
+  const rows = ts.map((t, i) => ({
+    date: new Date(t * 1000).toISOString().slice(0, 10),
+    tsIso: new Date(t * 1000).toISOString(),
+    equity: eq[i] == null ? null : +eq[i],
+    plCum: pl[i] == null ? null : +pl[i],   // cumulative vs base_value — reference only
+    eqDelta: i > 0 && eq[i] != null && eq[i - 1] != null ? +eq[i] - +eq[i - 1] : null,
+  }));
+  console.log(`✔ portfolio/history: ${rows.length} باراً (${rows[0]?.date} → ${rows[rows.length - 1]?.date})`);
+  console.log(`  base_value: ${base == null ? "—" : "$" + Math.round(+base)}`);
+  console.log(`  أول طابع زمني كامل: ${rows[0]?.tsIso}  — منه تُقرأ اتفاقية تأريخ البار`);
+  console.log(`  المقياس اليومي = eqDelta (equity[i] − equity[i−1]).`);
+  console.log(`  profit_loss تراكمي من base_value ولا يُعاد ضبطه — مرجع فقط، لا يُقارن بصافٍ يومي.`);
+  console.log(`  أول بار بلا eqDelta (لا سابق له)، وآخر بار هو إغلاق الجلسة السابقة فاليوم الحالي بلا بار.`);
+  return rows;
+}
+
+// Alpaca dates a 1D bar as the trading day PLUS ONE, so the expected
+// offset in shiftDate(day, off) is +1. That is not hard-coded: the
+// offset is scored from the data (-1 / 0 / +1 by mean |mismatch| against
+// the fill-derived daily net) and all three are printed, so a wrong
+// expectation shows up instead of silently biasing every row, and the
+// script self-corrects if the convention ever changes.
+// Scored on eqDelta, never on profit_loss, which is cumulative.
+function pickDayOffset(ourByDay, histRows) {
+  const byDate = new Map(histRows.map(h => [h.date, h]));
+  const shiftDate = (d, days) => new Date(new Date(d + "T00:00:00Z").getTime() + days * 86400000).toISOString().slice(0, 10);
+  const scores = [];
+  for (const off of [-1, 0, 1]) {
+    let total = 0, matched = 0;
+    for (const [day, net] of ourByDay) {
+      const h = byDate.get(shiftDate(day, off));
+      if (!h || h.eqDelta == null) continue;
+      total += Math.abs(net - h.eqDelta); matched++;
+    }
+    scores.push({ off, total, matched, mean: matched ? total / matched : Infinity });
+  }
+  scores.forEach(s => console.log(`  إزاحة ${s.off >= 0 ? "+" : ""}${s.off} يوم: ${s.matched} باراً مطابقاً، متوسط |الفرق| $${s.mean === Infinity ? "—" : s.mean.toFixed(0)}`));
+  const best = scores.filter(s => s.matched > 0).sort((a, b) => a.mean - b.mean)[0] || { off: 0 };
+  console.log(`  ⇒ الإزاحة المختارة: ${best.off >= 0 ? "+" : ""}${best.off} يوم (أقل متوسط |فرق|) — المتوقَّع +1`);
+  if (best.off !== 1) console.log(`  ⚠ الإزاحة المقيسة تخالف المتوقَّع (+1) — راجع اتفاقية التأريخ قبل تصديق الجدول.`);
+  return best.off;
 }
 
 // ─── Static integrity check — no network needed ───
@@ -401,8 +579,90 @@ function checkLookalikes(rows) {
     : "⚠ تحتاج فحصاً يدوياً"}`);
 }
 
+// ─── STEP 7d: per-day reconciliation ───
+// recorded (pnlFullRepriced) + reconstructed = total, against eqDelta
+// — the day-over-day equity change, which is the only per-day figure
+// portfolio/history actually provides. profit_loss is shown beside it
+// as "cumulative from base_value" and is never differenced against the
+// daily net. A day is conclusive only when every logged trade on it is
+// fully resolved AND it lands on a bar that has an eqDelta; otherwise
+// part of its net, or the benchmark itself, is missing and a residual
+// proves nothing. That distinction is kept in the table rather than
+// averaged away.
+const DIFF_THRESHOLD = 25;
+
+function dailyReconciliation(records, rows, orphanRows, histRows) {
+  const exitDayOf = new Map(rows.map(r => [r.tradeId, r.exitTime.slice(0, 10)]));
+  const days = new Map(); // day -> { rec, missing, orphan, nOrphan }
+  const touch = d => { if (!days.has(d)) days.set(d, { rec: 0, missing: 0, orphan: 0, nOrphan: 0, nRec: 0 }); return days.get(d); };
+
+  for (const r of records) {
+    const d = exitDayOf.get(r.tradeId) || r.day;
+    const e = touch(d);
+    e.nRec++;
+    if (r.pnlFullRepriced != null) e.rec += r.pnlFullRepriced; else e.missing++;
+  }
+  for (const o of orphanRows) {
+    if (o.kind !== "reconstructed_trade") continue;
+    const e = touch(o.day);
+    e.orphan += o.pnl; e.nOrphan++;
+  }
+
+  console.log(`\n${"-".repeat(64)}\nمطابقة يومية: المسجّل + المعاد بناؤه مقابل eqDelta (تغيّر رصيد Alpaca اليومي)`);
+  if (!histRows) { console.log("  لا بيانات portfolio/history — تُتخطّى المقارنة."); return; }
+
+  const ourByDay = new Map([...days.entries()].map(([d, e]) => [d, e.rec + e.orphan]));
+  console.log(`\n  اختبار إزاحة التاريخ (لا أفترضها — أقيسها):`);
+  const off = pickDayOffset(ourByDay, histRows);
+
+  const byDate = new Map(histRows.map(h => [h.date, h]));
+  const shiftDate = (d, n) => new Date(new Date(d + "T00:00:00Z").getTime() + n * 86400000).toISOString().slice(0, 10);
+
+  const table = [...days.keys()].sort().map(day => {
+    const e = days.get(day);
+    const h = byDate.get(shiftDate(day, off));
+    const total = e.rec + e.orphan;
+    const eqDelta = h?.eqDelta ?? null;              // the per-day benchmark
+    return {
+      day, ...e, total, eqDelta,
+      plCum: h?.plCum ?? null,                       // cumulative — reference only
+      barDate: h?.date ?? null,
+      diff: eqDelta == null ? null : total - eqDelta,
+      conclusive: e.missing === 0 && eqDelta != null,
+      why: !h ? "لا بار مقابل" : eqDelta == null ? "أول بار، بلا سابق" : e.missing ? `${e.missing} صفقة بلا تسعير كامل` : "",
+    };
+  });
+
+  console.log(`\n  يوم         صفقات  مسجّل     ناقص  يتيم(ن)      مجموع    eqDelta     الفرق   حاسم؟  plCum(مرجع)`);
+  for (const t of table) {
+    console.log(
+      `  ${t.day}  ${String(t.nRec).padStart(5)}  ${money(t.rec).padStart(8)}  ${String(t.missing).padStart(4)}  ` +
+      `${money(t.orphan).padStart(7)}(${t.nOrphan})  ${money(t.total).padStart(8)}  ` +
+      `${(t.eqDelta == null ? "—" : money(t.eqDelta)).padStart(8)}  ${(t.diff == null ? "—" : money(t.diff)).padStart(8)}   ` +
+      `${(t.conclusive ? "نعم" : "لا").padEnd(4)}  ${(t.plCum == null ? "—" : money(t.plCum)).padStart(9)}`
+    );
+  }
+
+  const flagged = table.filter(t => t.diff != null && Math.abs(t.diff) > DIFF_THRESHOLD);
+  console.log(`\n  أيام الفرق فيها > $${DIFF_THRESHOLD}: ${flagged.length} من ${table.length}`);
+  flagged.forEach(t => console.log(
+    `    ${t.day}  الفرق ${money(t.diff)}  (مجموعنا ${money(t.total)} مقابل eqDelta ${money(t.eqDelta)})` +
+    `${t.conclusive ? "  — حاسم: كل صفقات اليوم مسعَّرة وللبار eqDelta" : `  — غير حاسم: ${t.why}`}`
+  ));
+  console.log(`  منها حاسمة: ${flagged.filter(t => t.conclusive).length}`);
+  const noBar = table.filter(t => t.diff == null);
+  if (noBar.length) {
+    console.log(`\n  أيام بلا مقياس يومي (الفرق "—"، وغير حاسمة): ${noBar.length}`);
+    noBar.forEach(t => console.log(`    ${t.day}  ${t.why}`));
+  }
+  console.log(`\n  ملاحظتان على المقياس:`);
+  console.log(`  • eqDelta يشمل تقييم المراكز المفتوحة عند الإغلاق، فمركز لم يُغلق في يومه يُنتج فرقاً مشروعاً لا خطأً.`);
+  console.log(`  • plCum تراكمي من base_value ولا يُعاد ضبطه — معروض للمرجع فقط ولم يُطرح من أي صافٍ يومي.`);
+  return table;
+}
+
 // ─── STEP 6: summary ───
-function summarize(records, rows) {
+function summarize(records, rows, orphanFills = [], orphanRows = [], histRows = null) {
   const tally = key => {
     const c = {};
     records.forEach(r => c[r[key]] = (c[r[key]] || 0) + 1);
@@ -482,6 +742,41 @@ function summarize(records, rows) {
     console.log(`  (نشاط EXP/OPASN لا FILL)، أو تصفية من الوسيط. لا تُخمَّن أسعارها.`);
   }
 
+  // ── orphan fills and what FIFO could rebuild from them ──
+  console.log(`\n-- تنفيذات لم تُستهلك في أي صفقة محسومة --`);
+  const unresolvedLogged = records.filter(r => r.confidence !== "exact" && r.confidence !== "partial").length;
+  console.log(`  تنفيذات يتيمة: ${orphanFills.length}  (شراء ${orphanFills.filter(f => f.side === "buy").length} / بيع ${orphanFills.filter(f => f.side === "sell").length})`);
+  console.log(`  ⚠ تلوّث المجموعة: ${unresolvedLogged} صفقة مسجّلة لم يُحسم خروجها، فتنفيذاتها الحقيقية داخل هذه المجموعة.`);
+  console.log(`     أي أن "يتيم" تعني "غير منسوب لصفقة محسومة"، لا "دليل على صفقة غير مسجّلة".`);
+  if (orphanFills.length) {
+    const byDay = {};
+    orphanFills.forEach(f => {
+      const d = new Date(f.t).toISOString().slice(0, 10);
+      (byDay[d] = byDay[d] || new Set()).add(f.symbol);
+    });
+    console.log(`  موزّعة على ${Object.keys(byDay).length} يوم و${new Set(orphanFills.map(f => f.symbol)).size} عقد:`);
+    Object.keys(byDay).sort().forEach(d => {
+      const n = orphanFills.filter(f => new Date(f.t).toISOString().slice(0, 10) === d).length;
+      console.log(`    ${d}  ${String(n).padStart(3)} تنفيذ على ${byDay[d].size} عقد`);
+    });
+  }
+
+  const rebuilt  = orphanRows.filter(o => o.kind === "reconstructed_trade");
+  const unpaired = orphanRows.filter(o => o.kind === "unpaired_sell");
+  const openLots = orphanRows.filter(o => o.kind === "open_lot");
+  console.log(`\n-- إعادة البناء بـFIFO --`);
+  console.log(`  صفقات معاد بناؤها: ${rebuilt.length}  (منها ${rebuilt.filter(o => o.split).length} ازدواج جزئي)`);
+  console.log(`  صافيها بالتنفيذ: ${rebuilt.length ? money(rebuilt.reduce((a, o) => a + o.pnl, 0)) : "—"}`);
+  console.log(`  بيع بلا مخزون مقابل: ${unpaired.length}${unpaired.length ? ` (${unpaired.reduce((a, o) => a + o.qty, 0)} عقد)` : ""} — لا pnl، لا تخمين`);
+  console.log(`  شراء بلا بيع (مركز مفتوح أو خارج المدى): ${openLots.length}${openLots.length ? ` (${openLots.reduce((a, o) => a + o.qty, 0)} عقد)` : ""} — لا pnl، لا تخمين`);
+  if (rebuilt.length) {
+    console.log(`  أكبر 5 معاد بناؤها:`);
+    [...rebuilt].sort((a, b) => Math.abs(b.pnl) - Math.abs(a.pnl)).slice(0, 5).forEach(o =>
+      console.log(`    ${o.day} ${o.optionSymbol}  q=${o.qty}  ${o.entryPrice}→${o.exitPrice}  ${money(o.pnl)}  (${o.holdSec}s)`));
+  }
+
+  dailyReconciliation(records, rows, orphanRows, histRows);
+
   checkLookalikes(rows);
   console.log(`${"=".repeat(64)}`);
 }
@@ -499,11 +794,13 @@ async function main() {
 
   if (DRY_RUN) {
     console.log("\n⚠ --dry-run: لا اتصال بالشبكة، لا مفاتيح، لا كتابة.");
-    console.log("  يُشغّل منطق المطابقة على مجموعة تنفيذات فارغة للتحقق من المسارات فقط.");
+    console.log("  يُشغّل منطق المطابقة وإعادة البناء على مجموعة تنفيذات فارغة للتحقق من المسارات فقط.");
     const empty = indexFills([]);
-    const records = rows.map(r => buildRecord(r, resolveTrade(r, empty, bounds)));
-    summarize(records, rows);
-    console.log("\n✔ dry-run انتهى. كل سجل unresolved على الجانبين كما هو متوقَّع بلا بيانات.");
+    const resolutions = rows.map(r => ({ rec: r, m: resolveTrade(r, empty, bounds) }));
+    const records = resolutions.map(({ rec, m }) => buildRecord(rec, m));
+    const orphanFills = collectOrphans(empty, collectConsumed(resolutions));
+    summarize(records, rows, orphanFills, reconstructFifo(orphanFills), null);
+    console.log("\n✔ dry-run انتهى. كل سجل unresolved على الجانبين، وصفر يتيم، كما هو متوقَّع بلا بيانات.");
     return;
   }
 
@@ -528,12 +825,25 @@ async function main() {
   const sides = { buy: 0, sell: 0 };
   for (const list of bySymbol.values()) list.forEach(f => sides[f.side]++);
   console.log(`  تنفيذات على ${bySymbol.size} عقد مختلف — شراء ${sides.buy} / بيع ${sides.sell}`);
-  const records = rows.map(r => buildRecord(r, resolveTrade(r, bySymbol, bounds)));
+  const resolutions = rows.map(r => ({ rec: r, m: resolveTrade(r, bySymbol, bounds) }));
+  const records = resolutions.map(({ rec, m }) => buildRecord(rec, m));
 
-  console.log("\n--- 5) الكتابة ---");
-  writeOut(records);
+  console.log("\n--- 5) التنفيذات اليتيمة وإعادة بنائها ---");
+  const orphanFills = collectOrphans(bySymbol, collectConsumed(resolutions));
+  const orphanRows = reconstructFifo(orphanFills);
+  console.log(`  ${orphanFills.length} تنفيذ يتيم → ${orphanRows.filter(o => o.kind === "reconstructed_trade").length} صفقة معاد بناؤها، ` +
+              `${orphanRows.filter(o => o.kind === "unpaired_sell").length} بيع بلا مقابل، ` +
+              `${orphanRows.filter(o => o.kind === "open_lot").length} شراء بلا بيع`);
 
-  summarize(records, rows);
+  console.log("\n--- 6) منحنى الرصيد من Alpaca (المقياس اليومي = eqDelta) ---");
+  const histRows = await fetchPortfolioHistory();
+
+  console.log("\n--- 7) الكتابة ---");
+  writeJsonl(records, OUT_FILE, OUT_FILE, "سجلاً");
+  writeJsonl(orphanRows, ORPHAN_FILE, ORPHAN_FILE, "سطراً");
+  console.log("  (ولم يُلمس أي ملف آخر)");
+
+  summarize(records, rows, orphanFills, orphanRows, histRows);
 }
 
 main().catch(e => {
