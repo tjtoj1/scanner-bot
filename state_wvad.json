@@ -16,27 +16,5 @@
   ],
   "_cooldowns": {
     "SPY_CALL": "2026-10-06T16:09:40.074Z"
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261007C00755000",
-    "strike": "755",
-    "entryPremium": 1.105,
-    "qty": 4,
-    "entryTime": 1791385984040,
-    "stopOrderId": "e683b612-538f-4b67-8a3d-fce9ef27746f",
-    "hardStopPrice": 0.72,
-    "entryStockPrice": 754.61,
-    "wvadSumAtEntry": -2682562.88,
-    "signalLineAtEntry": -2785232.35,
-    "atrAtEntry": 1.45,
-    "slStock": 752.43,
-    "dte": 0,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 38.00904977375565
   }
 }
