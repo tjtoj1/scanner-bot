@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-06T20:01:01.501Z"
+      "lastUpdated": "2026-10-07T20:00:47.246Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-06T20:01:01.501Z"
+      "lastUpdated": "2026-10-07T20:00:47.246Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 169,
-      "wins": 92,
-      "pnl": 1797,
-      "avgPnlPct": 3.09,
-      "se": 2.81,
+      "n": 172,
+      "wins": 94,
+      "pnl": 1771,
+      "avgPnlPct": 2.99,
+      "se": 2.77,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-06T20:01:01.501Z"
+      "lastUpdated": "2026-10-07T20:00:47.246Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -75,15 +75,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 165,
-      "wins": 84,
-      "pnl": -1640,
-      "avgPnlPct": -2.32,
-      "se": 2.42,
+      "n": 175,
+      "wins": 90,
+      "pnl": -1695,
+      "avgPnlPct": -2.34,
+      "se": 2.31,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-06T20:01:01.501Z"
+      "lastUpdated": "2026-10-07T20:00:47.246Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-06T20:01:01.501Z"
+      "lastUpdated": "2026-10-07T20:00:47.247Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-06T20:01:01.501Z"
+      "lastUpdated": "2026-10-07T20:00:47.247Z"
     }
   },
   "changelog": [
