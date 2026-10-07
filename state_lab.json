@@ -11,5 +11,43 @@
     "QQQ_CALL": 1791302436539,
     "SPY_CALL": 1791304777134
   },
-  "_lastComboLearnedFinal": true
+  "_lastComboLearnedFinal": true,
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM261007P00279000",
+    "strike": "279",
+    "entryPremium": 1.0350000000000001,
+    "qty": 2,
+    "entryTime": 1791380701199,
+    "msgId": 5199,
+    "stopOrderId": "a489d499-64a6-45d3-9a5e-30f4770bc3bd",
+    "hardStopPrice": 0.72,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 278.515,
+      "regime": "bearish",
+      "emaFast": 278.9123,
+      "emaSlow": 279.5213,
+      "breakoutHigh": 279.7,
+      "breakoutLow": 278.5301,
+      "volRatio": 4.21,
+      "lastClose": 278.25,
+      "lastVolume": 93098,
+      "barTime": "2026-10-07T13:15:00Z",
+      "entryTimeUTC": "2026-10-07T13:45:01.199Z",
+      "vwapAtEntry": 279.2156,
+      "rsiAtEntry": 20.47,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
+  }
 }
