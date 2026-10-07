@@ -18,6 +18,12 @@
       "symbol": "SPY",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-07",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "_cooldowns": {}
