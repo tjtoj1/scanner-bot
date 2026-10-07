@@ -58,7 +58,9 @@
       "low": 253.17
     }
   },
-  "_cooldowns": {},
+  "_cooldowns": {
+    "SPY_PUT": "2026-10-07T15:14:46.397Z"
+  },
   "TSLA": {
     "active": true,
     "signal": "PUT",
@@ -82,28 +84,5 @@
     "slStock": null,
     "lastReportedThreshold": -10,
     "nearStopWarned": true
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261007P00774000",
-    "strike": "774",
-    "entryPremium": 1.0150000000000001,
-    "qty": 4,
-    "entryTime": 1791385508299,
-    "level": 774.2538,
-    "msgId": 5259,
-    "stopOrderId": null,
-    "hardStopPrice": 0.66,
-    "entryStockPrice": 774.06,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 62.83,
-    "volumeRatio": 2.1234403548214007,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -10
   }
 }
