@@ -54,12 +54,12 @@
     "signal": "PUT",
     "optionSymbol": "QQQ261007P00754000",
     "strike": "754",
-    "entryPremium": 1.75,
+    "entryPremium": 1.8650000000000002,
     "qty": 1,
-    "entryTime": 1791381623889,
-    "msgId": 5207,
-    "stopOrderId": "be04c2c2-ca36-412c-9a5a-7f0db330a847",
-    "hardStopPrice": 1.22,
+    "entryTime": 1791382208814,
+    "msgId": 5215,
+    "stopOrderId": "c6de90fc-9b23-4bb5-9555-64d102b03fc2",
+    "hardStopPrice": 1.31,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -68,7 +68,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 753.86,
+      "spot": 753.51,
       "regime": "bearish",
       "emaFast": 754.1208,
       "emaSlow": 755.3577,
@@ -78,18 +78,13 @@
       "lastClose": 752.8875,
       "lastVolume": 2697391,
       "barTime": "2026-10-07T13:30:00Z",
-      "entryTimeUTC": "2026-10-07T14:00:23.889Z",
+      "entryTimeUTC": "2026-10-07T14:10:08.814Z",
       "vwapAtEntry": 753.9762,
       "rsiAtEntry": 24.27,
       "signalType": "breakout",
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 21.428571428571427,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
+    }
   }
 }
