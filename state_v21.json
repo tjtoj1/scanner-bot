@@ -12,6 +12,12 @@
       "symbol": "TSLA",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-07",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -93,5 +99,27 @@
     "slStock": null,
     "lastReportedThreshold": -10,
     "nearStopWarned": true
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261007P00774000",
+    "strike": "774",
+    "entryPremium": 0.9550000000000001,
+    "qty": 5,
+    "entryTime": 1791385206972,
+    "level": 774.2538,
+    "msgId": 5246,
+    "stopOrderId": "c39a01c3-49d1-487e-ba34-b1aaef21987a",
+    "hardStopPrice": 0.62,
+    "entryStockPrice": 774.255,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 62.83,
+    "volumeRatio": 2.1234403548214007,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
