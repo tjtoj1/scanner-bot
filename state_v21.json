@@ -18,6 +18,12 @@
       "symbol": "SPY",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-07",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -53,34 +59,6 @@
     }
   },
   "_cooldowns": {},
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261007P00278000",
-    "strike": "278",
-    "entryPremium": 0.825,
-    "qty": 6,
-    "entryTime": 1791383427613,
-    "level": 277.87,
-    "msgId": 5224,
-    "stopOrderId": "af882f8d-1bfb-434e-930a-177abd22232b",
-    "hardStopPrice": 0.54,
-    "entryStockPrice": 277.665,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 37.64,
-    "volumeRatio": 4.771211878193525,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": 30,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 31.51515151515152,
-    "ladder2": true,
-    "trailPct": 10
-  },
   "TSLA": {
     "active": true,
     "signal": "PUT",
@@ -110,14 +88,14 @@
     "signal": "PUT",
     "optionSymbol": "SPY261007P00774000",
     "strike": "774",
-    "entryPremium": 0.9550000000000001,
-    "qty": 5,
-    "entryTime": 1791385206972,
+    "entryPremium": 1.0150000000000001,
+    "qty": 4,
+    "entryTime": 1791385508299,
     "level": 774.2538,
-    "msgId": 5246,
-    "stopOrderId": "c95859ba-8b49-4e1e-b990-f467bf4329ff",
-    "hardStopPrice": 0.62,
-    "entryStockPrice": 774.255,
+    "msgId": 5259,
+    "stopOrderId": null,
+    "hardStopPrice": 0.66,
+    "entryStockPrice": 774.06,
     "vwapAtEntry": null,
     "rsiAtEntry": 62.83,
     "volumeRatio": 2.1234403548214007,
@@ -125,10 +103,6 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 17.80104712041884,
-    "lastReportedThreshold": 10
+    "slStock": null
   }
 }
