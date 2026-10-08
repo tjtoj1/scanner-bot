@@ -61,7 +61,8 @@
   "_cooldowns": {
     "SPY_PUT": "2026-10-07T15:14:46.397Z",
     "QQQ_PUT": "2026-10-08T14:22:52.324Z",
-    "SPY_CALL": "2026-10-08T14:49:40.208Z"
+    "SPY_CALL": "2026-10-08T14:49:40.208Z",
+    "NVDA_CALL": "2026-10-08T15:08:50.249Z"
   },
   "TSLA": {
     "active": true,
@@ -85,29 +86,5 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "NVDA261009C00237500",
-    "strike": "237.5",
-    "entryPremium": 1.5550000000000002,
-    "qty": 3,
-    "entryTime": 1791469808994,
-    "level": 235.2,
-    "msgId": 5315,
-    "stopOrderId": null,
-    "hardStopPrice": 1.01,
-    "entryStockPrice": 236.98000000000002,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 52.94,
-    "volumeRatio": 6.39041682304577,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
   }
 }
