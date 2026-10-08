@@ -8,7 +8,8 @@
     "QQQ_PUT": 1791384733800,
     "SPY_PUT": 1791387778856,
     "IWM_PUT": 1791387888088,
-    "NVDA_PUT": 1791470235648
+    "NVDA_PUT": 1791470235648,
+    "SPY_CALL": 1791472784214
   },
   "_lastComboLearnedFinal": true,
   "TSLA": {
@@ -49,45 +50,5 @@
       "sizeMultiplier": 1
     },
     "lastReportedThreshold": -10
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY261008C00776000",
-    "strike": "776",
-    "entryPremium": 1.2149999999999999,
-    "qty": 2,
-    "entryTime": 1791469813870,
-    "msgId": 5316,
-    "stopOrderId": "11d77969-165a-4310-9c3c-17cda16d5d42",
-    "hardStopPrice": 0.85,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 776.365,
-      "regime": "bullish",
-      "emaFast": 774.8392,
-      "emaSlow": 774.748,
-      "breakoutHigh": 775.7456,
-      "breakoutLow": 773.15,
-      "volRatio": 3.21,
-      "lastClose": 775.86,
-      "lastVolume": 657522,
-      "barTime": "2026-10-08T14:00:00Z",
-      "entryTimeUTC": "2026-10-08T14:30:13.870Z",
-      "vwapAtEntry": 774.8695,
-      "rsiAtEntry": 60.31,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   }
 }

@@ -60,7 +60,8 @@
   },
   "_cooldowns": {
     "SPY_PUT": "2026-10-07T15:14:46.397Z",
-    "QQQ_PUT": "2026-10-08T14:22:52.324Z"
+    "QQQ_PUT": "2026-10-08T14:22:52.324Z",
+    "SPY_CALL": "2026-10-08T14:49:40.208Z"
   },
   "TSLA": {
     "active": true,
@@ -84,29 +85,6 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY261008C00776000",
-    "strike": "776",
-    "entryPremium": 1.255,
-    "qty": 3,
-    "entryTime": 1791469806353,
-    "level": 775.3299,
-    "msgId": 5314,
-    "stopOrderId": "4fc595bb-48f0-4a66-bd77-c78f0fbb4aae",
-    "hardStopPrice": 0.82,
-    "entryStockPrice": 776.38,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 56.48,
-    "volumeRatio": 3.21101838130532,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
