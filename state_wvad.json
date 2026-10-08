@@ -6,6 +6,12 @@
       "symbol": "QQQ",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-08",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
