@@ -8,8 +8,45 @@
     "QQQ_PUT": 1791384733800,
     "SPY_PUT": 1791387778856,
     "IWM_PUT": 1791387888088,
-    "TSLA_PUT": 1791389836995,
     "NVDA_PUT": 1791470235648
   },
-  "_lastComboLearnedFinal": true
+  "_lastComboLearnedFinal": true,
+  "TSLA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "TSLA261009P00375000",
+    "strike": "375",
+    "entryPremium": 4.775,
+    "qty": 1,
+    "entryTime": 1791468938687,
+    "msgId": 5310,
+    "stopOrderId": null,
+    "hardStopPrice": 3.34,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 373.885,
+      "regime": "bearish",
+      "emaFast": 373.7884,
+      "emaSlow": 374.4425,
+      "breakoutHigh": 375.96,
+      "breakoutLow": 372.4287,
+      "volRatio": 11.31,
+      "lastClose": 371.8804,
+      "lastVolume": 1711250,
+      "barTime": "2026-10-08T13:45:00Z",
+      "entryTimeUTC": "2026-10-08T14:15:38.687Z",
+      "vwapAtEntry": 373.8251,
+      "rsiAtEntry": 29.75,
+      "signalType": "breakout",
+      "positionBucket": "mid",
+      "comboKey": "PUT|position:mid",
+      "sizeMultiplier": 1
+    }
+  }
 }
