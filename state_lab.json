@@ -49,7 +49,8 @@
     "lastReportedThreshold": 10,
     "ladder1": true,
     "stopPct": 5,
-    "peakPct": 16.13663133097761
+    "peakPct": 16.13663133097761,
+    "nearStopWarned": true
   },
   "QQQ": {
     "active": true,
@@ -60,7 +61,7 @@
     "qty": 1,
     "entryTime": 1791480033036,
     "msgId": 5382,
-    "stopOrderId": null,
+    "stopOrderId": "62265435-b8df-45ac-9fde-44791a5128b8",
     "hardStopPrice": 1.19,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -88,7 +89,10 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.835777126099707
   },
   "SPY": {
     "active": true,
