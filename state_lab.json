@@ -12,44 +12,5 @@
     "NVDA_PUT": 1791483028651,
     "TSLA_PUT": 1791489176853
   },
-  "_lastComboLearnedFinal": true,
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN261009P00255000",
-    "strike": "255",
-    "entryPremium": 1.9695,
-    "qty": 1,
-    "entryTime": 1791483327516,
-    "msgId": 5428,
-    "stopOrderId": null,
-    "hardStopPrice": 1.38,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 254.32,
-      "regime": "bearish",
-      "emaFast": 256.5787,
-      "emaSlow": 257.6058,
-      "breakoutHigh": 259.35,
-      "breakoutLow": 254.5,
-      "volRatio": 1.76,
-      "lastClose": 254.45,
-      "lastVolume": 1464440,
-      "barTime": "2026-10-08T17:45:00Z",
-      "entryTimeUTC": "2026-10-08T18:15:27.516Z",
-      "vwapAtEntry": 257.7807,
-      "rsiAtEntry": 26.76,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -10
-  }
+  "_lastComboLearnedFinal": true
 }
