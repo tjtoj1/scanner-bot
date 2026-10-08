@@ -48,7 +48,7 @@
       "comboKey": "PUT|position:mid",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "SPY": {
     "active": true,
@@ -86,6 +86,7 @@
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
