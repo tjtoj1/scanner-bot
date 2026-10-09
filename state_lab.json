@@ -53,5 +53,8 @@
     "peakPct": 15.09433962264151,
     "lastReportedThreshold": 20,
     "nearStopWarned": true
+  },
+  "SPY": {
+    "active": true
   }
 }
