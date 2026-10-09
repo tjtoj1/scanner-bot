@@ -39,6 +39,9 @@
     "signalLineAtEntry": 3866432.16,
     "atrAtEntry": 0.843,
     "slStock": 779.43,
-    "dte": 0
+    "dte": 0,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.958904109589051
   }
 }
