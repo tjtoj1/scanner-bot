@@ -90,6 +90,6 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 15.088757396449697,
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20
   }
 }
