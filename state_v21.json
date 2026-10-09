@@ -52,29 +52,7 @@
       "low": 256
     }
   },
-  "_cooldowns": {},
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261009P00232500",
-    "strike": "232.5",
-    "entryPremium": 2.17,
-    "qty": 2,
-    "entryTime": 1791556186632,
-    "level": 230.85,
-    "msgId": 5491,
-    "stopOrderId": "a47a69be-552f-48f2-a042-2a41c634444f",
-    "hardStopPrice": 1.41,
-    "entryStockPrice": 230.59,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 65.18,
-    "volumeRatio": 7.954009702233678,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
+  "_cooldowns": {
+    "NVDA_PUT": "2026-10-09T14:53:09.423Z"
   }
 }
