@@ -135,14 +135,16 @@ async function tg(text, replyTo=null) {
   } catch(e) { console.error("TG:", e.message); return null; }
 }
 
-async function alpaca(path, method="GET", body=null) {
+// timeoutMs overrides fetchWithTimeout's own 15s default for one call.
+// Only the TA2 fill lookups pass it; every existing caller keeps 15s.
+async function alpaca(path, method="GET", body=null, timeoutMs=15000) {
   const res = await fetchWithTimeout(`${TRADING_BASE}${path}`, {
     method, headers: {
       "APCA-API-KEY-ID": ALPACA_KEY,
       "APCA-API-SECRET-KEY": ALPACA_SECRET,
       "Content-Type": "application/json"
     }, body: body ? JSON.stringify(body) : null
-  });
+  }, timeoutMs);
   const t = await res.text();
   try { return JSON.parse(t); } catch { return t; }
 }
@@ -168,6 +170,94 @@ async function getOwnedQty(optionSymbol) {
   } catch (e) {
     console.error(`getOwnedQty(${optionSymbol}) failed:`, e.message);
     return null;
+  }
+}
+
+// ─── TA2: the exit price the broker actually filled at ───────
+// The reconcile path only ever knew a market quote sampled when it
+// noticed the position was gone; the stop had already filled, earlier,
+// at a price nothing here read. Two layers, first hit wins:
+//   1. GET /orders/{pos.stopOrderId} — that id is stored at entry and
+//      the reconcile path never cancels it (the DELETE lives inside
+//      `if (!skipSell)`), so it is still valid here.
+//   2. GET /account/activities/FILL — covers a null stopOrderId (stop
+//      placement failed), a manual close, or a broker liquidation.
+// Returns { price, confirmed, source }:
+//   confirmed=true  → price came from a filled order or fill activity
+//   confirmed=false → looked and found nothing usable; price stays null
+// It NEVER estimates a price, and never throws: on any error the caller
+// gets the confirmed=false shape and the close proceeds untouched.
+// Both calls use a 6s timeout, not the usual 15s: this runs inside the
+// reconcile loop, which the runner kills at CHILD_TIMEOUT_MS (90s), and
+// a slow broker must not cost the whole cycle. Worst case is 12s per
+// position instead of 30s.
+const FILL_LOOKUP_TIMEOUT_MS = 6000;
+
+async function getExitFill(pos) {
+  const miss = source => ({ price: null, confirmed: false, source });
+  // entryTime is set as Date.now() — a number (see state[symbol] in
+  // scanEntry). Normalised anyway: were it ever an ISO string, the raw
+  // `>= pos.entryTime` comparison below would evaluate to NaN >= … and
+  // silently drop every fill, reporting "not found" for trades whose
+  // fill was right there. Cheap guard against a silent-miss failure.
+  const entryMs = typeof pos.entryTime === "number"
+    ? pos.entryTime
+    : new Date(pos.entryTime).getTime();
+
+  // ── layer 1: the stop order we placed ──
+  if (pos.stopOrderId) {
+    try {
+      const o = await alpaca(`/orders/${pos.stopOrderId}`, "GET", null, FILL_LOOKUP_TIMEOUT_MS);
+      const px = parseFloat(o?.filled_avg_price);
+      if (o?.status === "filled" && Number.isFinite(px) && px > 0) {
+        const fq = parseFloat(o.filled_qty);
+        if (Number.isFinite(fq) && fq === pos.qty) {
+          return { price: px, confirmed: true, source: "stop_order" };
+        }
+        // Filled, but not for the quantity we think we held. Report the
+        // price and refuse to call it confirmed rather than quietly
+        // pricing a different size than the one pnl is computed on.
+        console.warn(`${pos.optionSymbol}: stop order filled ${fq} but local qty ${pos.qty} — not confirmed`);
+        return { price: px, confirmed: false, source: "stop_order_qty_mismatch" };
+      }
+      console.log(`${pos.optionSymbol}: stop order ${pos.stopOrderId} status=${o?.status ?? "?"} — trying layer 2`);
+    } catch (e) {
+      console.warn(`${pos.optionSymbol}: order lookup failed (${e.message}) — trying layer 2`);
+    }
+  }
+
+  // ── layer 2: the account's own fill log ──
+  // Newest first and unfiltered by symbol (the endpoint takes no symbol
+  // filter), then narrowed here. 100 is far above v21's fill rate — 4
+  // trades a day, 2 fills each — but it IS a bound: a fill older than
+  // the newest 100 is reported as not found, never guessed at.
+  try {
+    const acts = await alpaca("/account/activities/FILL?direction=desc&page_size=100",
+                              "GET", null, FILL_LOOKUP_TIMEOUT_MS);
+    if (!Array.isArray(acts)) return miss("none");
+    const mine = acts.filter(a =>
+      a.symbol === pos.optionSymbol &&
+      String(a.side || "").startsWith("sell") &&
+      new Date(a.transaction_time).getTime() >= entryMs);
+    if (!mine.length) return miss("none");
+
+    const orders = new Set(mine.map(a => a.order_id));
+    if (orders.size > 1) {
+      console.warn(`${pos.optionSymbol}: ${orders.size} sell orders since entry — ambiguous, not confirmed`);
+      return miss("ambiguous_multiple_orders");
+    }
+    const qty = mine.reduce((a, f) => a + parseFloat(f.qty), 0);
+    const notional = mine.reduce((a, f) => a + parseFloat(f.price) * parseFloat(f.qty), 0);
+    if (!Number.isFinite(qty) || qty <= 0 || !Number.isFinite(notional)) return miss("none");
+    const px = +(notional / qty).toFixed(4);
+    if (qty !== pos.qty) {
+      console.warn(`${pos.optionSymbol}: fills total ${qty} but local qty ${pos.qty} — not confirmed`);
+      return { price: px, confirmed: false, source: "fill_activity_qty_mismatch" };
+    }
+    return { price: px, confirmed: true, source: "fill_activity" };
+  } catch (e) {
+    console.warn(`${pos.optionSymbol}: activities lookup failed (${e.message}) — no confirmed price`);
+    return miss("none");
   }
 }
 
@@ -362,7 +452,7 @@ async function checkBreakout(state, symbol) {
 // ─── LOG TRADE OUTCOME ───────────────────────────────────────
 // exitStockPrice is optional (undefined for any call site that doesn't
 // have it) — falls back to null so old-style callers never break.
-function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) {
+function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill = null) {
   try {
     const tradeId = `${symbol}_${pos.entryTime}`;
     let existing = "";
@@ -399,6 +489,15 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) 
       volumeRatio: pos.volumeRatio ?? null,
       signalType: pos.signalType ?? null,
       exitStockPrice: exitStockPrice ?? null,
+      // TA2 — recorded ALONGSIDE exitPremium, never instead of it. pnl,
+      // pnlPct, win, reason and fillSource above are computed exactly as
+      // before. Three states, deliberately distinct:
+      //   null  → this exit path never looked up a fill
+      //   false → it looked and found nothing usable (price stays null)
+      //   true  → exitFillPrice is what the broker actually filled at
+      exitFillPrice: exitFill?.price ?? null,
+      exitPriceConfirmed: exitFill ? exitFill.confirmed : null,
+      exitFillSource: exitFill?.source ?? null,
     };
     fs.appendFileSync("outcomes_v21.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
@@ -425,7 +524,7 @@ function closeMessageText(reason, symbol, pos, pnlPct, pnl) {
 // ─── UNIFIED POSITION CLOSE ──────────────────────────────────
 // skipSell=true is for the Alpaca-reconcile path, where the broker
 // already closed the position — no cancel/sell needed, just record it.
-async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false) {
+async function closePosition(state, symbol, pos, exitPremium, reason, fillSource, skipSell = false, exitFill = null) {
   // One extra lightweight quote fetch here — only when a position is
   // actually closing, not every monitor cycle — same call already used
   // once per trade at entry (getLatestPrice). Recorded for later
@@ -459,7 +558,7 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
     if (ownedQty === 0) {
       console.warn(`${symbol}: no position at Alpaca (already flat) — clearing local state without selling (${reason})`);
       await tg(`ℹ️ <b>${symbol}: لا يوجد مركز فعلي في Alpaca</b>\nتم تنظيف الحالة المحلية بدون إرسال أمر بيع (${reason}).`, pos.msgId);
-      logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
+      logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill);
       delete state[symbol];
       saveState(state);
       return;
@@ -483,7 +582,7 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
   }
   const pnl = Math.round((exitPremium - pos.entryPremium) * soldQty * 100);
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
-  logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
+  logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill);
 
   // ─── REGISTER COOLDOWN (on losing hard_stop or alpaca_stop) ────────
   if ((reason === "hard_stop" || reason === "alpaca_stop") && pnl < 0) {
@@ -886,14 +985,18 @@ ${slLine}`);
           const pos = state[sym];
           if (pos.optionSymbol && pos.entryPremium) {
             const exitPrem = await getQuote(pos.optionSymbol);
+            // TA2: ask Alpaca what the stop actually filled at. Never
+            // blocks the close — getExitFill swallows every error and
+            // returns confirmed:false — and never changes the pnl below.
+            const exitFill = await getExitFill(pos);
             if (exitPrem !== null) {
               // NOT an order fill: exitPrem is a market quote sampled at the
               // moment reconciliation noticed the position was gone. The real
               // fill happened earlier, at Alpaca, at a price nothing here read.
-              await closePosition(state, sym, pos, exitPrem, "alpaca_stop", "quote_at_detection", true);
+              await closePosition(state, sym, pos, exitPrem, "alpaca_stop", "quote_at_detection", true, exitFill);
             } else {
               // Can't get quote — estimate from last known
-              await closePosition(state, sym, pos, pos.entryPremium * 0.65, "alpaca_stop_est", "quote_estimate", true);
+              await closePosition(state, sym, pos, pos.entryPremium * 0.65, "alpaca_stop_est", "quote_estimate", true, exitFill);
             }
           } else {
             delete state[sym];
