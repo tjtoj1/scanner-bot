@@ -89,8 +89,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 34.31952662721894,
-    "lastReportedThreshold": 30,
+    "peakPct": 44.3786982248521,
+    "lastReportedThreshold": 40,
     "ladder2": true,
     "trailPct": 8
   }
