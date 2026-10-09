@@ -11,5 +11,43 @@
     "NVDA_PUT": 1791483028651,
     "TSLA_PUT": 1791489176853
   },
-  "_lastComboLearnedFinal": true
+  "_lastComboLearnedFinal": true,
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA261009C00385000",
+    "strike": "385",
+    "entryPremium": 3.49,
+    "qty": 1,
+    "entryTime": 1791554132817,
+    "msgId": 5458,
+    "stopOrderId": "476ba397-b5a6-4510-9bbc-26812e9ae26a",
+    "hardStopPrice": 2.44,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 384.18,
+      "regime": "bullish",
+      "emaFast": 380.7385,
+      "emaSlow": 379.5562,
+      "breakoutHigh": 382.26,
+      "breakoutLow": 378.5946,
+      "volRatio": 8.63,
+      "lastClose": 382.34,
+      "lastVolume": 234912,
+      "barTime": "2026-10-09T13:15:00Z",
+      "entryTimeUTC": "2026-10-09T13:55:32.817Z",
+      "vwapAtEntry": 380.4758,
+      "rsiAtEntry": 73.19,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
+  }
 }
