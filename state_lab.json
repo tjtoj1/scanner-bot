@@ -47,7 +47,8 @@
       "positionBucket": "near_high",
       "comboKey": "PUT|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
