@@ -11,50 +11,6 @@
     "NVDA_PUT": 1791559394069
   },
   "_lastComboLearnedFinal": true,
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY261009C00777000",
-    "strike": "777",
-    "entryPremium": 0.945,
-    "qty": 3,
-    "entryTime": 1791558933585,
-    "msgId": 5512,
-    "stopOrderId": "c0f734b4-879e-46ce-8bfe-eb6781f96a40",
-    "hardStopPrice": 0.66,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 777.37,
-      "regime": "bullish",
-      "emaFast": 776.5554,
-      "emaSlow": 776.4837,
-      "breakoutHigh": 777.18,
-      "breakoutLow": 775.14,
-      "volRatio": 3.75,
-      "lastClose": 777.32,
-      "lastVolume": 907065,
-      "barTime": "2026-10-09T14:45:00Z",
-      "entryTimeUTC": "2026-10-09T15:15:33.585Z",
-      "vwapAtEntry": 776.317,
-      "rsiAtEntry": 58.87,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 33.86243386243388,
-    "lastReportedThreshold": 30
-  },
   "AMZN": {
     "active": true,
     "signal": "CALL",
@@ -95,6 +51,7 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 15.09433962264151,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 20,
+    "nearStopWarned": true
   }
 }
