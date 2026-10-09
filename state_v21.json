@@ -6,6 +6,12 @@
       "symbol": "NVDA",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-09",
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -46,14 +52,14 @@
     "signal": "PUT",
     "optionSymbol": "NVDA261009P00232500",
     "strike": "232.5",
-    "entryPremium": 1.98,
+    "entryPremium": 2.0999999999999996,
     "qty": 2,
-    "entryTime": 1791555345851,
+    "entryTime": 1791556066069,
     "level": 230.85,
-    "msgId": 5475,
-    "stopOrderId": "85f58bd4-6b96-4b98-a7a3-cd5ff4c565fc",
-    "hardStopPrice": 1.29,
-    "entryStockPrice": 230.90499999999997,
+    "msgId": 5488,
+    "stopOrderId": "bec6d151-d299-4868-93cc-26c5d2007c4c",
+    "hardStopPrice": 1.36,
+    "entryStockPrice": 230.675,
     "vwapAtEntry": null,
     "rsiAtEntry": 65.18,
     "volumeRatio": 7.954009702233678,
@@ -61,10 +67,6 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.606060606060627,
-    "lastReportedThreshold": 10
+    "slStock": null
   }
 }
