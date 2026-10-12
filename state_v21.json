@@ -81,31 +81,5 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261012P00227500",
-    "strike": "227.5",
-    "entryPremium": 2.12,
-    "qty": 2,
-    "entryTime": 1791815130104,
-    "level": 227.21,
-    "msgId": 5676,
-    "stopOrderId": "919e8c85-0387-4572-8b6d-4b3e1ff1a6e5",
-    "hardStopPrice": 1.38,
-    "entryStockPrice": 225.52499999999998,
-    "vwapAtEntry": 227.9078,
-    "rsiAtEntry": 26.51,
-    "volumeRatio": 8.922062296798579,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 12.499999999999984,
-    "lastReportedThreshold": 10
   }
 }
