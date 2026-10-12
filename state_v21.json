@@ -18,6 +18,12 @@
       "symbol": "AMZN",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-12",
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -75,32 +81,6 @@
     "tp3Stock": null,
     "slStock": null
   },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261012P00227500",
-    "strike": "227.5",
-    "entryPremium": 2.135,
-    "qty": 2,
-    "entryTime": 1791814547496,
-    "level": 227.21,
-    "msgId": 5645,
-    "stopOrderId": "d420c7d1-c791-46a8-b4dc-4becebecd51c",
-    "hardStopPrice": 1.39,
-    "entryStockPrice": 225.58499999999998,
-    "vwapAtEntry": 227.9078,
-    "rsiAtEntry": 26.51,
-    "volumeRatio": 8.922062296798579,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.304449648711953,
-    "lastReportedThreshold": 10
-  },
   "AMZN": {
     "active": true,
     "signal": "PUT",
@@ -123,5 +103,27 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261012P00227500",
+    "strike": "227.5",
+    "entryPremium": 2.12,
+    "qty": 2,
+    "entryTime": 1791815130104,
+    "level": 227.21,
+    "msgId": 5676,
+    "stopOrderId": "5950d4a9-cde6-4e57-9658-a6033ab29284",
+    "hardStopPrice": 1.38,
+    "entryStockPrice": 225.52499999999998,
+    "vwapAtEntry": 227.9078,
+    "rsiAtEntry": 26.51,
+    "volumeRatio": 8.922062296798579,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
