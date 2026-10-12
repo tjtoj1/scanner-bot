@@ -51,8 +51,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 65.94982078853046,
-    "lastReportedThreshold": 60,
+    "peakPct": 78.49462365591398,
+    "lastReportedThreshold": 70,
     "ladder2": true,
     "trailPct": 8
   },
@@ -93,10 +93,10 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 90,
+    "lastReportedThreshold": 110,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 99.45945945945948,
+    "peakPct": 111.89189189189189,
     "ladder2": true,
     "trailPct": 8
   }
