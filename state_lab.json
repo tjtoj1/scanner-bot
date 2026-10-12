@@ -93,10 +93,10 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 110,
+    "lastReportedThreshold": 120,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 111.89189189189189,
+    "peakPct": 128.10810810810813,
     "ladder2": true,
     "trailPct": 8
   }
