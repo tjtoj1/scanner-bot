@@ -1,7 +1,7 @@
 {
-  "_lastDay": "2026-10-09",
+  "_lastDay": "2026-10-12",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-10-09",
+  "_lastComboLearnedDay": "2026-10-12",
   "_cooldowns": {
     "QQQ_CALL": 1791302436539,
     "QQQ_PUT": 1791482536243,
@@ -12,5 +12,5 @@
     "SPY_CALL": 1791567476537,
     "IWM_CALL": 1791570930876
   },
-  "_lastComboLearnedFinal": true
+  "_lastComboLearnedFinal": false
 }

@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-09T20:00:39.257Z"
+      "lastUpdated": "2026-10-12T13:31:59.159Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-09T20:00:39.257Z"
+      "lastUpdated": "2026-10-12T13:31:59.159Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -66,7 +66,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-09T20:00:39.258Z"
+      "lastUpdated": "2026-10-12T13:31:59.160Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -83,7 +83,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-09T20:00:39.258Z"
+      "lastUpdated": "2026-10-12T13:31:59.160Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-09T20:00:39.258Z"
+      "lastUpdated": "2026-10-12T13:31:59.160Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-09T20:00:39.258Z"
+      "lastUpdated": "2026-10-12T13:31:59.160Z"
     }
   },
   "changelog": [
