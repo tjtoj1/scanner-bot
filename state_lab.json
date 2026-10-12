@@ -98,6 +98,7 @@
     "stopPct": 12,
     "peakPct": 148.10810810810807,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   }
 }
