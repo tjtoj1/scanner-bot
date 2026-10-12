@@ -12,12 +12,6 @@
     "AMZN_PUT": 1791816567155
   },
   "_lastComboLearnedFinal": false,
-  "NVDA": {
-    "active": true
-  },
-  "QQQ": {
-    "active": true
-  },
   "SPY": {
     "active": true,
     "signal": "PUT",
@@ -56,5 +50,81 @@
       "sizeMultiplier": 1
     },
     "lastReportedThreshold": -10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ261012P00746000",
+    "strike": "746",
+    "entryPremium": 0.925,
+    "qty": 3,
+    "entryTime": 1791816241846,
+    "msgId": 5766,
+    "stopOrderId": "68fc8c8f-b7ea-41c3-afe5-83276320f6eb",
+    "hardStopPrice": 0.65,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 746.425,
+      "regime": "bearish",
+      "emaFast": 748.5768,
+      "emaSlow": 749.5178,
+      "breakoutHigh": 750.69,
+      "breakoutLow": 747.1,
+      "volRatio": 7.56,
+      "lastClose": 745.91,
+      "lastVolume": 1290158,
+      "barTime": "2026-10-12T14:00:00Z",
+      "entryTimeUTC": "2026-10-12T14:44:01.846Z",
+      "vwapAtEntry": 748.1226,
+      "rsiAtEntry": 25.28,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261012P00227500",
+    "strike": "227.5",
+    "entryPremium": 1.935,
+    "qty": 1,
+    "entryTime": 1791816243081,
+    "msgId": 5767,
+    "stopOrderId": "28e13aaf-ee5f-43a7-a3f2-dcc2aae37e71",
+    "hardStopPrice": 1.35,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 225.785,
+      "regime": "bearish",
+      "emaFast": 227.6117,
+      "emaSlow": 228.3943,
+      "breakoutHigh": 229.07,
+      "breakoutLow": 226.92,
+      "volRatio": 11.26,
+      "lastClose": 225.275,
+      "lastVolume": 6597036,
+      "barTime": "2026-10-12T14:00:00Z",
+      "entryTimeUTC": "2026-10-12T14:44:03.081Z",
+      "vwapAtEntry": 227.1764,
+      "rsiAtEntry": 18.06,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
   }
 }
