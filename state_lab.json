@@ -10,46 +10,8 @@
     "SPY_CALL": 1791567476537,
     "IWM_CALL": 1791570930876,
     "SPY_PUT": 1791818934299,
-    "NVDA_PUT": 1791821853392
+    "NVDA_PUT": 1791821853392,
+    "AMZN_PUT": 1791828982045
   },
-  "_lastComboLearnedFinal": false,
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN261012P00260000",
-    "strike": "260",
-    "entryPremium": 0.815,
-    "qty": 3,
-    "entryTime": 1791824447020,
-    "msgId": 5802,
-    "stopOrderId": null,
-    "hardStopPrice": 0.57,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 259.495,
-      "regime": "bearish",
-      "emaFast": 260.8616,
-      "emaSlow": 261.3756,
-      "breakoutHigh": 261.74,
-      "breakoutLow": 260.11,
-      "volRatio": 1.62,
-      "lastClose": 259.68,
-      "lastVolume": 826357,
-      "barTime": "2026-10-12T16:30:00Z",
-      "entryTimeUTC": "2026-10-12T17:00:47.020Z",
-      "vwapAtEntry": 261.4525,
-      "rsiAtEntry": 31.03,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -10
-  }
+  "_lastComboLearnedFinal": false
 }
