@@ -50,9 +50,11 @@
       "sizeMultiplier": 1
     },
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 22.939068100358412,
-    "lastReportedThreshold": 20
+    "stopPct": 12,
+    "peakPct": 26.523297491039433,
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "trailPct": 8
   },
   "NVDA": {
     "active": true,
@@ -91,10 +93,10 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 30.270270270270274,
+    "peakPct": 49.7297297297297,
     "ladder2": true,
     "trailPct": 8
   }
