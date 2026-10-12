@@ -69,7 +69,7 @@
     "entryTime": 1791814545475,
     "level": 778.675,
     "msgId": 5644,
-    "stopOrderId": "b5f0065b-9336-45f0-8491-e68ffdfd9443",
+    "stopOrderId": "8c3ed2d5-d1ad-4fbd-b96f-8f990f39338c",
     "hardStopPrice": 0.53,
     "entryStockPrice": 778.045,
     "vwapAtEntry": 778.9194,
@@ -79,7 +79,11 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.950920245398775,
+    "lastReportedThreshold": 10
   },
   "AMZN": {
     "active": true,
