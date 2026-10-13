@@ -24,7 +24,7 @@
     "qty": 2,
     "entryTime": 1791901841726,
     "msgId": 5868,
-    "stopOrderId": "cff55996-a93f-48d4-9f85-d5b3c30f06a1",
+    "stopOrderId": "6c1263be-add6-47f9-8aea-c65d8c785c98",
     "hardStopPrice": 0.79,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -52,6 +52,9 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.111111111111105
   }
 }
