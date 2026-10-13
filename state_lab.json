@@ -17,14 +17,14 @@
   "TSLA": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "TSLA261014P00372500",
-    "strike": "372.5",
-    "entryPremium": 3.5549999999999997,
+    "optionSymbol": "TSLA261014P00377500",
+    "strike": "377.5",
+    "entryPremium": 6.78,
     "qty": 1,
-    "entryTime": 1791898262460,
-    "msgId": 5821,
-    "stopOrderId": "42c2f357-2368-411b-8391-6bb13097b6cb",
-    "hardStopPrice": 2.49,
+    "entryTime": 1791898479415,
+    "msgId": 5825,
+    "stopOrderId": "5971f54b-614c-4a81-b030-d09686816556",
+    "hardStopPrice": 4.75,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -33,7 +33,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 371.19,
+      "spot": 377.44,
       "regime": "bearish",
       "emaFast": 374.4452,
       "emaSlow": 374.9813,
@@ -43,17 +43,13 @@
       "lastClose": 373.5,
       "lastVolume": 55143,
       "barTime": "2026-10-13T13:00:00Z",
-      "entryTimeUTC": "2026-10-13T13:31:02.460Z",
+      "entryTimeUTC": "2026-10-13T13:34:39.415Z",
       "vwapAtEntry": 374.6587,
       "rsiAtEntry": 29.26,
       "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
+      "positionBucket": "near_high",
+      "comboKey": "PUT|position:near_high",
       "sizeMultiplier": 1
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.330520393811534,
-    "lastReportedThreshold": 10
+    }
   }
 }
