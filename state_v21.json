@@ -59,33 +59,6 @@
     }
   },
   "_cooldowns": {},
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261013P00277000",
-    "strike": "277",
-    "entryPremium": 0.745,
-    "qty": 6,
-    "entryTime": 1791900903746,
-    "level": 277.32,
-    "msgId": 5841,
-    "stopOrderId": null,
-    "hardStopPrice": 0.48,
-    "entryStockPrice": 276.68,
-    "vwapAtEntry": 277.907,
-    "rsiAtEntry": 28.43,
-    "volumeRatio": 10.851120974166383,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.067114093959741,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
-  },
   "AMZN": {
     "active": true,
     "signal": "CALL",
@@ -130,6 +103,6 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
