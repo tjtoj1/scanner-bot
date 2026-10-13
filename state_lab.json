@@ -56,5 +56,43 @@
     "stopPct": 5,
     "peakPct": 16.770186335403714,
     "lastReportedThreshold": 10
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA261014C00227500",
+    "strike": "227.5",
+    "entryPremium": 1.125,
+    "qty": 2,
+    "entryTime": 1791901841726,
+    "msgId": 5868,
+    "stopOrderId": "cff55996-a93f-48d4-9f85-d5b3c30f06a1",
+    "hardStopPrice": 0.79,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 225.505,
+      "regime": "bullish",
+      "emaFast": 224.9536,
+      "emaSlow": 224.8407,
+      "breakoutHigh": 225.63,
+      "breakoutLow": 222.6,
+      "volRatio": 6,
+      "lastClose": 226.08,
+      "lastVolume": 4338328,
+      "barTime": "2026-10-13T14:00:00Z",
+      "entryTimeUTC": "2026-10-13T14:30:41.726Z",
+      "vwapAtEntry": 224.9491,
+      "rsiAtEntry": 64.22,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    }
   }
 }
