@@ -50,7 +50,7 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
@@ -89,7 +89,7 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   },
   "AMZN": {
     "active": true,
@@ -128,6 +128,7 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   }
 }
