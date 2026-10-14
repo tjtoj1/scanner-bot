@@ -13,47 +13,5 @@
     "TSLA_PUT": 1791988681511,
     "SPY_PUT": 1791990996505
   },
-  "_lastComboLearnedFinal": true,
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261014P00225000",
-    "strike": "225",
-    "entryPremium": 1.63,
-    "qty": 1,
-    "entryTime": 1791989125237,
-    "msgId": 5989,
-    "stopOrderId": "73dd9467-ef94-4d26-bfca-02b34df582e9",
-    "hardStopPrice": 1.14,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 223.865,
-      "regime": "bearish",
-      "emaFast": 225.4018,
-      "emaSlow": 226.5904,
-      "breakoutHigh": 228.36,
-      "breakoutLow": 224.24,
-      "volRatio": 4.12,
-      "lastClose": 224.04,
-      "lastVolume": 3587094,
-      "barTime": "2026-10-14T14:15:00Z",
-      "entryTimeUTC": "2026-10-14T14:45:25.237Z",
-      "vwapAtEntry": 225.1334,
-      "rsiAtEntry": 23.38,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.030674846625775
-  }
+  "_lastComboLearnedFinal": true
 }
