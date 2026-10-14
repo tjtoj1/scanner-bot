@@ -111,7 +111,8 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 19.718309859154935,
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
