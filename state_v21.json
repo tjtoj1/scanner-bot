@@ -71,7 +71,7 @@
     "entryTime": 1791987363022,
     "level": 774.47,
     "msgId": 5940,
-    "stopOrderId": "1dfdf18a-503a-4a64-b0a9-b4738fe94294",
+    "stopOrderId": "4f553942-0488-4829-84cf-305f6d5dc409",
     "hardStopPrice": 0.71,
     "entryStockPrice": 773.39,
     "vwapAtEntry": null,
@@ -81,7 +81,11 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 17.511520737327185,
+    "lastReportedThreshold": 10
   },
   "QQQ": {
     "active": true,
@@ -93,7 +97,7 @@
     "entryTime": 1791987364076,
     "level": 736.67,
     "msgId": 5941,
-    "stopOrderId": "8dc2b4ad-24e7-4da7-9f67-3681d61a243c",
+    "stopOrderId": "e80d3d68-d642-4437-86bb-f40695c099ee",
     "hardStopPrice": 1.15,
     "entryStockPrice": 737.04,
     "vwapAtEntry": null,
@@ -103,7 +107,11 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.718309859154935,
+    "lastReportedThreshold": 10
   },
   "IWM": {
     "active": true,
@@ -115,7 +123,7 @@
     "entryTime": 1791987365284,
     "level": 273.17,
     "msgId": 5942,
-    "stopOrderId": "9cf90e9a-0d53-4f23-9eab-14b1dddffe78",
+    "stopOrderId": "33c2850e-5a74-479d-a919-80ea759f2591",
     "hardStopPrice": 0.38,
     "entryStockPrice": 273.045,
     "vwapAtEntry": null,
@@ -125,7 +133,11 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 19.82758620689655,
+    "lastReportedThreshold": 10
   },
   "TSLA": {
     "active": true,
@@ -137,7 +149,7 @@
     "entryTime": 1791987367389,
     "level": 367.22,
     "msgId": 5943,
-    "stopOrderId": "3a4f0da5-e7a9-4293-bc25-e14d38ba2b6b",
+    "stopOrderId": "9c7643ac-aebc-45b3-bff6-b223f7007edd",
     "hardStopPrice": 1.19,
     "entryStockPrice": 368.34000000000003,
     "vwapAtEntry": null,
@@ -147,6 +159,10 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 14.168937329700263,
+    "lastReportedThreshold": 10
   }
 }
