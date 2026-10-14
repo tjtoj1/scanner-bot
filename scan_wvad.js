@@ -206,6 +206,30 @@ function stopOrderIdOrNull(label, raw) {
   return null;
 }
 
+// Entry path only. Alpaca rejects a sell stop sent while our own market
+// buy for the same contract is still open (code 40310000, "potential
+// wash trade detected"). That rejection means NO order was created, so
+// one retry after 2s cannot leave two sell orders. A thrown error
+// (network/timeout) or any other code is never retried — the order may
+// exist. If the retry is rejected too, both bodies go to stdout only;
+// the reconcile 🛑 alert covers the missing stop.
+const WASH_TRADE_CODE = 40310000;
+const ENTRY_STOP_RETRY_MS = 2000;
+async function postEntryStop(body) {
+  const first = await alpaca("/orders", "POST", body);
+  if (first?.id || first?.code !== WASH_TRADE_CODE) return first;
+  await new Promise(r => setTimeout(r, ENTRY_STOP_RETRY_MS));
+  let second;
+  try { second = await alpaca("/orders", "POST", body); }
+  catch (e) { console.log(`${body.symbol}: entry stop retry THREW after wash-trade reject. first=${brief(first)}`); throw e; }
+  if (!second?.id) {
+    console.log(`${body.symbol}: entry stop retry failed. first=${brief(first)} second=${brief(second)}`);
+  } else {
+    console.log(`${body.symbol}: entry stop placed on RETRY after wash-trade reject (order ${second.id})`);
+  }
+  return second;
+}
+
 // Paginated bar fetch. v21 uses limit=100 and silently truncates; this
 // one follows next_page_token so the WVAD warm-up is never starved.
 async function getBars(symbol, tf = BAR_TF, daysBack = BARS_DAYS_BACK) {
@@ -758,13 +782,13 @@ async function scanEntry(state, symbol, liveInAlpaca) {
   const hardStopPrice = +(opt.premium * (1 + HARD_STOP_PCT / 100)).toFixed(2);
   let stopOrderId = null;
   try {
-    const stopOrder = await alpaca("/orders", "POST", {
+    const stopOrder = await postEntryStop({
       symbol: opt.symbol, qty: String(qty), side: "sell",
       type: "stop", time_in_force: "day",
       stop_price: String(Math.max(0.01, hardStopPrice))
     });
     stopOrderId = stopOrderIdOrNull(`${symbol} entry stop`, stopOrder);
-    console.log(`${symbol}: hard stop placed @ $${hardStopPrice.toFixed(2)} (order ${stopOrderId})`);
+    if (stopOrderId) console.log(`${symbol}: hard stop placed @ $${hardStopPrice.toFixed(2)} (order ${stopOrderId})`);
   } catch (e) { console.error(`${symbol}: stop order THREW (network/timeout, not a rejection):`, e.message); }
 
   const slStock = sig.signal === "CALL"
