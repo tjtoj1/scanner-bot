@@ -50,5 +50,87 @@
       "sizeMultiplier": 1
     },
     "lastReportedThreshold": -20
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261014P00769000",
+    "strike": "769",
+    "entryPremium": 0.965,
+    "qty": 3,
+    "entryTime": 1791995439780,
+    "msgId": 6068,
+    "stopOrderId": "49082486-610d-4f14-a0ae-9b52b0cadadb",
+    "hardStopPrice": 0.68,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 769.4749999999999,
+      "regime": "bearish",
+      "emaFast": 771.6811,
+      "emaSlow": 773.9022,
+      "breakoutHigh": 776.35,
+      "breakoutLow": 770.3601,
+      "volRatio": 1.83,
+      "lastClose": 769.36,
+      "lastVolume": 1473216,
+      "barTime": "2026-10-14T16:00:00Z",
+      "entryTimeUTC": "2026-10-14T16:30:39.780Z",
+      "vwapAtEntry": 773.0275,
+      "rsiAtEntry": 17.01,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ261014P00730000",
+    "strike": "730",
+    "entryPremium": 1.585,
+    "qty": 1,
+    "entryTime": 1791995440747,
+    "msgId": 6069,
+    "stopOrderId": null,
+    "hardStopPrice": 1.11,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 730.04,
+      "regime": "bearish",
+      "emaFast": 733.9716,
+      "emaSlow": 736.8733,
+      "breakoutHigh": 740.53,
+      "breakoutLow": 732.03,
+      "volRatio": 1.71,
+      "lastClose": 730.23,
+      "lastVolume": 1484974,
+      "barTime": "2026-10-14T16:00:00Z",
+      "entryTimeUTC": "2026-10-14T16:30:40.747Z",
+      "vwapAtEntry": 736.0987,
+      "rsiAtEntry": 18.64,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
+  },
+  "_noStopAlerted": {
+    "day": "2026-10-14",
+    "symbols": [
+      "QQQ"
+    ]
   }
 }
