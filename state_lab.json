@@ -49,10 +49,10 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 35.83815028901732,
+    "peakPct": 45.086705202312125,
     "ladder2": true,
     "trailPct": 8
   },
@@ -95,8 +95,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 86.1924686192469,
-    "lastReportedThreshold": 80,
+    "peakPct": 97.90794979079503,
+    "lastReportedThreshold": 90,
     "nearStopWarned": true,
     "ladder2": true,
     "trailPct": 8
@@ -140,7 +140,7 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 80.25889967637542,
+    "peakPct": 81.22977346278317,
     "lastReportedThreshold": 80,
     "ladder2": true,
     "trailPct": 8
