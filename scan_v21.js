@@ -173,6 +173,45 @@ async function getOwnedQty(optionSymbol) {
   }
 }
 
+// ─── STOP-ORDER ACCEPTANCE CHECK (detection only) ────────────
+// alpaca() deliberately does not check res.ok — it returns the parsed
+// body whatever the status, and getOwnedQty() above depends on that
+// (it reads code 40410000 out of a 404 body to mean "flat"). The side
+// effect is that a REJECTED stop order (422/403) arrives as an ordinary
+// object with no `id`, throws nothing, and the old `stopOrder.id || null`
+// recorded it as "no stop" indistinguishably from a network failure —
+// silently, with no way afterwards to tell which happened or why.
+//
+// These two helpers only inspect a response that was already fetched.
+// They place no order, make no network call, and never throw. The POST
+// call sites are untouched; only the line that extracts the id changes.
+
+// Response body for the log, bounded. stdout only — never written to any
+// file that gets committed, so nothing from the broker reaches the repo.
+function brief(x, max = 500) {
+  let s;
+  try { s = typeof x === "string" ? x : JSON.stringify(x); } catch { s = String(x); }
+  if (s == null) return "(empty)";
+  return s.length > max ? s.slice(0, max) + `…[+${s.length - max} chars]` : s;
+}
+
+// Returns the order id, or null with the reason logged. Same return
+// contract as the `stopOrder.id || null` it replaces.
+function stopOrderIdOrNull(label, raw) {
+  const id = raw && typeof raw === "object" ? raw.id : null;
+  if (id) return id;
+  console.error(`${label}: stop order REJECTED — no id in response. body=${brief(raw)}`);
+  return null;
+}
+
+// A broker timestamp, kept only if it really parses as one. Recorded for
+// analysis; never compared against in any decision, so a null is harmless.
+function isoOrNull(v) {
+  if (!v) return null;
+  const t = new Date(v).getTime();
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
+}
+
 // ─── TA2: the exit price the broker actually filled at ───────
 // The reconcile path only ever knew a market quote sampled when it
 // noticed the position was gone; the stop had already filled, earlier,
@@ -194,7 +233,7 @@ async function getOwnedQty(optionSymbol) {
 const FILL_LOOKUP_TIMEOUT_MS = 6000;
 
 async function getExitFill(pos) {
-  const miss = source => ({ price: null, confirmed: false, source });
+  const miss = source => ({ price: null, confirmed: false, source, filledAt: null });
   // entryTime is set as Date.now() — a number (see state[symbol] in
   // scanEntry). Normalised anyway: were it ever an ISO string, the raw
   // `>= pos.entryTime` comparison below would evaluate to NaN >= … and
@@ -212,13 +251,13 @@ async function getExitFill(pos) {
       if (o?.status === "filled" && Number.isFinite(px) && px > 0) {
         const fq = parseFloat(o.filled_qty);
         if (Number.isFinite(fq) && fq === pos.qty) {
-          return { price: px, confirmed: true, source: "stop_order" };
+          return { price: px, confirmed: true, source: "stop_order", filledAt: isoOrNull(o.filled_at) };
         }
         // Filled, but not for the quantity we think we held. Report the
         // price and refuse to call it confirmed rather than quietly
         // pricing a different size than the one pnl is computed on.
         console.warn(`${pos.optionSymbol}: stop order filled ${fq} but local qty ${pos.qty} — not confirmed`);
-        return { price: px, confirmed: false, source: "stop_order_qty_mismatch" };
+        return { price: px, confirmed: false, source: "stop_order_qty_mismatch", filledAt: isoOrNull(o.filled_at) };
       }
       console.log(`${pos.optionSymbol}: stop order ${pos.stopOrderId} status=${o?.status ?? "?"} — trying layer 2`);
     } catch (e) {
@@ -248,13 +287,18 @@ async function getExitFill(pos) {
     }
     const qty = mine.reduce((a, f) => a + parseFloat(f.qty), 0);
     const notional = mine.reduce((a, f) => a + parseFloat(f.price) * parseFloat(f.qty), 0);
+    // The newest of the matched fills: when a stop fills in several
+    // prints, that is the moment the position actually went flat.
+    const lastFillAt = isoOrNull(mine.reduce((a, f) =>
+      new Date(f.transaction_time).getTime() > new Date(a).getTime() ? f.transaction_time : a,
+      mine[0].transaction_time));
     if (!Number.isFinite(qty) || qty <= 0 || !Number.isFinite(notional)) return miss("none");
     const px = +(notional / qty).toFixed(4);
     if (qty !== pos.qty) {
       console.warn(`${pos.optionSymbol}: fills total ${qty} but local qty ${pos.qty} — not confirmed`);
-      return { price: px, confirmed: false, source: "fill_activity_qty_mismatch" };
+      return { price: px, confirmed: false, source: "fill_activity_qty_mismatch", filledAt: lastFillAt };
     }
-    return { price: px, confirmed: true, source: "fill_activity" };
+    return { price: px, confirmed: true, source: "fill_activity", filledAt: lastFillAt };
   } catch (e) {
     console.warn(`${pos.optionSymbol}: activities lookup failed (${e.message}) — no confirmed price`);
     return miss("none");
@@ -498,6 +542,29 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, 
       exitFillPrice: exitFill?.price ?? null,
       exitPriceConfirmed: exitFill ? exitFill.confirmed : null,
       exitFillSource: exitFill?.source ?? null,
+      // When the broker actually filled, from the order's own filled_at
+      // (or the newest matched FILL activity). exitTime above is when
+      // reconciliation NOTICED — up to a full cycle later, and on 10-12
+      // AMZN that gap was ~16 minutes. Analysis only; null on every
+      // local exit path, which never looks a fill up.
+      exitFilledAt: exitFill?.filledAt ?? null,
+      // Stop-order provenance. Which stop was actually protecting the
+      // position at exit could not be answered from this file before —
+      // reconstructing it needed 373 revisions of state_v21.json. Pure
+      // record: nothing here is read by any trading decision.
+      //   ladder1/2 → whether a profit ladder had fired
+      //   stopPct   → the floor in force (5 after ladder 1, 10 after 2)
+      //   peakPct   → highest pnlPct any monitor cycle SAMPLED, not the
+      //               market's true peak
+      //   stopOrderIdAtExit → null here means the position was running
+      //               with no broker-side stop at all
+      ladder1: pos.ladder1 === true,
+      ladder2: pos.ladder2 === true,
+      stopPct: pos.stopPct ?? null,
+      trailPct: pos.trailPct ?? null,
+      peakPct: typeof pos.peakPct === "number" ? +pos.peakPct.toFixed(1) : null,
+      stopOrderIdAtExit: pos.stopOrderId ?? null,
+      hardStopPrice: pos.hardStopPrice ?? null,
     };
     fs.appendFileSync("outcomes_v21.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
@@ -640,9 +707,9 @@ async function updateStopOrder(pos, newStopPrice) {
       type: "stop", time_in_force: "day",
       stop_price: String(Math.max(0.01, newStopPrice))
     });
-    pos.stopOrderId = stopOrder.id || null;
+    pos.stopOrderId = stopOrderIdOrNull(`${pos.optionSymbol} ladder stop`, stopOrder);
     console.log(`New stop placed @ $${newStopPrice.toFixed(2)} (order ${pos.stopOrderId})`);
-  } catch(e) { console.error("updateStopOrder failed:", e.message); }
+  } catch(e) { console.error("updateStopOrder THREW (network/timeout, not a rejection):", e.message); }
 }
 
 // ─── PROGRESS BAR ────────────────────────────────────────────
@@ -914,9 +981,9 @@ ${slLine}`);
       type: "stop", time_in_force: "day",
       stop_price: String(Math.max(0.01, hardStopPrice))
     });
-    stopOrderId = stopOrder.id || null;
+    stopOrderId = stopOrderIdOrNull(`${symbol} entry stop`, stopOrder);
     console.log(`${symbol}: hard stop placed @ $${hardStopPrice.toFixed(2)} (order ${stopOrderId})`);
-  } catch(e) { console.error(`${symbol}: stop order failed:`, e.message); }
+  } catch(e) { console.error(`${symbol}: stop order THREW (network/timeout, not a rejection):`, e.message); }
 
   state[symbol] = {
     active: true, signal: breakout.signal,
@@ -963,6 +1030,7 @@ ${slLine}`);
 
   // Reconcile with Alpaca
   const liveInAlpaca = new Set();
+  const unprotected = [];   // live at Alpaca, tracked locally, no stop order id
   try {
     const positions = await alpaca("/positions");
     if (Array.isArray(positions)) {
@@ -976,7 +1044,30 @@ ${slLine}`);
           }
           if (!state[sym].optionSymbol || !state[sym].entryPremium) {
             await tg(`⚠️ <b>${sym}</b>: صفقة نشطة في Alpaca (${pos.symbol}) لكن بيانات المتابعة المحلية ناقصة — تحتاج مراجعة يدوية.`, null);
+          } else if (!state[sym].stopOrderId) {
+            // Alpaca itself confirms this position is open, and we hold
+            // no stop order id for it: nothing is protecting it
+            // broker-side. Detection only — placing a replacement is
+            // deliberately NOT done here.
+            unprotected.push(sym);
           }
+        }
+      }
+      // One alert per position per day, aggregated into a single message.
+      // The flag MUST live in the state file, not memory: this script is a
+      // short-lived child respawned twice a bot per 60s cycle, so an
+      // in-memory guard (as in runner.js alertOnce) would re-send roughly
+      // 390 times a day. Saved BEFORE the send, so a watchdog kill mid-send
+      // costs one missed alert rather than a daily flood.
+      if (unprotected.length) {
+        const todayKey = getToday();
+        const seen = state._noStopAlerted?.day === todayKey
+          ? (state._noStopAlerted.symbols || []) : [];
+        const fresh = unprotected.filter(s => !seen.includes(s));
+        if (fresh.length) {
+          state._noStopAlerted = { day: todayKey, symbols: [...seen, ...fresh] };
+          saveState(state);
+          await tg(`🛑 <b>v21: مركز بلا وقف عند الوسيط</b>\n${fresh.map(s => `${s} (${state[s].optionSymbol})`).join("\n")}\nالمركز مؤكَّد في Alpaca ولا يوجد أمر وقف محفوظ له — يحتاج مراجعة يدوية.`, null);
         }
       }
       for (const sym of TICKERS) {
