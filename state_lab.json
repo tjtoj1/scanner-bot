@@ -54,7 +54,8 @@
     "stopPct": 12,
     "peakPct": 27.683615819209027,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "NVDA": {
     "active": true,
