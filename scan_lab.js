@@ -169,6 +169,36 @@ async function getOwnedQty(optionSymbol) {
   }
 }
 
+// ─── STOP-ORDER ACCEPTANCE CHECK (detection only) ────────────
+// alpaca() deliberately does not check res.ok — it returns the parsed
+// body whatever the status, and getOwnedQty() above depends on that.
+// The side effect is that a REJECTED stop order (422/403) arrives as an
+// ordinary object with no `id`, throws nothing, and the old
+// `stopOrder.id || null` recorded it as "no stop" indistinguishably from
+// a network failure — silently, and in this file with no log line at all.
+//
+// These helpers only inspect a response that was already fetched. They
+// place no order, make no network call, and never throw. The POST call
+// sites are untouched; only the line that extracts the id changes.
+
+// Response body for the log, bounded. stdout only — never written to any
+// file that gets committed, so nothing from the broker reaches the repo.
+function brief(x, max = 500) {
+  let s;
+  try { s = typeof x === "string" ? x : JSON.stringify(x); } catch { s = String(x); }
+  if (s == null) return "(empty)";
+  return s.length > max ? s.slice(0, max) + `…[+${s.length - max} chars]` : s;
+}
+
+// Returns the order id, or null with the reason logged. Same return
+// contract as the `stopOrder.id || null` it replaces.
+function stopOrderIdOrNull(label, raw) {
+  const id = raw && typeof raw === "object" ? raw.id : null;
+  if (id) return id;
+  console.error(`${label}: stop order REJECTED — no id in response. body=${brief(raw)}`);
+  return null;
+}
+
 async function getBars(symbol, tf = "15Min", daysBack = 5) {
   try {
     const start = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
@@ -371,6 +401,23 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) 
       // Exit-snapshot indicator, for the weekly deep-dive analysis —
       // null on any trade closed before this field existed.
       exitStockPrice: exitStockPrice ?? null,
+      // Stop-order provenance. Which stop was actually protecting the
+      // position at exit could not be answered from this file before —
+      // reconstructing it needed 958 revisions of state_lab.json. Pure
+      // record: nothing here is read by any trading decision.
+      //   ladder1/2 → whether a profit ladder had fired
+      //   stopPct   → the floor in force (takeProfit1/2LockPct)
+      //   peakPct   → highest pnlPct any monitor cycle SAMPLED, not the
+      //               market's true peak
+      //   stopOrderIdAtExit → null here means the position was running
+      //               with no broker-side stop at all
+      ladder1: pos.ladder1 === true,
+      ladder2: pos.ladder2 === true,
+      stopPct: pos.stopPct ?? null,
+      trailPct: pos.trailPct ?? null,
+      peakPct: typeof pos.peakPct === "number" ? +pos.peakPct.toFixed(1) : null,
+      stopOrderIdAtExit: pos.stopOrderId ?? null,
+      hardStopPrice: pos.hardStopPrice ?? null,
     };
     fs.appendFileSync("outcomes_lab.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
@@ -518,8 +565,9 @@ async function updateStopOrder(pos, newStopPrice) {
       symbol: pos.optionSymbol, qty: String(stopQty), side: "sell",
       type: "stop", time_in_force: "day", stop_price: String(Math.max(0.01, newStopPrice))
     });
-    pos.stopOrderId = stopOrder.id || null;
-  } catch (e) { console.error("updateStopOrder failed:", e.message); }
+    pos.stopOrderId = stopOrderIdOrNull(`${pos.optionSymbol} ladder stop`, stopOrder);
+    console.log(`${pos.optionSymbol}: new stop @ $${newStopPrice.toFixed(2)} (order ${pos.stopOrderId})`);
+  } catch (e) { console.error("updateStopOrder THREW (network/timeout, not a rejection):", e.message); }
 }
 
 // ─── MONITOR OPEN POSITION ──────────────────────────────────
@@ -680,8 +728,9 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca) {
       symbol: opt.symbol, qty: String(qty), side: "sell", type: "stop",
       time_in_force: "day", stop_price: String(Math.max(0.01, hardStopPrice))
     });
-    stopOrderId = stopOrder.id || null;
-  } catch (e) { console.error(`${symbol}: stop order failed:`, e.message); }
+    stopOrderId = stopOrderIdOrNull(`${symbol} entry stop`, stopOrder);
+    console.log(`${symbol}: hard stop placed @ $${hardStopPrice.toFixed(2)} (order ${stopOrderId})`);
+  } catch (e) { console.error(`${symbol}: stop order THREW (network/timeout, not a rejection):`, e.message); }
 
   const msgId = await tg(`<b>${symbol} ${sig.signal} $${opt.strike}</b> (exp ${opt.expiry})\n💰 $${opt.premium.toFixed(2)} × ${qty} = $${(opt.premium*qty*100).toFixed(0)}\nنظام: ${strategy.name} | نطاق: ${sig.regime} | حجم×${sig.volRatio.toFixed(2)}`);
 
@@ -1394,6 +1443,7 @@ async function runComboLearning(state, strategy) {
 
   // Reconcile with Alpaca
   const liveInAlpaca = new Set();
+  const unprotected = [];   // live at Alpaca, tracked locally, no stop order id
   try {
     const positions = await alpaca("/positions");
     if (Array.isArray(positions)) {
@@ -1405,7 +1455,30 @@ async function runComboLearning(state, strategy) {
           if (!state[sym]?.active) state[sym] = { ...state[sym], active: true };
           if (!state[sym].optionSymbol || !state[sym].entryPremium) {
             await tg(`⚠️ <b>${sym}</b>: صفقة نشطة في Alpaca (${p.symbol}) لكن بيانات المتابعة المحلية ناقصة — تحتاج مراجعة يدوية.`, null);
+          } else if (!state[sym].stopOrderId) {
+            // Alpaca itself confirms this position is open, and we hold no
+            // stop order id for it: nothing is protecting it broker-side.
+            // Detection only — placing a replacement is deliberately NOT
+            // done here.
+            unprotected.push(sym);
           }
+        }
+      }
+      // One alert per position per day, aggregated into a single message.
+      // The flag MUST live in the state file, not memory: this script is a
+      // short-lived child respawned twice a bot per 60s cycle, so an
+      // in-memory guard (as in runner.js alertOnce) would re-send roughly
+      // 390 times a day. Saved BEFORE the send, so a watchdog kill mid-send
+      // costs one missed alert rather than a daily flood.
+      if (unprotected.length) {
+        const todayKey = getToday();
+        const seen = state._noStopAlerted?.day === todayKey
+          ? (state._noStopAlerted.symbols || []) : [];
+        const fresh = unprotected.filter(x => !seen.includes(x));
+        if (fresh.length) {
+          state._noStopAlerted = { day: todayKey, symbols: [...seen, ...fresh] };
+          saveState(state);
+          await tg(`🛑 <b>LAB: مركز بلا وقف عند الوسيط</b>\n${fresh.map(x => `${x} (${state[x].optionSymbol})`).join("\n")}\nالمركز مؤكَّد في Alpaca ولا يوجد أمر وقف محفوظ له — يحتاج مراجعة يدوية.`, null);
         }
       }
       for (const sym of ALLOWED_TICKERS) {
