@@ -18,6 +18,12 @@
       "symbol": "AMZN",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-15",
+      "symbol": "IWM",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -100,5 +106,27 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM261015C00273000",
+    "strike": "273",
+    "entryPremium": 0.775,
+    "qty": 6,
+    "entryTime": 1792075066313,
+    "level": 272.1,
+    "msgId": 6151,
+    "stopOrderId": "dfb38532-ce1b-4f54-a5a0-af6fc65a2572",
+    "hardStopPrice": 0.5,
+    "entryStockPrice": 273.12,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 45.35,
+    "volumeRatio": 10.698591333515317,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
