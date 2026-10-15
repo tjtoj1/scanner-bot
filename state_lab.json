@@ -30,7 +30,7 @@
     "qty": 1,
     "entryTime": 1792071952936,
     "msgId": 6113,
-    "stopOrderId": "b28fb0e0-f9dd-4df7-8d82-7796380e3b50",
+    "stopOrderId": "e80c78a2-d64e-4cab-be39-38aef8975828",
     "hardStopPrice": 1.82,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -58,9 +58,11 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.961538461538483
+    "stopPct": 12,
+    "peakPct": 32.50000000000003,
+    "ladder2": true,
+    "trailPct": 8
   }
 }
