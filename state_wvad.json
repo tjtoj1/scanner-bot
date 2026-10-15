@@ -1,6 +1,13 @@
 {
   "_lastDay": "2026-10-15",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-10-15",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "_cooldowns": {
     "SPY_PUT": "2026-10-13T15:48:15.447Z"
   }
