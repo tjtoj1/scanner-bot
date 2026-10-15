@@ -85,7 +85,8 @@
     "stopPct": 10,
     "peakPct": 28.516228748068013,
     "ladder2": true,
-    "trailPct": 10
+    "trailPct": 10,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
@@ -108,11 +109,12 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 20,
     "ladder1": true,
     "stopPct": 10,
     "peakPct": 31.89066059225511,
     "ladder2": true,
-    "trailPct": 10
+    "trailPct": 10,
+    "nearStopWarned": true
   }
 }
