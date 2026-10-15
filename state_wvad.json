@@ -6,9 +6,16 @@
       "symbol": "QQQ",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-15",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
-    "SPY_PUT": "2026-10-13T15:48:15.447Z"
+    "SPY_PUT": "2026-10-13T15:48:15.447Z",
+    "QQQ_PUT": "2026-10-15T13:47:14.498Z"
   }
 }
