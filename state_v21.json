@@ -6,6 +6,18 @@
       "symbol": "TSLA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-15",
+      "symbol": "IWM",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-15",
+      "symbol": "AMZN",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -65,5 +77,49 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM261015C00273000",
+    "strike": "273",
+    "entryPremium": 0.525,
+    "qty": 9,
+    "entryTime": 1792074633406,
+    "level": 272.1,
+    "msgId": 6135,
+    "stopOrderId": "7c75c8d0-441e-4cea-ac1c-7b637506ac65",
+    "hardStopPrice": 0.34,
+    "entryStockPrice": 272.59000000000003,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 45.35,
+    "volumeRatio": 10.698591333515317,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN261016C00252500",
+    "strike": "252.5",
+    "entryPremium": 2.1950000000000003,
+    "qty": 2,
+    "entryTime": 1792074634741,
+    "level": 250.89,
+    "msgId": 6136,
+    "stopOrderId": "67a9a75d-9c41-40a6-a39d-d364d07aed8d",
+    "hardStopPrice": 1.43,
+    "entryStockPrice": 252.565,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 36.33,
+    "volumeRatio": 5.767424871420768,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
