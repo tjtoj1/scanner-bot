@@ -58,9 +58,7 @@
       "low": 248.65
     }
   },
-  "_cooldowns": {
-    "QQQ_CALL": "2026-10-13T14:31:54.826Z"
-  },
+  "_cooldowns": {},
   "TSLA": {
     "active": true,
     "signal": "CALL",
@@ -71,7 +69,7 @@
     "entryTime": 1792071948696,
     "level": 360.595,
     "msgId": 6112,
-    "stopOrderId": "359c6844-c1be-4420-828c-6231b8042098",
+    "stopOrderId": "895482d6-13c5-427f-806f-cb2d9c262df5",
     "hardStopPrice": 4.21,
     "entryStockPrice": 356.885,
     "vwapAtEntry": null,
@@ -82,10 +80,12 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 13.755795981452854
+    "stopPct": 10,
+    "peakPct": 22.024729520865517,
+    "ladder2": true,
+    "trailPct": 10
   },
   "AMZN": {
     "active": true,
