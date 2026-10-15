@@ -56,7 +56,7 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -97,8 +97,8 @@
     },
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 39.60396039603962,
-    "lastReportedThreshold": 30,
+    "peakPct": 55.44554455445545,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "trailPct": 8
   },
