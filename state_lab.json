@@ -55,7 +55,8 @@
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": 10
   },
   "AMZN": {
     "active": true,
@@ -99,6 +100,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 27.027027027027025
+    "peakPct": 27.027027027027025,
+    "nearStopWarned": true
   }
 }
