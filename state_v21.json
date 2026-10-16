@@ -1,6 +1,66 @@
 {
   "_lastDay": "2026-10-16",
-  "_dailyTrades": [],
-  "range": {},
-  "_cooldowns": {}
+  "_dailyTrades": [
+    {
+      "day": "2026-10-16",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
+  "range": {
+    "SPY": {
+      "day": "2026-10-16",
+      "high": 773.25,
+      "low": 771.07
+    },
+    "QQQ": {
+      "day": "2026-10-16",
+      "high": 725.96,
+      "low": 721.38
+    },
+    "IWM": {
+      "day": "2026-10-16",
+      "high": 275.91,
+      "low": 275.03
+    },
+    "NVDA": {
+      "day": "2026-10-16",
+      "high": 216.8,
+      "low": 215.07
+    },
+    "TSLA": {
+      "day": "2026-10-16",
+      "high": 370.5799,
+      "low": 364.1501
+    },
+    "AMZN": {
+      "day": "2026-10-16",
+      "high": 255.54,
+      "low": 252.9
+    }
+  },
+  "_cooldowns": {},
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY261016C00772000",
+    "strike": "772",
+    "entryPremium": 1.4449999999999998,
+    "qty": 3,
+    "entryTime": 1792158340873,
+    "level": 773.25,
+    "msgId": 6234,
+    "stopOrderId": "76cd4b2a-3821-4c18-8add-7caf12490d96",
+    "hardStopPrice": 0.94,
+    "entryStockPrice": 772.3800000000001,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 29.87,
+    "volumeRatio": 11.667777424270334,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  }
 }
