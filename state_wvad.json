@@ -6,6 +6,12 @@
       "symbol": "QQQ",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-16",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
@@ -15,21 +21,18 @@
   "QQQ": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "QQQ261016C00716000",
-    "strike": "716",
-    "entryPremium": 1.835,
-    "qty": 2,
-    "entryTime": 1792166428541,
-    "stopOrderId": "549e7e69-2d00-4e82-bae2-5e8c2f45674a",
-    "hardStopPrice": 1.19,
-    "entryStockPrice": 716.2950000000001,
+    "optionSymbol": "QQQ261016C00717000",
+    "strike": "717",
+    "entryPremium": 1.48,
+    "qty": 3,
+    "entryTime": 1792167238156,
+    "stopOrderId": "ddae0543-051f-49e4-b6dd-b7eb69eca5aa",
+    "hardStopPrice": 0.96,
+    "entryStockPrice": 716.645,
     "wvadSumAtEntry": 1562143.97,
     "signalLineAtEntry": 171955.59,
     "atrAtEntry": 2.4003,
-    "slStock": 712.69,
-    "dte": 0,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.326975476839225
+    "slStock": 713.04,
+    "dte": 0
   }
 }
