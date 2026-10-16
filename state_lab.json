@@ -56,12 +56,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 80,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 39.43661971830986
+    "peakPct": 84.50704225352115
   },
   "AMZN": {
     "active": true,
@@ -72,7 +72,7 @@
     "qty": 1,
     "entryTime": 1792170053122,
     "msgId": 6348,
-    "stopOrderId": "ca74ea12-be5b-40c7-bf72-5e5c8774e1d8",
+    "stopOrderId": "f747aedc-0a76-47b3-9b4c-683804321521",
     "hardStopPrice": 1.17,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -100,6 +100,9 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 18.179104477611943
   }
 }
