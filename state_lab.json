@@ -10,7 +10,8 @@
     "AMZN_CALL": 1792080962181,
     "NVDA_PUT": 1792159461782,
     "AMZN_PUT": 1792163034770,
-    "IWM_PUT": 1792166547187
+    "IWM_PUT": 1792166547187,
+    "TSLA_PUT": 1792166859921
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -18,46 +19,6 @@
     "symbols": [
       "QQQ"
     ]
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA261016P00362500",
-    "strike": "362.5",
-    "entryPremium": 5.109999999999999,
-    "qty": 1,
-    "entryTime": 1792164299485,
-    "msgId": 6317,
-    "stopOrderId": "566d3289-ca57-47dd-9e31-6f16255767d9",
-    "hardStopPrice": 3.58,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 360.545,
-      "regime": "bearish",
-      "emaFast": 367.0223,
-      "emaSlow": 369.9199,
-      "breakoutHigh": 376.47,
-      "breakoutLow": 362.5,
-      "volRatio": 2.24,
-      "lastClose": 361.325,
-      "lastVolume": 2580467,
-      "barTime": "2026-10-16T14:45:00Z",
-      "entryTimeUTC": "2026-10-16T15:24:59.485Z",
-      "vwapAtEntry": 367.8529,
-      "rsiAtEntry": 27.04,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   },
   "SPY": {
     "active": true,
