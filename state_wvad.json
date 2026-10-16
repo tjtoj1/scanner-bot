@@ -1,8 +1,32 @@
 {
   "_lastDay": "2026-10-16",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-10-16",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "_cooldowns": {
     "QQQ_PUT": "2026-10-15T13:47:14.498Z",
     "SPY_PUT": "2026-10-15T19:28:34.846Z"
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ261016C00716000",
+    "strike": "716",
+    "entryPremium": 1.835,
+    "qty": 2,
+    "entryTime": 1792166428541,
+    "stopOrderId": "a296614d-6cd1-4118-af62-a688f4ea0de5",
+    "hardStopPrice": 1.19,
+    "entryStockPrice": 716.2950000000001,
+    "wvadSumAtEntry": 1562143.97,
+    "signalLineAtEntry": 171955.59,
+    "atrAtEntry": 2.4003,
+    "slStock": 712.69,
+    "dte": 0
   }
 }
