@@ -20,50 +20,6 @@
       "QQQ"
     ]
   },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261016P00769000",
-    "strike": "769",
-    "entryPremium": 1.245,
-    "qty": 2,
-    "entryTime": 1792165968001,
-    "msgId": 6337,
-    "stopOrderId": "6494ecbf-8674-47fd-a884-d824bd27ddfb",
-    "hardStopPrice": 0.87,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 768.72,
-      "regime": "bearish",
-      "emaFast": 770.9421,
-      "emaSlow": 771.7636,
-      "breakoutHigh": 773.71,
-      "breakoutLow": 769.39,
-      "volRatio": 1.96,
-      "lastClose": 768.745,
-      "lastVolume": 1015907,
-      "barTime": "2026-10-16T15:15:00Z",
-      "entryTimeUTC": "2026-10-16T15:52:48.001Z",
-      "vwapAtEntry": 771.3798,
-      "rsiAtEntry": 27.89,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 123.69477911646585,
-    "lastReportedThreshold": 120
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -100,6 +56,7 @@
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   }
 }
