@@ -19,5 +19,43 @@
     "symbols": [
       "QQQ"
     ]
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM261016P00274000",
+    "strike": "274",
+    "entryPremium": 0.585,
+    "qty": 5,
+    "entryTime": 1792163691713,
+    "msgId": 6306,
+    "stopOrderId": "38b7e4f7-7bc6-4f9d-8502-2d2ce2bdb5c7",
+    "hardStopPrice": 0.41,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 273.77,
+      "regime": "bearish",
+      "emaFast": 274.9796,
+      "emaSlow": 275.2707,
+      "breakoutHigh": 275.91,
+      "breakoutLow": 274.41,
+      "volRatio": 2.44,
+      "lastClose": 274.3695,
+      "lastVolume": 449328,
+      "barTime": "2026-10-16T14:30:00Z",
+      "entryTimeUTC": "2026-10-16T15:14:51.713Z",
+      "vwapAtEntry": 275.1424,
+      "rsiAtEntry": 31.51,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    }
   }
 }
