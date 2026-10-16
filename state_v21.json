@@ -18,6 +18,12 @@
       "symbol": "IWM",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-16",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "range": {
@@ -78,5 +84,27 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261016P00771000",
+    "strike": "771",
+    "entryPremium": 1.1549999999999998,
+    "qty": 4,
+    "entryTime": 1792161006962,
+    "level": 771.07,
+    "msgId": 6280,
+    "stopOrderId": "831a53ce-a73a-4c5a-ac9a-1bd94925a94a",
+    "hardStopPrice": 0.75,
+    "entryStockPrice": 770.835,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 34.81,
+    "volumeRatio": 4.856201035658958,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
