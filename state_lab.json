@@ -56,7 +56,7 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "SPY": {
     "active": true,
@@ -134,10 +134,10 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 28.881987577639755,
+    "peakPct": 31.366459627329196,
     "ladder2": true,
     "trailPct": 8
   }
