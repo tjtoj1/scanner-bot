@@ -18,6 +18,12 @@
       "symbol": "IWM",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-19",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -123,5 +129,27 @@
     "tp3Stock": null,
     "slStock": null,
     "lastReportedThreshold": -10
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA261019C00362500",
+    "strike": "362.5",
+    "entryPremium": 4.165,
+    "qty": 1,
+    "entryTime": 1792420204893,
+    "level": 362.18,
+    "msgId": 6418,
+    "stopOrderId": "612910cd-93a7-4cf1-a438-7faff7729f43",
+    "hardStopPrice": 2.71,
+    "entryStockPrice": 362.62,
+    "vwapAtEntry": 360.1209,
+    "rsiAtEntry": 81.31,
+    "volumeRatio": 5.737383776308697,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
   }
 }
