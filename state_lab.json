@@ -20,49 +20,5 @@
     "symbols": [
       "QQQ"
     ]
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261019C00367500",
-    "strike": "367.5",
-    "entryPremium": 1.4649999999999999,
-    "qty": 2,
-    "entryTime": 1792420424787,
-    "msgId": 6436,
-    "stopOrderId": "e80f2cd0-b5cf-40d1-adf0-437bad9bad40",
-    "hardStopPrice": 1.03,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 366.905,
-      "regime": "bullish",
-      "emaFast": 358.8671,
-      "emaSlow": 356.7356,
-      "breakoutHigh": 362.92,
-      "breakoutLow": 352.86,
-      "volRatio": 5.74,
-      "lastClose": 364.176,
-      "lastVolume": 2185605,
-      "barTime": "2026-10-19T14:00:00Z",
-      "entryTimeUTC": "2026-10-19T14:33:44.787Z",
-      "vwapAtEntry": 360.1209,
-      "rsiAtEntry": 81.23,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": 30,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 37.20136518771331
   }
 }
