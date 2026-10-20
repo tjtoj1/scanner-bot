@@ -83,7 +83,7 @@
     "ladder1": true,
     "stopPct": 10,
     "peakPct": 111.81662172101008,
-    "lastReportedThreshold": 110,
+    "lastReportedThreshold": 100,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
@@ -111,8 +111,8 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 193.95973154362414,
-    "lastReportedThreshold": 190,
+    "peakPct": 205.36912751677852,
+    "lastReportedThreshold": 200,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
