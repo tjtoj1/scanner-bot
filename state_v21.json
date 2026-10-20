@@ -83,6 +83,7 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 10.916542473919536,
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "nearStopWarned": true
   }
 }
