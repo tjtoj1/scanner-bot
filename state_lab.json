@@ -17,48 +17,6 @@
       "QQQ"
     ]
   },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261020C00722000",
-    "strike": "722",
-    "entryPremium": 1.795,
-    "qty": 1,
-    "entryTime": 1792507527771,
-    "msgId": 6561,
-    "stopOrderId": "48dce65f-576d-4a9d-ac80-343d6aaddfbc",
-    "hardStopPrice": 1.26,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 721.52,
-      "regime": "bullish",
-      "emaFast": 716.6389,
-      "emaSlow": 715.9882,
-      "breakoutHigh": 718.78,
-      "breakoutLow": 710.39,
-      "volRatio": 4.84,
-      "lastClose": 722.11,
-      "lastVolume": 1890159,
-      "barTime": "2026-10-20T14:15:00Z",
-      "entryTimeUTC": "2026-10-20T14:45:27.771Z",
-      "vwapAtEntry": 715.8686,
-      "rsiAtEntry": 65.12,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 19.777158774373284
-  },
   "IWM": {
     "active": true,
     "signal": "CALL",
@@ -101,6 +59,6 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 27.7173913043478
+    "peakPct": 29.891304347826065
   }
 }
