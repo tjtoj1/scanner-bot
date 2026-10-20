@@ -99,6 +99,12 @@ const RE = {
   pad:     /const STOP_SLIPPAGE_PAD\s*=\s*[\d.]+;/,
   pkFile:  /const DAYPEAK_FILE\s*=\s*"daypeak_(?:v21|lab)\.json";/,
   pfFn:    /function profitFloor\(_peakTotal\) \{ return PROFIT_FLOOR; \}/,
+  expiry:  /function optionExpiryISO\(optSym\) \{[\s\S]*?\n\}/,
+  f2:      /if \(PROFIT_FLOOR_ENABLED && dayCtx\?\.trusted === false\) \{[\s\S]*?\n  \}/,
+  // Must reach through the else{} block: a non-greedy match stopping at the
+  // first 10-space `}` truncates after the expired branch and would test
+  // only half the logic (it did, until this was corrected).
+  sumLoop: /\/\/ The ticker filter above says[\s\S]*?unrealIntraday \+= uplIntra;\n          \}/,
 };
 
 const CONSTS = bot => [
@@ -127,8 +133,34 @@ function makeOld(bot, fileText, today = "2026-10-20") {
 // tmp+rename path honestly.
 function makePeak(bot, file, today = "2026-10-20") {
   return new Function("fs", "getToday", "DAYPEAK_FILE",
-    `${grab(src[bot], RE.readPk, `readPk/${bot}`)}\n${grab(src[bot], RE.bumpPk, `bumpPk/${bot}`)}\n` +
+    `${CONSTS(bot)}\n${grab(src[bot], RE.readPk, `readPk/${bot}`)}\n${grab(src[bot], RE.bumpPk, `bumpPk/${bot}`)}\n` +
     `return { readDayPeak, bumpDayPeak };`)(fs, () => today, file);
+}
+
+// optionExpiryISO, extracted verbatim.
+const makeExpiry = bot =>
+  new Function(`${grab(src[bot], RE.expiry, `expiry/${bot}`)}\nreturn optionExpiryISO;`)();
+
+// The reconcile unrealised-sum loop body, lifted verbatim and driven with a
+// list of fake positions — so the exclusion logic under test is the shipped
+// text, not a restatement of it.
+function runSumLoop(bot, positions, today = "2026-10-20") {
+  const body = grab(src[bot], RE.sumLoop, `sumLoop/${bot}`);
+  const v = bot === "v21" ? "pos" : "p";
+  return new Function("positions", "getToday", "optionExpiryISO",
+    `let unrealPl = 0, unrealIntraday = 0, exclN = 0, exclPl = 0, unparsedN = 0;
+     for (const ${v} of positions) {
+       ${body}
+     }
+     return { unrealPl, unrealIntraday, exclN, exclPl, unparsedN };`
+  )(positions, () => today, makeExpiry(bot));
+}
+
+// The F2 early guard, lifted verbatim.
+function runF2(bot, { enabled, dayCtx }) {
+  const body = grab(src[bot], RE.f2, `f2/${bot}`);
+  return new Function("PROFIT_FLOOR_ENABLED", "dayCtx", "symbol",
+    `${body}\nreturn "continued";`)(enabled, dayCtx, "SPY");
 }
 
 // The gate block, lifted verbatim, with everything it touches stubbed.
@@ -252,8 +284,18 @@ for (const bot of ["v21", "lab"]) {
   // 12) stale file from a previous day ignored
   fs.writeFileSync(f, JSON.stringify({ day: "2026-10-17", peakTotal: 9999 }));
   check(`${bot}: ملف بيوم سابق ⇒ القمة 0 (لا يُسلّح)`, pk.readDayPeak().peakTotal === 0, pk.readDayPeak(), 0);
-  check(`${bot}: ثم bump يكتب يوم اليوم`, pk.bumpDayPeak(42) === 42 && JSON.parse(fs.readFileSync(f, "utf8")).day === "2026-10-20",
-    JSON.parse(fs.readFileSync(f, "utf8")), { day: "2026-10-20", peakTotal: 42 });
+  // Post-F3 the candidate must reach the floor to be written at all, so the
+  // rewrite is driven with the floor itself rather than an arbitrary 42.
+  const F0 = LIMITS[bot].floor;
+  check(`${bot}: ثم bump عند الأرضية يكتب يوم اليوم`,
+    pk.bumpDayPeak(F0) === F0 && JSON.parse(fs.readFileSync(f, "utf8")).day === "2026-10-20",
+    JSON.parse(fs.readFileSync(f, "utf8")), { day: "2026-10-20", peakTotal: F0 });
+  check(`${bot}: وملف بيوم سابق + مرشّح تحت الأرضية ⇒ لا كتابة`, (() => {
+    fs.writeFileSync(f, JSON.stringify({ day: "2026-10-17", peakTotal: 9999 }));
+    const before = fs.readFileSync(f, "utf8");
+    pk.bumpDayPeak(F0 - 1);
+    return fs.readFileSync(f, "utf8") === before;
+  })(), "file rewritten", "untouched");
   // 13) malformed
   fs.writeFileSync(f, "{not json");
   check(`${bot}: ملف تالف ⇒ القمة 0 بلا رمي`, pk.readDayPeak().peakTotal === 0, pk.readDayPeak(), 0);
@@ -426,6 +468,85 @@ for (const bot of ["v21", "lab"]) {
 }
 check("v21: unrealized_intraday_pl مجموع للتسجيل فقط", /unrealIntraday \+= uplIntra;/.test(src.v21), "missing", "present");
 check("lab: unrealized_intraday_pl مجموع للتسجيل فقط", /unrealIntraday \+= uplIntra;/.test(src.lab), "missing", "present");
+
+// ── F1) expiry parsing and exclusion ─────────────────────
+console.log("\n── F1) استبعاد العقود المنتهية من مجموع غير المحقق ──");
+for (const bot of ["v21", "lab"]) {
+  const exp = makeExpiry(bot);
+  check(`${bot}: SPY261020P00600000 ⇒ 2026-10-20`, exp("SPY261020P00600000") === "2026-10-20", exp("SPY261020P00600000"), "2026-10-20");
+  check(`${bot}: NVDA261017C00220000 ⇒ 2026-10-17`, exp("NVDA261017C00220000") === "2026-10-17", exp("NVDA261017C00220000"), "2026-10-17");
+  check(`${bot}: رمز بلا تاريخ ⇒ null`, exp("WEIRD") === null && exp("") === null && exp(undefined) === null, exp("WEIRD"), null);
+
+  const P = (symbol, upl, intra) => ({ symbol, unrealized_pl: String(upl), unrealized_intraday_pl: String(intra) });
+  // today = 2026-10-20: 10-17 expired, 10-20 is 0DTE (kept), 10-22 future
+  const r = runSumLoop(bot, [
+    P("SPY261020P00600000", 40, 38),    // today, kept
+    P("QQQ261022C00600000", 25, 20),    // future, kept
+    P("NVDA261017C00220000", -90, 0),   // EXPIRED, excluded
+    P("IWM261016P00240000", -15, 0),    // EXPIRED, excluded
+    P("WEIRDSYMBOL", 7, 7),             // unparseable, kept + counted
+  ]);
+  check(`${bot}: المنتهية مُستبعدة من unrealPl (40+25+7 = 72)`, r.unrealPl === 72, r.unrealPl, 72);
+  check(`${bot}: ومن unrealIntraday (38+20+7 = 65)`, r.unrealIntraday === 65, r.unrealIntraday, 65);
+  check(`${bot}: excl_n = 2`, r.exclN === 2, r.exclN, 2);
+  check(`${bot}: excl_pl = -105 (-90 + -15)`, r.exclPl === -105, r.exclPl, -105);
+  check(`${bot}: unparsed_n = 1 والرمز محسوب داخل المجموع`, r.unparsedN === 1 && r.unrealPl === 72, { unparsedN: r.unparsedN }, 1);
+
+  const kept = runSumLoop(bot, [P("SPY261020P00600000", 100, 90)]);
+  check(`${bot}: عقد اليوم (0DTE) يُحتسب ولا يُستبعد`, kept.unrealPl === 100 && kept.exclN === 0, kept, { unrealPl: 100, exclN: 0 });
+  const bad = runSumLoop(bot, [P("SPY261020P00600000", "n/a", "n/a")]);
+  check(`${bot}: unrealized_pl غير رقمي ⇒ 0 بلا NaN`, bad.unrealPl === 0 && !Number.isNaN(bad.unrealPl), bad.unrealPl, 0);
+  const badExcl = runSumLoop(bot, [P("NVDA261017C00220000", "n/a", "n/a")]);
+  check(`${bot}: منتهٍ بقيمة غير رقمية ⇒ excl_n=1 و excl_pl=0`, badExcl.exclN === 1 && badExcl.exclPl === 0, badExcl, { exclN: 1, exclPl: 0 });
+
+  check(`${bot}: سطر اللوق يحمل excl_n / excl_pl / unparsed_n`,
+    ["excl_n=", "excl_pl=", "unparsed_n="].every(f => grab(src[bot], RE.logLine, "log").includes(f)), "missing", "all three");
+  check(`${bot}: أساس اليوم في optionExpiryISO هو getToday()`,
+    /expISO < getToday\(\)/.test(src[bot]) && !/toLocaleDateString|Intl\./.test(grab(src[bot], RE.expiry, "exp")), "other basis", "getToday()");
+}
+
+// ── F2) untrusted + not armed ⇒ skip ─────────────────────
+console.log("\n── F2) لقطة غير موثوقة ⇒ تخطٍّ حتى بلا تسليح ──");
+for (const bot of ["v21", "lab"]) {
+  const r1 = capture(() => runF2(bot, { enabled: true, dayCtx: { trusted: false, armed: false } }));
+  check(`${bot}: enabled + غير موثوق + غير مُسلَّح ⇒ يُرجِع (تخطٍّ)`, r1.out === undefined, r1.out, "undefined (returned)");
+  check(`${bot}: ويسجّل السبب`, r1.lines.some(l => l.includes("untrusted") && l.includes("fail closed")), r1.lines, "logged");
+  const r2 = capture(() => runF2(bot, { enabled: true, dayCtx: { trusted: true, armed: false } }));
+  check(`${bot}: موثوق ⇒ يُكمل`, r2.out === "continued", r2.out, "continued");
+  const r3 = capture(() => runF2(bot, { enabled: false, dayCtx: { trusted: false, armed: false } }));
+  check(`${bot}: enabled=false ⇒ يُكمل (لا تغيير في السلوك)`, r3.out === "continued", r3.out, "continued");
+  const r4 = capture(() => runF2(bot, { enabled: true, dayCtx: undefined }));
+  check(`${bot}: dayCtx غير مُمرَّر ⇒ يُكمل (خامل)`, r4.out === "continued", r4.out, "continued");
+  // placement: before any network call in scanEntry
+  const fn = grab(src[bot], bot === "v21"
+    ? /async function scanEntry\(state, symbol, portfolio, liveInAlpaca, dayCtx\) \{[\s\S]*?\n\}/
+    : /async function scanEntry\(state, strategy, symbol, liveInAlpaca, dayCtx\) \{[\s\S]*?\n\}/, `scanEntry/${bot}`);
+  const f2At = fn.indexOf("dayCtx?.trusted === false");
+  const firstAwait = fn.search(/await (getBars|checkBreakout|getLatestPrice|alpaca|findOption|getQuoteLegs)/);
+  check(`${bot}: حارس F2 قبل أول نداء شبكي`, f2At > -1 && firstAwait > -1 && f2At < firstAwait, { f2At, firstAwait }, "F2 first");
+  check(`${bot}: التعليق لم يبقَ يدّعي التطابق التام بلا استثناء`,
+    /EXCEPT when the positions snapshot/.test(fn), "stale claim", "corrected");
+}
+
+// ── F3) peak written only at/above the floor ─────────────
+console.log("\n── F3) القمة تُكتب فقط عند الأرضية أو فوقها ──");
+for (const bot of ["v21", "lab"]) {
+  const F = LIMITS[bot].floor;
+  const f = path.join(TMP, `f3_${bot}.json`);
+  try { fs.unlinkSync(f); } catch {}
+  const pk = makePeak(bot, f);
+  check(`${bot}: تحت الأرضية (${F - 1}) ⇒ لا ملف`, pk.bumpDayPeak(F - 1) === 0 && !fs.existsSync(f), fs.existsSync(f), false);
+  check(`${bot}: صفر ⇒ لا ملف`, pk.bumpDayPeak(0) === 0 && !fs.existsSync(f), fs.existsSync(f), false);
+  check(`${bot}: سالب ⇒ لا ملف`, pk.bumpDayPeak(-500) === 0 && !fs.existsSync(f), fs.existsSync(f), false);
+  check(`${bot}: عند الأرضية بالضبط (${F}) ⇒ يُكتب`, pk.bumpDayPeak(F) === F && fs.existsSync(f), pk.readDayPeak(), F);
+  check(`${bot}: فوقها (${F + 120}) ⇒ يرتفع`, pk.bumpDayPeak(F + 120) === F + 120, pk.readDayPeak(), F + 120);
+  check(`${bot}: ثم أدنى منها لكن فوق الأرضية ⇒ لا ينزل`, pk.bumpDayPeak(F + 10) === F + 120, pk.readDayPeak(), F + 120);
+  check(`${bot}: ثم تحت الأرضية ⇒ لا ينزل ولا يكتب`, pk.bumpDayPeak(F - 999) === F + 120, pk.readDayPeak(), F + 120);
+  check(`${bot}: التعليق يذكر أن peak يظهر +0 قبل بلوغ الأرضية`,
+    /`peak` shows \+0 until the day's total first reaches the/.test(src[bot]), "missing note", "documented");
+  check(`${bot}: bumpDayPeak يفحص الأرضية قبل الرتابة`,
+    /if \(candidate < profitFloor\(candidate\)\) return cur\.peakTotal;/.test(grab(src[bot], RE.bumpPk, "bump")), "missing", "present");
+}
 
 // ── G) regressions ────────────────────────────────────────
 console.log("\n── G) الانحدار ──");
