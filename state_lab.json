@@ -53,7 +53,8 @@
       "positionBucket": "near_high",
       "comboKey": "PUT|position:near_high",
       "sizeMultiplier": 1
-    }
+    },
+    "lastReportedThreshold": -10
   },
   "NVDA": {
     "active": true,
@@ -92,7 +93,8 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
