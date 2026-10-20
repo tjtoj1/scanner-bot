@@ -113,7 +113,8 @@
     "peakPct": 27.4822260357931,
     "lastReportedThreshold": 20,
     "ladder2": true,
-    "trailPct": 10
+    "trailPct": 10,
+    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
@@ -138,8 +139,8 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 46.30872483221478,
-    "lastReportedThreshold": 40,
+    "peakPct": 82.55033557046981,
+    "lastReportedThreshold": 80,
     "ladder2": true,
     "trailPct": 10
   },
