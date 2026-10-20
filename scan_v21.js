@@ -53,6 +53,39 @@ const DAILY_TARGET_MAX  = 0.05;  // 5% of portfolio
 // v21's $500 budget and 4-trade cap: four trades stopping out at -35% is
 // about -$700, so this trips only on a genuinely bad day, not a normal one.
 const DAILY_LOSS_LIMIT  = -600;
+// ─── TIER 1a: DAILY LOSS STOP (blocks new entries only) ───────────
+// The day is down STOP_DAY_LOSS or worse on REALISED P&L. Sticky for the
+// day via replay, so a later recovery does not re-open trading. It only
+// ever makes scanEntry() return. Nothing here force-closes: positions
+// already open are left to their own stops, which means the day's
+// realised loss can overshoot STOP_DAY_LOSS by one open position's
+// worth. That is accepted, deliberately.
+// DAILY_LOSS_LIMIT above remains tier 2 — the wider emergency that does
+// flatten (monitorPosition) — and is untouched by any of this.
+const STOP_DAY_LOSS     = -280;
+
+// ─── TIER 1b: PROFIT FLOOR on the day's TOTAL P&L ─────────────────
+// Total = realised (from the outcomes log) + unrealised (summed from the
+// Alpaca positions this bot manages). Once the day's total has touched
+// the floor it is "armed" for the rest of the day; after that a new entry
+// is admitted only if its worst case still leaves the day at or above the
+// floor, and its size is cut down to fit. At exactly the floor the budget
+// is zero, so nothing opens. Open positions are NEVER force-closed by
+// this rule — guaranteeing the floor against open risk is phase B.
+//
+// profitFloor() is the seam for a future ratchet; today it ignores its
+// argument and returns the constant.
+//
+// Arming must survive the cycle, and nothing survives in memory: the
+// runner spawns a fresh `node` per bot per mode every 60s
+// (runner.js:414, :501, :503). A peak reached only on unrealised P&L
+// would therefore be forgotten by the next cycle, so the running maximum
+// of the day's total is journaled to DAYPEAK_FILE.
+const PROFIT_FLOOR_ENABLED = true;   // per-bot switch: false ⇒ gate fully inert
+const PROFIT_FLOOR      = 170;       // $ total P&L
+const STOP_SLIPPAGE_PAD = 0.10;      // a triggered stop is a MARKET order
+const DAYPEAK_FILE      = "daypeak_v21.json";
+function profitFloor(_peakTotal) { return PROFIT_FLOOR; }
 const VOL_SURGE_RATIO   = 1.2;   // high volume threshold
 const LADDER_1_PCT      = 10;
 const LADDER_1_STOP     = 5;
@@ -106,20 +139,134 @@ function loadState() {
   catch { return {}; }
 }
 
-// Realised P&L booked today, from the outcomes log — the same source and
-// shape LAB's breaker uses, so the two bots measure the day identically.
-// A missing or unreadable log reads as 0, which fails open (keeps trading)
-// rather than halting the bot on a filesystem hiccup.
-function getTodayRealizedPnl() {
+// Today's realised P&L, replayed trade by trade from the outcomes log —
+// the same source and shape LAB's breaker uses, so the two bots measure
+// the day identically. A missing or unreadable log reads as zeros, which
+// fails open (keeps trading) rather than halting the bot on a filesystem
+// hiccup.
+//
+// Returns { net, peak, stopped, reason }:
+//   net     — realised P&L for today
+//   peak    — the highest `net` reached at any point today
+//   stopped — the loss stop became true at some point today
+//   reason  — "loss" when it did, else null
+//
+// `stopped` is STICKY and yet nothing is persisted: realised P&L only
+// changes when logTrade() appends, so replaying today's records rebuilds
+// the whole day exactly — including a condition that was true at trade 3
+// and false again by trade 7. That is why there is no _dayStopped flag.
+// A stored flag would be lost by the boot-time `reset --hard origin/main`
+// whenever the last push had not landed; a replay cannot be.
+//
+// Records are sorted by exitTime rather than trusted in file order:
+// logTrade appends in close order, but this log has been rebuilt from a
+// backup branch once already and may be re-ordered again.
+function getTodayRealizedDay() {
   const today = getToday();
-  let total = 0;
+  const todays = [];
   try {
     const lines = fs.readFileSync("outcomes_v21.jsonl", "utf8").split("\n").filter(Boolean);
     for (const line of lines) {
-      try { const r = JSON.parse(line); if (r.day === today) total += r.pnl; } catch {}
+      try { const r = JSON.parse(line); if (r.day === today) todays.push(r); } catch {}
     }
   } catch {}
-  return total;
+  todays.sort((a, b) => Date.parse(a.exitTime) - Date.parse(b.exitTime));
+
+  let net = 0, peak = 0, stopped = false, reason = null;
+  for (const r of todays) {
+    net += r.pnl;
+    if (net > peak) peak = net;
+    // Checked after EVERY record, so a later recovery cannot clear it.
+    if (!stopped && net <= STOP_DAY_LOSS) { stopped = true; reason = "loss"; }
+  }
+  return { net, peak, stopped, reason };
+}
+
+// Unchanged contract for the tier-2 call sites, which only ever wanted
+// the day's net.
+function getTodayRealizedPnl() { return getTodayRealizedDay().net; }
+
+// ─── OPTION EXPIRY, FROM THE OCC SYMBOL ───────────────────────────
+// "SPY261020P00600000" → "2026-10-20". Used only to keep an EXPIRED
+// contract out of the profit floor's unrealised sum: unrealized_pl is
+// cumulative since entry, so a contract that expired days ago still
+// reports a number, and counting it would move today's floor on P&L that
+// is not today's. The day basis is getToday() — the same UTC date key
+// logTrade writes as `day` and readDayPeak uses — so an expiry equal to
+// today is kept (0DTE is the normal case here) and only strictly earlier
+// expiries are dropped.
+//
+// Returns null when the symbol does not parse. A null is NOT excluded:
+// dropping a position because its symbol looked odd would understate the
+// day and could silently disarm the floor. It is counted separately and
+// logged as unparsed_n so an unexpected format is visible rather than
+// silent.
+function optionExpiryISO(optSym) {
+  const m = /^[A-Z]+(\d{6})[CP]/.exec(optSym || "");
+  if (!m) return null;
+  const d = m[1];
+  return `20${d.slice(0, 2)}-${d.slice(2, 4)}-${d.slice(4, 6)}`;
+}
+
+// ─── DAY-PEAK JOURNAL (for the profit floor's arming) ─────────────
+// The running maximum of the day's TOTAL P&L. Needed because the
+// unrealised half cannot be replayed from anything: the runner spawns a
+// fresh process per bot per mode every cycle (runner.js:414, :501, :503),
+// so a peak reached only on open positions would be forgotten by the
+// next cycle and the gate would go inert at exactly the wrong moment.
+//
+// The day key is getToday() — the SAME value logTrade writes as `day`
+// (see the record built in logTrade), never a second date computation.
+// A file whose day is not today is treated as a peak of 0, so a stale
+// file from a previous session can never arm the floor.
+//
+// Every failure mode here reads the peak LOWER, which leaves the gate
+// inert: permissive by design. The gate's own fail-closed behaviour (on
+// an untrusted positions snapshot or a missing ask) is independent of
+// this file and is not weakened by losing it.
+function readDayPeak() {
+  try {
+    const d = JSON.parse(fs.readFileSync(DAYPEAK_FILE, "utf8"));
+    if (d && d.day === getToday() && Number.isFinite(d.peakTotal)) {
+      return { day: d.day, peakTotal: d.peakTotal };
+    }
+  } catch {}
+  return { day: getToday(), peakTotal: 0 };
+}
+
+// Writes only when BOTH hold: the candidate has reached the floor, and it
+// is strictly higher than what is on disk. The floor condition keeps the
+// file untouched on every ordinary day, which is the point — fewer writes
+// mean fewer commits for syncToGitHub to carry and less exposure to the
+// line-wise `merge -X ours` recovery. The consequence to remember when
+// reading logs: `peak` shows +0 until the day's total first reaches the
+// floor, so a low peak does NOT mean the day never made money.
+// Monotonic, so a writer never lowers the recorded peak. tmp + rename, so
+// a reader never sees a torn file.
+//
+// Two OS processes doing read-modify-write without a lock can still lose
+// an update (both read 300, one writes 390, the other 350). That is not
+// claimed to be impossible — but a lost update can only ever leave the
+// peak too LOW, which is the permissive direction, and the next cycle
+// re-raises it. The caller restricts writing to the scan child and to a
+// trusted positions snapshot, which removes the scan-vs-monitor race.
+function bumpDayPeak(candidate) {
+  if (!Number.isFinite(candidate)) return readDayPeak().peakTotal;
+  const cur = readDayPeak();
+  // Below the floor there is nothing worth journaling: arming needs a peak
+  // at or above it, so a lower peak changes no decision.
+  if (candidate < profitFloor(candidate)) return cur.peakTotal;
+  if (candidate <= cur.peakTotal) return cur.peakTotal;
+  const tmp = `${DAYPEAK_FILE}.tmp`;
+  try {
+    fs.writeFileSync(tmp, JSON.stringify({ day: getToday(), peakTotal: candidate }));
+    fs.renameSync(tmp, DAYPEAK_FILE);
+    return candidate;
+  } catch (e) {
+    console.error(`bumpDayPeak failed (peak stays ${cur.peakTotal}):`, e.message);
+    try { fs.unlinkSync(tmp); } catch {}
+    return cur.peakTotal;
+  }
 }
 function saveState(s) { fs.writeFileSync("state_v21.json", JSON.stringify(s,null,2)); }
 
@@ -387,6 +534,23 @@ async function getQuote(optSym) {
     const d = await res.json();
     const q = d.quotes?.[optSym];
     return q ? (q.ap + q.bp) / 2 : null;
+  } catch { return null; }
+}
+
+// Both legs of the quote, for the profit floor's risk arithmetic only.
+// getQuote() above is left exactly as it was (it returns the mid, and
+// every existing caller depends on that). This is only ever called from
+// the armed branch of the floor gate, so an unarmed cycle makes no extra
+// network call and behaves byte-for-byte as before.
+async function getQuoteLegs(optSym) {
+  try {
+    const res = await fetchWithTimeout(`https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`, {
+      headers: { "APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET }
+    });
+    const d = await res.json();
+    const q = d.quotes?.[optSym];
+    if (!q || !Number.isFinite(q.ap) || !Number.isFinite(q.bp) || q.ap <= 0) return null;
+    return { bid: q.bp, ask: q.ap, mid: (q.ap + q.bp) / 2 };
   } catch { return null; }
 }
 
@@ -878,17 +1042,35 @@ async function monitorPosition(state, symbol) {
 }
 
 // ─── SCAN FOR NEW ENTRIES ───────────────────────────────────
-async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
+async function scanEntry(state, symbol, portfolio, liveInAlpaca, dayCtx) {
   if (state[symbol]?.active) return;
   if (liveInAlpaca.has(symbol)) return;
   if (isPastLastEntry()) return;
   if (isRangeBuilding()) return;
 
-  // Daily loss breaker, checked before any network call so a breached day
-  // costs nothing to re-evaluate each cycle.
-  const realizedToday = getTodayRealizedPnl();
-  if (realizedToday <= DAILY_LOSS_LIMIT) {
-    console.log(`${symbol}: daily loss limit hit ($${realizedToday} <= $${DAILY_LOSS_LIMIT}) — no new entries today`);
+  // Daily gates, checked before any network call so a stopped day costs
+  // nothing to re-evaluate each cycle. One replay of the day covers both
+  // tiers: tier 1 (stop opening trades) and tier 2 (the older, wider
+  // floor, whose force-close lives in monitorPosition and is untouched).
+  // F2 — an untrusted positions snapshot means the day's total P&L is
+  // unknowable this cycle (alpaca() does not check res.ok, so an error body
+  // is indistinguishable from "flat"). While the floor is enabled we refuse
+  // to open anything on a number we cannot compute, armed or not: the cost
+  // is one cycle of missed entries, the cost of being wrong the other way
+  // is the giveback the floor exists to prevent. Placed here, before any
+  // network call, so it is also the cheapest possible refusal.
+  if (PROFIT_FLOOR_ENABLED && dayCtx?.trusted === false) {
+    console.log(`${symbol}: positions snapshot untrusted — skipping entry (fail closed)`);
+    return;
+  }
+
+  const day = getTodayRealizedDay();
+  if (day.stopped) {
+    console.log(`${symbol}: day stopped (${day.reason}) — net $${day.net}, peak $${day.peak} — no new entries today`);
+    return;
+  }
+  if (day.net <= DAILY_LOSS_LIMIT) {
+    console.log(`${symbol}: daily loss limit hit ($${day.net} <= $${DAILY_LOSS_LIMIT}) — no new entries today`);
     return;
   }
 
@@ -964,7 +1146,52 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   const opt = await findOption(symbol, breakout.signal, spot);
   if (!opt || opt.premium < 0.05) { console.log(`${symbol}: no option found`); return; }
 
-  const qty = calcQty(opt.premium);
+  let qty = calcQty(opt.premium);
+
+  // ─── PROFIT-FLOOR GATE ──────────────────────────────────────────
+  // Armed only. An unarmed cycle reaches the buy POST with qty exactly as
+  // calcQty computed it and makes no extra network call — identical to the
+  // behaviour before this rule existed, EXCEPT when the positions snapshot
+  // is untrusted, which the F2 guard near the top of this function now
+  // refuses regardless of arming (and which PROFIT_FLOOR_ENABLED=false
+  // switches off along with everything else here).
+  //
+  // The !trusted branch below is therefore unreachable while the F2 guard
+  // stands. It is kept deliberately: it is the invariant this arithmetic
+  // depends on, and it must not become reachable silently if that guard is
+  // ever moved.
+  //
+  // Max loss per contract is measured against the stop that is ACTUALLY
+  // placed below (mid-based, with the same 0.01 clamp), not against a
+  // percentage of the ask: the buy fills near the ask while the stop sits
+  // at a fraction of the mid, so `ask - stopPlaced` is strictly wider than
+  // `ask * 0.35` whenever there is a spread. Plus a pad, because a
+  // triggered stop is a market order — on 2026-10-12 AMZN filled 6% below
+  // its stop.
+  if (dayCtx?.armed) {
+    if (!dayCtx.trusted) {
+      console.log(`${symbol}: floor armed but positions snapshot untrusted — skipping entry (fail closed)`);
+      return;
+    }
+    const legs = await getQuoteLegs(opt.symbol);
+    if (!legs) {
+      console.log(`${symbol}: floor armed but no ask available — skipping entry (fail closed)`);
+      return;
+    }
+    const stopPlaced = Math.max(0.01, +(opt.premium * (1 + HARD_STOP_PCT/100)).toFixed(2));
+    const maxLossPerCt = 100 * (legs.ask - stopPlaced) * (1 + STOP_SLIPPAGE_PAD);
+    const allowed = maxLossPerCt > 0 ? Math.floor(dayCtx.budget / maxLossPerCt) : 0;
+    const sized = Math.min(qty, allowed);
+    console.log(`${symbol}: floor gate — budget $${Math.round(dayCtx.budget)}, `
+      + `ask ${legs.ask.toFixed(2)}, stop ${stopPlaced.toFixed(2)}, `
+      + `maxLoss/ct $${maxLossPerCt.toFixed(2)} ⇒ allowed ${allowed}, qty ${qty} → ${sized}`);
+    if (!(sized >= 1)) {
+      console.log(`${symbol}: not even 1 contract fits under the floor — skipping entry`);
+      return;
+    }
+    qty = sized;
+  }
+
   const order = await alpaca("/orders","POST",{symbol:opt.symbol,qty:String(qty),side:"buy",type:"market",time_in_force:"day"});
   if (!order.id) { console.log(`${symbol}: order failed`, order); return; }
 
@@ -1055,14 +1282,47 @@ ${slLine}`);
   // Reconcile with Alpaca
   const liveInAlpaca = new Set();
   const unprotected = [];   // live at Alpaca, tracked locally, no stop order id
+  // Unrealised P&L for the profit floor, summed over the symbols THIS bot
+  // manages — never account-level, so a ghost or a hand-opened contract
+  // cannot move the floor. unrealized_pl is the number the floor uses: its
+  // semantics match the realised side (both measure from entry).
+  // unrealized_intraday_pl is summed only to be logged beside it for
+  // comparison against live data; no decision reads it.
+  let unrealPl = 0, unrealIntraday = 0;
+  // Expired contracts excluded from the sums above (F1), plus any symbol
+  // whose expiry could not be parsed — both reported in the log line so
+  // the exclusion is never invisible.
+  let exclN = 0, exclPl = 0, unparsedN = 0;
+  // False whenever the snapshot is not a trustworthy array. alpaca() does
+  // not check res.ok, so an error body is indistinguishable from "flat" —
+  // which is exactly why the gate must fail CLOSED on this, and why the
+  // peak must not be bumped from it.
+  let positionsTrusted = false;
   try {
     const positions = await alpaca("/positions");
     if (Array.isArray(positions)) {
+      positionsTrusted = true;
       for (const pos of positions) {
         const match = pos.symbol?.match(/^([A-Z]+)\d/);
         if (match && TICKERS.includes(match[1])) {
           const sym = match[1];
           liveInAlpaca.add(sym);
+          // The ticker filter above says "a symbol this bot trades"; it does
+          // NOT say "a position from today". An expired contract on a
+          // managed ticker still reports a cumulative unrealized_pl, so it
+          // is excluded from the floor's sums (but left alone otherwise —
+          // nothing here changes reconcile or trading).
+          const upl = parseFloat(pos.unrealized_pl);
+          const uplIntra = parseFloat(pos.unrealized_intraday_pl);
+          const expISO = optionExpiryISO(pos.symbol);
+          if (expISO === null) unparsedN++;
+          if (expISO !== null && expISO < getToday()) {
+            exclN++;
+            if (Number.isFinite(upl)) exclPl += upl;
+          } else {
+            if (Number.isFinite(upl)) unrealPl += upl;
+            if (Number.isFinite(uplIntra)) unrealIntraday += uplIntra;
+          }
           if (!state[sym]?.active) {
             state[sym] = { ...state[sym], active: true };
           }
@@ -1122,6 +1382,34 @@ ${slLine}`);
     saveState(state);
   } catch(e) { console.error("Reconcile failed:", e.message); }
 
+  // ─── DAY CONTEXT for the profit-floor gate ──────────────────────
+  // dayTotal = realised (replayed from the outcomes log) + unrealised
+  // (managed positions only). The peak is journaled by the SCAN child
+  // only, and only from a trusted snapshot: an untrusted one reads as
+  // flat, and bumping from it would record a peak that never happened.
+  const realizedDay = getTodayRealizedDay();
+  const dayTotal = realizedDay.net + unrealPl;
+  const peakTotal = (positionsTrusted && MODE !== "monitor")
+    ? bumpDayPeak(dayTotal)
+    : readDayPeak().peakTotal;
+  const floorNow = profitFloor(peakTotal);
+  const armed = PROFIT_FLOOR_ENABLED && (peakTotal >= floorNow || dayTotal >= floorNow);
+  const dayCtx = {
+    total: dayTotal, peak: peakTotal, floor: floorNow,
+    armed, trusted: positionsTrusted,
+    budget: Math.max(0, dayTotal - floorNow),
+  };
+  // One line per cycle, stdout only — enough to reconstruct every gate
+  // decision afterwards without persisting anything new.
+  console.log(`[v21 day] realized=${realizedDay.net >= 0 ? "+" : ""}${realizedDay.net} `
+    + `unreal_pl=${unrealPl >= 0 ? "+" : ""}${Math.round(unrealPl)} `
+    + `unreal_intraday=${unrealIntraday >= 0 ? "+" : ""}${Math.round(unrealIntraday)} `
+    + `total=${dayTotal >= 0 ? "+" : ""}${Math.round(dayTotal)} peak=${peakTotal >= 0 ? "+" : ""}${Math.round(peakTotal)} `
+    + `floor=${floorNow} enabled=${PROFIT_FLOOR_ENABLED ? "YES" : "NO"} armed=${armed ? "YES" : "NO"} `
+    + `budget=${Math.round(dayCtx.budget)} trusted=${positionsTrusted ? "YES" : "NO"} `
+    + `excl_n=${exclN} excl_pl=${exclPl >= 0 ? "+" : ""}${Math.round(exclPl)} unparsed_n=${unparsedN} `
+    + `loss_stopped=${realizedDay.stopped ? realizedDay.reason : "no"}`);
+
   // Get portfolio value
   let portfolio = 5000;
   try {
@@ -1132,11 +1420,20 @@ ${slLine}`);
 
   // Daily loss breaker — one-time alert, so a breached day is visible
   // immediately rather than inferred from a silent absence of entries.
-  const dailyPnlNow = getTodayRealizedPnl();
-  if (dailyPnlNow <= DAILY_LOSS_LIMIT && state._lossBreakerAlerted !== today) {
+  const dayNow = getTodayRealizedDay();
+  if (dayNow.net <= DAILY_LOSS_LIMIT && state._lossBreakerAlerted !== today) {
     state._lossBreakerAlerted = today;
     saveState(state);
-    await tg(`🚨 <b>v21: تم بلوغ حد الخسارة اليومي</b>\n($${dailyPnlNow} ≤ $${DAILY_LOSS_LIMIT}) — إيقاف كل دخول جديد وإغلاق المراكز المفتوحة لبقية اليوم.`);
+    await tg(`🚨 <b>v21: تم بلوغ حد الخسارة اليومي</b>\n($${dayNow.net} ≤ $${DAILY_LOSS_LIMIT}) — إيقاف كل دخول جديد وإغلاق المراكز المفتوحة لبقية اليوم.`);
+  }
+
+  // Tier 1 — one alert per day, same pattern. Saved before the send so a
+  // watchdog kill mid-send costs one missed alert, not a daily flood.
+  if (dayNow.stopped && state._dayStoppedAlerted !== today) {
+    state._dayStoppedAlerted = today;
+    saveState(state);
+    const why = `حدّ الخسارة اليومي: الصافي المحقق $${dayNow.net} ≤ $${STOP_DAY_LOSS}`;
+    await tg(`⏸️ <b>v21: إيقاف الدخول لبقية اليوم</b>\n${why}\nالمراكز المفتوحة تُترك لأوقافها — لا إغلاق قسري.`);
   }
 
   if (MODE === "monitor") {
@@ -1149,7 +1446,7 @@ ${slLine}`);
         // Always try to build/verify range first
         await buildRange(freshState, sym);
         if (!freshState[sym]?.active && !liveInAlpaca.has(sym)) {
-          await scanEntry(freshState, sym, portfolio, liveInAlpaca);
+          await scanEntry(freshState, sym, portfolio, liveInAlpaca, dayCtx);
         }
       }
       saveState(freshState);
@@ -1159,7 +1456,7 @@ ${slLine}`);
       // Always build range from bars (works anytime after 8:30)
       await buildRange(state, sym);
       if (!state[sym]?.active && !liveInAlpaca.has(sym)) {
-        await scanEntry(state, sym, portfolio, liveInAlpaca);
+        await scanEntry(state, sym, portfolio, liveInAlpaca, dayCtx);
       }
     }
     saveState(state);

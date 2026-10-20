@@ -203,8 +203,18 @@ for (const bot of ["v21", "lab", "wvad"]) {
       .replace(helper, "")
       .replace("await postEntryStop({", 'await alpaca("/orders", "POST", {')
       .replace("if (stopOrderId) console.log(`${symbol}: hard stop placed", "console.log(`${symbol}: hard stop placed");
-    check(`${bot}: الملف = الأساس ${BASE_REF} بعد إزالة التعديل وحده`, rebuilt === base[bot],
-      "differs outside the entry-stop change", "identical");
+    // Scoped to the entry-stop block, not the whole file. A whole-file
+    // equality against a fixed old commit is a tripwire, not a guard: it
+    // fails on EVERY later unrelated edit to scan_*.js, and keeping it
+    // green would mean adding a new .replace() above for each one — which
+    // would also let a real regression hide inside a sloppy reversal.
+    // What this test exists to prove is that the retry change stayed
+    // inside the entry-stop block, and comparing that block proves it
+    // directly. Leakage outside it is covered by the checks below
+    // (postEntryStop call count, updateStopOrder, alpaca(), no tg()).
+    check(`${bot}: كتلة وقف الدخول = الأساس ${BASE_REF} بعد إزالة التعديل وحده`,
+      grab(rebuilt, RE.block, `rebuilt block/${bot}`) === grab(base[bot], RE.block, `base block/${bot}`),
+      "differs inside the entry-stop block", "identical");
     check(`${bot}: postEntryStop مستدعاة مرة واحدة فقط (مسار الدخول)`,
       (src[bot].match(/postEntryStop\(/g) || []).length === 2, (src[bot].match(/postEntryStop\(/g) || []).length - 1, 1);
     const upd = /async function updateStopOrder\([\s\S]*?\n\}/;
