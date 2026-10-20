@@ -53,6 +53,23 @@ const DAILY_TARGET_MAX  = 0.05;  // 5% of portfolio
 // v21's $500 budget and 4-trade cap: four trades stopping out at -35% is
 // about -$700, so this trips only on a genuinely bad day, not a normal one.
 const DAILY_LOSS_LIMIT  = -600;
+// ─── TIER 1: DAILY STOP-TRADING RULES (block new entries only) ────
+// Two independent reasons to stop opening trades for the rest of the day,
+// both measured on REALISED P&L only:
+//   loss     — the day is down STOP_DAY_LOSS or worse
+//   giveback — the day once reached PROFIT_ARM and has fallen back to
+//              PROFIT_GIVEBACK or below. It does NOT stop at PROFIT_ARM:
+//              the bot keeps trading as long as it stays above the
+//              giveback level.
+// These only ever make scanEntry() return. Nothing here force-closes:
+// positions already open are left to their own stops, which means the
+// day's realised loss can overshoot STOP_DAY_LOSS by one open position's
+// worth. That is accepted, deliberately.
+// DAILY_LOSS_LIMIT above remains tier 2 — the wider emergency that does
+// flatten (monitorPosition) — and is untouched by any of this.
+const STOP_DAY_LOSS     = -280;
+const PROFIT_ARM        = 170;
+const PROFIT_GIVEBACK   = 85;
 const VOL_SURGE_RATIO   = 1.2;   // high volume threshold
 const LADDER_1_PCT      = 10;
 const LADDER_1_STOP     = 5;
@@ -106,21 +123,56 @@ function loadState() {
   catch { return {}; }
 }
 
-// Realised P&L booked today, from the outcomes log — the same source and
-// shape LAB's breaker uses, so the two bots measure the day identically.
-// A missing or unreadable log reads as 0, which fails open (keeps trading)
-// rather than halting the bot on a filesystem hiccup.
-function getTodayRealizedPnl() {
+// Today's realised P&L, replayed trade by trade from the outcomes log —
+// the same source and shape LAB's breaker uses, so the two bots measure
+// the day identically. A missing or unreadable log reads as zeros, which
+// fails open (keeps trading) rather than halting the bot on a filesystem
+// hiccup.
+//
+// Returns { net, peak, stopped, reason }:
+//   net     — realised P&L for today
+//   peak    — the highest `net` reached at any point today
+//   stopped — a tier-1 rule became true at some point today
+//   reason  — "loss" or "giveback", whichever triggered FIRST, else null
+//
+// `stopped` is STICKY and yet nothing is persisted: realised P&L only
+// changes when logTrade() appends, so replaying today's records rebuilds
+// the whole day exactly — including a condition that was true at trade 3
+// and false again by trade 7. That is why there is no _dayStopped flag.
+// A stored flag would be lost by the boot-time `reset --hard origin/main`
+// whenever the last push had not landed; a replay cannot be.
+//
+// Records are sorted by exitTime rather than trusted in file order:
+// logTrade appends in close order, but this log has been rebuilt from a
+// backup branch once already and may be re-ordered again.
+function getTodayRealizedDay() {
   const today = getToday();
-  let total = 0;
+  const todays = [];
   try {
     const lines = fs.readFileSync("outcomes_v21.jsonl", "utf8").split("\n").filter(Boolean);
     for (const line of lines) {
-      try { const r = JSON.parse(line); if (r.day === today) total += r.pnl; } catch {}
+      try { const r = JSON.parse(line); if (r.day === today) todays.push(r); } catch {}
     }
   } catch {}
-  return total;
+  todays.sort((a, b) => Date.parse(a.exitTime) - Date.parse(b.exitTime));
+
+  let net = 0, peak = 0, stopped = false, reason = null;
+  for (const r of todays) {
+    net += r.pnl;
+    if (net > peak) peak = net;
+    // Checked after EVERY record, so the first condition to occur is the
+    // one reported, and a later recovery cannot clear it.
+    if (!stopped) {
+      if (net <= STOP_DAY_LOSS) { stopped = true; reason = "loss"; }
+      else if (peak >= PROFIT_ARM && net <= PROFIT_GIVEBACK) { stopped = true; reason = "giveback"; }
+    }
+  }
+  return { net, peak, stopped, reason };
 }
+
+// Unchanged contract for the tier-2 call sites, which only ever wanted
+// the day's net.
+function getTodayRealizedPnl() { return getTodayRealizedDay().net; }
 function saveState(s) { fs.writeFileSync("state_v21.json", JSON.stringify(s,null,2)); }
 
 async function tg(text, replyTo=null) {
@@ -884,11 +936,17 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca) {
   if (isPastLastEntry()) return;
   if (isRangeBuilding()) return;
 
-  // Daily loss breaker, checked before any network call so a breached day
-  // costs nothing to re-evaluate each cycle.
-  const realizedToday = getTodayRealizedPnl();
-  if (realizedToday <= DAILY_LOSS_LIMIT) {
-    console.log(`${symbol}: daily loss limit hit ($${realizedToday} <= $${DAILY_LOSS_LIMIT}) — no new entries today`);
+  // Daily gates, checked before any network call so a stopped day costs
+  // nothing to re-evaluate each cycle. One replay of the day covers both
+  // tiers: tier 1 (stop opening trades) and tier 2 (the older, wider
+  // floor, whose force-close lives in monitorPosition and is untouched).
+  const day = getTodayRealizedDay();
+  if (day.stopped) {
+    console.log(`${symbol}: day stopped (${day.reason}) — net $${day.net}, peak $${day.peak} — no new entries today`);
+    return;
+  }
+  if (day.net <= DAILY_LOSS_LIMIT) {
+    console.log(`${symbol}: daily loss limit hit ($${day.net} <= $${DAILY_LOSS_LIMIT}) — no new entries today`);
     return;
   }
 
@@ -1132,11 +1190,22 @@ ${slLine}`);
 
   // Daily loss breaker — one-time alert, so a breached day is visible
   // immediately rather than inferred from a silent absence of entries.
-  const dailyPnlNow = getTodayRealizedPnl();
-  if (dailyPnlNow <= DAILY_LOSS_LIMIT && state._lossBreakerAlerted !== today) {
+  const dayNow = getTodayRealizedDay();
+  if (dayNow.net <= DAILY_LOSS_LIMIT && state._lossBreakerAlerted !== today) {
     state._lossBreakerAlerted = today;
     saveState(state);
-    await tg(`🚨 <b>v21: تم بلوغ حد الخسارة اليومي</b>\n($${dailyPnlNow} ≤ $${DAILY_LOSS_LIMIT}) — إيقاف كل دخول جديد وإغلاق المراكز المفتوحة لبقية اليوم.`);
+    await tg(`🚨 <b>v21: تم بلوغ حد الخسارة اليومي</b>\n($${dayNow.net} ≤ $${DAILY_LOSS_LIMIT}) — إيقاف كل دخول جديد وإغلاق المراكز المفتوحة لبقية اليوم.`);
+  }
+
+  // Tier 1 — one alert per day, same pattern. Saved before the send so a
+  // watchdog kill mid-send costs one missed alert, not a daily flood.
+  if (dayNow.stopped && state._dayStoppedAlerted !== today) {
+    state._dayStoppedAlerted = today;
+    saveState(state);
+    const why = dayNow.reason === "loss"
+      ? `حدّ الخسارة اليومي: الصافي المحقق $${dayNow.net} ≤ $${STOP_DAY_LOSS}`
+      : `حماية الربح: بلغ اليوم قمة $${dayNow.peak} (≥ $${PROFIT_ARM}) ثم تراجع إلى $${dayNow.net} (≤ $${PROFIT_GIVEBACK})`;
+    await tg(`⏸️ <b>v21: إيقاف الدخول لبقية اليوم</b>\n${why}\nالمراكز المفتوحة تُترك لأوقافها — لا إغلاق قسري.`);
   }
 
   if (MODE === "monitor") {
