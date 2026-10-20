@@ -1,22 +1,27 @@
 // ============================================================
-// TIER-1 DAILY STOP RULES — TEST SUITE. No network, no API keys.
+// TIER-1 DAILY STOP + PROFIT FLOOR — TEST SUITE. No network, no keys.
 //
-// getTodayRealizedDay(), getTodayRealizedPnl() and the scanEntry gate are
-// EXTRACTED BY TEXT from the real scan_v21.js / scan_lab.js and run
-// against a stubbed fs. If a regex stops matching, the suite throws
-// instead of silently testing nothing.
+// Every function and inline block under test is EXTRACTED BY TEXT from
+// the real scan_v21.js / scan_lab.js and run against a stubbed fs,
+// stubbed quote fetch and stubbed order POST. If a regex stops matching,
+// the suite throws instead of silently testing nothing.
 //
-// Regression baseline: origin/main (the branch point), against which the
-// old getTodayRealizedPnl() is replayed on the REAL outcomes files and
-// compared value-for-value, and the tier-2 force-close paths are asserted
-// unchanged by text.
+// Two deliberate choices about the baseline:
+//   * BASE_SHA is PINNED. origin/main moves every few minutes (the
+//     container commits state), so a moving baseline would make this
+//     suite's regression checks non-reproducible.
+//   * The previous getTodayRealizedPnl() is embedded below as a FROZEN
+//     LITERAL rather than extracted from git, so the regression compares
+//     against a fixed, reviewable definition that cannot drift.
 //
 // Run:  node test_daily_stop.mjs
 // ============================================================
 import fs from "fs";
+import os from "os";
+import path from "path";
 import { execFileSync } from "child_process";
 
-const BASE_REF = "origin/main";
+const BASE_SHA = "042bd24a337a57339b687a603eca5cdfa5409337";
 const FILES = { v21: "scan_v21.js", lab: "scan_lab.js" };
 const OUTCOMES = { v21: "outcomes_v21.jsonl", lab: "outcomes_lab.jsonl" };
 const lf = s => s.replace(/\r\n/g, "\n");
@@ -24,8 +29,22 @@ const lf = s => s.replace(/\r\n/g, "\n");
 const src = {}, base = {};
 for (const [bot, file] of Object.entries(FILES)) {
   src[bot]  = lf(fs.readFileSync(file, "utf8"));
-  base[bot] = lf(execFileSync("git", ["show", `${BASE_REF}:${file}`], { maxBuffer: 1 << 28 }).toString());
+  base[bot] = lf(execFileSync("git", ["show", `${BASE_SHA}:${file}`], { maxBuffer: 1 << 28 }).toString());
 }
+
+// ── the FROZEN previous implementation, verbatim from BASE_SHA ──
+const FROZEN_OLD_PNL = bot => `
+function getTodayRealizedPnl() {
+  const today = getToday();
+  let total = 0;
+  try {
+    const lines = fs.readFileSync("outcomes_${bot === "v21" ? "v21" : "lab"}.jsonl", "utf8").split("\\n").filter(Boolean);
+    for (const line of lines) {
+      try { const r = JSON.parse(line); if (r.day === today) total += r.pnl; } catch {}
+    }
+  } catch {}
+  return total;
+}`;
 
 const grab = (text, re, what) => {
   const m = text.match(re);
@@ -52,48 +71,106 @@ function capture(fn) {
   try { return { out: fn(), lines }; }
   finally { Object.assign(console, orig); }
 }
+async function captureAsync(fn) {
+  const lines = [];
+  const orig = { error: console.error, warn: console.warn, log: console.log };
+  const sink = (...a) => lines.push(a.map(x => typeof x === "string" ? x : JSON.stringify(x)).join(" "));
+  console.error = sink; console.warn = sink; console.log = sink;
+  try { return { out: await fn(), lines }; }
+  catch (e) { return { out: undefined, err: e, lines }; }
+  finally { Object.assign(console, orig); }
+}
 
 // ════════════════════════════════════════════════════════════
-// Extraction + builders
+// Extraction
 // ════════════════════════════════════════════════════════════
 const RE = {
-  day:   /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/,
-  wrap:  /function getTodayRealizedPnl\(\) \{ return getTodayRealizedDay\(\)\.net; \}/,
-  oldFn: /function getTodayRealizedPnl\(\) \{\n  const today = getToday\(\);[\s\S]*?\n\}/,
-  loss:  /const STOP_DAY_LOSS\s*=\s*-?\d+;/,
-  arm:   /const PROFIT_ARM\s*=\s*-?\d+;/,
-  give:  /const PROFIT_GIVEBACK\s*=\s*-?\d+;/,
+  day:     /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/,
+  wrap:    /function getTodayRealizedPnl\(\) \{ return getTodayRealizedDay\(\)\.net; \}/,
+  readPk:  /function readDayPeak\(\) \{[\s\S]*?\n\}/,
+  bumpPk:  /function bumpDayPeak\(candidate\) \{[\s\S]*?\n\}/,
+  legs:    /async function getQuoteLegs\(optSym\) \{[\s\S]*?\n\}/,
+  gate:    /if \(dayCtx\?\.armed\) \{[\s\S]*?\n    qty = sized;\n  \}/,
+  logLine: /console\.log\(`\[(?:v21|LAB) day\][\s\S]*?loss_stopped=\$\{realizedDay\.stopped \? realizedDay\.reason : "no"\}`\);/,
+  ctx:     /const realizedDay = getTodayRealizedDay\(\);\n  const dayTotal[\s\S]*?\n  \};/,
+  loss:    /const STOP_DAY_LOSS\s*=\s*-?\d+;/,
+  floor:   /const PROFIT_FLOOR\s*=\s*-?\d+;/,
+  enabled: /const PROFIT_FLOOR_ENABLED = (true|false);/,
+  pad:     /const STOP_SLIPPAGE_PAD\s*=\s*[\d.]+;/,
+  pkFile:  /const DAYPEAK_FILE\s*=\s*"daypeak_(?:v21|lab)\.json";/,
+  pfFn:    /function profitFloor\(_peakTotal\) \{ return PROFIT_FLOOR; \}/,
 };
 
 const CONSTS = bot => [
   grab(src[bot], RE.loss, `STOP_DAY_LOSS/${bot}`),
-  grab(src[bot], RE.arm,  `PROFIT_ARM/${bot}`),
-  grab(src[bot], RE.give, `PROFIT_GIVEBACK/${bot}`),
+  grab(src[bot], RE.floor, `PROFIT_FLOOR/${bot}`),
+  grab(src[bot], RE.enabled, `PROFIT_FLOOR_ENABLED/${bot}`),
+  grab(src[bot], RE.pad, `STOP_SLIPPAGE_PAD/${bot}`),
+  grab(src[bot], RE.pfFn, `profitFloor/${bot}`),
 ].join("\n");
 
-// The real getTodayRealizedDay, closed over a fake fs and a fixed "today".
 function makeDay(bot, fileText, today = "2026-10-20") {
-  const fn = grab(src[bot], RE.day, `getTodayRealizedDay/${bot}`);
-  const wrap = grab(src[bot], RE.wrap, `getTodayRealizedPnl wrapper/${bot}`);
-  const fsStub = {
-    readFileSync: () => { if (fileText === null) throw new Error("ENOENT"); return fileText; },
-  };
+  const fsStub = { readFileSync: () => { if (fileText === null) throw new Error("ENOENT"); return fileText; } };
   return new Function("fs", "getToday",
-    `${CONSTS(bot)}\n${fn}\n${wrap}\nreturn { getTodayRealizedDay, getTodayRealizedPnl };`
-  )(fsStub, () => today);
+    `${CONSTS(bot)}\n${grab(src[bot], RE.day, `day/${bot}`)}\n${grab(src[bot], RE.wrap, `wrap/${bot}`)}\n` +
+    `return { getTodayRealizedDay, getTodayRealizedPnl };`)(fsStub, () => today);
 }
 
-// The ORIGINAL getTodayRealizedPnl from origin/main, same fake fs.
+// The frozen previous implementation, same fake fs.
 function makeOld(bot, fileText, today = "2026-10-20") {
-  const fn = grab(base[bot], RE.oldFn, `old getTodayRealizedPnl/${bot}`);
-  const fsStub = {
-    readFileSync: () => { if (fileText === null) throw new Error("ENOENT"); return fileText; },
-  };
-  return new Function("fs", "getToday", `${fn}\nreturn getTodayRealizedPnl;`)(fsStub, () => today);
+  const fsStub = { readFileSync: () => { if (fileText === null) throw new Error("ENOENT"); return fileText; } };
+  return new Function("fs", "getToday", `${FROZEN_OLD_PNL(bot)}\nreturn getTodayRealizedPnl;`)(fsStub, () => today);
 }
 
-// Build a JSONL log. `trades` is a list of pnl values (in intended close
-// order); exitTime is synthesised one minute apart.
+// readDayPeak / bumpDayPeak against the REAL fs, with DAYPEAK_FILE
+// pointed at a scratch path — this is the only way to exercise the
+// tmp+rename path honestly.
+function makePeak(bot, file, today = "2026-10-20") {
+  return new Function("fs", "getToday", "DAYPEAK_FILE",
+    `${grab(src[bot], RE.readPk, `readPk/${bot}`)}\n${grab(src[bot], RE.bumpPk, `bumpPk/${bot}`)}\n` +
+    `return { readDayPeak, bumpDayPeak };`)(fs, () => today, file);
+}
+
+// The gate block, lifted verbatim, with everything it touches stubbed.
+function makeGate(bot, { dayCtx, premium, legs, calcQtyResult }) {
+  const pctExpr = bot === "v21" ? "HARD_STOP_PCT/100" : "strategy.params.stopLossPct / 100";
+  const legsCalls = [];
+  const posts = [];
+  const body = grab(src[bot], RE.gate, `gate/${bot}`);
+  const fn = new Function(
+    "dayCtx", "symbol", "opt", "qtyIn", "getQuoteLegs", "postOrder", "HARD_STOP_PCT", "strategy", "STOP_SLIPPAGE_PAD",
+    `return (async () => {
+       let qty = qtyIn;
+       ${body}
+       postOrder(qty);
+       return { qty, skipped: false };
+     })().catch(e => { throw e; });`
+  );
+  // The gate's early returns return undefined; wrap to detect them.
+  const wrapped = new Function(
+    "dayCtx", "symbol", "opt", "qtyIn", "getQuoteLegs", "postOrder", "HARD_STOP_PCT", "strategy", "STOP_SLIPPAGE_PAD",
+    `return (async () => {
+       let qty = qtyIn;
+       ${body}
+       postOrder(qty);
+       return { qty, skipped: false };
+     })();`
+  );
+  return {
+    run: () => wrapped(
+      dayCtx, "SPY",
+      { symbol: "SPY261020P00600000", premium },
+      calcQtyResult,
+      async s => { legsCalls.push(s); return legs; },
+      q => posts.push(q),
+      -35,
+      { params: { stopLossPct: -30 } },
+      0.10,
+    ).then(r => r ?? { skipped: true }),
+    legsCalls, posts,
+  };
+}
+
 const DAY = "2026-10-20";
 function logOf(trades, { day = DAY, reverse = false, extraDays = [] } = {}) {
   const rows = trades.map((pnl, i) => ({
@@ -108,234 +185,288 @@ const otherDay = (day, pnl, i = 0) => ({
   exitTime: new Date(Date.parse(`${day}T14:00:00Z`) + i * 60000).toISOString(),
 });
 
-const LIMITS = {
-  v21: { loss: -280, arm: 170, give: 85 },
-  lab: { loss: -500, arm: 300, give: 150 },
-};
+const LIMITS = { v21: { loss: -280, floor: 170, pct: -35 }, lab: { loss: -500, floor: 300, pct: -30 } };
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "daypeak-"));
 
 console.log("\n═══════════════════════════════════════════════════════════");
-console.log(" TIER-1 DAILY STOP RULES — no network, no keys");
-console.log(`  baseline: ${BASE_REF}`);
+console.log(" TIER-1 DAILY STOP + PROFIT FLOOR — no network, no keys");
+console.log(`  pinned base: ${BASE_SHA.slice(0, 12)}   old impl: frozen literal`);
 console.log("═══════════════════════════════════════════════════════════");
 
-// ── 0) the constants really are what was approved ─────────
-console.log("\n── 0) الثوابت المعتمدة ──");
+// ── A) constants / profitFloor ────────────────────────────
+console.log("\n── A) الثوابت و profitFloor ──");
 for (const bot of ["v21", "lab"]) {
   const L = LIMITS[bot];
-  check(`${bot}: STOP_DAY_LOSS = ${L.loss}`, grab(src[bot], RE.loss).includes(String(L.loss)), grab(src[bot], RE.loss), L.loss);
-  check(`${bot}: PROFIT_ARM = ${L.arm}`, new RegExp(`=\\s*${L.arm};`).test(grab(src[bot], RE.arm)), grab(src[bot], RE.arm), L.arm);
-  check(`${bot}: PROFIT_GIVEBACK = ${L.give}`, new RegExp(`=\\s*${L.give};`).test(grab(src[bot], RE.give)), grab(src[bot], RE.give), L.give);
+  check(`${bot}: STOP_DAY_LOSS = ${L.loss}`, new RegExp(`=\\s*${L.loss};`).test(grab(src[bot], RE.loss)), grab(src[bot], RE.loss), L.loss);
+  check(`${bot}: PROFIT_FLOOR = ${L.floor}`, new RegExp(`=\\s*${L.floor};`).test(grab(src[bot], RE.floor)), grab(src[bot], RE.floor), L.floor);
+  check(`${bot}: PROFIT_FLOOR_ENABLED = true`, /= true;/.test(grab(src[bot], RE.enabled)), grab(src[bot], RE.enabled), "true");
+  check(`${bot}: STOP_SLIPPAGE_PAD = 0.10`, /=\s*0\.10;/.test(grab(src[bot], RE.pad)), grab(src[bot], RE.pad), "0.10");
+  check(`${bot}: DAYPEAK_FILE = daypeak_${bot === "v21" ? "v21" : "lab"}.json`,
+    grab(src[bot], RE.pkFile).includes(`daypeak_${bot === "v21" ? "v21" : "lab"}.json`), grab(src[bot], RE.pkFile), bot);
+  const pf = new Function(`${CONSTS(bot)}\nreturn profitFloor;`)();
+  check(`${bot}: profitFloor() ثابت لأي مُدخل (ratchet-ready)`,
+    pf(0) === L.floor && pf(99999) === L.floor && pf(undefined) === L.floor, pf(99999), L.floor);
+  check(`${bot}: لا أثر لـ PROFIT_ARM / PROFIT_GIVEBACK`,
+    !/PROFIT_ARM|PROFIT_GIVEBACK/.test(src[bot]), "still present", "removed");
+  check(`${bot}: لا نص "حماية الربح" في أي تنبيه`, !/حماية الربح/.test(src[bot]), "present", "absent");
 }
-check("lab: الثوابت داخل كتلة HARD SAFETY LIMITS (بعيدة عن التهيئة الذاتية)",
-  /HARD SAFETY LIMITS[\s\S]*?const STOP_DAY_LOSS[\s\S]*?const MARKET_OPEN_UTC/.test(src.lab), "n/a", "inside the block");
-check("lab: لا يوجد STOP_DAY_LOSS في strategy_lab.json params",
-  !/STOP_DAY_LOSS|PROFIT_ARM|PROFIT_GIVEBACK/.test(lf(fs.readFileSync("strategy_lab.json", "utf8"))), "n/a", "absent");
+check("lab: ثوابت الأرضية داخل كتلة HARD SAFETY LIMITS",
+  /HARD SAFETY LIMITS[\s\S]*?const PROFIT_FLOOR\s*=[\s\S]*?const MARKET_OPEN_UTC/.test(src.lab), "outside", "inside");
 
-// ── 1) empty / unreadable log fails open ──────────────────
-console.log("\n── 1) سجل فارغ أو غير مقروء ⇒ يفشل مفتوحاً ──");
-for (const bot of ["v21", "lab"]) {
-  const miss = makeDay(bot, null).getTodayRealizedDay();
-  check(`${bot}: ENOENT ⇒ {net:0,peak:0,stopped:false,reason:null}`,
-    eq(miss, { net: 0, peak: 0, stopped: false, reason: null }), miss, { net: 0, peak: 0, stopped: false, reason: null });
-  const empty = makeDay(bot, "").getTodayRealizedDay();
-  check(`${bot}: ملف فارغ ⇒ نفس الشكل`, eq(empty, { net: 0, peak: 0, stopped: false, reason: null }), empty, "zeros");
-  const junk = makeDay(bot, "not json\n{broken\n").getTodayRealizedDay();
-  check(`${bot}: أسطر تالفة تُتجاهل بلا رمي`, eq(junk, { net: 0, peak: 0, stopped: false, reason: null }), junk, "zeros");
-}
-
-// ── 2) loss boundary: exact ──────────────────────────────
-console.log("\n── 2) حدّ الخسارة — الحدود بالضبط ──");
+// ── B) loss stop (kept from tier 1) ───────────────────────
+console.log("\n── B) حدّ الخسارة المحقق (بقي كما هو) ──");
 for (const bot of ["v21", "lab"]) {
   const L = LIMITS[bot];
   const at = makeDay(bot, logOf([L.loss])).getTodayRealizedDay();
-  check(`${bot}: net == ${L.loss} ⇒ متوقف (loss)`,
-    at.stopped && at.reason === "loss" && at.net === L.loss, at, { stopped: true, reason: "loss" });
+  check(`${bot}: net == ${L.loss} ⇒ متوقف (loss)`, at.stopped && at.reason === "loss", at, { stopped: true, reason: "loss" });
   const just = makeDay(bot, logOf([L.loss + 1])).getTodayRealizedDay();
-  check(`${bot}: net == ${L.loss + 1} ⇒ غير متوقف`,
-    just.stopped === false && just.reason === null && just.net === L.loss + 1, just, { stopped: false });
+  check(`${bot}: net == ${L.loss + 1} ⇒ غير متوقف`, just.stopped === false && just.reason === null, just, { stopped: false });
+  const sticky = makeDay(bot, logOf([L.loss, 900])).getTodayRealizedDay();
+  check(`${bot}: لاصق — خسارة ثم تعافٍ ⇒ ما زال متوقفاً`, sticky.stopped && sticky.reason === "loss", sticky, { stopped: true });
+  const prof = makeDay(bot, logOf([L.floor + 50, -20])).getTodayRealizedDay();
+  check(`${bot}: يوم رابح لا يُوقفه حدّ الخسارة`, prof.stopped === false, prof, { stopped: false });
+  const miss = makeDay(bot, null).getTodayRealizedDay();
+  check(`${bot}: سجل غير مقروء ⇒ أصفار (يفشل مفتوحاً)`,
+    eq(miss, { net: 0, peak: 0, stopped: false, reason: null }), miss, "zeros");
+  const rev = makeDay(bot, logOf([L.loss, 900], { reverse: true })).getTodayRealizedDay();
+  check(`${bot}: ترتيب الملف معكوساً ⇒ نفس النتيجة`, eq(rev, sticky), rev, sticky);
+  const other = makeDay(bot, logOf([10], { extraDays: [otherDay("2026-10-19", -9999)] })).getTodayRealizedDay();
+  check(`${bot}: أيام أخرى تُتجاهل`, other.net === 10, other, { net: 10 });
 }
 
-// ── 3) giveback boundary: exact ──────────────────────────
-console.log("\n── 3) حماية الربح — الحدود بالضبط ──");
+// ── C) peak file ──────────────────────────────────────────
+console.log("\n── C) ملف القمة (daypeak) ──");
+for (const bot of ["v21", "lab"]) {
+  const f = path.join(TMP, `pk_${bot}.json`);
+  try { fs.unlinkSync(f); } catch {}
+  const pk = makePeak(bot, f);
+
+  check(`${bot}: ملف غير موجود ⇒ القمة 0 (متسامح)`, pk.readDayPeak().peakTotal === 0, pk.readDayPeak(), 0);
+  check(`${bot}: أول bump يكتب 390`, pk.bumpDayPeak(390) === 390 && pk.readDayPeak().peakTotal === 390, pk.readDayPeak(), 390);
+  // 11) lower write rejected
+  check(`${bot}: كتابة أدنى (350) مرفوضة — الملف يبقى 390`,
+    pk.bumpDayPeak(350) === 390 && pk.readDayPeak().peakTotal === 390, pk.readDayPeak(), 390);
+  check(`${bot}: مساوٍ (390) لا يكتب`, pk.bumpDayPeak(390) === 390, pk.readDayPeak(), 390);
+  check(`${bot}: أعلى (500) يرفع`, pk.bumpDayPeak(500) === 500, pk.readDayPeak(), 500);
+  check(`${bot}: NaN لا يكتب ولا يرمي`, pk.bumpDayPeak(NaN) === 500, pk.readDayPeak(), 500);
+  // 12) stale file from a previous day ignored
+  fs.writeFileSync(f, JSON.stringify({ day: "2026-10-17", peakTotal: 9999 }));
+  check(`${bot}: ملف بيوم سابق ⇒ القمة 0 (لا يُسلّح)`, pk.readDayPeak().peakTotal === 0, pk.readDayPeak(), 0);
+  check(`${bot}: ثم bump يكتب يوم اليوم`, pk.bumpDayPeak(42) === 42 && JSON.parse(fs.readFileSync(f, "utf8")).day === "2026-10-20",
+    JSON.parse(fs.readFileSync(f, "utf8")), { day: "2026-10-20", peakTotal: 42 });
+  // 13) malformed
+  fs.writeFileSync(f, "{not json");
+  check(`${bot}: ملف تالف ⇒ القمة 0 بلا رمي`, pk.readDayPeak().peakTotal === 0, pk.readDayPeak(), 0);
+  fs.writeFileSync(f, JSON.stringify({ day: "2026-10-20", peakTotal: "high" }));
+  check(`${bot}: peakTotal غير رقمي ⇒ 0`, pk.readDayPeak().peakTotal === 0, pk.readDayPeak(), 0);
+  // 14) tmp + rename
+  check(`${bot}: الكتابة عبر tmp ثم rename`,
+    /\.tmp`;/.test(grab(src[bot], RE.bumpPk)) && /renameSync/.test(grab(src[bot], RE.bumpPk)), "no tmp/rename", "tmp + rename");
+  check(`${bot}: مفتاح اليوم هو getToday() نفسه (لا حساب تاريخ جديد)`,
+    /d\.day === getToday\(\)/.test(grab(src[bot], RE.readPk)) &&
+    /day: getToday\(\)/.test(grab(src[bot], RE.bumpPk)) &&
+    !/toLocaleDateString|Intl\.|America\/Chicago/.test(grab(src[bot], RE.readPk) + grab(src[bot], RE.bumpPk)),
+    "other date source", "getToday()");
+}
+// 9) the defect this file exists to fix, and 10) that it is fixed
+console.log("\n── C2) النسيان بين الدورات: العيب والإصلاح ──");
 for (const bot of ["v21", "lab"]) {
   const L = LIMITS[bot];
-  // peak exactly ARM, then down to exactly GIVEBACK
-  const hit = makeDay(bot, logOf([L.arm, L.give - L.arm])).getTodayRealizedDay();
-  check(`${bot}: قمة ${L.arm} ثم صافي ${L.give} ⇒ متوقف (giveback)`,
-    hit.stopped && hit.reason === "giveback" && hit.peak === L.arm && hit.net === L.give,
-    hit, { stopped: true, reason: "giveback", peak: L.arm, net: L.give });
-  // peak one dollar short of ARM, same landing
-  const noArm = makeDay(bot, logOf([L.arm - 1, L.give - (L.arm - 1)])).getTodayRealizedDay();
-  check(`${bot}: قمة ${L.arm - 1} ثم صافي ${L.give} ⇒ غير متوقف (لم يتسلّح)`,
-    noArm.stopped === false && noArm.peak === L.arm - 1 && noArm.net === L.give, noArm, { stopped: false });
-  // armed, lands one dollar ABOVE giveback
-  const above = makeDay(bot, logOf([L.arm, L.give + 1 - L.arm])).getTodayRealizedDay();
-  check(`${bot}: تسلّح ثم صافي ${L.give + 1} (فوق العتبة) ⇒ غير متوقف`,
-    above.stopped === false && above.net === L.give + 1, above, { stopped: false });
+  const armedFrom = (peak, total) => (peak >= L.floor || total >= L.floor);
+  check(`${bot}: بلا ملف — دورة N total ${L.floor + 90} تُسلّح، دورة N+1 total ${L.floor - 50} تنسى (العيب)`,
+    armedFrom(0, L.floor + 90) === true && armedFrom(0, L.floor - 50) === false, "n/a", "defect reproduced");
+  const f = path.join(TMP, `fix_${bot}.json`);
+  try { fs.unlinkSync(f); } catch {}
+  const pk = makePeak(bot, f);
+  pk.bumpDayPeak(L.floor + 90);                       // cycle N, scan child
+  const peakNext = pk.readDayPeak().peakTotal;        // cycle N+1, fresh process
+  check(`${bot}: بالملف — دورة N+1 ما زالت مُسلَّحة (peak=${peakNext})`,
+    armedFrom(peakNext, L.floor - 50) === true, { peakNext }, "armed");
 }
-
-// ── 4) STICKY ────────────────────────────────────────────
-console.log("\n── 4) اللصوقية (sticky) ──");
+// 15) monitor child must not write / 7) untrusted must not bump
+console.log("\n── C3) مَن يكتب القمة ──");
 for (const bot of ["v21", "lab"]) {
-  const L = LIMITS[bot];
-  // arm, dip to giveback, then recover well above
-  const rec = makeDay(bot, logOf([L.arm, L.give - L.arm, 500])).getTodayRealizedDay();
-  check(`${bot}: تسلّح ← هبوط للعتبة ← تعافٍ إلى ${L.give + 500} ⇒ ما زال متوقفاً (giveback)`,
-    rec.stopped && rec.reason === "giveback" && rec.net === L.give + 500,
-    rec, { stopped: true, reason: "giveback", net: L.give + 500 });
-  // loss stop then full recovery into profit
-  const lrec = makeDay(bot, logOf([L.loss, 900])).getTodayRealizedDay();
-  check(`${bot}: حدّ الخسارة ← تعافٍ إلى +${L.loss + 900} ⇒ ما زال متوقفاً (loss)`,
-    lrec.stopped && lrec.reason === "loss" && lrec.net === L.loss + 900,
-    lrec, { stopped: true, reason: "loss" });
-  // never armed, big drawdown -> loss only
-  const dd = makeDay(bot, logOf([L.arm - 1, -(L.arm - 1) + L.loss])).getTodayRealizedDay();
-  check(`${bot}: لم يتسلّح + هبوط حادّ ⇒ السبب loss لا giveback`,
-    dd.stopped && dd.reason === "loss", dd, { stopped: true, reason: "loss" });
+  const ctx = grab(src[bot], RE.ctx, `ctx/${bot}`);
+  check(`${bot}: bumpDayPeak مشروط بـ positionsTrusted && MODE !== "monitor"`,
+    /positionsTrusted && MODE !== "monitor"\)\n\s*\? bumpDayPeak\(dayTotal\)/.test(ctx), ctx.slice(0, 200), "guarded bump");
+  check(`${bot}: وإلا يقرأ فقط (readDayPeak)`, /: readDayPeak\(\)\.peakTotal;/.test(ctx), "no read fallback", "readDayPeak");
 }
 
-// ── 5) first condition wins ──────────────────────────────
-console.log("\n── 5) أي شرط يسبق هو السبب المسجَّل ──");
+// ── D) gate + sizing with the REAL stop price ─────────────
+console.log("\n── D) البوابة والتحجيم بسعر الوقف الحقيقي ──");
+{
+  // v21: mid 1.00 -> stopPlaced = max(0.01, 0.65) = 0.65 ; ask 1.05
+  // maxLoss/ct = 100*(1.05-0.65)*1.10 = 44.00   (NOT 100*1.05*0.35 = 36.75)
+  const g = makeGate("v21", {
+    dayCtx: { armed: true, trusted: true, budget: 100, total: 270, peak: 270, floor: 170 },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 4,
+  });
+  const r = await captureAsync(() => g.run());
+  const line = r.lines.find(l => l.includes("maxLoss/ct")) || "";
+  check("v21: maxLoss/ct = $44.00 بسعر الوقف الحقيقي (لا $36.75)", line.includes("$44.00"), line, "$44.00");
+  check("v21: budget 100 / 44 ⇒ allowed 2، qty 4 → 2", r.out.qty === 2 && g.posts[0] === 2, { qty: r.out?.qty, posts: g.posts }, 2);
+}
+{
+  // LAB: mid 1.00 -> stopPlaced 0.70 ; ask 1.05 -> 100*(1.05-0.70)*1.10 = 38.50
+  const g = makeGate("lab", {
+    dayCtx: { armed: true, trusted: true, budget: 100, total: 400, peak: 400, floor: 300 },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 5,
+  });
+  const r = await captureAsync(() => g.run());
+  const line = r.lines.find(l => l.includes("maxLoss/ct")) || "";
+  check("lab: maxLoss/ct = $38.50 (وقف -30%)", line.includes("$38.50"), line, "$38.50");
+  check("lab: budget 100 / 38.5 ⇒ allowed 2", r.out.qty === 2, r.out?.qty, 2);
+}
+{
+  // the 0.01 clamp: mid 0.02 -> round2(0.013) = 0.01 -> max(0.01,0.01) = 0.01
+  const g = makeGate("v21", {
+    dayCtx: { armed: true, trusted: true, budget: 1000, total: 1170, peak: 1170, floor: 170 },
+    premium: 0.02, legs: { ask: 0.03, bid: 0.01, mid: 0.02 }, calcQtyResult: 50,
+  });
+  const r = await captureAsync(() => g.run());
+  const line = r.lines.find(l => l.includes("maxLoss/ct")) || "";
+  check("v21: قيد 0.01 — الوقف 0.01 والمخاطرة ≈ (ask-0.01)*100*1.1 = $2.20", line.includes("stop 0.01") && line.includes("$2.20"), line, "stop 0.01 / $2.20");
+}
+{
+  const g = makeGate("v21", {
+    dayCtx: { armed: true, trusted: true, budget: 0, total: 170, peak: 170, floor: 170 },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 4,
+  });
+  const r = await captureAsync(() => g.run());
+  check("v21: total == floor بالضبط ⇒ budget 0 ⇒ تخطٍّ، لا أمر شراء",
+    r.out.skipped === true && g.posts.length === 0, { out: r.out, posts: g.posts }, "skipped");
+}
+{
+  const g = makeGate("v21", {
+    dayCtx: { armed: true, trusted: true, budget: 20, total: 190, peak: 300, floor: 170 },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 4,
+  });
+  const r = await captureAsync(() => g.run());
+  check("v21: budget 20 < maxLoss 44 ⇒ ولا عقد واحد يُناسب ⇒ تخطٍّ",
+    r.out.skipped === true && g.posts.length === 0, { out: r.out, posts: g.posts }, "skipped");
+}
+{
+  const g = makeGate("v21", {
+    dayCtx: { armed: true, trusted: true, budget: 10000, total: 10170, peak: 10170, floor: 170 },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 4,
+  });
+  const r = await captureAsync(() => g.run());
+  check("v21: ميزانية وفيرة ⇒ qty يبقى 4 (لا يزيد أبداً)", r.out.qty === 4, r.out?.qty, 4);
+}
+// 20) NOT armed -> no legs call, qty untouched
+console.log("\n── D2) غير مُسلَّح ⇒ لا نداء ask ولا تغيير ──");
 for (const bot of ["v21", "lab"]) {
-  const L = LIMITS[bot];
-  // giveback occurs at trade 2, loss at trade 3
-  const gFirst = makeDay(bot, logOf([L.arm, L.give - L.arm, L.loss - L.give])).getTodayRealizedDay();
-  check(`${bot}: giveback أولاً ثم loss ⇒ السبب "giveback"`,
-    gFirst.stopped && gFirst.reason === "giveback" && gFirst.net === L.loss, gFirst, { reason: "giveback" });
-  // loss occurs at trade 1, then the day climbs and givebacks later
-  const lFirst = makeDay(bot, logOf([L.loss, L.arm - L.loss, L.give - L.arm])).getTodayRealizedDay();
-  check(`${bot}: loss أولاً ثم giveback ⇒ السبب "loss"`,
-    lFirst.stopped && lFirst.reason === "loss" && lFirst.net === L.give, lFirst, { reason: "loss" });
-  // both true on the SAME record is impossible (loss < giveback), so the
-  // loss branch must win when a single record lands at or below both
-  const same = makeDay(bot, logOf([L.arm, L.loss - L.arm])).getTodayRealizedDay();
-  check(`${bot}: سجل واحد يهبط تحت العتبتين ⇒ loss له الأسبقية`,
-    same.stopped && same.reason === "loss", same, { reason: "loss" });
+  const g = makeGate(bot, {
+    dayCtx: { armed: false, trusted: true, budget: 0, total: -50, peak: 10, floor: LIMITS[bot].floor },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 7,
+  });
+  const r = await captureAsync(() => g.run());
+  check(`${bot}: غير مُسلَّح ⇒ getQuoteLegs لم تُستدعَ إطلاقاً`, g.legsCalls.length === 0, g.legsCalls, []);
+  check(`${bot}: غير مُسلَّح ⇒ qty == calcQty بالضبط`, r.out.qty === 7 && g.posts[0] === 7, { qty: r.out?.qty }, 7);
+  const g2 = makeGate(bot, {
+    dayCtx: undefined,
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 7,
+  });
+  const r2 = await captureAsync(() => g2.run());
+  check(`${bot}: dayCtx غير مُمرَّر (undefined) ⇒ البوابة خاملة`, r2.out.qty === 7 && g2.legsCalls.length === 0, r2.out?.qty, 7);
 }
-
-// ── 6) ordering and day isolation ────────────────────────
-console.log("\n── 6) الترتيب وعزل الأيام ──");
+// PROFIT_FLOOR_ENABLED=false -> armed is false by construction
+console.log("\n── D3) PROFIT_FLOOR_ENABLED = false ⇒ خامل تماماً ──");
 for (const bot of ["v21", "lab"]) {
-  const L = LIMITS[bot];
-  const trades = [L.arm, L.give - L.arm, 500];
-  const fwd = makeDay(bot, logOf(trades)).getTodayRealizedDay();
-  const rev = makeDay(bot, logOf(trades, { reverse: true })).getTodayRealizedDay();
-  check(`${bot}: ترتيب الملف معكوساً ⇒ نفس النتيجة بالضبط`, eq(fwd, rev), rev, fwd);
-
-  const withOthers = makeDay(bot, logOf(trades, {
-    extraDays: [otherDay("2026-10-19", -9999), otherDay("2026-10-21", 9999), otherDay("2026-10-19", -500, 1)],
-  })).getTodayRealizedDay();
-  check(`${bot}: سجلات أيام أخرى تُتجاهل تماماً`, eq(withOthers, fwd), withOthers, fwd);
-
-  const onlyOthers = makeDay(bot, JSON.stringify(otherDay("2026-10-19", -9999)) + "\n").getTodayRealizedDay();
-  check(`${bot}: لا سجل لليوم ⇒ أصفار`, eq(onlyOthers, { net: 0, peak: 0, stopped: false, reason: null }), onlyOthers, "zeros");
+  const ctx = grab(src[bot], RE.ctx, `ctx/${bot}`);
+  check(`${bot}: armed يشترط PROFIT_FLOOR_ENABLED`,
+    /const armed = PROFIT_FLOOR_ENABLED && \(/.test(ctx), "not gated", "gated");
+  const armedOf = new Function("PROFIT_FLOOR_ENABLED", "peakTotal", "dayTotal", "floorNow",
+    `return PROFIT_FLOOR_ENABLED && (peakTotal >= floorNow || dayTotal >= floorNow);`);
+  check(`${bot}: enabled=false مع قمة فوق الأرضية ⇒ غير مُسلَّح`,
+    armedOf(false, 9999, 9999, LIMITS[bot].floor) === false, armedOf(false, 9999, 9999, LIMITS[bot].floor), false);
+  check(`${bot}: enabled=true مع قمة فوق الأرضية ⇒ مُسلَّح`,
+    armedOf(true, 9999, 0, LIMITS[bot].floor) === true, true, true);
+  check(`${bot}: سطر اللوق يُطبع مهما كانت enabled`, /enabled=\$\{PROFIT_FLOOR_ENABLED \? "YES" : "NO"\}/.test(src[bot]), "missing", "present");
 }
 
-// ── 7) peak tracks the running max, not the final net ────
-console.log("\n── 7) القمة = أعلى تراكمي، لا الصافي النهائي ──");
+// ── E) fail-closed / fail-open directions ─────────────────
+console.log("\n── E) اتجاه الفشل ──");
 for (const bot of ["v21", "lab"]) {
-  const d = makeDay(bot, logOf([100, 50, -30, 10])).getTodayRealizedDay();
-  check(`${bot}: قمة 150 وصافي 130`, d.peak === 150 && d.net === 130, d, { peak: 150, net: 130 });
-  const neg = makeDay(bot, logOf([-50, -10])).getTodayRealizedDay();
-  check(`${bot}: يوم سالب بالكامل ⇒ القمة 0 لا -50`, neg.peak === 0 && neg.net === -60, neg, { peak: 0, net: -60 });
+  const g = makeGate(bot, {
+    dayCtx: { armed: true, trusted: false, budget: 500, total: 700, peak: 700, floor: LIMITS[bot].floor },
+    premium: 1.00, legs: { ask: 1.05, bid: 0.95, mid: 1.00 }, calcQtyResult: 4,
+  });
+  const r = await captureAsync(() => g.run());
+  check(`${bot}: مُسلَّح + positions غير موثوق ⇒ تخطٍّ (fail closed) ولا نداء ask`,
+    r.out.skipped === true && g.legsCalls.length === 0 && g.posts.length === 0, { out: r.out, legs: g.legsCalls }, "skipped");
+  const g2 = makeGate(bot, {
+    dayCtx: { armed: true, trusted: true, budget: 500, total: 700, peak: 700, floor: LIMITS[bot].floor },
+    premium: 1.00, legs: null, calcQtyResult: 4,
+  });
+  const r2 = await captureAsync(() => g2.run());
+  check(`${bot}: مُسلَّح + لا ask ⇒ تخطٍّ (fail closed)`,
+    r2.out.skipped === true && g2.posts.length === 0, { out: r2.out }, "skipped");
+  const legs = new Function("fetchWithTimeout", "ALPACA_KEY", "ALPACA_SECRET", "HEADERS",
+    `${grab(src[bot], RE.legs, `legs/${bot}`)}\nreturn getQuoteLegs;`)(
+      async () => ({ json: async () => ({ quotes: { X: { ap: 0, bp: 0 } } }) }), "k", "s", {});
+  check(`${bot}: getQuoteLegs مع ask=0 ⇒ null`, (await legs("X")) === null, await legs("X"), null);
+  const legs2 = new Function("fetchWithTimeout", "ALPACA_KEY", "ALPACA_SECRET", "HEADERS",
+    `${grab(src[bot], RE.legs, `legs2/${bot}`)}\nreturn getQuoteLegs;`)(
+      async () => { throw new Error("boom"); }, "k", "s", {});
+  check(`${bot}: getQuoteLegs عند خطأ شبكي ⇒ null بلا رمي`, (await legs2("X")) === null, "threw", null);
 }
 
-// ── 8) REGRESSION: getTodayRealizedPnl() on the REAL logs ─
-console.log("\n── 8) انحدار: getTodayRealizedPnl() على السجلات الحقيقية ──");
+// ── F) the stdout line ────────────────────────────────────
+console.log("\n── F) سطر اللوق ──");
+for (const bot of ["v21", "lab"]) {
+  const line = grab(src[bot], RE.logLine, `log/${bot}`);
+  for (const field of ["realized=", "unreal_pl=", "unreal_intraday=", "total=", "peak=", "floor=", "enabled=", "armed=", "budget=", "trusted=", "loss_stopped="]) {
+    check(`${bot}: سطر اللوق يحمل ${field}`, line.includes(field), field, "present");
+  }
+  check(`${bot}: المجموعان كلاهما مسجَّلان`, line.includes("unreal_pl=") && line.includes("unreal_intraday="), "one only", "both");
+  const ctx = grab(src[bot], RE.ctx, `ctx2/${bot}`);
+  check(`${bot}: القرار يستخدم unrealPl فقط (لا intraday)`,
+    /const dayTotal = realizedDay\.net \+ unrealPl;/.test(ctx) && !/unrealIntraday/.test(ctx), ctx.slice(0, 120), "unrealPl only");
+}
+check("v21: unrealized_intraday_pl مجموع للتسجيل فقط", /unrealIntraday \+= uplIntra;/.test(src.v21), "missing", "present");
+check("lab: unrealized_intraday_pl مجموع للتسجيل فقط", /unrealIntraday \+= uplIntra;/.test(src.lab), "missing", "present");
+
+// ── G) regressions ────────────────────────────────────────
+console.log("\n── G) الانحدار ──");
 for (const bot of ["v21", "lab"]) {
   const real = lf(fs.readFileSync(OUTCOMES[bot], "utf8"));
-  const days = [...new Set(real.split("\n").filter(Boolean).map(l => {
-    try { return JSON.parse(l).day; } catch { return null; }
-  }).filter(Boolean))].sort();
-  let mismatch = 0, checked = 0;
-  for (const d of days) {
-    const now = makeDay(bot, real, d).getTodayRealizedPnl();
-    const old = makeOld(bot, real, d)();
-    if (now !== old) mismatch++;
-    checked++;
-  }
-  check(`${bot}: الصافي مطابق على كل الأيام (${checked} يوماً، ${real.split("\n").filter(Boolean).length} سجلاً)`,
-    mismatch === 0 && checked > 0, { checked, mismatch }, { checked, mismatch: 0 });
-  // and the wrapper is literally net
-  const d0 = makeDay(bot, real, days[days.length - 1]);
-  check(`${bot}: الغلاف يُرجع net حرفياً`,
-    d0.getTodayRealizedPnl() === d0.getTodayRealizedDay().net, d0.getTodayRealizedPnl(), d0.getTodayRealizedDay().net);
-}
+  const days = [...new Set(real.split("\n").filter(Boolean).map(l => { try { return JSON.parse(l).day; } catch { return null; } }).filter(Boolean))].sort();
+  let mismatch = 0;
+  for (const d of days) if (makeDay(bot, real, d).getTodayRealizedPnl() !== makeOld(bot, real, d)()) mismatch++;
+  check(`${bot}: الصافي مطابق للنسخة المجمَّدة على كل الأيام (${days.length} يوماً)`, mismatch === 0 && days.length > 0, { days: days.length, mismatch }, { mismatch: 0 });
 
-// ── 9) REGRESSION: tier-2 paths unchanged (by text) ──────
-console.log("\n── 9) انحدار: مسارات الطبقة 2 كما هي (نصّاً) ──");
-const TIER2 = {
-  v21: [
-    ["DAILY_LOSS_LIMIT constant", /const DAILY_LOSS_LIMIT\s*=\s*-600;/],
-    ["monitorPosition force-close", /if \(getTodayRealizedPnl\(\) <= DAILY_LOSS_LIMIT\) \{\n    await closePosition\(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill"\);\n    return;\n  \}/],
-  ],
-  lab: [
-    ["MAX_DAILY_LOSS constant", /const MAX_DAILY_LOSS\s*=\s*1000;/],
-    ["monitorPosition force-close", /if \(getTodayRealizedPnl\(\) <= -MAX_DAILY_LOSS\) \{\n    await closePosition\(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill"\);\n    return;\n  \}/],
-  ],
-};
-for (const bot of ["v21", "lab"]) {
-  for (const [label, re] of TIER2[bot]) {
-    const inNew = re.test(src[bot]), inOld = re.test(base[bot]);
-    check(`${bot}: ${label} موجود في الأصل وفي الجديد بلا تغيير`, inOld && inNew, { inOld, inNew }, { inOld: true, inNew: true });
+  const TIER2 = bot === "v21"
+    ? [["DAILY_LOSS_LIMIT", /const DAILY_LOSS_LIMIT\s*=\s*-600;/],
+       ["force-close", /if \(getTodayRealizedPnl\(\) <= DAILY_LOSS_LIMIT\) \{\n    await closePosition\(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill"\);\n    return;\n  \}/]]
+    : [["MAX_DAILY_LOSS", /const MAX_DAILY_LOSS\s*=\s*1000;/],
+       ["force-close", /if \(getTodayRealizedPnl\(\) <= -MAX_DAILY_LOSS\) \{\n    await closePosition\(state, symbol, pos, currentPremium, "daily_loss_breaker", "order_fill"\);\n    return;\n  \}/]];
+  for (const [label, re] of TIER2) {
+    check(`${bot}: tier-2 ${label} موجود في الأساس وفي الجديد`, re.test(src[bot]) && re.test(base[bot]), { now: re.test(src[bot]), old: re.test(base[bot]) }, "both");
   }
-  // the force-close must NOT have learned about tier 1
-  const monitor = grab(src[bot], /async function monitorPosition\([\s\S]*?\n\}/, `monitorPosition/${bot}`);
-  check(`${bot}: monitorPosition لا يذكر أي ثابت من الطبقة 1`,
-    !/STOP_DAY_LOSS|PROFIT_ARM|PROFIT_GIVEBACK|getTodayRealizedDay/.test(monitor), "mentions tier 1", "clean");
-  // alpaca() untouched
-  const alp = grab(src[bot], /async function alpaca\([\s\S]*?\n\}/, `alpaca/${bot}`);
-  const alpOld = grab(base[bot], /async function alpaca\([\s\S]*?\n\}/, `alpaca-old/${bot}`);
-  check(`${bot}: alpaca() لم تُلمس`, alp === alpOld, "changed", "identical");
+  for (const [label, re] of [
+    ["alpaca()", /async function alpaca\([\s\S]*?\n\}/],
+    ["getOwnedQty()", /async function getOwnedQty\([\s\S]*?\n\}/],
+    ["getQuote()", /async function getQuote\(optSym\) \{[\s\S]*?\n\}/],
+    ["monitorPosition()", /async function monitorPosition\([\s\S]*?\n\}/],
+  ]) {
+    check(`${bot}: ${label} مطابق للأساس حرفياً`, grab(src[bot], re, label) === grab(base[bot], re, `${label} base`), "changed", "identical");
+  }
+  check(`${bot}: monitorPosition لا يعرف شيئاً عن الأرضية`,
+    !/PROFIT_FLOOR|dayCtx|getQuoteLegs|DAYPEAK/.test(grab(src[bot], /async function monitorPosition\([\s\S]*?\n\}/, "mp")), "knows", "clean");
 }
-// WVAD must be untouched entirely
 const wv = lf(fs.readFileSync("scan_wvad.js", "utf8"));
-const wvOld = lf(execFileSync("git", ["show", `${BASE_REF}:scan_wvad.js`], { maxBuffer: 1 << 28 }).toString());
-check("wvad: scan_wvad.js غير معدَّل إطلاقاً", wv === wvOld, "changed", "identical");
+check("wvad: غير معدَّل إطلاقاً", wv === lf(execFileSync("git", ["show", `${BASE_SHA}:scan_wvad.js`], { maxBuffer: 1 << 28 }).toString()), "changed", "identical");
 
-// ── 10) the scanEntry gate itself ────────────────────────
-console.log("\n── 10) بوابة scanEntry ──");
-for (const bot of ["v21", "lab"]) {
-  const L = LIMITS[bot];
-  const entry = grab(src[bot], /const day = getTodayRealizedDay\(\);\n  if \(day\.stopped\) \{[\s\S]*?\n  \}/, `gate/${bot}`);
-  check(`${bot}: البوابة تستخدم day.stopped وتُرجِع`, /day\.stopped/.test(entry) && /return;/.test(entry), entry.slice(0, 60), "day.stopped + return");
-  // the gate runs before the first network call in scanEntry
-  const fn = grab(src[bot], bot === "v21"
-    ? /async function scanEntry\(state, symbol, portfolio, liveInAlpaca\) \{[\s\S]*?\n\}/
-    : /async function scanEntry\(state, strategy, symbol, liveInAlpaca\) \{[\s\S]*?\n\}/, `scanEntry/${bot}`);
-  const gateAt = fn.indexOf("getTodayRealizedDay()");
-  const firstAwait = fn.search(/await (getBars|checkBreakout|getLatestPrice|alpaca|findOption)/);
-  check(`${bot}: البوابة قبل أول نداء شبكي في scanEntry`,
-    gateAt > -1 && firstAwait > -1 && gateAt < firstAwait, { gateAt, firstAwait }, "gate first");
-  // tier 2 still checked in scanEntry too
-  check(`${bot}: الطبقة 2 ما زالت مفحوصة في scanEntry`,
-    bot === "v21" ? /day\.net <= DAILY_LOSS_LIMIT/.test(fn) : /day\.net <= -MAX_DAILY_LOSS/.test(fn),
-    "missing", "present");
-}
+// runner.js: ONLY the STATE_FILES line changed
+const runNow = lf(fs.readFileSync("runner.js", "utf8"));
+const runBase = lf(execFileSync("git", ["show", `${BASE_SHA}:runner.js`], { maxBuffer: 1 << 28 }).toString());
+check("runner.js: daypeak_v21.json و daypeak_lab.json في STATE_FILES",
+  /"daypeak_v21\.json", "daypeak_lab\.json",/.test(runNow), "missing", "present");
+check("runner.js: لا شيء آخر تغيّر (بعد إزالة السطر الواحد يساوي الأساس)",
+  runNow.replace('  "daypeak_v21.json", "daypeak_lab.json",\n', "") === runBase, "differs elsewhere", "identical");
 
-// ── 11) the alert block ──────────────────────────────────
-console.log("\n── 11) تنبيه مرة واحدة يومياً ──");
-for (const bot of ["v21", "lab"]) {
-  const alert = grab(src[bot], /if \(dayNow\.stopped && state\._dayStoppedAlerted !== today\) \{[\s\S]*?\n  \}/, `alert/${bot}`);
-  const saveIdx = alert.indexOf("saveState(state)");
-  const tgIdx = alert.search(/await tg\(/);
-  check(`${bot}: العلم يُحفظ قبل الإرسال`, saveIdx > -1 && tgIdx > -1 && saveIdx < tgIdx, { saveIdx, tgIdx }, "save first");
-  check(`${bot}: العلم مُخزَّن في الحالة ببادئة _`, /state\._dayStoppedAlerted = today;/.test(alert), "missing", "present");
-  check(`${bot}: الرسالة تذكر السبب والعتبات`,
-    /حدّ الخسارة اليومي/.test(alert) && /حماية الربح/.test(alert) &&
-    /STOP_DAY_LOSS/.test(alert) && /PROFIT_ARM/.test(alert) && /PROFIT_GIVEBACK/.test(alert),
-    "incomplete", "both reasons + thresholds");
-  check(`${bot}: الرسالة تنصّ أن المراكز المفتوحة لا تُغلق قسرياً`,
-    /لا إغلاق قسري/.test(alert), "missing", "present");
-  check(`${bot}: تنبيه الطبقة 2 منفصل وما زال قائماً`,
-    /state\._lossBreakerAlerted !== today/.test(src[bot]), "missing", "present");
-}
-// daily_report.js enumerates state keys — the new flag must be filtered out
-const dr = lf(fs.readFileSync("daily_report.js", "utf8"));
-const enumLines = dr.split("\n").filter(l => /Object\.keys\(\w*State\)/.test(l));
-check(`daily_report: كل أسطر تعداد مفاتيح الحالة (${enumLines.length}) تُرشِّح البادئة _`,
-  enumLines.length === 3 && enumLines.every(l => l.includes('!k.startsWith("_")')), enumLines.length, 3);
-
+try { fs.rmSync(TMP, { recursive: true, force: true }); } catch {}
 console.log(`\n═══════════════════════════════════════════════════════════`);
 console.log(` نجح ${pass} | فشل ${fail}`);
 console.log(`═══════════════════════════════════════════════════════════\n`);

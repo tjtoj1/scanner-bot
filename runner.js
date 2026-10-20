@@ -59,6 +59,7 @@ const STATE_FILES = [
   "state_lab.json", "strategy_lab.json", "outcomes_lab.jsonl",
   "state_wvad.json", "outcomes_wvad.jsonl",
   "report_state.json",
+  "daypeak_v21.json", "daypeak_lab.json",
 ];
 
 const REPORT_WINDOW_START_UTC = 20 * 60 + 35; // 20:35 UTC — after LAB's own 20:00-20:30 learning window
