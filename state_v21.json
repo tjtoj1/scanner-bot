@@ -82,8 +82,8 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 47.138047138047156,
-    "lastReportedThreshold": 40,
+    "peakPct": 67.6767676767677,
+    "lastReportedThreshold": 60,
     "ladder2": true,
     "trailPct": 10
   },
@@ -110,8 +110,8 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 27.4822260357931,
-    "lastReportedThreshold": 20,
+    "peakPct": 32.63054670262321,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
@@ -139,8 +139,8 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 82.55033557046981,
-    "lastReportedThreshold": 80,
+    "peakPct": 113.42281879194631,
+    "lastReportedThreshold": 110,
     "ladder2": true,
     "trailPct": 10
   },
