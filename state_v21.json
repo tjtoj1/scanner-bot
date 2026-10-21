@@ -60,7 +60,8 @@
   },
   "_cooldowns": {
     "SPY_PUT": "2026-10-21T14:44:30.079Z",
-    "NVDA_PUT": "2026-10-21T14:44:30.605Z"
+    "NVDA_PUT": "2026-10-21T14:44:30.605Z",
+    "IWM_PUT": "2026-10-21T14:48:00.213Z"
   },
   "TSLA": {
     "active": true,
@@ -85,27 +86,5 @@
     "slStock": null,
     "lastReportedThreshold": -10
   },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261021P00277000",
-    "strike": "277",
-    "entryPremium": 0.745,
-    "qty": 6,
-    "entryTime": 1792593026486,
-    "level": 276.555,
-    "msgId": 6603,
-    "stopOrderId": "ba8a4d14-06ab-4420-b4df-1e8c8c917293",
-    "hardStopPrice": 0.48,
-    "entryStockPrice": 276.79499999999996,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 67.32,
-    "volumeRatio": 5.415482775308553,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -20
-  }
+  "_dayStoppedAlerted": "2026-10-21"
 }
