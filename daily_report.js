@@ -1,7 +1,8 @@
 // ============================================================
 // DAILY REPORT — combined v21 + LAB performance report, sent to
 // Telegram once per day after market close. Invoked by runner.js
-// within a fixed window (20:35-21:00 UTC); self-guards against
+// within a window derived from America/Chicago (15:35-16:00 local, see
+// runner.js reportWindowStartUtc/marketEndUtc); self-guards against
 // re-sending the same day via report_state.json.
 //
 // Read-only: never touches scan_v21.js, scan_lab.js, or any state
