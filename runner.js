@@ -49,8 +49,72 @@ const GH_PUSH_TOKEN = process.env.GH_PUSH_TOKEN; // needed only to push
 const TG_TOKEN = process.env.TG_TOKEN;
 const PERSONAL_CHAT = "810642442";
 
-const MARKET_START_UTC = 13 * 60 + 30; // 13:30 UTC
-const MARKET_END_UTC   = 21 * 60;      // 21:00 UTC
+// ─── SESSION TIMES, DERIVED FROM America/Chicago ──────────────────
+// The session used to be hard-coded in UTC, which is correct for exactly
+// half the year: on 2026-11-01 the US leaves daylight saving and the same
+// constants point an hour early — range building would read pre-market
+// bars and the force-exit would flatten an hour before the close.
+//
+// So the clock is derived from the zone instead. `Intl.DateTimeFormat`
+// with a timeZone reads the system tz database, so this is correct on
+// both sides of every past and future transition without a date table
+// and without a dependency. scan_wvad.js has derived its RTH window this
+// way since it was written; this extends the same idea to the gates.
+//
+// chicagoOffsetMin() returns UTC-minus-Chicago in minutes:
+//   300 = CDT (UTC-5, summer)      360 = CST (UTC-6, winter)
+// Both transitions happen at 02:00 local on a SUNDAY, so the answer never
+// changes inside a trading session. NaN on any failure — see the startup
+// assertion below, which refuses to trade on a silent fallback rather
+// than guessing.
+const CHI_HM = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Chicago", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+});
+function chicagoOffsetMin(d = new Date()) {
+  try {
+    const p = CHI_HM.formatToParts(d);
+    const h = +p.find(x => x.type === "hour")?.value;
+    const m = +p.find(x => x.type === "minute")?.value;
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
+    let off = (d.getUTCHours() * 60 + d.getUTCMinutes()) - (h * 60 + m);
+    if (off < 0) off += 1440;
+    return off;
+  } catch { return NaN; }
+}
+// UTC minute-of-day for h:m America/Chicago, on the day `d` falls in.
+// Pass the bar's own Date when filtering historical bars, so a bar from
+// the other side of a transition is judged by its own day's offset.
+function chicagoToUtcMinutes(h, m, d = new Date()) {
+  return (h * 60 + m + chicagoOffsetMin(d)) % 1440;
+}
+
+// Startup check — deliberately NOT process.exit(). This process is the
+// supervisor, and railway.json sets restartPolicyType: ALWAYS, so exiting
+// here would restart immediately and crash-loop forever, burning the
+// container and the logs with it. Instead: log once, alert once, and make
+// isMarketHours() return false so the loop takes its idle branch and
+// sleeps IDLE_INTERVAL_MS (5 min) indefinitely. The process stays alive,
+// Railway never restarts it, and the one thing it must not do — spawn
+// bots on a clock it cannot trust — it does not do.
+//
+// The alert itself is sent from main(), not here: alertOnce() is async and
+// `alertedOn` (line ~453) is a const that is still in its temporal dead
+// zone while this module is being evaluated.
+const CHI_OFFSET_AT_BOOT = chicagoOffsetMin();
+const CHI_OFFSET_OK = CHI_OFFSET_AT_BOOT === 300 || CHI_OFFSET_AT_BOOT === 360;
+if (!CHI_OFFSET_OK) {
+  console.error(`[runner] FATAL: America/Chicago offset resolved to ${CHI_OFFSET_AT_BOOT} `
+    + `(expected 300=CDT or 360=CST) — tz database unavailable. Refusing to run any `
+    + `bot cycle; idling instead of exiting so Railway does not restart-loop.`);
+}
+
+// Session bounds for the supervisor, in America/Chicago wall-clock.
+// marketEndUtc is 16:00 local — one hour past the 15:00 close — because
+// syncToGitHub() and the daily report both live inside the isMarketHours()
+// branch of the main loop. If this were the close itself, the last hour of
+// state would never reach GitHub and daily_report.js would never run.
+function marketStartUtc() { return chicagoToUtcMinutes(8, 30); }
+function marketEndUtc()   { return chicagoToUtcMinutes(16, 0); }
 const CYCLE_INTERVAL_MS = 60 * 1000;      // 60s during market hours
 const IDLE_INTERVAL_MS  = 5 * 60 * 1000;  // 5 min outside market hours
 
@@ -62,7 +126,10 @@ const STATE_FILES = [
   "daypeak_v21.json", "daypeak_lab.json",
 ];
 
-const REPORT_WINDOW_START_UTC = 20 * 60 + 35; // 20:35 UTC — after LAB's own 20:00-20:30 learning window
+// 15:35 America/Chicago — after LAB's own learning window, which opens 5
+// minutes past its force exit (scan_lab.js pastClose) and runs to the
+// close. Must stay strictly inside [marketStartUtc, marketEndUtc).
+function reportWindowStartUtc() { return chicagoToUtcMinutes(15, 35); }
 
 // Build-generated paths that must never enter git history — Nixpacks
 // writes secrets (env vars) into .nixpacks/build.sh in plaintext.
@@ -78,7 +145,11 @@ const GIT_TIMEOUT_MS = 20000;
 
 function utcMin() { const n = new Date(); return n.getUTCHours() * 60 + n.getUTCMinutes(); }
 function isWeekday() { const d = new Date().getUTCDay(); return d >= 1 && d <= 5; }
-function isMarketHours() { return isWeekday() && utcMin() >= MARKET_START_UTC && utcMin() < MARKET_END_UTC; }
+function isMarketHours() {
+  if (!CHI_OFFSET_OK) return false;   // unknown clock ⇒ never trade, just idle
+  const m = utcMin();
+  return isWeekday() && m >= marketStartUtc() && m < marketEndUtc();
+}
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function sh(cmd) { return execSync(cmd, { stdio: "ignore", timeout: GIT_TIMEOUT_MS }); }
 
@@ -530,6 +601,15 @@ process.on("unhandledRejection", (e) => console.error("[runner] unhandledRejecti
 
 async function main() {
   console.log(`=== Runner started ${new Date().toISOString()} ===`);
+  // One alert for a broken clock, sent from here because alertOnce() is
+  // async and its `alertedOn` map is not initialised at module-evaluation
+  // time. alertOnce is keyed per UTC day, so a container left broken
+  // re-notifies once a day rather than every five minutes.
+  if (!CHI_OFFSET_OK) {
+    await alertOnce("tz:chicago", `🚨 <b>[ALERT] Runner: الساعة غير موثوقة</b>\n`
+      + `تعذّر تحديد فرق توقيت America/Chicago (النتيجة ${CHI_OFFSET_AT_BOOT}، المتوقع 300 أو 360).\n`
+      + `لن تُشغَّل أي دورة تداول — الحاوية في وضع الخمول بدل إعادة التشغيل المتكررة.`);
+  }
   syncStateFromGitHub();
 
   while (true) {
@@ -541,7 +621,7 @@ async function main() {
         await runBotCycle("lab", "scan_lab.js");
         await runBotCycle("wvad", "scan_wvad.js");
         for (const bot of ["v21", "lab", "wvad"]) await checkStateFreshness(bot);
-        if (utcMin() >= REPORT_WINDOW_START_UTC) {
+        if (utcMin() >= reportWindowStartUtc()) {
           console.log("[runner] daily report window — checking");
           await runNode("daily_report.js", {});
         }

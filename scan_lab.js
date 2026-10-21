@@ -77,10 +77,63 @@ const STOP_SLIPPAGE_PAD    = 0.10;   // a triggered stop is a MARKET order
 const DAYPEAK_FILE         = "daypeak_lab.json";
 function profitFloor(_peakTotal) { return PROFIT_FLOOR; }
 const MAX_DTE            = 2;     // days — never trade an expiry further out
-const MARKET_OPEN_UTC    = 13 * 60 + 30; // 8:30 AM CDT
-const MARKET_CLOSE_UTC   = 20 * 60 + 30; // 3:30 PM CDT
-const FORCE_EXIT_UTC     = 19 * 60 + 55; // 2:55 PM CDT
-const LAST_ENTRY_UTC     = FORCE_EXIT_UTC - 25; // 2:30 PM CDT
+// ─── SESSION TIMES, DERIVED FROM America/Chicago ──────────────────
+// The session used to be hard-coded in UTC, which is correct for exactly
+// half the year: on 2026-11-01 the US leaves daylight saving and the same
+// constants point an hour early — range building would read pre-market
+// bars and the force-exit would flatten an hour before the close.
+//
+// So the clock is derived from the zone instead. `Intl.DateTimeFormat`
+// with a timeZone reads the system tz database, so this is correct on
+// both sides of every past and future transition without a date table
+// and without a dependency. scan_wvad.js has derived its RTH window this
+// way since it was written; this extends the same idea to the gates.
+//
+// chicagoOffsetMin() returns UTC-minus-Chicago in minutes:
+//   300 = CDT (UTC-5, summer)      360 = CST (UTC-6, winter)
+// Both transitions happen at 02:00 local on a SUNDAY, so the answer never
+// changes inside a trading session. NaN on any failure — see the startup
+// assertion below, which refuses to trade on a silent fallback rather
+// than guessing.
+const CHI_HM = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Chicago", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+});
+function chicagoOffsetMin(d = new Date()) {
+  try {
+    const p = CHI_HM.formatToParts(d);
+    const h = +p.find(x => x.type === "hour")?.value;
+    const m = +p.find(x => x.type === "minute")?.value;
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
+    let off = (d.getUTCHours() * 60 + d.getUTCMinutes()) - (h * 60 + m);
+    if (off < 0) off += 1440;
+    return off;
+  } catch { return NaN; }
+}
+// UTC minute-of-day for h:m America/Chicago, on the day `d` falls in.
+// Pass the bar's own Date when filtering historical bars, so a bar from
+// the other side of a transition is judged by its own day's offset.
+function chicagoToUtcMinutes(h, m, d = new Date()) {
+  return (h * 60 + m + chicagoOffsetMin(d)) % 1440;
+}
+
+// Startup assertion. A container without a full tz database makes
+// Intl.DateTimeFormat fall back to UTC, which would silently move every
+// gate by an hour — far worse than not trading. Exit non-zero instead:
+// runner.js treats a non-zero child exit as "halted, not idle" and raises
+// a one-per-day Telegram alert (runner.js:509-515).
+const CHI_OFFSET_AT_BOOT = chicagoOffsetMin();
+if (CHI_OFFSET_AT_BOOT !== 300 && CHI_OFFSET_AT_BOOT !== 360) {
+  console.error(`FATAL: America/Chicago offset resolved to ${CHI_OFFSET_AT_BOOT} `
+    + `(expected 300=CDT or 360=CST) — tz database unavailable, refusing to trade.`);
+  process.exit(1);
+}
+
+// Session gates, in America/Chicago wall-clock. lastEntryUtc keeps the
+// original "25 minutes before the force exit" relationship.
+function marketOpenUtc()  { return chicagoToUtcMinutes(8, 30); }
+function marketCloseUtc() { return chicagoToUtcMinutes(15, 30); }
+function forceExitUtc()   { return chicagoToUtcMinutes(14, 55); }
+function lastEntryUtc()   { return forceExitUtc() - 25; }
 
 // Re-entry cooldown: blocks immediate re-entry of (symbol × direction) after losing stops
 const STOP_REASONS       = new Set(["hard_stop", "alpaca_stop", "alpaca_stop_est"]);
@@ -121,9 +174,9 @@ const DEFAULT_STRATEGY = {
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function utcMin() { const n = new Date(); return n.getUTCHours() * 60 + n.getUTCMinutes(); }
-function isMarketOpen()   { const m = utcMin(); return m >= MARKET_OPEN_UTC && m < MARKET_CLOSE_UTC; }
-function isPastLastEntry(){ return utcMin() >= LAST_ENTRY_UTC; }
-function isForceExit()    { return utcMin() >= FORCE_EXIT_UTC; }
+function isMarketOpen()   { const m = utcMin(); return m >= marketOpenUtc() && m < marketCloseUtc(); }
+function isPastLastEntry(){ return utcMin() >= lastEntryUtc(); }
+function isForceExit()    { return utcMin() >= forceExitUtc(); }
 function getToday() { return new Date().toISOString().split("T")[0]; }
 function daysAgoUTC(n) { return new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString().split("T")[0]; }
 
@@ -1559,7 +1612,7 @@ function buildComboTemplate(combo, overallAvgPnlPct) {
 // day of learning.
 function shouldRunComboLearning(state) {
   const today = getToday();
-  const pastClose = utcMin() >= FORCE_EXIT_UTC + 5;
+  const pastClose = utcMin() >= forceExitUtc() + 5;
 
   if (state._lastComboLearnedDay === today) {
     // Already ran today. Re-run only if that was a mid-day catch-up for
@@ -1582,7 +1635,7 @@ function shouldRunComboLearning(state) {
 // work that never happened.
 async function runComboLearning(state, strategy) {
   const today = getToday();
-  const pastClose = utcMin() >= FORCE_EXIT_UTC + 5;
+  const pastClose = utcMin() >= forceExitUtc() + 5;
 
   let combos, overallAvgPnlPct, changed;
   try {

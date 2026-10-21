@@ -14,6 +14,14 @@
 //     LITERAL rather than extracted from git, so the regression compares
 //     against a fixed, reviewable definition that cannot drift.
 //
+// PHASE_A_SHA is a second pinned baseline: the commit that landed phase A
+// on main. Later work (the DST session-time change, and anything after it)
+// legitimately edits these files, so "nothing else changed" cannot be
+// asserted whole-file any more. Instead every phase A region is extracted
+// by text and compared BYTE FOR BYTE against PHASE_A_SHA — a stricter
+// claim about the code that matters than a whole-file diff ever made,
+// because it cannot be satisfied by an offsetting edit elsewhere.
+//
 // Run:  node test_daily_stop.mjs
 // ============================================================
 import fs from "fs";
@@ -22,14 +30,18 @@ import path from "path";
 import { execFileSync } from "child_process";
 
 const BASE_SHA = "042bd24a337a57339b687a603eca5cdfa5409337";
+const PHASE_A_SHA = "1aab1ffdf73ca731326fcfb4044eb032a2fd9926";
 const FILES = { v21: "scan_v21.js", lab: "scan_lab.js" };
 const OUTCOMES = { v21: "outcomes_v21.jsonl", lab: "outcomes_lab.jsonl" };
 const lf = s => s.replace(/\r\n/g, "\n");
+const showAt = (sha, file) =>
+  lf(execFileSync("git", ["show", `${sha}:${file}`], { maxBuffer: 1 << 28 }).toString());
 
-const src = {}, base = {};
+const src = {}, base = {}, phaseA = {};
 for (const [bot, file] of Object.entries(FILES)) {
-  src[bot]  = lf(fs.readFileSync(file, "utf8"));
-  base[bot] = lf(execFileSync("git", ["show", `${BASE_SHA}:${file}`], { maxBuffer: 1 << 28 }).toString());
+  src[bot]    = lf(fs.readFileSync(file, "utf8"));
+  base[bot]   = showAt(BASE_SHA, file);
+  phaseA[bot] = showAt(PHASE_A_SHA, file);
 }
 
 // ── the FROZEN previous implementation, verbatim from BASE_SHA ──
@@ -105,6 +117,15 @@ const RE = {
   // first 10-space `}` truncates after the expired branch and would test
   // only half the logic (it did, until this was corrected).
   sumLoop: /\/\/ The ticker filter above says[\s\S]*?unrealIntraday \+= uplIntra;\n          \}/,
+  // LAB only: the block self-tuning cannot reach. Ends at MAX_DTE, the last
+  // constant declared before the session-time section — so the region covers
+  // every hard limit without reaching into code that may legitimately move.
+  hsl:     /\/\/ ─── HARD SAFETY LIMITS[\s\S]*?\nconst MAX_DTE\s+=[^\n]*\n/,
+  // runner.js: the one line phase A added there.
+  stateFiles: /const STATE_FILES = \[[\s\S]*?\n\];/,
+  // scan_wvad.js: the zone-derived RTH filter. It predates all of this and
+  // is the precedent the DST change followed, so it must not move either.
+  etRth:   /const ET_FMT = [\s\S]*?function filterRTH\([\s\S]*?\n\}/,
 };
 
 const CONSTS = bot => [
@@ -242,8 +263,20 @@ for (const bot of ["v21", "lab"]) {
     !/PROFIT_ARM|PROFIT_GIVEBACK/.test(src[bot]), "still present", "removed");
   check(`${bot}: لا نص "حماية الربح" في أي تنبيه`, !/حماية الربح/.test(src[bot]), "present", "absent");
 }
-check("lab: ثوابت الأرضية داخل كتلة HARD SAFETY LIMITS",
-  /HARD SAFETY LIMITS[\s\S]*?const PROFIT_FLOOR\s*=[\s\S]*?const MARKET_OPEN_UTC/.test(src.lab), "outside", "inside");
+// Position, not just presence: all six declarations must sit INSIDE the
+// HARD SAFETY LIMITS block, which is the only reason the self-tuner cannot
+// rewrite them. The old form anchored the block's end on const
+// MARKET_OPEN_UTC, which the DST change replaced with a getter; the block
+// is now delimited by its own last constant and compared byte for byte
+// against phase A as well, which the old anchor never did.
+{
+  const hsl = grab(src.lab, RE.hsl, "HARD SAFETY LIMITS/lab");
+  const inside = [RE.loss, RE.enabled, RE.floor, RE.pad, RE.pkFile, RE.pfFn]
+    .every(re => re.test(hsl));
+  check("lab: ثوابت الأرضية داخل كتلة HARD SAFETY LIMITS", inside, "outside", "inside");
+  check("lab: كتلة HARD SAFETY LIMITS مطابقة بايتاً ببايت للمرحلة A",
+    hsl === grab(phaseA.lab, RE.hsl, "HARD SAFETY LIMITS/lab@phaseA"), "changed", "identical");
+}
 
 // ── B) loss stop (kept from tier 1) ───────────────────────
 console.log("\n── B) حدّ الخسارة المحقق (بقي كما هو) ──");
@@ -576,16 +609,55 @@ for (const bot of ["v21", "lab"]) {
   check(`${bot}: monitorPosition لا يعرف شيئاً عن الأرضية`,
     !/PROFIT_FLOOR|dayCtx|getQuoteLegs|DAYPEAK/.test(grab(src[bot], /async function monitorPosition\([\s\S]*?\n\}/, "mp")), "knows", "clean");
 }
-const wv = lf(fs.readFileSync("scan_wvad.js", "utf8"));
-check("wvad: غير معدَّل إطلاقاً", wv === lf(execFileSync("git", ["show", `${BASE_SHA}:scan_wvad.js`], { maxBuffer: 1 << 28 }).toString()), "changed", "identical");
+// ── E2) every phase A region, byte-identical to PHASE_A_SHA ───
+// The invariant: work landed AFTER phase A must not change phase A's code.
+// Whole-file equality used to carry this, but scan_wvad.js and runner.js
+// are legitimately edited now, so the claim is made per region instead.
+console.log(`\n── E2) مناطق المرحلة A مطابقة بايتاً ببايت لـ ${PHASE_A_SHA.slice(0, 8)} ──`);
+const PHASE_A_REGIONS = [
+  ["profitFloor()",           RE.pfFn],
+  ["readDayPeak()",           RE.readPk],
+  ["bumpDayPeak()",           RE.bumpPk],
+  ["getTodayRealizedDay()",   RE.day],
+  ["optionExpiryISO()",       RE.expiry],
+  ["getQuoteLegs()",          RE.legs],
+  ["كتلة PROFIT-FLOOR GATE",  RE.gate],
+  ["حارس F2 (untrusted)",     RE.f2],
+  ["كتلة DAY CONTEXT",        RE.ctx],
+  ["سطر لوق [day]",           RE.logLine],
+  ["STOP_DAY_LOSS",           RE.loss],
+  ["PROFIT_FLOOR_ENABLED",    RE.enabled],
+  ["PROFIT_FLOOR",            RE.floor],
+  ["STOP_SLIPPAGE_PAD",       RE.pad],
+  ["DAYPEAK_FILE",            RE.pkFile],
+];
+for (const bot of ["v21", "lab"]) {
+  for (const [label, re] of PHASE_A_REGIONS) {
+    check(`${bot}: ${label} مطابق للمرحلة A`,
+      grab(src[bot], re, `${label}/${bot}`) === grab(phaseA[bot], re, `${label}/${bot}@phaseA`),
+      "changed", "identical");
+  }
+}
 
-// runner.js: ONLY the STATE_FILES line changed
+// runner.js: phase A's only change there was the STATE_FILES line. The rest
+// of the file moves with later work, so only that array is pinned.
 const runNow = lf(fs.readFileSync("runner.js", "utf8"));
-const runBase = lf(execFileSync("git", ["show", `${BASE_SHA}:runner.js`], { maxBuffer: 1 << 28 }).toString());
 check("runner.js: daypeak_v21.json و daypeak_lab.json في STATE_FILES",
   /"daypeak_v21\.json", "daypeak_lab\.json",/.test(runNow), "missing", "present");
-check("runner.js: لا شيء آخر تغيّر (بعد إزالة السطر الواحد يساوي الأساس)",
-  runNow.replace('  "daypeak_v21.json", "daypeak_lab.json",\n', "") === runBase, "differs elsewhere", "identical");
+check("runner.js: مصفوفة STATE_FILES مطابقة للمرحلة A",
+  grab(runNow, RE.stateFiles, "STATE_FILES") ===
+  grab(showAt(PHASE_A_SHA, "runner.js"), RE.stateFiles, "STATE_FILES@phaseA"), "changed", "identical");
+
+// scan_wvad.js: phase A never touched it. It is edited now, so the claim is
+// narrowed to the zone-derived RTH filter — asserted identical at BOTH pinned
+// shas, i.e. unchanged all the way back to before phase A.
+const wv = lf(fs.readFileSync("scan_wvad.js", "utf8"));
+check("wvad: مرشّح ET RTH مطابق للأساس وللمرحلة A",
+  grab(wv, RE.etRth, "ET RTH") === grab(showAt(BASE_SHA, "scan_wvad.js"), RE.etRth, "ET RTH@base") &&
+  grab(wv, RE.etRth, "ET RTH") === grab(showAt(PHASE_A_SHA, "scan_wvad.js"), RE.etRth, "ET RTH@phaseA"),
+  "changed", "identical");
+check("wvad: لا أثر لكود الأرضية فيه",
+  !/PROFIT_FLOOR|DAYPEAK_FILE|getQuoteLegs|dayCtx/.test(wv), "present", "absent");
 
 try { fs.rmSync(TMP, { recursive: true, force: true }); } catch {}
 console.log(`\n═══════════════════════════════════════════════════════════`);
