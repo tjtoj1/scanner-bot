@@ -61,12 +61,12 @@
     "signal": "PUT",
     "optionSymbol": "AMZN261021P00260000",
     "strike": "260",
-    "entryPremium": 1.13,
+    "entryPremium": 1.2650000000000001,
     "qty": 2,
-    "entryTime": 1792591701538,
-    "msgId": 6593,
-    "stopOrderId": "4a05bb70-866d-45fd-9685-14e7a658c140",
-    "hardStopPrice": 0.79,
+    "entryTime": 1792591912714,
+    "msgId": 6596,
+    "stopOrderId": "bbf9df5d-54cf-4cca-b32b-0f2873b7e290",
+    "hardStopPrice": 0.89,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -75,7 +75,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 260.07,
+      "spot": 259.82,
       "regime": "bearish",
       "emaFast": 262.5326,
       "emaSlow": 262.8081,
@@ -85,17 +85,13 @@
       "lastClose": 260.66,
       "lastVolume": 3051986,
       "barTime": "2026-10-21T13:30:00Z",
-      "entryTimeUTC": "2026-10-21T14:08:21.538Z",
+      "entryTimeUTC": "2026-10-21T14:11:52.714Z",
       "vwapAtEntry": 261.5659,
       "rsiAtEntry": 26.61,
       "signalType": "breakout",
       "positionBucket": "near_low",
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
-    },
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 17.699115044247804,
-    "lastReportedThreshold": 10
+    }
   }
 }
