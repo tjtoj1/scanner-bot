@@ -18,44 +18,5 @@
     "symbols": [
       "QQQ"
     ]
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261023C00387500",
-    "strike": "387.5",
-    "entryPremium": 11.085,
-    "qty": 1,
-    "entryTime": 1792591486612,
-    "msgId": 6589,
-    "stopOrderId": "6873c2b4-baf0-4ade-b362-535f718022c5",
-    "hardStopPrice": 7.76,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 385.66499999999996,
-      "regime": "bullish",
-      "emaFast": 380.7306,
-      "emaSlow": 379.8171,
-      "breakoutHigh": 382.49,
-      "breakoutLow": 377.86,
-      "volRatio": 53.56,
-      "lastClose": 385.28,
-      "lastVolume": 5133400,
-      "barTime": "2026-10-21T13:30:00Z",
-      "entryTimeUTC": "2026-10-21T14:04:46.612Z",
-      "vwapAtEntry": 382.8307,
-      "rsiAtEntry": 73.61,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "lastReportedThreshold": -10
   }
 }
