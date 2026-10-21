@@ -299,6 +299,32 @@ check("scan_wvad.js ET_FMT / etMinutes / filterRTH byte-identical to origin/main
   return grab(src["scan_wvad.js"], re, "rth") === grab(baseOf("scan_wvad.js"), re, "rth base");
 })(), "changed", "identical");
 
+// Every constant the getters replaced. A surviving READ of one of these is
+// a ReferenceError the moment that line runs — and `node --check` cannot
+// see it, because an undeclared identifier is valid syntax. Only the real
+// code path would reveal it, during a session, with money open. So it is
+// asserted here instead: zero live references, per file.
+//
+// Comments and plain strings are stripped first, so prose may name a
+// removed constant while code may not. Template literals are deliberately
+// NOT stripped: a name inside `${...}` is a live read, and this errs
+// towards a false failure rather than a silent pass.
+const REMOVED_NAMES = [
+  "MARKET_START_UTC", "MARKET_END_UTC", "REPORT_WINDOW_START_UTC",
+  "RANGE_START_UTC", "RANGE_END_UTC", "LAST_ENTRY_UTC", "FORCE_EXIT_UTC",
+  "MARKET_OPEN_UTC", "MARKET_CLOSE_UTC", "FIRST_ENTRY_UTC",
+];
+const stripCommentsAndStrings = s => s
+  .replace(/\/\*[\s\S]*?\*\//g, " ")
+  .replace(/(^|[^:])\/\/[^\n]*/g, "$1")
+  .replace(/'(?:\\.|[^'\\\n])*'/g, "''")
+  .replace(/"(?:\\.|[^"\\\n])*"/g, '""');
+for (const f of [...FILES, "daily_report.js"]) {
+  const code = stripCommentsAndStrings(lf(fs.readFileSync(f, "utf8")));
+  const live = REMOVED_NAMES.filter(n => new RegExp(`\\b${n}\\b`).test(code));
+  check(`${f}: live references to removed names = 0`, live.length === 0, live, []);
+}
+
 // ── 11) nothing else moved ────────────────────────────────
 console.log("\n── 11) out-of-scope code untouched ──");
 for (const f of ["scan_v21.js", "scan_lab.js", "scan_wvad.js"]) {
