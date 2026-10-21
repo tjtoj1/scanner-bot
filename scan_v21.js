@@ -97,20 +97,74 @@ const HARD_STOP_PCT     = -35;
 // Cooldown: prevent re-entry on same symbol×signal within 30 min after losing close
 const COOLDOWN_MINUTES  = 30;
 
-// Range building window: 8:30-8:45 AM CDT = 13:30-13:45 UTC
-const RANGE_START_UTC   = 13 * 60 + 30;
-const RANGE_END_UTC     = 13 * 60 + 45;
-const LAST_ENTRY_UTC    = 19 * 60 + 30; // 2:30 PM CDT
-const FORCE_EXIT_UTC    = 19 * 60 + 55; // 2:55 PM CDT
+// ─── SESSION TIMES, DERIVED FROM America/Chicago ──────────────────
+// The session used to be hard-coded in UTC, which is correct for exactly
+// half the year: on 2026-11-01 the US leaves daylight saving and the same
+// constants point an hour early — range building would read pre-market
+// bars and the force-exit would flatten an hour before the close.
+//
+// So the clock is derived from the zone instead. `Intl.DateTimeFormat`
+// with a timeZone reads the system tz database, so this is correct on
+// both sides of every past and future transition without a date table
+// and without a dependency. scan_wvad.js has derived its RTH window this
+// way since it was written; this extends the same idea to the gates.
+//
+// chicagoOffsetMin() returns UTC-minus-Chicago in minutes:
+//   300 = CDT (UTC-5, summer)      360 = CST (UTC-6, winter)
+// Both transitions happen at 02:00 local on a SUNDAY, so the answer never
+// changes inside a trading session. NaN on any failure — see the startup
+// assertion below, which refuses to trade on a silent fallback rather
+// than guessing.
+const CHI_HM = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Chicago", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+});
+function chicagoOffsetMin(d = new Date()) {
+  try {
+    const p = CHI_HM.formatToParts(d);
+    const h = +p.find(x => x.type === "hour")?.value;
+    const m = +p.find(x => x.type === "minute")?.value;
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return NaN;
+    let off = (d.getUTCHours() * 60 + d.getUTCMinutes()) - (h * 60 + m);
+    if (off < 0) off += 1440;
+    return off;
+  } catch { return NaN; }
+}
+// UTC minute-of-day for h:m America/Chicago, on the day `d` falls in.
+// Pass the bar's own Date when filtering historical bars, so a bar from
+// the other side of a transition is judged by its own day's offset.
+function chicagoToUtcMinutes(h, m, d = new Date()) {
+  return (h * 60 + m + chicagoOffsetMin(d)) % 1440;
+}
+
+// Startup assertion. A container without a full tz database makes
+// Intl.DateTimeFormat fall back to UTC, which would silently move every
+// gate by an hour — far worse than not trading. Exit non-zero instead:
+// runner.js treats a non-zero child exit as "halted, not idle" and raises
+// a one-per-day Telegram alert (runner.js:509-515).
+const CHI_OFFSET_AT_BOOT = chicagoOffsetMin();
+if (CHI_OFFSET_AT_BOOT !== 300 && CHI_OFFSET_AT_BOOT !== 360) {
+  console.error(`FATAL: America/Chicago offset resolved to ${CHI_OFFSET_AT_BOOT} `
+    + `(expected 300=CDT or 360=CST) — tz database unavailable, refusing to trade.`);
+  process.exit(1);
+}
+
+// Session gates, in America/Chicago wall-clock. The UTC minute each one
+// resolves to shifts by 60 across the DST boundary; the local time does
+// not. Range building is 8:30-8:45 local, the opening 15 minutes.
+function rangeStartUtc()   { return chicagoToUtcMinutes(8, 30); }
+function rangeEndUtc()     { return chicagoToUtcMinutes(8, 45); }
+function lastEntryUtc()    { return chicagoToUtcMinutes(14, 30); }
+function forceExitUtc()    { return chicagoToUtcMinutes(14, 55); }
+function marketCloseUtc()  { return chicagoToUtcMinutes(15, 30); }
 
 function utcMin() {
   const n = new Date();
   return n.getUTCHours() * 60 + n.getUTCMinutes();
 }
-function isMarketOpen() { const m=utcMin(); return m>=RANGE_START_UTC && m<20*60+30; }
-function isRangeBuilding() { const m=utcMin(); return m>=RANGE_START_UTC && m<RANGE_END_UTC; }
-function isPastLastEntry() { return utcMin() >= LAST_ENTRY_UTC; }
-function isForceExit() { return utcMin() >= FORCE_EXIT_UTC; }
+function isMarketOpen() { const m=utcMin(); return m>=rangeStartUtc() && m<marketCloseUtc(); }
+function isRangeBuilding() { const m=utcMin(); return m>=rangeStartUtc() && m<rangeEndUtc(); }
+function isPastLastEntry() { return utcMin() >= lastEntryUtc(); }
+function isForceExit() { return utcMin() >= forceExitUtc(); }
 function getToday() { return new Date().toISOString().split("T")[0]; }
 
 // Get next available expiry after today (for NVDA/TSLA/AMZN)
@@ -621,12 +675,15 @@ async function buildRange(state, symbol) {
   const bars = await getBars(symbol, "15Min", 1);
   if (!bars.length) { console.log(`${symbol}: no bars available`); return; }
 
-  // Filter bars from TODAY 8:30-8:45 AM CDT (13:30-13:45 UTC)
+  // Filter bars from TODAY's opening 15 minutes, 8:30-8:45 America/Chicago.
+  // Each bar is judged with the offset of its OWN timestamp, not of "now",
+  // so a bar set spanning a DST transition is filtered correctly.
   const rangeBars = bars.filter(b => {
     const t = new Date(b.t);
     const barDate = t.toISOString().split("T")[0];
     const m = t.getUTCHours() * 60 + t.getUTCMinutes();
-    return barDate === today && m >= RANGE_START_UTC && m < RANGE_END_UTC;
+    return barDate === today
+      && m >= chicagoToUtcMinutes(8, 30, t) && m < chicagoToUtcMinutes(8, 45, t);
   });
 
   // If no range bars yet (before 8:45), use all TODAY's bars so far
@@ -634,7 +691,7 @@ async function buildRange(state, symbol) {
     const t = new Date(b.t);
     const barDate = t.toISOString().split("T")[0];
     const m = t.getUTCHours() * 60 + t.getUTCMinutes();
-    return barDate === today && m >= RANGE_START_UTC;
+    return barDate === today && m >= chicagoToUtcMinutes(8, 30, t);
   });
 
   if (!todayBars.length) {
