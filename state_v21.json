@@ -63,28 +63,5 @@
     "NVDA_PUT": "2026-10-21T14:44:30.605Z",
     "IWM_PUT": "2026-10-21T14:48:00.213Z"
   },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261023C00387500",
-    "strike": "387.5",
-    "entryPremium": 11.184999999999999,
-    "qty": 1,
-    "entryTime": 1792592120822,
-    "level": 386.68,
-    "msgId": 6598,
-    "stopOrderId": "b5c05272-72a8-49b0-87f1-f3b8a0611dbb",
-    "hardStopPrice": 7.27,
-    "entryStockPrice": 386.53499999999997,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 60.33,
-    "volumeRatio": 12.004748933822288,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "lastReportedThreshold": -10
-  },
   "_dayStoppedAlerted": "2026-10-21"
 }
