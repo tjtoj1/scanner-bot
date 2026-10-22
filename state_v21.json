@@ -61,34 +61,5 @@
   "_cooldowns": {
     "IWM_PUT": "2026-10-21T14:48:00.213Z"
   },
-  "_dayStoppedAlerted": "2026-10-21",
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261023P00217500",
-    "strike": "217.5",
-    "entryPremium": 3.115,
-    "qty": 1,
-    "entryTime": 1792678563025,
-    "level": 216.74,
-    "msgId": 6690,
-    "stopOrderId": "e7bdb891-0087-4786-b798-ec197885ef33",
-    "hardStopPrice": 2.02,
-    "entryStockPrice": 215.635,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 63.65,
-    "volumeRatio": 12.897166068851087,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 76.24398073836277,
-    "lastReportedThreshold": 70,
-    "nearStopWarned": true
-  }
+  "_dayStoppedAlerted": "2026-10-21"
 }
