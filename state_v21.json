@@ -59,7 +59,6 @@
     }
   },
   "_cooldowns": {
-    "SPY_PUT": "2026-10-21T14:44:30.079Z",
     "IWM_PUT": "2026-10-21T14:48:00.213Z"
   },
   "_dayStoppedAlerted": "2026-10-21",
@@ -73,7 +72,7 @@
     "entryTime": 1792678563025,
     "level": 216.74,
     "msgId": 6690,
-    "stopOrderId": "4ac79089-d718-4a2c-8638-f6d482101249",
+    "stopOrderId": "e7bdb891-0087-4786-b798-ec197885ef33",
     "hardStopPrice": 2.02,
     "entryStockPrice": 215.635,
     "vwapAtEntry": null,
@@ -83,7 +82,13 @@
     "tp1Stock": null,
     "tp2Stock": null,
     "tp3Stock": null,
-    "slStock": null
+    "slStock": null,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 21.829855537720697,
+    "lastReportedThreshold": 20
   },
   "TSLA": {
     "active": true,
@@ -130,8 +135,8 @@
     "slStock": null,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 22.224932910465956,
-    "lastReportedThreshold": 20,
+    "peakPct": 33.93510612344474,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "trailPct": 10
   }
