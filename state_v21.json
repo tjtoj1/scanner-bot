@@ -1,6 +1,31 @@
 {
   "_lastDay": "2026-10-22",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-10-22",
+      "symbol": "IWM",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-22",
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-22",
+      "symbol": "TSLA",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-22",
+      "symbol": "AMZN",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-10-22",
@@ -35,8 +60,99 @@
   },
   "_cooldowns": {
     "SPY_PUT": "2026-10-21T14:44:30.079Z",
-    "NVDA_PUT": "2026-10-21T14:44:30.605Z",
     "IWM_PUT": "2026-10-21T14:48:00.213Z"
   },
-  "_dayStoppedAlerted": "2026-10-21"
+  "_dayStoppedAlerted": "2026-10-21",
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM261022C00276000",
+    "strike": "276",
+    "entryPremium": 0.685,
+    "qty": 7,
+    "entryTime": 1792678558533,
+    "level": 276.23,
+    "msgId": 6689,
+    "stopOrderId": "e5b7dd0a-5c9d-420a-b6ce-76aadedbc614",
+    "hardStopPrice": 0.45,
+    "entryStockPrice": 275.9,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 59.06,
+    "volumeRatio": 17.142931008772962,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 11.678832116788314,
+    "lastReportedThreshold": 10
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261023P00217500",
+    "strike": "217.5",
+    "entryPremium": 3.115,
+    "qty": 1,
+    "entryTime": 1792678563025,
+    "level": 216.74,
+    "msgId": 6690,
+    "stopOrderId": "4ac79089-d718-4a2c-8638-f6d482101249",
+    "hardStopPrice": 2.02,
+    "entryStockPrice": 215.635,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 63.65,
+    "volumeRatio": 12.897166068851087,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA261023C00380000",
+    "strike": "380",
+    "entryPremium": 8.780000000000001,
+    "qty": 1,
+    "entryTime": 1792678565562,
+    "level": 382.14,
+    "msgId": 6691,
+    "stopOrderId": "3f2f2651-5f9b-4953-8d0b-fa77b23fe168",
+    "hardStopPrice": 5.71,
+    "entryStockPrice": 380,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 65.46,
+    "volumeRatio": 11.382183323243368,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "AMZN261023P00252500",
+    "strike": "252.5",
+    "entryPremium": 2.0495,
+    "qty": 2,
+    "entryTime": 1792678566987,
+    "level": 254.46,
+    "msgId": 6692,
+    "stopOrderId": "6f11b828-0e8b-4ba0-be47-e0a38753ba8b",
+    "hardStopPrice": 1.33,
+    "entryStockPrice": 252.855,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 58.64,
+    "volumeRatio": 18.865031044668154,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null
+  }
 }
