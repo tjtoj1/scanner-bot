@@ -1,31 +1,6 @@
 {
-  "_lastDay": "2026-10-21",
-  "_dailyTrades": [
-    {
-      "day": "2026-10-21",
-      "symbol": "SPY",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-10-21",
-      "symbol": "SPY",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-10-21",
-      "symbol": "QQQ",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-10-21",
-      "symbol": "QQQ",
-      "signal": "CALL",
-      "pnl": 0
-    }
-  ],
+  "_lastDay": "2026-10-22",
+  "_dailyTrades": [],
   "_cooldowns": {
     "QQQ_PUT": "2026-10-20T13:47:45.256Z",
     "SPY_PUT": "2026-10-20T13:51:25.897Z",
