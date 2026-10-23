@@ -7,7 +7,8 @@
     "QQQ_CALL": 1792601763901,
     "IWM_CALL": 1792679786068,
     "TSLA_CALL": 1792683328227,
-    "QQQ_PUT": 1792684213388
+    "QQQ_PUT": 1792684213388,
+    "NVDA_PUT": 1792765879149
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -58,48 +59,5 @@
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T13:45:02.413Z",
     "lastReportedThreshold": -10
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261023P00212500",
-    "strike": "212.5",
-    "entryPremium": 1.495,
-    "qty": 2,
-    "entryTime": 1792763106380,
-    "msgId": 6746,
-    "stopOrderId": "db8631f1-d945-4930-99b3-9fab62cd5d8e",
-    "hardStopPrice": 1.05,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 212.57,
-      "regime": "bearish",
-      "emaFast": 212.1725,
-      "emaSlow": 212.6718,
-      "breakoutHigh": 213.43,
-      "breakoutLow": 211.6577,
-      "volRatio": 4.12,
-      "lastClose": 211.04,
-      "lastVolume": 366471,
-      "barTime": "2026-10-23T13:15:00Z",
-      "entryTimeUTC": "2026-10-23T13:45:06.380Z",
-      "vwapAtEntry": 212.9502,
-      "rsiAtEntry": 30.91,
-      "signalType": "breakout",
-      "positionBucket": "mid",
-      "comboKey": "PUT|position:mid",
-      "sizeMultiplier": 1
-    },
-    "entryFillPrice": 1.5,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-23T13:45:06.175Z",
-    "lastReportedThreshold": -20
   }
 }
