@@ -58,9 +58,7 @@
       "low": 210.18
     }
   },
-  "_cooldowns": {
-    "IWM_PUT": "2026-10-21T14:48:00.213Z"
-  },
+  "_cooldowns": {},
   "_dayStoppedAlerted": "2026-10-21",
   "SPY": {
     "active": true,
@@ -87,10 +85,10 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:12.245Z",
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 38.98734177215189,
+    "peakPct": 44.050632911392384,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
@@ -125,6 +123,7 @@
     "peakPct": 49.04679376083189,
     "lastReportedThreshold": 40,
     "ladder2": true,
-    "trailPct": 10
+    "trailPct": 10,
+    "nearStopWarned": true
   }
 }
