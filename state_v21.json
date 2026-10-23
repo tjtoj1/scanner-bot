@@ -18,6 +18,12 @@
       "symbol": "NVDA",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-23",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -83,36 +89,6 @@
     "entryFilledAt": "2026-10-23T14:16:12.245Z",
     "lastReportedThreshold": -10
   },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261023C00705000",
-    "strike": "705",
-    "entryPremium": 2.7750000000000004,
-    "qty": 1,
-    "entryTime": 1792764976027,
-    "level": 704.499,
-    "msgId": 6761,
-    "stopOrderId": "2c3144ba-ce60-458a-9474-24e8c306ba8f",
-    "hardStopPrice": 1.8,
-    "entryStockPrice": 705,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 33.16,
-    "volumeRatio": 10.214966546370796,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 2.78,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-23T14:16:15.900Z",
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 18.918918918918898
-  },
   "NVDA": {
     "active": true,
     "signal": "CALL",
@@ -139,5 +115,31 @@
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:17.973Z",
     "lastReportedThreshold": -10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ261023C00705000",
+    "strike": "705",
+    "entryPremium": 2.885,
+    "qty": 1,
+    "entryTime": 1792765995232,
+    "level": 704.499,
+    "msgId": 6781,
+    "stopOrderId": "f4382c2b-6a0b-495f-b049-efb6b3ed2d3c",
+    "hardStopPrice": 1.88,
+    "entryStockPrice": 705.455,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 29.83,
+    "volumeRatio": 6.481781165126639,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 2.86,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-23T14:33:15.093Z"
   }
 }
