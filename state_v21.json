@@ -72,7 +72,7 @@
     "entryTime": 1792764974393,
     "level": 760.77,
     "msgId": 6760,
-    "stopOrderId": "e50617df-4c8b-463f-872c-b83406e3a31f",
+    "stopOrderId": "7d7be6ef-0722-439f-894c-154b90f23868",
     "hardStopPrice": 1.28,
     "entryStockPrice": 760.12,
     "vwapAtEntry": null,
@@ -87,7 +87,10 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:12.245Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 10.886075949367104
   },
   "NVDA": {
     "active": true,
@@ -99,7 +102,7 @@
     "entryTime": 1792764980133,
     "level": 212.59,
     "msgId": 6762,
-    "stopOrderId": "14457501-a0bc-4c1a-9ba5-239ee740344c",
+    "stopOrderId": "bf2c4d8f-cb27-473b-bd4c-a00bbebbb87c",
     "hardStopPrice": 0.86,
     "entryStockPrice": 212.32,
     "vwapAtEntry": null,
@@ -114,10 +117,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:17.973Z",
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 19.696969696969695
+    "stopPct": 10,
+    "peakPct": 27.27272727272726,
+    "ladder2": true,
+    "trailPct": 10
   },
   "QQQ": {
     "active": true,
@@ -146,8 +151,8 @@
     "entryFilledAt": "2026-10-23T14:33:15.093Z",
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 25.823223570190645,
-    "lastReportedThreshold": 20,
+    "peakPct": 37.0883882149047,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "trailPct": 10
   }
