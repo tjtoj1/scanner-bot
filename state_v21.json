@@ -80,7 +80,8 @@
     "entryFillPrice": 2.01,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-23T14:16:12.245Z"
+    "entryFilledAt": "2026-10-23T14:16:12.245Z",
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
@@ -106,7 +107,8 @@
     "entryFillPrice": 2.78,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-23T14:16:15.900Z"
+    "entryFilledAt": "2026-10-23T14:16:15.900Z",
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
@@ -132,6 +134,7 @@
     "entryFillPrice": 1.29,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-23T14:16:17.973Z"
+    "entryFilledAt": "2026-10-23T14:16:17.973Z",
+    "lastReportedThreshold": -10
   }
 }
