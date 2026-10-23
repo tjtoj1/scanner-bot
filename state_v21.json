@@ -85,10 +85,10 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:12.245Z",
-    "lastReportedThreshold": 60,
+    "lastReportedThreshold": 80,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 61.77215189873419,
+    "peakPct": 81.51898734177215,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
@@ -120,8 +120,8 @@
     "entryFilledAt": "2026-10-23T14:33:15.093Z",
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 57.19237435008667,
-    "lastReportedThreshold": 50,
+    "peakPct": 71.40381282495669,
+    "lastReportedThreshold": 70,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
