@@ -81,7 +81,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:12.245Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
@@ -108,7 +108,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:15.900Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
@@ -135,6 +135,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-23T14:16:17.973Z",
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   }
 }
