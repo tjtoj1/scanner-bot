@@ -131,6 +131,30 @@ function pctLine(rows, portfolioValue) {
   return parts.length ? `📐 ${parts.join(" | ")}\n` : "";
 }
 
+// The same day's net measured at the REAL fill prices instead of at the
+// mid-entry / quoted-exit prices `pnl` uses. Reported pnl is optimistic
+// by construction — the entry is priced at the mid but bought at market,
+// and most exits are priced from a quote sampled after the fact — and
+// over 2026-10-19..22 that was -$240 on v21 and -$214 on LAB against real
+// equity.
+//
+// Deliberately a SECOND line, never a replacement: `pnl` is what every
+// stat, the self-tuner, the combo learner and all history are denominated
+// in, and silently re-denominating them would invalidate every comparison
+// made so far.
+//
+// The coverage count is part of the line, not decoration. pnlAtFill is
+// null unless BOTH fills were confirmed, so early on most rows will be
+// null and a sum over 3 of 9 trades is not comparable to the net above.
+// Zero coverage prints nothing at all rather than a misleading $0.
+function fillLine(rows) {
+  const withFill = rows.filter(r => typeof r.pnlAtFill === "number");
+  if (!withFill.length) return "";
+  const netAtFill = withFill.reduce((a, r) => a + r.pnlAtFill, 0);
+  return `💱 صافي عند التنفيذ الفعلي: ${netAtFill >= 0 ? "+" : ""}$${netAtFill}`
+    + ` (${withFill.length} من ${rows.length} صفقة)\n`;
+}
+
 function buildBotSection(title, todayRows, activeSymbols, portfolioValue = 0) {
   let msg = `\n<b>━━ ${title} ━━</b>\n`;
   if (!todayRows.length) {
@@ -140,6 +164,7 @@ function buildBotSection(title, todayRows, activeSymbols, portfolioValue = 0) {
     const best = todayRows.reduce((a, r) => (!a || r.pnlPct > a.pnlPct) ? r : a, null);
     const worst = todayRows.reduce((a, r) => (!a || r.pnlPct < a.pnlPct) ? r : a, null);
     msg += `📋 ${s.n} صفقة | WR ${s.wr}% | صافي ${s.net>=0?"+":""}$${s.net}\n`;
+    msg += fillLine(todayRows);
     msg += pctLine(todayRows, portfolioValue);
     msg += `🥇 أفضل: ${best.symbol} ${best.signal} ${best.pnlPct.toFixed(1)}% (${best.pnl>=0?"+":""}$${best.pnl})\n`;
     msg += `🥉 أسوأ: ${worst.symbol} ${worst.signal} ${worst.pnlPct.toFixed(1)}% (${worst.pnl>=0?"+":""}$${worst.pnl})\n`;

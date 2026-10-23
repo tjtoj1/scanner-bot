@@ -226,12 +226,26 @@ for (const bot of ["v21", "lab", "wvad"]) {
     check(`${bot}: لا tg() في كتلة الوقف`, !/\btg\(/.test(block), "tg( found", "absent");
   }
 
-  // 8) logTrade byte-for-byte regression
+  // 8) logTrade additive regression: every field the base wrote is
+  //    unchanged, and the base's line is a literal PREFIX of the new one.
+  //
+  //    This used to assert byte-for-byte equality with BASE_REF. That is
+  //    now intentionally false — the fill-capture work APPENDS fields to
+  //    the record — so the assertion states the contract those new fields
+  //    actually have to honour instead. It is not a weakening: byte
+  //    equality is the special case of this where no field was added, and
+  //    this form additionally pins that nothing was INSERTED mid-record,
+  //    which byte equality could not distinguish from a rewrite. The
+  //    prefix half is load-bearing: logTrade's own duplicate guard is a
+  //    substring match on '"tradeId":"…"', so a field inserted before
+  //    tradeId would change the serialized prefix.
   {
-    console.log("── 8) انحدار logTrade بايت ببايت");
+    console.log("── 8) انحدار logTrade: الحقول القديمة + البادئة");
+    // `exitFill` optional: this extracts both head and BASE_REF, and LAB
+    // gained the parameter with the fill-capture work.
     const re = bot === "v21"
       ? /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill = null\) \{[\s\S]*?\n\}/
-      : /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice\) \{[\s\S]*?\n\}/;
+      : /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice(?:, exitFill = null)?\) \{[\s\S]*?\n\}/;
     const make = text => {
       const written = [];
       const fsStub = { readFileSync: () => "", appendFileSync: (_f, line) => written.push(line) };
@@ -249,11 +263,13 @@ for (const bot of ["v21", "lab", "wvad"]) {
       wvadSumAtEntry: -8.1, signalLineAtEntry: -2.2, atrAtEntry: 0.9, slStock: 732.4, dte: 0,
     };
     const EXIT_FILL = { price: 1.2, confirmed: true, source: "stop_order", filledAt: "2026-10-14T17:02:11.000Z" };
-    const cases = bot === "v21"
-      ? [[POS, "QQQ", 1.2, "alpaca_stop", "quote_at_detection", 732.0, EXIT_FILL],
-         [POS, "QQQ", 2.4, "ladder_stop", "order_fill", 729.0, null]]
-      : [[POS, "QQQ", 1.2, "alpaca_stop", "quote_at_detection", 732.0],
-         [POS, "QQQ", 2.4, "ladder_stop", "order_fill", 729.0]];
+    // Both bots now take exitFill. The base LAB logTrade has 6 parameters
+    // and simply ignores the 7th argument, which is exactly the
+    // compatibility being asserted.
+    const cases = [
+      [POS, "QQQ", 1.2, "alpaca_stop", "quote_at_detection", 732.0, EXIT_FILL],
+      [POS, "QQQ", 2.4, "ladder_stop", "order_fill", 729.0, null],
+    ];
     // Freeze the clock completely (Date.now AND new Date()): logTrade
     // stamps exitTime itself, and two runs can straddle a millisecond.
     const RealDate = globalThis.Date;
@@ -267,8 +283,13 @@ for (const bot of ["v21", "lab", "wvad"]) {
         const a = make(src[bot]), b = make(base[bot]);
         await captureAsync(async () => a.fn(...args));
         await captureAsync(async () => b.fn(...args));
-        check(`${bot}: سجل logTrade #${i + 1} مطابق بايتاً ببايت (${(a.written[0] || "").length} بايت)`,
-          a.written.length === 1 && a.written[0] === b.written[0], a.written[0], b.written[0]);
+        const rNew = JSON.parse(a.written[0]), rOld = JSON.parse(b.written[0]);
+        const changed = Object.keys(rOld).filter(k => JSON.stringify(rOld[k]) !== JSON.stringify(rNew[k]));
+        check(`${bot}: سجل logTrade #${i + 1} — لا حقل من حقول الأساس تغيّر (${Object.keys(rOld).length} حقلاً)`,
+          a.written.length === 1 && changed.length === 0, changed, []);
+        const oldPrefix = b.written[0].trimEnd().replace(/\}$/, "");
+        check(`${bot}: سجل logTrade #${i + 1} — سطر الأساس بادئة حرفية للجديد`,
+          a.written[0].startsWith(oldPrefix), a.written[0].slice(0, 80) + "…", oldPrefix.slice(0, 80) + "…");
       }
     } finally { globalThis.Date = RealDate; }
   }

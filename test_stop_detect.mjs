@@ -98,8 +98,14 @@ function makeGetExitFill(alpaca) {
 // logTrade from either the current tree or origin/main, with fs stubbed.
 function makeLogTrade(bot, text) {
   const re = bot === "v21"
+    // `exitFill` is optional in the pattern because this same helper
+    // extracts BOTH the current source and the pinned base: LAB gained
+    // the parameter with the fill-capture work, so its base has 6 and its
+    // head has 7. Everything else is still spelled out literally, so any
+    // other signature change makes grab() throw rather than silently
+    // extracting the wrong thing.
     ? /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill = null\) \{[\s\S]*?\n\}/
-    : /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice\) \{[\s\S]*?\n\}/;
+    : /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice(?:, exitFill = null)?\) \{[\s\S]*?\n\}/;
   const fn = grab(text, re, `logTrade/${bot}`);
   const written = [];
   const fsStub = {
@@ -302,8 +308,26 @@ for (const bot of ["v21", "lab", "wvad"]) {
     ? [POS_FULL, "NVDA", 2.16, "alpaca_stop", "quote_at_detection", 227.0, EXIT_FILL]
     : [POS_FULL, "NVDA", 2.16, "alpaca_stop", "quote_at_detection", 227.0];
 
-  capture(() => now.logTrade(...args));
-  capture(() => old.logTrade(...args));
+  // Freeze the clock completely (Date.now AND new Date()) across BOTH
+  // runs, the same way test_stop_retry.mjs does for its own paired
+  // comparison. logTrade stamps exitTime itself with new Date(), so the
+  // two runs below can straddle a millisecond and report exitTime as a
+  // changed field — which made assertions (a) and (c) flake on roughly
+  // one run in three. The flake widened when logTrade gained statements
+  // ahead of the record literal; the cause was always this.
+  //
+  // Only these two calls are frozen. The bare run further down stamps
+  // once and nothing compares it, so it keeps the real clock.
+  const RealDate = globalThis.Date;
+  const FROZEN = 1791814600000;
+  globalThis.Date = class extends RealDate {
+    constructor(...a) { a.length ? super(...a) : super(FROZEN); }
+    static now() { return FROZEN; }
+  };
+  try {
+    capture(() => now.logTrade(...args));
+    capture(() => old.logTrade(...args));
+  } finally { globalThis.Date = RealDate; }
   const rNew = JSON.parse(now.written[0]);
   const rOld = JSON.parse(old.written[0]);
 
