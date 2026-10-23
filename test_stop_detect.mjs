@@ -308,8 +308,26 @@ for (const bot of ["v21", "lab", "wvad"]) {
     ? [POS_FULL, "NVDA", 2.16, "alpaca_stop", "quote_at_detection", 227.0, EXIT_FILL]
     : [POS_FULL, "NVDA", 2.16, "alpaca_stop", "quote_at_detection", 227.0];
 
-  capture(() => now.logTrade(...args));
-  capture(() => old.logTrade(...args));
+  // Freeze the clock completely (Date.now AND new Date()) across BOTH
+  // runs, the same way test_stop_retry.mjs does for its own paired
+  // comparison. logTrade stamps exitTime itself with new Date(), so the
+  // two runs below can straddle a millisecond and report exitTime as a
+  // changed field — which made assertions (a) and (c) flake on roughly
+  // one run in three. The flake widened when logTrade gained statements
+  // ahead of the record literal; the cause was always this.
+  //
+  // Only these two calls are frozen. The bare run further down stamps
+  // once and nothing compares it, so it keeps the real clock.
+  const RealDate = globalThis.Date;
+  const FROZEN = 1791814600000;
+  globalThis.Date = class extends RealDate {
+    constructor(...a) { a.length ? super(...a) : super(FROZEN); }
+    static now() { return FROZEN; }
+  };
+  try {
+    capture(() => now.logTrade(...args));
+    capture(() => old.logTrade(...args));
+  } finally { globalThis.Date = RealDate; }
   const rNew = JSON.parse(now.written[0]);
   const rOld = JSON.parse(old.written[0]);
 
