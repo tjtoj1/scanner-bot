@@ -374,6 +374,95 @@ async function getQuoteLegs(optSym) {
   } catch { return null; }
 }
 
+// ─── REAL FILL PRICES — ADDITIVE ONLY ────────────────────────────────
+// Reported pnl is optimistic by construction: entryPremium is the MID
+// (getQuote returns (ap+bp)/2) while the entry is a MARKET buy that fills
+// near the ask, and 38 of 49 exits over 2026-10-19..22 were priced from a
+// quote sampled when reconciliation noticed the stop had gone, not from
+// the fill. Over those four days LAB's real equity fell $214 more than
+// the sum of its own records. LAB had no fill price in any record at all.
+// These lookups measure it. They ADD fields and nothing else: pnl,
+// pnlPct, win, reason and fillSource are computed exactly as before, and
+// no trading decision reads any of this.
+//
+// Every failure records null. Never a guess, never an estimate.
+//
+// alpaca() is deliberately NOT used and NOT modified: it takes no timeout
+// argument and it is the one function every trading decision depends on.
+// fetchWithTimeout is called directly instead, which costs two duplicated
+// lines and keeps alpaca() frozen.
+//
+// Budgets, against runner.js's 90s child watchdog and 60s cycle:
+//   entry — ONE attempt, 4s, no retry, no sleep. It runs immediately
+//           after the buy, where the order can still read "accepted", so
+//           "not_ready" is an expected answer rather than a failure.
+//   exit  — ONE attempt, 3s. For a sell this bot just placed, after a
+//           fixed 1s wait for it to settle; for a stop order that filled
+//           minutes ago at the broker, with no wait.
+//   whole process — FILL_BUDGET_MS. Once spent, every further lookup
+//           returns null with source "budget_exhausted" and makes NO
+//           call, so a slow broker costs a bounded ~20s per child
+//           instead of ~20s per position.
+const ENTRY_FILL_TIMEOUT_MS = 4000;
+const EXIT_FILL_TIMEOUT_MS  = 3000;
+const EXIT_FILL_WAIT_MS     = 1000;
+const FILL_BUDGET_MS        = 20000;
+let fillBudgetUsedMs = 0;
+
+const fillMiss = source => ({ price: null, confirmed: false, source, filledAt: null });
+
+function fillIsoOrNull(v) {
+  if (!v) return null;
+  const t = new Date(v).getTime();
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
+}
+
+// One GET of one order. confirmed:true only when the order is filled AND
+// filled_qty is the quantity this trade thinks it traded — a partial or
+// mismatched fill reports its price with confirmed:false rather than
+// quietly pricing a different size than pnl is computed on.
+async function fillFromOrder(orderId, expectedQty, timeoutMs, okSource) {
+  if (!orderId) return fillMiss("no_order_id");
+  if (fillBudgetUsedMs >= FILL_BUDGET_MS) return fillMiss("budget_exhausted");
+  const started = Date.now();
+  try {
+    const res = await fetchWithTimeout(`${TRADING_BASE}/orders/${orderId}`,
+                                       { headers: HEADERS }, timeoutMs);
+    const o = await res.json();
+    // An Alpaca error body carries `code` and no `status`. Distinguish it
+    // from a real order that simply has not filled yet.
+    if (o && o.code !== undefined && o.status === undefined) return fillMiss("lookup_error");
+    const px = parseFloat(o?.filled_avg_price);
+    if (o?.status !== "filled" || !Number.isFinite(px) || px <= 0) return fillMiss("not_ready");
+    const fq = parseFloat(o.filled_qty);
+    if (!Number.isFinite(fq) || fq !== expectedQty) {
+      console.warn(`order ${orderId}: filled ${o.filled_qty} but expected ${expectedQty} — not confirmed`);
+      return { price: px, confirmed: false, source: "qty_mismatch", filledAt: fillIsoOrNull(o.filled_at) };
+    }
+    return { price: px, confirmed: true, source: okSource, filledAt: fillIsoOrNull(o.filled_at) };
+  } catch (e) {
+    console.warn(`order ${orderId}: fill lookup failed (${e.message})`);
+    return fillMiss("lookup_failed");
+  } finally {
+    fillBudgetUsedMs += Date.now() - started;
+  }
+}
+
+async function getEntryFill(orderId, expectedQty) {
+  return fillFromOrder(orderId, expectedQty, ENTRY_FILL_TIMEOUT_MS, "entry_order");
+}
+
+// The wait counts against the budget too: a child that has already spent
+// its allowance must not even sleep.
+async function getSellFill(orderId, expectedQty) {
+  if (!orderId) return fillMiss("no_order_id");
+  if (fillBudgetUsedMs >= FILL_BUDGET_MS) return fillMiss("budget_exhausted");
+  const waitStarted = Date.now();
+  await new Promise(r => setTimeout(r, EXIT_FILL_WAIT_MS));
+  fillBudgetUsedMs += Date.now() - waitStarted;
+  return fillFromOrder(orderId, expectedQty, EXIT_FILL_TIMEOUT_MS, "sell_order");
+}
+
 function calcQty(premium, tradeBudget) {
   const budget = Math.min(tradeBudget, MAX_TRADE_BUDGET);
   return Math.max(1, Math.floor(budget / (premium * 100)));
@@ -603,7 +692,7 @@ function countOpenPositions(state) {
 // ─── LOG TRADE OUTCOME (with entry-condition snapshot) ──────────
 // exitStockPrice is optional (undefined for any call site that doesn't
 // have it) — falls back to null so old-style callers never break.
-function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) {
+function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill = null) {
   try {
     const tradeId = `${symbol}_${pos.entryTime}`;
     let existing = "";
@@ -614,6 +703,17 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) 
     }
     const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
     const pnl = Math.round((exitPremium - pos.entryPremium) * pos.qty * 100);
+    // P&L at the REAL fills, additive and deliberately all-or-nothing.
+    // Null unless BOTH sides are real prices: a real entry fill against a
+    // quoted exit is not "P&L at fill", it is the same bias measured once
+    // instead of twice, and summing such records would mislead. Also null
+    // on any *_est exit, whose exitPremium is an invented 65% of entry.
+    const entryFillPx = typeof pos.entryFillPrice === "number" && pos.entryFillPrice > 0
+      ? pos.entryFillPrice : null;
+    const exitFillPx = exitFill && typeof exitFill.price === "number" && exitFill.price > 0
+      ? exitFill.price : null;
+    const bothReal = entryFillPx !== null && exitFillPx !== null
+      && !String(reason).endsWith("_est");
     const record = {
       day: getToday(), symbol, signal: pos.signal, optionSymbol: pos.optionSymbol, strike: pos.strike,
       tradeId, entryPremium: pos.entryPremium, exitPremium: +exitPremium.toFixed(2), qty: pos.qty,
@@ -641,6 +741,30 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice) 
       peakPct: typeof pos.peakPct === "number" ? +pos.peakPct.toFixed(1) : null,
       stopOrderIdAtExit: pos.stopOrderId ?? null,
       hardStopPrice: pos.hardStopPrice ?? null,
+      // ── FILL-ACCURATE P&L — appended LAST, on purpose ──
+      // Everything above is byte-for-byte what the previous version
+      // wrote. These keys go at the end so the old serialization stays a
+      // literal PREFIX of the new one, which keeps logTrade's own
+      // substring duplicate guard above matching exactly as before and
+      // keeps test_stop_detect's prefix assertion true.
+      //
+      // Field names match scan_v21.js exactly, so one analysis reads both
+      // bots. Three states throughout:
+      //   null  → nothing was looked up, or the lookup found nothing
+      //   false → it looked and the price is unconfirmed (qty mismatch)
+      //   true  → the price is what the broker actually filled at
+      entryFillPrice: pos.entryFillPrice ?? null,
+      entryFillConfirmed: typeof pos.entryFillConfirmed === "boolean" ? pos.entryFillConfirmed : null,
+      fillSourceEntry: pos.fillSourceEntry ?? null,
+      entryFilledAt: pos.entryFilledAt ?? null,
+      exitFillPrice: exitFill?.price ?? null,
+      exitPriceConfirmed: exitFill ? exitFill.confirmed : null,
+      exitFillSource: exitFill?.source ?? null,
+      // When the broker actually filled. exitTime above is when this bot
+      // NOTICED, which on the reconcile path is up to a full cycle later.
+      exitFilledAt: exitFill?.filledAt ?? null,
+      pnlAtFill: bothReal ? Math.round((exitFillPx - entryFillPx) * pos.qty * 100) : null,
+      pnlPctAtFill: bothReal ? +((exitFillPx - entryFillPx) / entryFillPx * 100).toFixed(1) : null,
     };
     fs.appendFileSync("outcomes_lab.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
@@ -672,6 +796,11 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
   // this never blocks or fails the actual close below.
   const exitStockPrice = await getLatestPrice(symbol);
   let soldQty = pos.qty;
+  // The id of the sell order this function places, so its real fill can be
+  // looked up after the close is already done. Stays null on the reconcile
+  // path (no sell) and on every early return.
+  let sellOrderId = null;
+  let exitFill = null;
   if (!skipSell) {
     // Never trust local state's qty for how much to sell — verify against
     // Alpaca first. This is the fix for the AMZN incident: a stale/lost
@@ -719,10 +848,38 @@ async function closePosition(state, symbol, pos, exitPremium, reason, fillSource
       await tg(`⚠️ <b>فشل إغلاق ${symbol}</b>\nأمر البيع لم يُنفَّذ (${reason}) — يحتاج تدخلاً يدوياً.`, pos.msgId);
       return;
     }
+    sellOrderId = order.id;
+  }
+  // ── the exit's REAL fill, per exit path ──
+  // Deliberately here and not in monitorPosition(): the sell is already
+  // placed, so a slow or failed lookup costs a null field and nothing
+  // else, and monitorPosition stays byte-identical for the suites that
+  // pin it.
+  //
+  //   sold here (ladder_stop, regime_flip, force_exit, hard_stop,
+  //   daily_loss_breaker) → the sell order's own fill, after a 1s settle.
+  //
+  //   alpaca_stop → no sell happened; the stop order this bot placed at
+  //   entry IS the order that filled, and its id is already on pos. It
+  //   filled minutes ago at the broker, so no wait.
+  //
+  //   alpaca_stop_est → NOTHING is looked up. exitPremium on that path is
+  //   an invented 65% of entry, and a record built on a guess must read
+  //   as a guess: exitFillPrice stays null and pnlAtFill with it.
+  //
+  //   ownedQty === 0 → returns above, before this; no order to ask about.
+  try {
+    if (sellOrderId) exitFill = await getSellFill(sellOrderId, soldQty);
+    else if (reason === "alpaca_stop" && pos.stopOrderId) {
+      exitFill = await fillFromOrder(pos.stopOrderId, pos.qty, EXIT_FILL_TIMEOUT_MS, "stop_order");
+    }
+    if (exitFill) console.log(`${symbol}: exit fill ${exitFill.price ?? "n/a"} (${exitFill.source})`);
+  } catch (e) {
+    console.error(`${symbol}: exit fill capture failed (non-fatal):`, e.message);
   }
   const pnl = Math.round((exitPremium - pos.entryPremium) * soldQty * 100);
   const pnlPct = (exitPremium - pos.entryPremium) / pos.entryPremium * 100;
-  logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice);
+  logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill);
   await tg(closeMessageText(reason, symbol, pos, pnlPct, pnl), pos.msgId);
 
   // Set re-entry cooldown: block this (symbol × signal × direction) for 30 min after losing stops
@@ -1040,6 +1197,75 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
   };
   saveState(state);
   console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty} (combo ${comboKey || "n/a"} ×${sizeMultiplier})`);
+
+  // ── the entry's REAL fill, recorded STRICTLY AFTER the position is ──
+  // Everything above is unchanged and already persisted: the buy, the
+  // protective stop, the Telegram message and the state write all
+  // completed before this runs. So a hang, a throw or a watchdog kill in
+  // here cannot lose or delay the open-position record — the worst case
+  // is entryFillPrice staying null on this one trade, which is exactly
+  // what null means.
+  //
+  // The amend RE-READS the state file rather than reusing the `state`
+  // object above, and this matters. saveState() is a bare
+  // fs.writeFileSync of the whole file — no lock, no temp+rename, unlike
+  // bumpDayPeak which does use temp+rename. The monitor child writes the
+  // same file. Within one runner process scan and monitor are sequential
+  // (runner.js awaits each in runBotCycle), but two Railway replicas
+  // would overlap, and several seconds of wall clock have passed since
+  // the write above — the buy, the stop POST and the Telegram call.
+  // Writing back the stale in-memory object would discard anything the
+  // monitor changed in that window. Re-reading shrinks the
+  // read-modify-write race to microseconds.
+  //
+  // It is NOT a lock and does not make the write atomic. A concurrent
+  // writer can still lose this amend, or this amend can still lose
+  // theirs. What it cannot do is roll back seconds of state.
+  // The amend is applied to BOTH objects, and both are necessary:
+  //
+  //   `state` — the caller's in-memory object. main() saves it once at the
+  //   very end, in BOTH modes, and that write is a whole-file overwrite.
+  //   Without this the amend lands on disk and is clobbered seconds
+  //   later; and because the ticker loop runs scanEntry for every symbol
+  //   before that single save, one overwrite would discard every
+  //   ticker's amend. entryFillPrice would be null on essentially every
+  //   trade.
+  //
+  //   `fresh` — the file as it is right now. Needed because the caller's
+  //   final save may never happen (a watchdog kill, an early return, a
+  //   throw in a later ticker or in combo learning), and because writing
+  //   back the stale in-memory object alone would discard anything the
+  //   monitor changed during the seconds this lookup took.
+  //
+  // Each write is guarded on its own object: `state[symbol]` is what the
+  // caller will persist, `fresh[symbol]` is what is on disk, and they can
+  // legitimately disagree if the monitor closed the position meanwhile.
+  try {
+    const entryFill = await getEntryFill(order.id, qty);
+    const amend = target => {
+      target.entryFillPrice = entryFill.price;
+      target.entryFillConfirmed = entryFill.confirmed;
+      target.fillSourceEntry = entryFill.source;
+      target.entryFilledAt = entryFill.filledAt;
+    };
+    // The caller's object, which main() will save last and therefore wins.
+    if (state[symbol]?.active && state[symbol].optionSymbol === opt.symbol) {
+      amend(state[symbol]);
+    }
+    const fresh = loadState();
+    // Never resurrect a position the monitor already closed: if it is
+    // gone from the file, or the symbol now holds a different contract,
+    // do not write it back.
+    if (fresh[symbol]?.active && fresh[symbol].optionSymbol === opt.symbol) {
+      amend(fresh[symbol]);
+      saveState(fresh);
+      console.log(`${symbol}: entry fill ${entryFill.price ?? "n/a"} (${entryFill.source})`);
+    } else {
+      console.log(`${symbol}: position gone from the state file — entry fill kept in memory only (${entryFill.source})`);
+    }
+  } catch (e) {
+    console.error(`${symbol}: entry fill capture failed (non-fatal):`, e.message);
+  }
 }
 
 // ─── RICH EXPLANATORY NOTIFICATION (sent for every self-adjustment) ──
