@@ -23,6 +23,8 @@
 // Run:  node test_entry_fill.mjs
 // ============================================================
 import fs from "fs";
+import os from "os";
+import path from "path";
 import { execFileSync } from "child_process";
 
 const FILES = { v21: "scan_v21.js", lab: "scan_lab.js" };
@@ -409,11 +411,13 @@ for (const bot of ["v21", "lab"]) {
   check(`${bot}: التعديل داخل try/catch`, /^\s*try \{/m.test(amend) && /catch \(e\)/.test(amend), "unguarded", "guarded");
   check(`${bot}: التعديل يعيد قراءة الملف (loadState)`, /const fresh = loadState\(\);/.test(amend), "reuses stale object", "re-reads");
   check(`${bot}: لا يُحيي مركزاً أُغلق`, /fresh\[symbol\]\?\.active/.test(amend), "no guard", "guarded");
-  // `= (?!=)` on purpose: a bare `\w+ =` also matches the `=== ` in the
-  // guard condition `fresh[symbol].optionSymbol === opt.symbol`, which
-  // reads nothing and assigns nothing.
-  const writes = amend.match(/fresh\[symbol\]\.\w+ = (?!=)/g) || [];
+  // Exactly four keys are written, from the one shared amend() helper, so
+  // the in-memory and on-disk writes can never drift apart.
+  const writes = amend.match(/target\.\w+ = entryFill\.\w+;/g) || [];
   check(`${bot}: لا يكتب إلا مفاتيح التعبئة الأربعة`, writes.length === 4, writes, 4);
+  check(`${bot}: ويُطبَّق على الكائنين معاً`,
+    (amend.match(/amend\((?:state|fresh)\[symbol\]\);/g) || []).length === 2,
+    (amend.match(/amend\((?:state|fresh)\[symbol\]\);/g) || []), 2);
   // getEntryFill must be awaited before loadState, so a hang cannot hold a
   // stale snapshot open across the lookup.
   check(`${bot}: البحث قبل القراءة الجديدة`,
@@ -522,6 +526,217 @@ for (const bot of ["v21", "lab"]) {
   check(`${bot}: لا bid ولا ask في كائن الخيار`, !/\bbid\b|\bask\b/.test(fo), "has legs", "absent");
   check(`${bot}: findOption بلا تغيير عن الأساس`,
     fo === grab(base[bot], /async function findOption\([\s\S]*?\n\}/, `fo base/${bot}`), "changed", "identical");
+}
+
+// ── 17) END TO END: the amend must survive the caller's final save ──
+// The unit sections above drive scanEntry's amend in isolation, and that
+// is exactly how a real blocker slipped through: the amend wrote the four
+// keys onto `fresh` (its own loadState object) and saved it, but main()
+// then saves its OWN in-memory `state` once at the very end — a
+// whole-file overwrite — so the amend was clobbered seconds later and
+// entryFillPrice would have been null on essentially every trade.
+//
+// These cases run the REAL scanEntry against stubbed network/fs and then
+// perform the caller's final saveState exactly as main() does:
+//   scan_lab.js   saveState(state) at the end of main, BOTH modes
+//   scan_v21.js   saveState(state) in scan mode
+//                 saveState(freshState) in monitor mode, where freshState
+//                 is the object passed in as `state`
+// Verified to FAIL at 7c4ca9a4 (entryFillPrice undefined on disk) and to
+// pass after the fix.
+console.log("\n── 17) من الطرف للطرف: التعديل يصمد أمام الحفظ الأخير ──");
+
+const SCAN_ENTRY_RE = {
+  v21: /async function scanEntry\(state, symbol, portfolio, liveInAlpaca, dayCtx\) \{[\s\S]*?\n\}/,
+  lab: /async function scanEntry\(state, strategy, symbol, liveInAlpaca, dayCtx\) \{[\s\S]*?\n\}/,
+};
+const ENTRY_FILL = { price: 1.07, confirmed: true, source: "entry_order", filledAt: "2026-10-23T14:31:02.500Z" };
+
+// The real scanEntry, with every collaborator stubbed and state on a temp
+// file. Nothing here touches the network; `alpaca` only ever answers the
+// entry POST. The stub list is explicit so a new dependency in scanEntry
+// makes this throw rather than silently skip.
+function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null }) {
+  const loadState = () => { try { return JSON.parse(fs.readFileSync(stateFile, "utf8")); } catch { return {}; } };
+  const saveState = s => fs.writeFileSync(stateFile, JSON.stringify(s, null, 2));
+  const saves = [];
+  const stubs = {
+    fs,
+    TICKERS_0DTE: ["SPY", "QQQ", "IWM"], HARD_STOP_PCT: -35,
+    DAILY_LOSS_LIMIT: -1000, DAILY_TARGET_MAX: 99999, MAX_DAILY_TRADES: 99,
+    COOLDOWN_MINUTES: 30, PROFIT_FLOOR_ENABLED: true, STOP_SLIPPAGE_PAD: 0.10,
+    TRADING_BASE: "https://stub", ALPACA_KEY: "k", ALPACA_SECRET: "s",
+    MAX_DAILY_LOSS: 1000, MAX_DTE: 2, MAX_OPEN_POSITIONS: 3, MAX_TRADE_BUDGET: 1000,
+    fetchWithTimeout: async () => ({ json: async () => ({}), text: async () => "{}" }),
+    alpaca: async (p, m) => (m === "POST" && p === "/orders" ? { id: "entry-order-xyz" } : {}),
+    calcQty: () => 3,
+    checkBreakout: () => ({ signal: "PUT", level: 731.2, volSurge: 1.8 }),
+    computeSignal: () => ({ signal: "PUT", regime: "bearish", emaFast: 1, emaSlow: 1,
+                            breakoutHigh: 2, breakoutLow: 1, volRatio: 1.5, lastClose: 1.5,
+                            lastVolume: 100, barTime: "2026-10-23T14:00:00Z" }),
+    computeHalfTrend: () => ({ atr2: 1.0 }),
+    computeRSI: () => 44.1, computeVWAP: () => 731.4,
+    countOpenPositions: () => 0,
+    findOption: async () => ({ symbol: "QQQ261023P00730000", strike: 730, premium: 1.00, expiry: "2026-10-23" }),
+    getBars: async () => [{ t: "2026-10-23T14:00:00Z", o: 1, h: 2, l: 0.5, c: 1.5, v: 100 }],
+    getLatestPrice: async () => 731.0,
+    getNearExpiry: async () => "2026-10-23",
+    getQuoteLegs: async () => ({ bid: 0.95, ask: 1.05, mid: 1.00 }),
+    getToday: () => "2026-10-23",
+    getTodayRealizedDay: () => ({ net: 0, peak: 0, stopped: false, reason: null }),
+    // onLookup fires as the lookup resolves, which is how the
+    // "monitor closed the position mid-lookup" race is driven.
+    getEntryFill: async () => { if (onLookup) onLookup(); return entryFill; },
+    isPastLastEntry: () => false, isRangeBuilding: () => false,
+    loadState, saveState: s => { saves.push("saveState"); saveState(s); },
+    logTrade: () => true, monitorPosition: async () => {},
+    postEntryStop: async () => ({ id: "stop-order-abc" }),
+    stopOrderIdOrNull: (_l, o) => o?.id ?? null,
+    progressBar: () => "███", tg: async () => 12345,
+    bumpDayPeak: c => c, clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v)),
+    lookupComboMultiplier: () => ({ comboKey: "PUT|position:near_low", sizeMultiplier: 1 }),
+    positionBucket: () => "near_low", spot: 731.0,
+  };
+  const fn = grab(src[bot], SCAN_ENTRY_RE[bot], `scanEntry/${bot}`);
+  const scanEntry = new Function(...Object.keys(stubs), `${fn}\nreturn scanEntry;`)(...Object.values(stubs));
+  const strategy = { name: "t", version: 1, combos: {}, params: { tradeBudget: 300, stopLossPct: -30,
+    takeProfit1Pct: 15, takeProfit1LockPct: 5, takeProfit2Pct: 25, takeProfit2LockPct: 12, trailingPct: 8 } };
+  const dayCtx = { armed: false, trusted: true, budget: 0 };
+  const run = (state, symbol) => bot === "v21"
+    ? scanEntry(state, symbol, { last_equity: 99000 }, new Set(), dayCtx)
+    : scanEntry(state, strategy, symbol, new Set(), dayCtx);
+  return { run, loadState, saveState, saves };
+}
+
+const FILL_KEYS = { entryFillPrice: 1.07, entryFillConfirmed: true,
+                    fillSourceEntry: "entry_order", entryFilledAt: "2026-10-23T14:31:02.500Z" };
+
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "fillcap-"));
+try {
+  for (const bot of ["v21", "lab"]) {
+    // (a) one ticker, then the caller's final save — the core blocker.
+    {
+      const stateFile = path.join(TMP, `${bot}-a.json`);
+      fs.writeFileSync(stateFile, "{}");
+      const h = makeScanEntry(bot, { stateFile });
+      const state = {};
+      await captureAsync(() => h.run(state, "QQQ"));
+      check(`${bot}: المفاتيح على الكائن في الذاكرة (الذي سيحفظه main)`,
+        FILL_KEYS.entryFillPrice === state.QQQ?.entryFillPrice, state.QQQ?.entryFillPrice, 1.07);
+      // main()'s final whole-file overwrite.
+      h.saveState(state);
+      const disk = h.loadState();
+      for (const [k, v] of Object.entries(FILL_KEYS)) {
+        check(`${bot}: ${k} باقٍ على القرص بعد الحفظ الأخير`,
+          JSON.stringify(disk.QQQ?.[k]) === JSON.stringify(v), disk.QQQ?.[k], v);
+      }
+      check(`${bot}: المركز نفسه لم يُفقد`,
+        disk.QQQ?.active === true && disk.QQQ?.optionSymbol === "QQQ261023P00730000",
+        { a: disk.QQQ?.active, o: disk.QQQ?.optionSymbol }, "intact");
+    }
+
+    // (b) TWO tickers, ONE final save. This is why the bug was a blocker
+    //     rather than a one-trade loss: the ticker loop runs scanEntry for
+    //     every symbol and main saves once, so a single overwrite
+    //     discarded every ticker's amend at once.
+    {
+      const stateFile = path.join(TMP, `${bot}-b.json`);
+      fs.writeFileSync(stateFile, "{}");
+      const h = makeScanEntry(bot, { stateFile });
+      const state = {};
+      await captureAsync(() => h.run(state, "QQQ"));
+      await captureAsync(() => h.run(state, "SPY"));
+      h.saveState(state);
+      const disk = h.loadState();
+      check(`${bot}: رمزان ثم حفظ واحد — كلاهما يحفظ تعبئته`,
+        disk.QQQ?.entryFillPrice === 1.07 && disk.SPY?.entryFillPrice === 1.07,
+        { QQQ: disk.QQQ?.entryFillPrice, SPY: disk.SPY?.entryFillPrice }, { QQQ: 1.07, SPY: 1.07 });
+    }
+
+    // (c) a null lookup must still be recorded as null, not left absent —
+    //     "we looked and found nothing" is information.
+    {
+      const stateFile = path.join(TMP, `${bot}-c.json`);
+      fs.writeFileSync(stateFile, "{}");
+      const h = makeScanEntry(bot, { stateFile,
+        entryFill: { price: null, confirmed: false, source: "not_ready", filledAt: null } });
+      const state = {};
+      await captureAsync(() => h.run(state, "QQQ"));
+      h.saveState(state);
+      const disk = h.loadState();
+      check(`${bot}: بحث فاشل ⇒ المفاتيح موجودة بقيمة null`,
+        "entryFillPrice" in (disk.QQQ || {}) && disk.QQQ.entryFillPrice === null
+        && disk.QQQ.fillSourceEntry === "not_ready",
+        { p: disk.QQQ?.entryFillPrice, s: disk.QQQ?.fillSourceEntry }, { p: null, s: "not_ready" });
+    }
+
+    // (d) the monitor closes the position WHILE the lookup is in flight.
+    //     onLookup empties the state file as the lookup resolves, which
+    //     is exactly that race. Expected: the on-disk write is skipped —
+    //     the position is gone from the file, do not resurrect it — while
+    //     the in-memory amend still happens, because the caller owns that
+    //     object and persisting it is main's pre-existing behaviour, not
+    //     something these four fields introduce.
+    {
+      const stateFile = path.join(TMP, `${bot}-d.json`);
+      fs.writeFileSync(stateFile, "{}");
+      const h = makeScanEntry(bot, { stateFile,
+        onLookup: () => fs.writeFileSync(stateFile, "{}") });
+      const state = {};
+      await captureAsync(() => h.run(state, "QQQ"));
+      check(`${bot}: اختفى المركز من الملف ⇒ لا إحياء على القرص`,
+        h.loadState().QQQ === undefined, h.loadState().QQQ, undefined);
+      check(`${bot}: ومع ذلك الذاكرة تحمل التعبئة (main سيحفظها)`,
+        state.QQQ?.entryFillPrice === 1.07 && state.QQQ?.fillSourceEntry === "entry_order",
+        { p: state.QQQ?.entryFillPrice, s: state.QQQ?.fillSourceEntry },
+        { p: 1.07, s: "entry_order" });
+    }
+  }
+
+  // (e) v21 monitor mode: scanEntry is called with freshState, and main
+  //     saves freshState — a DIFFERENT object from the `state` the
+  //     monitor loop used. The amend must land on whatever is passed in.
+  {
+    const stateFile = path.join(TMP, "v21-monitor.json");
+    // The monitor branch starts from a file that already holds other keys.
+    fs.writeFileSync(stateFile, JSON.stringify({ _lastDay: "2026-10-23", _dailyTrades: [] }, null, 2));
+    const h = makeScanEntry("v21", { stateFile });
+    const freshState = h.loadState();          // scan_v21.js: const freshState = loadState()
+    await captureAsync(() => h.run(freshState, "QQQ"));
+    h.saveState(freshState);                   // scan_v21.js: saveState(freshState)
+    const disk = h.loadState();
+    check("v21 monitor: التعديل على freshState يصل للقرص",
+      disk.QQQ?.entryFillPrice === 1.07 && disk.QQQ?.fillSourceEntry === "entry_order",
+      { p: disk.QQQ?.entryFillPrice, s: disk.QQQ?.fillSourceEntry }, { p: 1.07, s: "entry_order" });
+    check("v21 monitor: المفاتيح الأخرى في الملف لم تُفقد",
+      disk._lastDay === "2026-10-23", disk._lastDay, "2026-10-23");
+  }
+
+  // (f) the source itself: both objects must be amended, under their own
+  //     guards. Pinned so the blocker cannot come back by someone
+  //     deleting one of the two writes.
+  for (const bot of ["v21", "lab"]) {
+    const amend = grab(src[bot], RE.amend, `amend/${bot}`);
+    check(`${bot}: يعدّل state[symbol] (كائن المُنادي)`,
+      /if \(state\[symbol\]\?\.active && state\[symbol\]\.optionSymbol === opt\.symbol\) \{\n\s*amend\(state\[symbol\]\);/.test(amend),
+      "missing in-memory amend", "present");
+    check(`${bot}: ويعدّل fresh[symbol] (الملف)`,
+      /if \(fresh\[symbol\]\?\.active && fresh\[symbol\]\.optionSymbol === opt\.symbol\) \{\n\s*amend\(fresh\[symbol\]\);/.test(amend),
+      "missing on-disk amend", "present");
+    check(`${bot}: الحقول الأربعة تُكتب من دالة واحدة مشتركة`,
+      (amend.match(/target\.\w+ = entryFill\./g) || []).length === 4,
+      (amend.match(/target\.\w+ = entryFill\./g) || []), 4);
+    check(`${bot}: saveState(fresh) مرة واحدة فقط`,
+      (amend.match(/saveState\(fresh\)/g) || []).length === 1,
+      (amend.match(/saveState\(fresh\)/g) || []).length, 1);
+    // Comments stripped first: the block's own prose explains what main's
+    // saveState(state) does, and a bare search matches that explanation.
+    const code = amend.replace(/\/\/[^\n]*/g, "");
+    check(`${bot}: لا saveState(state) داخل التعديل (main يتولّاه)`,
+      !/saveState\(state\)/.test(code), "saves the caller's object", "leaves it to main");
+  }
+} finally {
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch {}
 }
 
 console.log(`\n═══════════════════════════════════════════════════════════`);

@@ -1221,20 +1221,47 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
   // It is NOT a lock and does not make the write atomic. A concurrent
   // writer can still lose this amend, or this amend can still lose
   // theirs. What it cannot do is roll back seconds of state.
+  // The amend is applied to BOTH objects, and both are necessary:
+  //
+  //   `state` — the caller's in-memory object. main() saves it once at the
+  //   very end, in BOTH modes, and that write is a whole-file overwrite.
+  //   Without this the amend lands on disk and is clobbered seconds
+  //   later; and because the ticker loop runs scanEntry for every symbol
+  //   before that single save, one overwrite would discard every
+  //   ticker's amend. entryFillPrice would be null on essentially every
+  //   trade.
+  //
+  //   `fresh` — the file as it is right now. Needed because the caller's
+  //   final save may never happen (a watchdog kill, an early return, a
+  //   throw in a later ticker or in combo learning), and because writing
+  //   back the stale in-memory object alone would discard anything the
+  //   monitor changed during the seconds this lookup took.
+  //
+  // Each write is guarded on its own object: `state[symbol]` is what the
+  // caller will persist, `fresh[symbol]` is what is on disk, and they can
+  // legitimately disagree if the monitor closed the position meanwhile.
   try {
     const entryFill = await getEntryFill(order.id, qty);
+    const amend = target => {
+      target.entryFillPrice = entryFill.price;
+      target.entryFillConfirmed = entryFill.confirmed;
+      target.fillSourceEntry = entryFill.source;
+      target.entryFilledAt = entryFill.filledAt;
+    };
+    // The caller's object, which main() will save last and therefore wins.
+    if (state[symbol]?.active && state[symbol].optionSymbol === opt.symbol) {
+      amend(state[symbol]);
+    }
     const fresh = loadState();
     // Never resurrect a position the monitor already closed: if it is
-    // gone, or the symbol now holds a different contract, drop the amend.
+    // gone from the file, or the symbol now holds a different contract,
+    // do not write it back.
     if (fresh[symbol]?.active && fresh[symbol].optionSymbol === opt.symbol) {
-      fresh[symbol].entryFillPrice = entryFill.price;
-      fresh[symbol].entryFillConfirmed = entryFill.confirmed;
-      fresh[symbol].fillSourceEntry = entryFill.source;
-      fresh[symbol].entryFilledAt = entryFill.filledAt;
+      amend(fresh[symbol]);
       saveState(fresh);
       console.log(`${symbol}: entry fill ${entryFill.price ?? "n/a"} (${entryFill.source})`);
     } else {
-      console.log(`${symbol}: position already gone — entry fill not recorded (${entryFill.source})`);
+      console.log(`${symbol}: position gone from the state file — entry fill kept in memory only (${entryFill.source})`);
     }
   } catch (e) {
     console.error(`${symbol}: entry fill capture failed (non-fatal):`, e.message);
