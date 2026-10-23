@@ -88,7 +88,7 @@
     "lastReportedThreshold": 80,
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 81.51898734177215,
+    "peakPct": 82.27848101265822,
     "ladder2": true,
     "trailPct": 10,
     "nearStopWarned": true
@@ -120,7 +120,7 @@
     "entryFilledAt": "2026-10-23T14:33:15.093Z",
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 71.40381282495669,
+    "peakPct": 71.92374350086656,
     "lastReportedThreshold": 70,
     "ladder2": true,
     "trailPct": 10,
