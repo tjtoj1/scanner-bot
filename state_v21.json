@@ -1,6 +1,25 @@
 {
   "_lastDay": "2026-10-23",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-10-23",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-23",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-10-23",
+      "symbol": "NVDA",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "TSLA": {
       "day": "2026-10-23",
@@ -36,5 +55,83 @@
   "_cooldowns": {
     "IWM_PUT": "2026-10-21T14:48:00.213Z"
   },
-  "_dayStoppedAlerted": "2026-10-21"
+  "_dayStoppedAlerted": "2026-10-21",
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY261023C00760000",
+    "strike": "760",
+    "entryPremium": 1.975,
+    "qty": 2,
+    "entryTime": 1792764974393,
+    "level": 760.77,
+    "msgId": 6760,
+    "stopOrderId": "e50617df-4c8b-463f-872c-b83406e3a31f",
+    "hardStopPrice": 1.28,
+    "entryStockPrice": 760.12,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 32.72,
+    "volumeRatio": 9.09429685885837,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 2.01,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-23T14:16:12.245Z"
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ261023C00705000",
+    "strike": "705",
+    "entryPremium": 2.7750000000000004,
+    "qty": 1,
+    "entryTime": 1792764976027,
+    "level": 704.499,
+    "msgId": 6761,
+    "stopOrderId": "72681c03-591e-4b7d-8968-c03c647ee34f",
+    "hardStopPrice": 1.8,
+    "entryStockPrice": 705,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 33.16,
+    "volumeRatio": 10.214966546370796,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 2.78,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-23T14:16:15.900Z"
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA261023C00212500",
+    "strike": "212.5",
+    "entryPremium": 1.32,
+    "qty": 3,
+    "entryTime": 1792764980133,
+    "level": 212.59,
+    "msgId": 6762,
+    "stopOrderId": "2d406855-2608-4ccb-ae8d-426158cb0fd0",
+    "hardStopPrice": 0.86,
+    "entryStockPrice": 212.32,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 41.98,
+    "volumeRatio": 9.680046406905145,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 1.29,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-23T14:16:17.973Z"
+  }
 }
