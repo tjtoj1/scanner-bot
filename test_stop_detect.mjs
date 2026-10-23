@@ -98,8 +98,14 @@ function makeGetExitFill(alpaca) {
 // logTrade from either the current tree or origin/main, with fs stubbed.
 function makeLogTrade(bot, text) {
   const re = bot === "v21"
+    // `exitFill` is optional in the pattern because this same helper
+    // extracts BOTH the current source and the pinned base: LAB gained
+    // the parameter with the fill-capture work, so its base has 6 and its
+    // head has 7. Everything else is still spelled out literally, so any
+    // other signature change makes grab() throw rather than silently
+    // extracting the wrong thing.
     ? /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, exitFill = null\) \{[\s\S]*?\n\}/
-    : /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice\) \{[\s\S]*?\n\}/;
+    : /function logTrade\(pos, symbol, exitPremium, reason, fillSource, exitStockPrice(?:, exitFill = null)?\) \{[\s\S]*?\n\}/;
   const fn = grab(text, re, `logTrade/${bot}`);
   const written = [];
   const fsStub = {

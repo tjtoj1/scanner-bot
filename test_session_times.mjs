@@ -333,7 +333,14 @@ for (const f of ["scan_v21.js", "scan_lab.js", "scan_wvad.js"]) {
     ["getToday()", /function getToday\(\)[^\n]*\n?/],
     ["alpaca()", /async function alpaca\([\s\S]*?\n\}/],
     ["getOwnedQty()", /async function getOwnedQty\([\s\S]*?\n\}/],
-    ["logTrade()", /function logTrade\([\s\S]*?\n\}/],
+    // logTrade() as a whole is no longer out of scope: the fill-capture
+    // work appends fields to its record on purpose. What this section is
+    // really protecting is that NOTHING changed the reported P&L, so pin
+    // the two lines that compute it instead of the whole function. That
+    // is the narrower and more honest guard — a whole-function pin would
+    // have to be deleted outright, leaving nothing behind.
+    ["logTrade() pnlPct line", /^    const pnlPct = \(exitPremium - pos\.entryPremium\) \/ pos\.entryPremium \* 100;$/m],
+    ["logTrade() pnl line", /^    const pnl = Math\.round\(\(exitPremium - pos\.entryPremium\) \* pos\.qty \* 100\);$/m],
   ]) {
     let a, b;
     try { a = grab(src[f], re, label); b = grab(base, re, label); } catch { continue; }
