@@ -559,7 +559,6 @@ const ENTRY_FILL = { price: 1.07, confirmed: true, source: "entry_order", filled
 function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null }) {
   const loadState = () => { try { return JSON.parse(fs.readFileSync(stateFile, "utf8")); } catch { return {}; } };
   const saveState = s => fs.writeFileSync(stateFile, JSON.stringify(s, null, 2));
-  const saves = [];
   const stubs = {
     fs,
     TICKERS_0DTE: ["SPY", "QQQ", "IWM"], HARD_STOP_PCT: -35,
@@ -588,7 +587,7 @@ function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null
     // "monitor closed the position mid-lookup" race is driven.
     getEntryFill: async () => { if (onLookup) onLookup(); return entryFill; },
     isPastLastEntry: () => false, isRangeBuilding: () => false,
-    loadState, saveState: s => { saves.push("saveState"); saveState(s); },
+    loadState, saveState,
     logTrade: () => true, monitorPosition: async () => {},
     postEntryStop: async () => ({ id: "stop-order-abc" }),
     stopOrderIdOrNull: (_l, o) => o?.id ?? null,
@@ -605,7 +604,7 @@ function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null
   const run = (state, symbol) => bot === "v21"
     ? scanEntry(state, symbol, { last_equity: 99000 }, new Set(), dayCtx)
     : scanEntry(state, strategy, symbol, new Set(), dayCtx);
-  return { run, loadState, saveState, saves };
+  return { run, loadState, saveState };
 }
 
 const FILL_KEYS = { entryFillPrice: 1.07, entryFillConfirmed: true,
