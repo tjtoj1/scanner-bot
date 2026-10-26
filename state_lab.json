@@ -56,7 +56,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-26T13:32:08.528Z",
-    "lastReportedThreshold": -10,
+    "lastReportedThreshold": -20,
     "nearStopWarned": true
   },
   "TSLA": {
@@ -100,10 +100,10 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-26T13:35:42.801Z",
-    "lastReportedThreshold": 30,
+    "lastReportedThreshold": 50,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 32.88364249578415,
+    "peakPct": 54.97470489038788,
     "nearStopWarned": true,
     "ladder2": true,
     "trailPct": 8
