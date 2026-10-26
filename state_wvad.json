@@ -18,6 +18,12 @@
       "symbol": "SPY",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-26",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
@@ -29,19 +35,16 @@
     "signal": "CALL",
     "optionSymbol": "SPY261026C00767000",
     "strike": "767",
-    "entryPremium": 1.225,
-    "qty": 4,
-    "entryTime": 1793026834041,
-    "stopOrderId": "1747c2ea-de47-4c65-84a9-1190245c8fcf",
-    "hardStopPrice": 0.8,
-    "entryStockPrice": 767.215,
+    "entryPremium": 1.3250000000000002,
+    "qty": 3,
+    "entryTime": 1793027049705,
+    "stopOrderId": "a23e8c3d-f1c4-4396-98de-5b7a5834eb2f",
+    "hardStopPrice": 0.86,
+    "entryStockPrice": 767.415,
     "wvadSumAtEntry": -1676837.68,
     "signalLineAtEntry": -2686917.35,
     "atrAtEntry": 1.4124,
-    "slStock": 765.1,
-    "dte": 0,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.510204081632647
+    "slStock": 765.3,
+    "dte": 0
   }
 }
