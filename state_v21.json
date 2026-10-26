@@ -12,6 +12,12 @@
       "symbol": "IWM",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-10-26",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -49,5 +55,31 @@
   "_cooldowns": {
     "IWM_CALL": "2026-10-26T14:27:32.015Z"
   },
-  "_dayStoppedAlerted": "2026-10-21"
+  "_dayStoppedAlerted": "2026-10-21",
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY261026C00764000",
+    "strike": "764",
+    "entryPremium": 1.6150000000000002,
+    "qty": 3,
+    "entryTime": 1793025060035,
+    "level": 764.02,
+    "msgId": 6836,
+    "stopOrderId": "d1dc13f5-bb5c-4bf5-b8ee-7903bf48be6d",
+    "hardStopPrice": 1.05,
+    "entryStockPrice": 764.46,
+    "vwapAtEntry": 763.023,
+    "rsiAtEntry": 70.94,
+    "volumeRatio": 6.4186786120703285,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 1.6,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-26T14:30:59.903Z"
+  }
 }
