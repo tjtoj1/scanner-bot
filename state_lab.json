@@ -24,7 +24,7 @@
     "qty": 1,
     "entryTime": 1793021527661,
     "msgId": 6809,
-    "stopOrderId": "413155e4-8838-4ba4-abc2-a46c0420e1b3",
+    "stopOrderId": "8a44a165-1bda-4c52-b8f2-11b9692441b7",
     "hardStopPrice": 4.06,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -55,7 +55,13 @@
     "entryFillPrice": 6.25,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-26T13:32:07.255Z"
+    "entryFilledAt": "2026-10-26T13:32:07.255Z",
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 25.86206896551722,
+    "lastReportedThreshold": 20
   },
   "AMZN": {
     "active": true,
