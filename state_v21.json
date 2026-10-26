@@ -58,8 +58,6 @@
       "low": 247.23
     }
   },
-  "_cooldowns": {
-    "IWM_CALL": "2026-10-26T14:27:32.015Z"
-  },
+  "_cooldowns": {},
   "_dayStoppedAlerted": "2026-10-21"
 }
