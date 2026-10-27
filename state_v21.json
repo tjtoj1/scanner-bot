@@ -59,35 +59,8 @@
     }
   },
   "_cooldowns": {
-    "AMZN_PUT": "2026-10-27T14:48:47.689Z"
+    "AMZN_PUT": "2026-10-27T14:48:47.689Z",
+    "NVDA_PUT": "2026-10-27T14:55:48.162Z"
   },
-  "_dayStoppedAlerted": "2026-10-21",
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261028P00217500",
-    "strike": "217.5",
-    "entryPremium": 2.825,
-    "qty": 1,
-    "entryTime": 1793110559283,
-    "level": 217.408,
-    "msgId": 6857,
-    "stopOrderId": "48d350d7-8a4c-4cf5-80d7-aef04919c387",
-    "hardStopPrice": 1.84,
-    "entryStockPrice": 215.89999999999998,
-    "vwapAtEntry": 217.481,
-    "rsiAtEntry": 42.01,
-    "volumeRatio": 8.997604650925334,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 2.84,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-27T14:15:59.148Z",
-    "lastReportedThreshold": -30,
-    "nearStopWarned": true
-  }
+  "_dayStoppedAlerted": "2026-10-21"
 }
