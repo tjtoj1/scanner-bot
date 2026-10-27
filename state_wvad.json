@@ -24,28 +24,6 @@
     "SPY_PUT": "2026-10-23T16:47:01.125Z",
     "QQQ_PUT": "2026-10-23T18:30:56.422Z"
   },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY261027C00769000",
-    "strike": "769",
-    "entryPremium": 1.145,
-    "qty": 4,
-    "entryTime": 1793113447351,
-    "stopOrderId": "ddb49eba-39aa-4a84-ab20-52c3b3b8e211",
-    "hardStopPrice": 0.74,
-    "entryStockPrice": 769.06,
-    "wvadSumAtEntry": -1473566.96,
-    "signalLineAtEntry": -1716118.3,
-    "atrAtEntry": 1.2448,
-    "slStock": 767.19,
-    "dte": 0,
-    "ladder1": true,
-    "stopPct": 10,
-    "peakPct": 20.96069868995631,
-    "ladder2": true,
-    "trailPct": 10
-  },
   "QQQ": {
     "active": true,
     "signal": "CALL",
@@ -54,13 +32,16 @@
     "entryPremium": 1.185,
     "qty": 4,
     "entryTime": 1793114147297,
-    "stopOrderId": "cabb096b-fa80-486a-8f6f-63b245b4b551",
+    "stopOrderId": "3a0514d5-aaf7-47e6-965c-fd4533a45843",
     "hardStopPrice": 0.77,
     "entryStockPrice": 719.585,
     "wvadSumAtEntry": -454069.93,
     "signalLineAtEntry": -1016434.62,
     "atrAtEntry": 1.9848,
     "slStock": 716.61,
-    "dte": 0
+    "dte": 0,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 13.502109704641363
   }
 }
