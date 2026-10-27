@@ -97,7 +97,8 @@
     "entryFillPrice": 1,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-27T15:52:56.488Z"
+    "entryFilledAt": "2026-10-27T15:52:56.488Z",
+    "lastReportedThreshold": 10
   },
   "SPY": {
     "active": true,
