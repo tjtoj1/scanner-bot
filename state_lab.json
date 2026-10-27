@@ -23,7 +23,7 @@
     "qty": 2,
     "entryTime": 1793114136732,
     "msgId": 6882,
-    "stopOrderId": "5671bde3-dbbb-46dc-a91d-cc6c84edefeb",
+    "stopOrderId": "47f5e58e-a69d-4cf2-92f3-415454ae1c95",
     "hardStopPrice": 0.83,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -54,7 +54,11 @@
     "entryFillPrice": 1.18,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-27T15:15:36.325Z"
+    "entryFilledAt": "2026-10-27T15:15:36.325Z",
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.546218487394963,
+    "lastReportedThreshold": 10
   },
   "IWM": {
     "active": true,
@@ -65,7 +69,7 @@
     "qty": 4,
     "entryTime": 1793114137807,
     "msgId": 6883,
-    "stopOrderId": "e7db39fc-8a8a-4801-bad0-58aaf41a5ae7",
+    "stopOrderId": "a0f9347a-c6a8-4b60-90cc-886892d39b55",
     "hardStopPrice": 0.43,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -96,7 +100,11 @@
     "entryFillPrice": 0.6,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-27T15:15:37.674Z"
+    "entryFilledAt": "2026-10-27T15:15:37.674Z",
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 16.260162601626014,
+    "lastReportedThreshold": 10
   },
   "AMZN": {
     "active": true,
