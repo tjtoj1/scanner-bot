@@ -55,7 +55,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-27T13:45:52.045Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
