@@ -58,7 +58,9 @@
       "low": 249.75
     }
   },
-  "_cooldowns": {},
+  "_cooldowns": {
+    "AMZN_PUT": "2026-10-27T14:48:47.689Z"
+  },
   "_dayStoppedAlerted": "2026-10-21",
   "NVDA": {
     "active": true,
@@ -85,34 +87,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-27T14:15:59.148Z",
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN261028P00250000",
-    "strike": "250",
-    "entryPremium": 2.3049999999999997,
-    "qty": 2,
-    "entryTime": 1793110560619,
-    "level": 249.75,
-    "msgId": 6858,
-    "stopOrderId": "50555f7c-f9e7-4940-bb86-494aa0e2f16f",
-    "hardStopPrice": 1.5,
-    "entryStockPrice": 249.69,
-    "vwapAtEntry": 250.2762,
-    "rsiAtEntry": 45.41,
-    "volumeRatio": 8.728988537044316,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 2.35,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-27T14:16:00.478Z",
     "lastReportedThreshold": -30,
     "nearStopWarned": true
   }
