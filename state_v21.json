@@ -113,7 +113,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-28T14:16:05.750Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
