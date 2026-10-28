@@ -56,6 +56,7 @@
     "entryFillPrice": 2.25,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-28T17:15:51.149Z"
+    "entryFilledAt": "2026-10-28T17:15:51.149Z",
+    "lastReportedThreshold": -10
   }
 }
