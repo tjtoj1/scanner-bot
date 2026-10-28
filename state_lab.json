@@ -56,6 +56,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-28T14:14:54.623Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
