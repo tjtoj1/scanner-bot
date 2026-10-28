@@ -8,7 +8,8 @@
     "TSLA_PUT": 1793200582320,
     "NVDA_PUT": 1793208283472,
     "AMZN_PUT": 1793208686263,
-    "SPY_CALL": 1793213022350
+    "SPY_CALL": 1793213022350,
+    "SPY_PUT": 1793214359021
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -16,47 +17,5 @@
     "symbols": [
       "QQQ"
     ]
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261028P00771000",
-    "strike": "771",
-    "entryPremium": 2.02,
-    "qty": 1,
-    "entryTime": 1793212423657,
-    "msgId": 7023,
-    "stopOrderId": "84d707af-e9c5-4f71-a6a8-12b0df5e7356",
-    "hardStopPrice": 1.41,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 770.865,
-      "regime": "bearish",
-      "emaFast": 771.0275,
-      "emaSlow": 771.0295,
-      "breakoutHigh": 772.69,
-      "breakoutLow": 770.65,
-      "volRatio": 1.52,
-      "lastClose": 770.42,
-      "lastVolume": 797218,
-      "barTime": "2026-10-28T18:00:00Z",
-      "entryTimeUTC": "2026-10-28T18:33:43.657Z",
-      "vwapAtEntry": 770.9523,
-      "rsiAtEntry": 43.63,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryFillPrice": 2.06,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-28T18:33:43.356Z"
   }
 }
