@@ -64,35 +64,5 @@
     "IWM_CALL": "2026-10-28T14:40:20.788Z",
     "TSLA_PUT": "2026-10-28T14:43:54.539Z"
   },
-  "_dayStoppedAlerted": "2026-10-28",
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ261028P00722000",
-    "strike": "722",
-    "entryPremium": 3.455,
-    "qty": 1,
-    "entryTime": 1793196964740,
-    "level": 722.51,
-    "msgId": null,
-    "stopOrderId": "ee13420b-54a2-44db-bce4-18f5e13596ba",
-    "hardStopPrice": 2.25,
-    "entryStockPrice": 721.865,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 64.59,
-    "volumeRatio": 12.725016997913903,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 3.44,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-28T14:16:04.627Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 12.301013024602021,
-    "lastReportedThreshold": 10
-  }
+  "_dayStoppedAlerted": "2026-10-28"
 }
