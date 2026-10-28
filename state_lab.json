@@ -95,7 +95,8 @@
     "entryFillPrice": 1.1,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-28T14:16:16.769Z"
+    "entryFilledAt": "2026-10-28T14:16:16.769Z",
+    "lastReportedThreshold": -10
   },
   "NVDA": {
     "active": true,
