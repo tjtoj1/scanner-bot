@@ -114,7 +114,8 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-28T14:16:05.750Z",
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -30,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
@@ -141,6 +142,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-28T14:16:11.439Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   }
 }
