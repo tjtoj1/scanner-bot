@@ -16,5 +16,47 @@
     "symbols": [
       "QQQ"
     ]
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261028P00771000",
+    "strike": "771",
+    "entryPremium": 1.9649999999999999,
+    "qty": 1,
+    "entryTime": 1793212218451,
+    "msgId": 7020,
+    "stopOrderId": "92f9aca5-84b1-487a-a53e-926b91cd6e47",
+    "hardStopPrice": 1.38,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 770.935,
+      "regime": "bearish",
+      "emaFast": 771.0275,
+      "emaSlow": 771.0295,
+      "breakoutHigh": 772.69,
+      "breakoutLow": 770.65,
+      "volRatio": 1.52,
+      "lastClose": 770.42,
+      "lastVolume": 797218,
+      "barTime": "2026-10-28T18:00:00Z",
+      "entryTimeUTC": "2026-10-28T18:30:18.451Z",
+      "vwapAtEntry": 770.9523,
+      "rsiAtEntry": 43.63,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryFillPrice": 1.94,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-28T18:30:18.044Z"
   }
 }
