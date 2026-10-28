@@ -140,7 +140,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-28T14:16:09.101Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "TSLA": {
     "active": true,
