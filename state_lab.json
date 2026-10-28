@@ -21,14 +21,14 @@
   "QQQ": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "QQQ261028C00723000",
-    "strike": "723",
-    "entryPremium": 2.76,
+    "optionSymbol": "QQQ261028C00724000",
+    "strike": "724",
+    "entryPremium": 2.45,
     "qty": 1,
-    "entryTime": 1793214026995,
-    "msgId": 7026,
-    "stopOrderId": "5217fadc-46e0-4a0f-8e13-3dd1769fc437",
-    "hardStopPrice": 1.93,
+    "entryTime": 1793214311486,
+    "msgId": 7030,
+    "stopOrderId": "8a9d957f-32ac-436a-b6ab-411a649d7dc0",
+    "hardStopPrice": 1.72,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -37,7 +37,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 723.3900000000001,
+      "spot": 724.25,
       "regime": "bullish",
       "emaFast": 722.7139,
       "emaSlow": 722.6434,
@@ -47,7 +47,7 @@
       "lastClose": 724.64,
       "lastVolume": 2349241,
       "barTime": "2026-10-28T18:30:00Z",
-      "entryTimeUTC": "2026-10-28T19:00:26.995Z",
+      "entryTimeUTC": "2026-10-28T19:05:11.486Z",
       "vwapAtEntry": 722.6194,
       "rsiAtEntry": 60.78,
       "signalType": "breakout",
@@ -55,15 +55,9 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryFillPrice": 2.77,
+    "entryFillPrice": 2.44,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-28T19:00:26.667Z",
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 26.26811594202901
+    "entryFilledAt": "2026-10-28T19:05:11.210Z"
   }
 }
