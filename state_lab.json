@@ -54,7 +54,8 @@
     "entryFillPrice": 3.15,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-28T14:14:54.623Z"
+    "entryFilledAt": "2026-10-28T14:14:54.623Z",
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
