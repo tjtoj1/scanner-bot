@@ -1,6 +1,13 @@
 {
   "_lastDay": "2026-10-29",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-10-29",
+      "symbol": "IWM",
+      "signal": "CALL",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-10-29",
@@ -36,8 +43,33 @@
   "_cooldowns": {
     "AMZN_PUT": "2026-10-27T14:48:47.689Z",
     "NVDA_PUT": "2026-10-28T14:31:52.186Z",
-    "IWM_CALL": "2026-10-28T14:40:20.788Z",
     "TSLA_PUT": "2026-10-28T14:43:54.539Z"
   },
-  "_dayStoppedAlerted": "2026-10-28"
+  "_dayStoppedAlerted": "2026-10-28",
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM261029C00284000",
+    "strike": "284",
+    "entryPremium": 0.825,
+    "qty": 6,
+    "entryTime": 1793284218057,
+    "level": 283.87,
+    "msgId": 7063,
+    "stopOrderId": "87704016-9066-42d3-8505-c210382b4e46",
+    "hardStopPrice": 0.54,
+    "entryStockPrice": 284.25,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 60.52,
+    "volumeRatio": 7.552267760313581,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 0.86,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-10-29T14:30:17.870Z"
+  }
 }
