@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-28T20:00:39.438Z"
+      "lastUpdated": "2026-10-29T20:00:36.248Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -41,15 +41,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 12,
+      "n": 13,
       "wins": 5,
-      "pnl": -88,
-      "avgPnlPct": -3.73,
-      "se": 9.43,
+      "pnl": -249,
+      "avgPnlPct": -6.07,
+      "se": 8.99,
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-28T20:00:39.438Z"
+      "lastUpdated": "2026-10-29T20:00:36.248Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 251,
-      "wins": 137,
-      "pnl": 1408,
-      "avgPnlPct": 1.51,
-      "se": 2.12,
+      "n": 255,
+      "wins": 139,
+      "pnl": 1298,
+      "avgPnlPct": 1.33,
+      "se": 2.09,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-28T20:00:39.439Z"
+      "lastUpdated": "2026-10-29T20:00:36.248Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -75,15 +75,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 292,
-      "wins": 159,
-      "pnl": 425,
-      "avgPnlPct": 1.62,
-      "se": 1.97,
+      "n": 295,
+      "wins": 160,
+      "pnl": 308,
+      "avgPnlPct": 1.49,
+      "se": 1.95,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-28T20:00:39.439Z"
+      "lastUpdated": "2026-10-29T20:00:36.248Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-28T20:00:39.439Z"
+      "lastUpdated": "2026-10-29T20:00:36.248Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-10-28T20:00:39.439Z"
+      "lastUpdated": "2026-10-29T20:00:36.248Z"
     }
   },
   "changelog": [
