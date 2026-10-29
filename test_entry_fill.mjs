@@ -595,6 +595,14 @@ function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null
     bumpDayPeak: c => c, clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v)),
     lookupComboMultiplier: () => ({ comboKey: "PUT|position:near_low", sizeMultiplier: 1 }),
     positionBucket: () => "near_low", spot: 731.0,
+    // Stage 0 shadow logging. scanEntry now calls these, so the extraction
+    // needs them; they are inert no-ops here because this suite is about
+    // the fill capture, not the shadow log (test_signal_shadow.mjs covers
+    // that). snapQuoteLegs returns null so no bid/ask reaches the record —
+    // which also proves the null path does not disturb the entry.
+    bumpSigCount: () => {}, logSignal: () => false, queueFollowup: () => {},
+    snapQuoteLegs: async () => null,
+    CHI_HM: { formatToParts: () => [{ type: "hour", value: "09" }] },
   };
   const fn = grab(src[bot], SCAN_ENTRY_RE[bot], `scanEntry/${bot}`);
   const scanEntry = new Function(...Object.keys(stubs), `${fn}\nreturn scanEntry;`)(...Object.values(stubs));
