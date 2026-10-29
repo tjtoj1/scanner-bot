@@ -65,12 +65,12 @@
     "signal": "PUT",
     "optionSymbol": "QQQ261029P00715000",
     "strike": "715",
-    "entryPremium": 2.785,
+    "entryPremium": 2.8200000000000003,
     "qty": 1,
-    "entryTime": 1793282413743,
-    "msgId": 7043,
-    "stopOrderId": "cfe09584-3ce4-4928-b5e2-596742bee605",
-    "hardStopPrice": 1.95,
+    "entryTime": 1793283277436,
+    "msgId": 7058,
+    "stopOrderId": "a9ade407-96a0-45c5-943a-c214b78edec3",
+    "hardStopPrice": 1.97,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -79,7 +79,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 715.005,
+      "spot": 714.925,
       "regime": "bearish",
       "emaFast": 716.9578,
       "emaSlow": 717.5663,
@@ -89,7 +89,7 @@
       "lastClose": 715.1,
       "lastVolume": 3628557,
       "barTime": "2026-10-29T13:30:00Z",
-      "entryTimeUTC": "2026-10-29T14:00:13.743Z",
+      "entryTimeUTC": "2026-10-29T14:14:37.436Z",
       "vwapAtEntry": 715.592,
       "rsiAtEntry": 38.91,
       "signalType": "breakout",
@@ -97,13 +97,9 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "entryFillPrice": 2.88,
+    "entryFillPrice": 2.82,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-29T14:00:13.364Z",
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 19.56912028725314
+    "entryFilledAt": "2026-10-29T14:14:37.133Z"
   }
 }
