@@ -56,34 +56,8 @@
     "AMZN_PUT": "2026-10-27T14:48:47.689Z",
     "NVDA_PUT": "2026-10-28T14:31:52.186Z",
     "TSLA_PUT": "2026-10-28T14:43:54.539Z",
-    "SPY_CALL": "2026-10-29T14:48:26.369Z"
+    "SPY_CALL": "2026-10-29T14:48:26.369Z",
+    "IWM_CALL": "2026-10-29T14:49:40.792Z"
   },
-  "_dayStoppedAlerted": "2026-10-28",
-  "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "IWM261029C00285000",
-    "strike": "285",
-    "entryPremium": 0.505,
-    "qty": 9,
-    "entryTime": 1793285153509,
-    "level": 283.87,
-    "msgId": 7068,
-    "stopOrderId": "1444b9a3-1a97-4bc5-b343-bee03fb40484",
-    "hardStopPrice": 0.33,
-    "entryStockPrice": 284.63,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 62.63,
-    "volumeRatio": 2.9397986935086773,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 0.5,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-29T14:45:53.362Z",
-    "lastReportedThreshold": -20
-  }
+  "_dayStoppedAlerted": "2026-10-28"
 }
