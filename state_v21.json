@@ -61,34 +61,7 @@
   "_cooldowns": {
     "AMZN_PUT": "2026-10-27T14:48:47.689Z",
     "NVDA_PUT": "2026-10-28T14:31:52.186Z",
-    "TSLA_PUT": "2026-10-28T14:43:54.539Z",
-    "SPY_CALL": "2026-10-29T14:48:26.369Z"
+    "TSLA_PUT": "2026-10-28T14:43:54.539Z"
   },
-  "_dayStoppedAlerted": "2026-10-28",
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261030C00407500",
-    "strike": "407.5",
-    "entryPremium": 3.035,
-    "qty": 1,
-    "entryTime": 1793286032839,
-    "level": 406.43,
-    "msgId": 7074,
-    "stopOrderId": "f28d29e5-da1b-4780-927c-e4bcebc153c3",
-    "hardStopPrice": 1.97,
-    "entryStockPrice": 406.34000000000003,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 63.9,
-    "volumeRatio": 3.968398491684142,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 3.05,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-29T15:00:32.768Z"
-  }
+  "_dayStoppedAlerted": "2026-10-28"
 }
