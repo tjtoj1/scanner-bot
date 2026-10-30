@@ -404,10 +404,7 @@ console.log("\n── 4b) شمعة واحدة، 30 تقييماً ──");
 
   // (i) a bar whose signal is NEVER entered: the buy fails every time.
   {
-    const b = build({ sig: () => SIG }, path.join(TMP, "s4b-i.jsonl"));
-    // make the buy fail so no "taken" record is ever written
     const state = {};
-    b.scanEntry.__noop = 0;
     const stubsFailBuy = build({ sig: () => SIG }, path.join(TMP, "s4b-i2.jsonl"));
     // drive 30 evaluations of the same bar
     for (let i = 0; i < 30; i++) {
@@ -423,7 +420,6 @@ console.log("\n── 4b) شمعة واحدة، 30 تقييماً ──");
       (state._sigPending?.items ?? []).length === 1, (state._sigPending?.items ?? []).length, 1);
     check("ولم يُفتح أي مركز", stubsFailBuy.posts.length === 0, stubsFailBuy.posts.length, 0);
     check("و_sigSeen يحمل مفتاحاً واحداً", state._sigSeen.keys.length === 1, state._sigSeen.keys.length, 1);
-    void b;
   }
 
   // (ii) the same bar, gated for 29 cycles, then entered on the 30th.
