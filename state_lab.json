@@ -9,7 +9,8 @@
     "IWM_CALL": 1793291993912,
     "AMZN_CALL": 1793371364235,
     "SPY_PUT": 1793372922938,
-    "IWM_PUT": 1793372997454
+    "IWM_PUT": 1793372997454,
+    "TSLA_CALL": 1793374150067
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -20,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 505,
+    "no_signal": 511,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -49,57 +50,12 @@
       "SPY|14:15|S|cooldown",
       "IWM|14:15|S|cooldown",
       "TSLA|14:15|G|",
-      "TSLA|14:15|T|"
+      "TSLA|14:15|T|",
+      "TSLA|14:15|S|cooldown"
     ]
   },
   "_sigPending": {
     "day": "2026-10-30",
     "items": []
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261030C00405000",
-    "strike": "405",
-    "entryPremium": 1.435,
-    "qty": 2,
-    "entryTime": 1793371925042,
-    "msgId": 7164,
-    "stopOrderId": "dbea6e7c-d744-43c7-830a-e32dfc07d5db",
-    "hardStopPrice": 1,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 404.92499999999995,
-      "regime": "bullish",
-      "emaFast": 395.4924,
-      "emaSlow": 395.2332,
-      "breakoutHigh": 398.19,
-      "breakoutLow": 387.52,
-      "volRatio": 3.04,
-      "lastClose": 398.265,
-      "lastVolume": 1405024,
-      "barTime": "2026-10-30T14:15:00Z",
-      "entryTimeUTC": "2026-10-30T14:52:05.042Z",
-      "vwapAtEntry": 394.0647,
-      "rsiAtEntry": 62.58,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.41,
-    "entryAsk": 1.42,
-    "entrySpreadPct": 0.707,
-    "entryFillPrice": 1.44,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:52:04.887Z",
-    "lastReportedThreshold": -10
   }
 }
