@@ -595,6 +595,15 @@ function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null
     bumpDayPeak: c => c, clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v)),
     lookupComboMultiplier: () => ({ comboKey: "PUT|position:near_low", sizeMultiplier: 1 }),
     positionBucket: () => "near_low", spot: 731.0,
+    // Stage 0 shadow logging. scanEntry now calls these, so the extraction
+    // needs them; they are inert no-ops here because this suite is about
+    // the fill capture, not the shadow log (test_signal_shadow.mjs covers
+    // that). snapQuoteLegs returns null so no bid/ask reaches the record —
+    // which also proves the null path does not disturb the entry.
+    bumpSigCount: () => {}, logSignal: () => false, queueFollowup: () => {},
+    sigSeenHas: () => false,
+    snapQuoteLegs: async () => null,
+    CHI_HM: { formatToParts: () => [{ type: "hour", value: "09" }] },
   };
   const fn = grab(src[bot], SCAN_ENTRY_RE[bot], `scanEntry/${bot}`);
   const scanEntry = new Function(...Object.keys(stubs), `${fn}\nreturn scanEntry;`)(...Object.values(stubs));
@@ -619,7 +628,13 @@ try {
       fs.writeFileSync(stateFile, "{}");
       const h = makeScanEntry(bot, { stateFile });
       const state = {};
-      await captureAsync(() => h.run(state, "QQQ"));
+      const r0 = await captureAsync(() => h.run(state, "QQQ"));
+      // Asserted explicitly: a missing stub makes scanEntry throw, which
+      // leaves the state empty and every assertion below fails with a
+      // confusing "undefined". This names the real cause instead. It has
+      // already caught two new scanEntry dependencies.
+      check(`${bot}: scanEntry اكتملت بلا استثناء (كل الوكلاء موجودون)`,
+        r0.err === undefined, String(r0.err), "no throw");
       check(`${bot}: المفاتيح على الكائن في الذاكرة (الذي سيحفظه main)`,
         FILL_KEYS.entryFillPrice === state.QQQ?.entryFillPrice, state.QQQ?.entryFillPrice, 1.07);
       // main()'s final whole-file overwrite.

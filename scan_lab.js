@@ -463,6 +463,204 @@ async function getSellFill(orderId, expectedQty) {
   return fillFromOrder(orderId, expectedQty, EXIT_FILL_TIMEOUT_MS, "sell_order");
 }
 
+// ─── SIGNAL SHADOW LOG — STAGE 0, OBSERVATION ONLY ───────────────────
+// Every record in outcomes_lab.jsonl is a trade the bot TOOK, which makes
+// it a sample selected by the very gates we might want to evaluate. We
+// have no idea whether those gates help or hurt, because each one returns
+// silently. This logs what was seen and what was decided, and changes
+// nothing: no decision, no return path, no sizing, no stop, no order.
+//
+// SIZING, measured not guessed. The session is 8:30-15:30 CT = 420
+// cycles/day, each cycle runs a scan child and a monitor child, and each
+// sweeps up to 6 tickers — an upper bound of 5040 evaluations/day. At a
+// median outcomes record of 811 bytes that would be ~3 MB/day, six times
+// the entire existing outcomes file per day, in a file runner.js syncs to
+// git every cycle. So:
+//   * a record is written ONLY when a signal fired, or when a gate AFTER
+//     computeSignal blocked one. Everything else increments a counter.
+//   * records dedupe on (day, symbol, barTime, decision, reason).
+//     computeSignal reads the last CLOSED 15-min bar, so its verdict
+//     cannot change within a bar — one record per bar per outcome.
+// Expected: tens of records a day, not thousands. The real rate is
+// unknown until this runs, which is the point.
+const SIGNALS_FILE          = "signals_lab.jsonl";
+const SNAP_LEGS_TIMEOUT_MS  = 3000;   // one bid/ask fetch for the snapshot
+const FOLLOWUP_TIMEOUT_MS   = 3000;   // one quote per shadow follow-up
+const FOLLOWUP_BUDGET_MS    = 5000;   // per process, separate from FILL_BUDGET_MS
+const FOLLOWUP_MAX_PER_CYCLE = 2;
+// A bar NEVER recurs as the last-closed bar, so the dedupe set only has
+// to cover the bar in flight plus a little slack — 6 symbols x ~5
+// decisions x 4 bars. The old cap of 400, with the day and the full ISO
+// barTime in every key, was 22.7 KiB of _sigSeen in a state_lab.json that
+// is 463 bytes today and is committed to git every cycle: a 50x inflation
+// of a file on the hot sync path. The compact key below plus this cap is
+// ~2.9 KiB worst case. The reason is NOT truncated — a key collision
+// would silently drop a record, which is worse than the bytes.
+const SIG_SEEN_CAP          = 120;
+const SIG_PENDING_CAP       = 60;
+const SIG_DECISION_CODE     = { taken: "T", skipped: "S", reached_floor_gate: "G" };
+let followupBudgetUsedMs = 0;
+
+// The dedupe key. The day lives on _sigSeen itself (the set resets per
+// day) and the bar's date is that same day, so only the time survives.
+function sigKey(snap, decision, reason) {
+  const hhmm = String(snap?.barTime ?? "").slice(11, 16) || "??:??";
+  const code = SIG_DECISION_CODE[decision] ?? decision;
+  return `${snap?.symbol ?? "?"}|${hhmm}|${code}|${reason ?? ""}`;
+}
+
+// Read-only membership test, so a caller can ask "have I already handled
+// this bar?" WITHOUT marking it handled. Used to make the bid/ask fetch
+// once per bar instead of once per evaluation.
+function sigSeenHas(state, snap, decision, reason) {
+  try {
+    if (state?._sigSeen?.day !== getToday()) return false;
+    return state._sigSeen.keys.includes(sigKey(snap, decision, reason));
+  } catch { return false; }
+}
+
+// Bid/ask for the snapshot. getQuoteLegs() already returns exactly this
+// shape and is NOT reused here on purpose: its only caller is inside the
+// profit-floor gate, which test_daily_stop pins byte-identical to the
+// phase A commit, and hoisting its `legs` out of that block to share it
+// would mean editing a pinned safety region for a path that has armed on
+// 2 days out of 43. One extra fetch per SIGNAL (tens per day, not per
+// evaluation) is the cheaper trade. 3s cap, null on anything.
+async function snapQuoteLegs(optSym) {
+  try {
+    const res = await fetchWithTimeout(
+      `https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${optSym}`,
+      { headers: HEADERS }, SNAP_LEGS_TIMEOUT_MS);
+    const d = await res.json();
+    const q = d.quotes?.[optSym];
+    if (!q || !Number.isFinite(q.ap) || !Number.isFinite(q.bp) || q.ap <= 0) return null;
+    return { bid: q.bp, ask: q.ap, mid: (q.ap + q.bp) / 2 };
+  } catch { return null; }
+}
+
+// Per-day counters for the gates that fire before a signal is even
+// computed. These are the overwhelming majority of evaluations (a symbol
+// already holding a position returns on the first line), so they get a
+// count rather than a record. Mutates `state` only — main() already saves
+// it once at the end of both modes, so this adds no write of its own.
+function bumpSigCount(state, reason) {
+  try {
+    const today = getToday();
+    if (state._sigCounts?.day !== today) state._sigCounts = { day: today };
+    state._sigCounts[reason] = (state._sigCounts[reason] || 0) + 1;
+  } catch { /* a counter must never affect a cycle */ }
+}
+
+// Append-only, deduped, and incapable of throwing. Returns true when a
+// record was written, false when deduped or on any failure — no caller
+// branches on it, it is there for the tests.
+function logSignal(state, snap, decision, reason) {
+  try {
+    const today = getToday();
+    if (state._sigSeen?.day !== today) state._sigSeen = { day: today, keys: [] };
+    const key = sigKey(snap, decision, reason);
+    if (state._sigSeen.keys.includes(key)) return false;
+    state._sigSeen.keys.push(key);
+    // Oldest-first eviction: a bar that stops recurring will never be
+    // revisited, so dropping the front cannot resurrect a duplicate.
+    if (state._sigSeen.keys.length > SIG_SEEN_CAP) {
+      state._sigSeen.keys.splice(0, state._sigSeen.keys.length - SIG_SEEN_CAP);
+    }
+    fs.appendFileSync(SIGNALS_FILE, JSON.stringify({
+      type: "signal", ...snap, decision, reason: reason ?? null,
+      loggedAt: new Date().toISOString(),
+    }) + "\n");
+    return true;
+  } catch (e) {
+    // Deliberately swallowed. A full disk or a bad path must cost a log
+    // line, never a trading cycle.
+    try { console.error(`logSignal failed (non-fatal): ${e.message}`); } catch {}
+    return false;
+  }
+}
+
+// Queue a skipped signal for a later price look, so its hypothetical
+// outcome can be computed offline. Bounded list; oldest dropped.
+function queueFollowup(state, snap, decision, reason) {
+  try {
+    const today = getToday();
+    if (state._sigPending?.day !== today) state._sigPending = { day: today, items: [] };
+    if (!snap.optionSymbol) return;            // nothing to price
+    // Dedupe on its own, independently of _sigSeen. The caller only
+    // queues on a fresh logSignal, but a queue that drains across cycles
+    // must not be re-filled with a bar it has already priced — and
+    // _sigSeen is capped, so it cannot be relied on as the only guard.
+    const dup = state._sigPending.items.some(it =>
+      it.symbol === snap.symbol && it.barTime === snap.barTime
+      && it.decision === decision && (it.reason ?? null) === (reason ?? null));
+    if (dup) return;
+    state._sigPending.items.push({
+      symbol: snap.symbol, optionSymbol: snap.optionSymbol, barTime: snap.barTime,
+      decision, reason: reason ?? null, premium: snap.premium ?? null,
+      queuedAt: new Date().toISOString(),
+    });
+    if (state._sigPending.items.length > SIG_PENDING_CAP) {
+      state._sigPending.items.splice(0, state._sigPending.items.length - SIG_PENDING_CAP);
+    }
+  } catch { /* never affects a cycle */ }
+}
+
+// WHAT THE FOLLOW-UP SUPPORTS, and what it does not.
+//
+// Supports: "the contract this signal would have bought was quoted at X a
+// few minutes later" — enough to ask whether skipped signals moved the way
+// the strategy expected, and to compare the skipped population's drift
+// against the taken population's.
+//
+// Does NOT support a P&L claim. It is a MID quote, so it ignores the
+// spread the entry would actually have crossed; there is no order, so no
+// liquidity, no partial fill, no market impact; nothing simulates the
+// ladder, the trailing stop or the hard stop, so there is no exit; and the
+// sampling is whenever the monitor child got to it, not a decision point.
+// Treat it as "which way did it go", never as "what it would have made".
+async function runShadowFollowups(state) {
+  try {
+    const items = state._sigPending?.day === getToday() ? state._sigPending.items : [];
+    if (!items.length) return;
+    let done = 0;
+    while (items.length && done < FOLLOWUP_MAX_PER_CYCLE) {
+      if (followupBudgetUsedMs >= FOLLOWUP_BUDGET_MS) {
+        console.log(`shadow follow-up: budget spent, ${items.length} still queued`);
+        return;
+      }
+      const it = items.shift();
+      const started = Date.now();
+      let quote = null;
+      try {
+        const res = await fetchWithTimeout(
+          `https://data.alpaca.markets/v1beta1/options/quotes/latest?symbols=${it.optionSymbol}`,
+          { headers: HEADERS }, FOLLOWUP_TIMEOUT_MS);
+        const d = await res.json();
+        const q = d.quotes?.[it.optionSymbol];
+        if (q && Number.isFinite(q.ap) && Number.isFinite(q.bp)) {
+          quote = { bid: q.bp, ask: q.ap, mid: +((q.ap + q.bp) / 2).toFixed(4) };
+        }
+      } catch { quote = null; }
+      followupBudgetUsedMs += Date.now() - started;
+      done++;
+      try {
+        fs.appendFileSync(SIGNALS_FILE, JSON.stringify({
+          type: "followup", day: getToday(), symbol: it.symbol,
+          optionSymbol: it.optionSymbol, barTime: it.barTime,
+          decision: it.decision, reason: it.reason,
+          premiumAtSignal: it.premium, queuedAt: it.queuedAt,
+          quote, elapsedSec: Math.round((Date.now() - Date.parse(it.queuedAt)) / 1000),
+          loggedAt: new Date().toISOString(),
+        }) + "\n");
+      } catch (e) {
+        try { console.error(`shadow follow-up append failed (non-fatal): ${e.message}`); } catch {}
+      }
+    }
+  } catch (e) {
+    try { console.error(`runShadowFollowups failed (non-fatal): ${e.message}`); } catch {}
+  }
+}
+
 function calcQty(premium, tradeBudget) {
   const budget = Math.min(tradeBudget, MAX_TRADE_BUDGET);
   return Math.max(1, Math.floor(budget / (premium * 100)));
@@ -765,6 +963,14 @@ function logTrade(pos, symbol, exitPremium, reason, fillSource, exitStockPrice, 
       exitFilledAt: exitFill?.filledAt ?? null,
       pnlAtFill: bothReal ? Math.round((exitFillPx - entryFillPx) * pos.qty * 100) : null,
       pnlPctAtFill: bothReal ? +((exitFillPx - entryFillPx) / entryFillPx * 100).toFixed(1) : null,
+      // ── STAGE 0 SHADOW: the spread this entry crossed ──
+      // Appended last, like every additive field before it, so the old
+      // serialization stays a literal prefix. Set in scanEntry's state
+      // literal from a quote taken before the buy; null on older
+      // positions and whenever that quote failed.
+      entryBid: pos.entryBid ?? null,
+      entryAsk: pos.entryAsk ?? null,
+      entrySpreadPct: pos.entrySpreadPct ?? null,
     };
     fs.appendFileSync("outcomes_lab.jsonl", JSON.stringify(record) + "\n");
     console.log(`logged: ${symbol} ${pos.signal} ${pnlPct.toFixed(1)}% (${reason})`);
@@ -1049,12 +1255,13 @@ async function monitorPosition(state, strategy, symbol) {
 
 // ─── SCAN FOR NEW ENTRIES ───────────────────────────────────
 async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
-  if (state[symbol]?.active) return;
-  if (liveInAlpaca.has(symbol)) return;
-  if (isPastLastEntry()) return;
+  if (state[symbol]?.active) { bumpSigCount(state, "already_active"); return; }
+  if (liveInAlpaca.has(symbol)) { bumpSigCount(state, "live_in_alpaca"); return; }
+  if (isPastLastEntry()) { bumpSigCount(state, "past_last_entry"); return; }
 
   if (countOpenPositions(state) >= MAX_OPEN_POSITIONS) {
     console.log(`Max open positions (${MAX_OPEN_POSITIONS}) reached — skip ${symbol}`);
+    bumpSigCount(state, "max_open_positions");
     return;
   }
   // One replay of the day covers both tiers: tier 1 (stop opening trades)
@@ -1075,16 +1282,49 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
   const day = getTodayRealizedDay();
   if (day.stopped) {
     console.log(`Day stopped (${day.reason}) — net $${day.net}, peak $${day.peak} — no new entries today`);
+    bumpSigCount(state, "day_stopped");
     return;
   }
   if (day.net <= -MAX_DAILY_LOSS) {
     console.log(`Daily loss cap hit — no new entries today`);
+    bumpSigCount(state, "daily_loss_cap");
     return;
   }
 
   const bars = await getBars(symbol, "15Min", 5);
   const sig = computeSignal(bars, strategy.params);
-  if (!sig || !sig.signal) return;
+  if (!sig || !sig.signal) { bumpSigCount(state, "no_signal"); return; }
+
+  // ── SHADOW SNAPSHOT — observation only, nothing below reads it ──
+  // Built here, the first point at which a signal exists, and enriched as
+  // each later step learns more. Every field is already in hand or free:
+  // sig came from bars fetched above, the clock is local, and dayCtx was
+  // computed by the caller. A field still unknown when a gate fires stays
+  // null, which is the honest record of what the bot knew at that moment.
+  const snapDt = new Date();
+  const snap = {
+    day: getToday(), symbol, signal: sig.signal, barTime: sig.barTime,
+    hourCT: +CHI_HM.formatToParts(snapDt).find(p => p.type === "hour").value,
+    dow: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][snapDt.getUTCDay()],
+    regime: sig.regime,
+    emaFast: +sig.emaFast.toFixed(4), emaSlow: +sig.emaSlow.toFixed(4),
+    emaGapPct: sig.emaSlow ? +((sig.emaFast - sig.emaSlow) / sig.emaSlow * 100).toFixed(4) : null,
+    breakoutHigh: sig.breakoutHigh, breakoutLow: sig.breakoutLow,
+    // How far past the level the close actually was, signed so that
+    // positive always means "through the level in the signal's direction".
+    marginPct: sig.signal === "CALL"
+      ? +((sig.lastClose - sig.breakoutHigh) / sig.breakoutHigh * 100).toFixed(4)
+      : +((sig.breakoutLow - sig.lastClose) / sig.breakoutLow * 100).toFixed(4),
+    rangePct: +((sig.breakoutHigh - sig.breakoutLow) / ((sig.breakoutHigh + sig.breakoutLow) / 2) * 100).toFixed(4),
+    volRatio: +sig.volRatio.toFixed(2), lastClose: sig.lastClose, lastVolume: sig.lastVolume,
+    spot: null, vwapAtEntry: null, rsiAtEntry: null,
+    positionBucket: null, comboKey: null, sizeMultiplier: null,
+    openPositions: countOpenPositions(state),
+    dayNet: day.net, dayArmed: !!dayCtx?.armed,
+    dayBudget: dayCtx?.budget != null ? Math.round(dayCtx.budget) : null,
+    optionSymbol: null, strike: null, premium: null,
+    bid: null, ask: null, spreadPct: null, qty: null, cost1: null,
+  };
 
   // Check re-entry cooldown: block immediate re-entry of same (symbol × direction) after losing stops
   state._cooldowns = state._cooldowns || {};
@@ -1092,6 +1332,7 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
   if (state._cooldowns[cooldownKey] && state._cooldowns[cooldownKey] > Date.now()) {
     const remainMin = Math.ceil((state._cooldowns[cooldownKey] - Date.now()) / 60000);
     console.log(`⏸️  ${symbol} ${sig.signal}: cooldown active (${remainMin}min remaining) — skipping entry`);
+    logSignal(state, snap, "skipped", "cooldown");
     return;
   }
   delete state._cooldowns[cooldownKey]; // Clear expired cooldown
@@ -1101,9 +1342,10 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
   const closedBars = bars.length > 1 ? bars.slice(0, -1) : bars;
   const vwapAtEntry = computeVWAP(bars);
   const rsiAtEntry = computeRSI(closedBars.map(b => b.c));
+  snap.vwapAtEntry = vwapAtEntry; snap.rsiAtEntry = rsiAtEntry;
 
   const spot = await getLatestPrice(symbol);
-  if (!spot) return;
+  if (!spot) { logSignal(state, snap, "skipped", "no_spot"); return; }
 
   // ── COMBO-BASED POSITION SIZING ──────────────────────────────
   // Sizes THIS trade by how its (signal × position) combo has performed.
@@ -1113,11 +1355,64 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
   const positionBkt = positionBucket(spot, sig.breakoutHigh, sig.breakoutLow);
   const { comboKey, sizeMultiplier } = lookupComboMultiplier(strategy.combos, sig.signal, positionBkt);
   const effectiveBudget = strategy.params.tradeBudget * sizeMultiplier;
+  snap.spot = spot; snap.positionBucket = positionBkt;
+  snap.comboKey = comboKey; snap.sizeMultiplier = sizeMultiplier;
+  snap.vwapDistPct = vwapAtEntry ? +((spot - vwapAtEntry) / vwapAtEntry * 100).toFixed(4) : null;
 
   const opt = await findOption(symbol, sig.signal, spot);
-  if (!opt) { console.log(`${symbol}: no option within ${MAX_DTE} DTE`); return; }
+  if (!opt) { console.log(`${symbol}: no option within ${MAX_DTE} DTE`); logSignal(state, snap, "skipped", "no_option"); return; }
 
   let qty = calcQty(opt.premium, effectiveBudget);
+  snap.optionSymbol = opt.symbol; snap.strike = opt.strike;
+  snap.premium = opt.premium; snap.qty = qty;
+  snap.cost1 = +(opt.premium * 100).toFixed(2);
+
+  // The spread this entry is about to cross — the one feature most worth
+  // having and the one the bot currently throws away (getQuote returns
+  // only the mid). Measured BEFORE the buy on purpose: measured after, it
+  // would be a different spread. snapQuoteLegs caps itself at 3s and
+  // returns null on anything, so the worst case is a null field and a
+  // slower cycle; it cannot change qty, the order, the stop or any gate.
+  //
+  // ONCE PER BAR, not once per evaluation. scanEntry re-runs every cycle
+  // while the same 15-min bar is the last closed one — 15 cycles x 2
+  // children is ~30 evaluations of the identical signal — so an
+  // unconditional fetch here was ~30 extra calls and up to 30x3s of entry
+  // path latency per bar. The read-only _sigSeen check below makes it one:
+  // if this bar's reached_floor_gate record already exists, the snapshot
+  // is a duplicate that logSignal will drop anyway, so there is nothing
+  // to populate. An entry that DOES proceed re-fetches after the gate.
+  const alreadyLogged = sigSeenHas(state, snap, "reached_floor_gate", null);
+  if (!alreadyLogged) {
+    const snapLegs = await snapQuoteLegs(opt.symbol);
+    if (snapLegs) {
+      snap.bid = snapLegs.bid; snap.ask = snapLegs.ask;
+      snap.spreadPct = snapLegs.mid > 0
+        ? +((snapLegs.ask - snapLegs.bid) / snapLegs.mid * 100).toFixed(3) : null;
+    }
+  }
+
+  // Logged BEFORE the floor gate, deliberately. The gate's three returns
+  // sit inside the `if (dayCtx?.armed)` block that test_daily_stop pins
+  // byte-identical to the phase A commit, and I will not edit a pinned
+  // safety region to add a log line. So the gate's effect is recovered by
+  // ABSENCE instead: a bar with a "reached_floor_gate" record and no
+  // "taken" record for the same (day, symbol, barTime) was gated. The
+  // record carries dayArmed and dayBudget, so which branch fired is
+  // reconstructable. This is the one decision point the shadow log cannot
+  // name directly — see the report.
+  //
+  // queueFollowup runs ONLY on a fresh record. Previously it ran on every
+  // evaluation with no dedupe of its own, so one bar could fill the
+  // 60-item queue by itself and the follow-up worker would spend its 2
+  // lookups per cycle and its 5s budget re-pricing the same contract.
+  const freshGateRecord = logSignal(state, snap, "reached_floor_gate", null);
+  // Queued here because this is the first point where the contract is
+  // known. A signal skipped EARLIER (cooldown, no spot, no option) cannot
+  // be priced without calling findOption for it, which would add a network
+  // call to the entry path for a trade the bot is not taking — so those
+  // skips are logged but never priced. Stated gap, not an oversight.
+  if (freshGateRecord) queueFollowup(state, snap, "reached_floor_gate", null);
 
   // ─── PROFIT-FLOOR GATE ──────────────────────────────────────────
   // Armed only, and deliberately placed AFTER the combo sizeMultiplier so
@@ -1163,8 +1458,30 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
     qty = sized;
   }
 
+  // ── the spread for a trade that IS being taken ──
+  // Placement: strictly AFTER the profit-floor gate's closing brace above
+  // (that whole `if (dayCtx?.armed) { … qty = sized; }` block is pinned
+  // byte-identical to the phase A commit and is not touched) and strictly
+  // BEFORE the buy POST below.
+  //
+  // Needed because the fetch earlier in this function is now once per
+  // bar: on the ~30 evaluations of a bar where the signal was logged but
+  // not entered, snap.bid stays null. If a later cycle of that same bar
+  // reaches the buy, the trade would otherwise carry no entryBid/entryAsk
+  // at all. One 3s-capped fetch, null on anything, and nothing below
+  // reads it — qty, the order, the stop and every gate are already
+  // decided by this line.
+  if (snap.bid === null) {
+    const buyLegs = await snapQuoteLegs(opt.symbol);
+    if (buyLegs) {
+      snap.bid = buyLegs.bid; snap.ask = buyLegs.ask;
+      snap.spreadPct = buyLegs.mid > 0
+        ? +((buyLegs.ask - buyLegs.bid) / buyLegs.mid * 100).toFixed(3) : null;
+    }
+  }
+
   const order = await alpaca("/orders", "POST", { symbol: opt.symbol, qty: String(qty), side: "buy", type: "market", time_in_force: "day" });
-  if (!order.id) { console.log(`${symbol}: entry order failed`, order); return; }
+  if (!order.id) { console.log(`${symbol}: entry order failed`, order); logSignal(state, snap, "skipped", "order_failed"); return; }
 
   const hardStopPrice = +(opt.premium * (1 + strategy.params.stopLossPct / 100)).toFixed(2);
   let stopOrderId = null;
@@ -1194,9 +1511,16 @@ async function scanEntry(state, strategy, symbol, liveInAlpaca, dayCtx) {
       vwapAtEntry, rsiAtEntry, signalType: "breakout",
       positionBucket: positionBkt, comboKey, sizeMultiplier,
     },
+    // The spread this entry crossed, carried through to logTrade at exit.
+    // Unlike the entry FILL, this is already known here — it was fetched
+    // before the buy — so it needs no post-save amend and has no race: it
+    // goes into the literal the caller is about to persist. Null whenever
+    // the quote fetch failed, which is what null means.
+    entryBid: snap.bid, entryAsk: snap.ask, entrySpreadPct: snap.spreadPct,
   };
   saveState(state);
   console.log(`✅ LAB ENTRY: ${symbol} ${sig.signal} $${opt.strike} @ $${opt.premium.toFixed(2)} × ${qty} (combo ${comboKey || "n/a"} ×${sizeMultiplier})`);
+  logSignal(state, snap, "taken", null);
 
   // ── the entry's REAL fill, recorded STRICTLY AFTER the position is ──
   // Everything above is unchanged and already persisted: the buy, the
@@ -2109,6 +2433,18 @@ async function runComboLearning(state, strategy) {
   // nothing at all.
   if (shouldRunComboLearning(state)) {
     await runComboLearning(state, strategy);
+  }
+
+  // ── STAGE 0 SHADOW FOLLOW-UPS — last thing before the final save ──
+  // Monitor child only, so the scan child's entry path gains nothing at
+  // all. Runs after every monitorPosition, every scanEntry and the combo
+  // learner, so a slow or hung quote costs a shadow record and never a
+  // trading decision. Bounded at 2 lookups x 3s inside a 5s per-process
+  // budget, i.e. at most ~6s added to a monitor child against runner.js's
+  // 90s watchdog. Mutates only _sigPending, which the existing save below
+  // persists — this adds no write of its own.
+  if (MODE === "monitor") {
+    await runShadowFollowups(state);
   }
 
   saveState(state);
