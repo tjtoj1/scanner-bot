@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 222
+    "no_signal": 232
   },
   "_sigSeen": {
     "day": "2026-10-30",
@@ -76,6 +76,7 @@
     "entryFillPrice": 0.82,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T13:55:44.960Z"
+    "entryFilledAt": "2026-10-30T13:55:44.960Z",
+    "lastReportedThreshold": -10
   }
 }
