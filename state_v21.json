@@ -90,36 +90,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-30T14:15:09.590Z",
-    "lastReportedThreshold": -10
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261030C00395000",
-    "strike": "395",
-    "entryPremium": 3.24,
-    "qty": 1,
-    "entryTime": 1793369713834,
-    "level": 393.458,
-    "msgId": 7130,
-    "stopOrderId": "6986f3ef-cd57-463a-90e0-67e41e8ddd81",
-    "hardStopPrice": 2.11,
-    "entryStockPrice": 393.93,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 47.2,
-    "volumeRatio": 8.520215385020473,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 3.35,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:15:13.676Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.586419753086417,
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -20
   }
 }
