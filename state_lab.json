@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 162
+    "no_signal": 172
   },
   "_sigSeen": {
     "day": "2026-10-30",
@@ -82,6 +82,7 @@
     "stopPct": 12,
     "trailPct": 8,
     "peakPct": 28.42639593908631,
-    "lastReportedThreshold": 20
+    "lastReportedThreshold": 20,
+    "nearStopWarned": true
   }
 }
