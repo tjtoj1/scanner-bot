@@ -19,7 +19,7 @@
   "_sigCounts": {
     "day": "2026-10-30",
     "no_signal": 253,
-    "max_open_positions": 5
+    "max_open_positions": 11
   },
   "_sigSeen": {
     "day": "2026-10-30",
@@ -37,17 +37,7 @@
   },
   "_sigPending": {
     "day": "2026-10-30",
-    "items": [
-      {
-        "symbol": "NVDA",
-        "optionSymbol": "NVDA261030P00207500",
-        "barTime": "2026-10-30T13:30:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 0.975,
-        "queuedAt": "2026-10-30T14:00:42.338Z"
-      }
-    ]
+    "items": []
   },
   "SPY": {
     "active": true,
@@ -92,7 +82,8 @@
     "entryFillPrice": 1.71,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:00:35.482Z"
+    "entryFilledAt": "2026-10-30T14:00:35.482Z",
+    "lastReportedThreshold": 10
   },
   "QQQ": {
     "active": true,
@@ -137,7 +128,8 @@
     "entryFillPrice": 2.36,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:00:38.607Z"
+    "entryFilledAt": "2026-10-30T14:00:38.607Z",
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
