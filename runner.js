@@ -124,6 +124,10 @@ const STATE_FILES = [
   "state_wvad.json", "outcomes_wvad.jsonl",
   "report_state.json",
   "daypeak_v21.json", "daypeak_lab.json",
+  // Stage 0 signal shadow log (LAB). Append-only JSONL, same shape of
+  // file as outcomes_lab.jsonl, so the existing `checkout --ours` conflict
+  // handling applies to it unchanged.
+  "signals_lab.jsonl",
 ];
 
 // 15:35 America/Chicago — after LAB's own learning window, which opens 5

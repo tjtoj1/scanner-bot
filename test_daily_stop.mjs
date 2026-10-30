@@ -644,9 +644,21 @@ for (const bot of ["v21", "lab"]) {
 const runNow = lf(fs.readFileSync("runner.js", "utf8"));
 check("runner.js: daypeak_v21.json و daypeak_lab.json في STATE_FILES",
   /"daypeak_v21\.json", "daypeak_lab\.json",/.test(runNow), "missing", "present");
-check("runner.js: مصفوفة STATE_FILES مطابقة للمرحلة A",
-  grab(runNow, RE.stateFiles, "STATE_FILES") ===
-  grab(showAt(PHASE_A_SHA, "runner.js"), RE.stateFiles, "STATE_FILES@phaseA"), "changed", "identical");
+// STATE_FILES is append-only by nature: later work legitimately adds a
+// synced file (stage 0 added signals_lab.jsonl). Byte-identity would have
+// to be deleted outright, so the pin becomes the invariant it was actually
+// protecting — every file phase A listed is STILL listed, none removed and
+// none renamed. A dropped entry means a state file silently stops syncing,
+// which is the failure this guards against.
+{
+  const quoted = t => (grab(t, RE.stateFiles, "STATE_FILES").match(/"[^"]+"/g) || []);
+  const now = quoted(runNow), pa = quoted(showAt(PHASE_A_SHA, "runner.js"));
+  const missing = pa.filter(f => !now.includes(f));
+  check(`runner.js: كل ملفات المرحلة A ما زالت في STATE_FILES (${pa.length})`,
+    missing.length === 0, missing, []);
+  check("runner.js: STATE_FILES لا يفقد شيئاً (إضافة فقط)",
+    now.length >= pa.length, { now: now.length, phaseA: pa.length }, ">= phase A");
+}
 
 // scan_wvad.js: phase A never touched it. It is edited now, so the claim is
 // narrowed to the zone-derived RTH filter — asserted identical at BOTH pinned
