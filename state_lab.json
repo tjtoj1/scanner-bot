@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 2403,
+    "no_signal": 2413,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -65,7 +65,8 @@
       "QQQ|16:45|G|",
       "QQQ|17:00|G|",
       "SPY|17:45|G|",
-      "QQQ|17:45|G|"
+      "QQQ|17:45|G|",
+      "SPY|18:15|G|"
     ]
   },
   "_sigPending": {
