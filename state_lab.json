@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 1637,
+    "no_signal": 1645,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -60,7 +60,9 @@
       "SPY|16:00|T|",
       "NVDA|16:00|G|",
       "NVDA|16:00|T|",
-      "NVDA|16:15|G|"
+      "NVDA|16:15|G|",
+      "SPY|16:45|G|",
+      "QQQ|16:45|G|"
     ]
   },
   "_sigPending": {
