@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 1201,
+    "no_signal": 1209,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -108,8 +108,8 @@
     "entryFilledAt": "2026-10-30T16:01:06.400Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 30.946882217090067,
-    "lastReportedThreshold": 30,
+    "peakPct": 40.87759815242493,
+    "lastReportedThreshold": 40,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -158,7 +158,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-30T16:14:59.947Z",
-    "lastReportedThreshold": -20,
+    "lastReportedThreshold": -10,
     "nearStopWarned": true
   }
 }
