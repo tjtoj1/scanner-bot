@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 469,
+    "no_signal": 475,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -59,14 +59,14 @@
   "TSLA": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "TSLA261030C00402500",
-    "strike": "402.5",
-    "entryPremium": 2.295,
-    "qty": 1,
-    "entryTime": 1793371563612,
-    "msgId": 7160,
-    "stopOrderId": "7d122b76-b8f7-4a79-b725-01be433568d1",
-    "hardStopPrice": 1.61,
+    "optionSymbol": "TSLA261030C00405000",
+    "strike": "405",
+    "entryPremium": 1.435,
+    "qty": 2,
+    "entryTime": 1793371925042,
+    "msgId": 7164,
+    "stopOrderId": "dbea6e7c-d744-43c7-830a-e32dfc07d5db",
+    "hardStopPrice": 1,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -75,7 +75,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 402.265,
+      "spot": 404.92499999999995,
       "regime": "bullish",
       "emaFast": 395.4924,
       "emaSlow": 395.2332,
@@ -85,7 +85,7 @@
       "lastClose": 398.265,
       "lastVolume": 1405024,
       "barTime": "2026-10-30T14:15:00Z",
-      "entryTimeUTC": "2026-10-30T14:46:03.612Z",
+      "entryTimeUTC": "2026-10-30T14:52:05.042Z",
       "vwapAtEntry": 394.0647,
       "rsiAtEntry": 62.58,
       "signalType": "breakout",
@@ -93,18 +93,12 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryBid": 2.26,
-    "entryAsk": 2.33,
-    "entrySpreadPct": 3.05,
-    "entryFillPrice": 2.3,
+    "entryBid": 1.41,
+    "entryAsk": 1.42,
+    "entrySpreadPct": 0.707,
+    "entryFillPrice": 1.44,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:46:03.326Z",
-    "ladder1": true,
-    "stopPct": 12,
-    "peakPct": 31.372549019607852,
-    "lastReportedThreshold": 30,
-    "ladder2": true,
-    "trailPct": 8
+    "entryFilledAt": "2026-10-30T14:52:04.887Z"
   }
 }
