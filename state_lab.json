@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 261,
+    "no_signal": 265,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -44,57 +44,6 @@
   "_sigPending": {
     "day": "2026-10-30",
     "items": []
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261030P00207500",
-    "strike": "207.5",
-    "entryPremium": 0.975,
-    "qty": 3,
-    "entryTime": 1793368842666,
-    "msgId": 7107,
-    "stopOrderId": "284c32fc-704c-46b0-a5e0-0091230b6749",
-    "hardStopPrice": 0.68,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 207.01999999999998,
-      "regime": "bearish",
-      "emaFast": 207.7367,
-      "emaSlow": 208.0324,
-      "breakoutHigh": 209,
-      "breakoutLow": 206.5,
-      "volRatio": 46.65,
-      "lastClose": 206.47,
-      "lastVolume": 11271862,
-      "barTime": "2026-10-30T13:30:00Z",
-      "entryTimeUTC": "2026-10-30T14:00:42.666Z",
-      "vwapAtEntry": 207.2467,
-      "rsiAtEntry": 37.69,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 0.96,
-    "entryAsk": 0.99,
-    "entrySpreadPct": 3.077,
-    "entryFillPrice": 0.97,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:00:42.469Z",
-    "lastReportedThreshold": 40,
-    "ladder1": true,
-    "stopPct": 12,
-    "peakPct": 41.02564102564103,
-    "ladder2": true,
-    "trailPct": 8
   },
   "QQQ": {
     "active": true,
@@ -139,6 +88,7 @@
     "entryFillPrice": 2.56,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:12:45.526Z"
+    "entryFilledAt": "2026-10-30T14:12:45.526Z",
+    "lastReportedThreshold": 10
   }
 }
