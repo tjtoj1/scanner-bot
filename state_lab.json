@@ -7,7 +7,8 @@
     "SPY_CALL": 1793213022350,
     "QQQ_CALL": 1793216251284,
     "IWM_CALL": 1793291993912,
-    "AMZN_CALL": 1793371364235
+    "AMZN_CALL": 1793371364235,
+    "SPY_PUT": 1793372922938
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -18,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 391,
+    "no_signal": 399,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -41,7 +42,8 @@
       "IWM|13:45|G|",
       "IWM|13:45|T|",
       "SPY|14:00|G|",
-      "SPY|14:00|T|"
+      "SPY|14:00|T|",
+      "SPY|14:00|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -92,52 +94,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-30T14:29:55.833Z",
-    "lastReportedThreshold": -10
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261030P00758000",
-    "strike": "758",
-    "entryPremium": 1.83,
-    "qty": 1,
-    "entryTime": 1793370674819,
-    "msgId": 7148,
-    "stopOrderId": "a74f84f6-3aab-4277-8c2d-4584fa26eadf",
-    "hardStopPrice": 1.28,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 758.005,
-      "regime": "bearish",
-      "emaFast": 760.6896,
-      "emaSlow": 761.5606,
-      "breakoutHigh": 762.0201,
-      "breakoutLow": 759.44,
-      "volRatio": 6.23,
-      "lastClose": 758.59,
-      "lastVolume": 2030258,
-      "barTime": "2026-10-30T14:00:00Z",
-      "entryTimeUTC": "2026-10-30T14:31:14.819Z",
-      "vwapAtEntry": 760.4003,
-      "rsiAtEntry": 28.75,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.82,
-    "entryAsk": 1.83,
-    "entrySpreadPct": 0.548,
-    "entryFillPrice": 1.8,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:31:14.551Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   }
 }
