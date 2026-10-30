@@ -90,11 +90,11 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-30T14:15:09.590Z",
-    "lastReportedThreshold": 40,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 46.25886524822697
+    "peakPct": 51.241134751773046
   }
 }
