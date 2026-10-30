@@ -89,7 +89,8 @@
     "entryFillPrice": 2.8,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-10-30T14:15:09.590Z"
+    "entryFilledAt": "2026-10-30T14:15:09.590Z",
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
