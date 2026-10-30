@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 511,
+    "no_signal": 521,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -51,7 +51,8 @@
       "IWM|14:15|S|cooldown",
       "TSLA|14:15|G|",
       "TSLA|14:15|T|",
-      "TSLA|14:15|S|cooldown"
+      "TSLA|14:15|S|cooldown",
+      "TSLA|14:30|S|cooldown"
     ]
   },
   "_sigPending": {
