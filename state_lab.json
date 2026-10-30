@@ -1,7 +1,7 @@
 {
   "_lastDay": "2026-10-30",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-10-29",
+  "_lastComboLearnedDay": "2026-10-30",
   "_cooldowns": {
     "TSLA_PUT": 1793200582320,
     "SPY_CALL": 1793213022350,
@@ -22,7 +22,7 @@
     "day": "2026-10-30",
     "no_signal": 2822,
     "max_open_positions": 65,
-    "past_last_entry": 168
+    "past_last_entry": 174
   },
   "_sigSeen": {
     "day": "2026-10-30",
