@@ -601,6 +601,7 @@ function makeScanEntry(bot, { stateFile, entryFill = ENTRY_FILL, onLookup = null
     // that). snapQuoteLegs returns null so no bid/ask reaches the record —
     // which also proves the null path does not disturb the entry.
     bumpSigCount: () => {}, logSignal: () => false, queueFollowup: () => {},
+    sigSeenHas: () => false,
     snapQuoteLegs: async () => null,
     CHI_HM: { formatToParts: () => [{ type: "hour", value: "09" }] },
   };
@@ -627,7 +628,13 @@ try {
       fs.writeFileSync(stateFile, "{}");
       const h = makeScanEntry(bot, { stateFile });
       const state = {};
-      await captureAsync(() => h.run(state, "QQQ"));
+      const r0 = await captureAsync(() => h.run(state, "QQQ"));
+      // Asserted explicitly: a missing stub makes scanEntry throw, which
+      // leaves the state empty and every assertion below fails with a
+      // confusing "undefined". This names the real cause instead. It has
+      // already caught two new scanEntry dependencies.
+      check(`${bot}: scanEntry اكتملت بلا استثناء (كل الوكلاء موجودون)`,
+        r0.err === undefined, String(r0.err), "no throw");
       check(`${bot}: المفاتيح على الكائن في الذاكرة (الذي سيحفظه main)`,
         FILL_KEYS.entryFillPrice === state.QQQ?.entryFillPrice, state.QQQ?.entryFillPrice, 1.07);
       // main()'s final whole-file overwrite.

@@ -52,6 +52,8 @@ async function captureAsync(fn) {
 
 const RE = {
   consts:  /const SIGNALS_FILE          = "signals_lab\.jsonl";[\s\S]*?let followupBudgetUsedMs = 0;/,
+  sigKey:  /function sigKey\(snap, decision, reason\) \{[\s\S]*?\n\}/,
+  sigSeen: /function sigSeenHas\(state, snap, decision, reason\) \{[\s\S]*?\n\}/,
   snapLegs:/async function snapQuoteLegs\(optSym\) \{[\s\S]*?\n\}/,
   bump:    /function bumpSigCount\(state, reason\) \{[\s\S]*?\n\}/,
   logSig:  /function logSignal\(state, snap, decision, reason\) \{[\s\S]*?\n\}/,
@@ -85,12 +87,15 @@ function makeHelpers({ sigFile, today = "2026-10-29", legs = { bid: 0.95, ask: 1
   };
   const body = [
     grab(src, RE.consts, "consts"),
+    grab(src, RE.sigKey, "sigKey"),
+    grab(src, RE.sigSeen, "sigSeenHas"),
     grab(src, RE.snapLegs, "snapQuoteLegs"),
     grab(src, RE.bump, "bumpSigCount"),
     grab(src, RE.logSig, "logSignal"),
     grab(src, RE.queue, "queueFollowup"),
     grab(src, RE.follow, "runShadowFollowups"),
     `return { snapQuoteLegs, bumpSigCount, logSignal, queueFollowup, runShadowFollowups,
+              sigKey, sigSeenHas,
               budget: () => followupBudgetUsedMs, FOLLOWUP_BUDGET_MS, FOLLOWUP_MAX_PER_CYCLE,
               SIG_SEEN_CAP, SIG_PENDING_CAP, SIGNALS_FILE };`,
   ].join("\n");
@@ -137,28 +142,60 @@ console.log("\n── 2) إزالة التكرار على (day, symbol, barTime,
   const f = path.join(TMP, "s2.jsonl");
   const h = makeHelpers({ sigFile: f });
   const st = {};
-  check("أول كتابة تنجح", h.api.logSignal(st, SNAP, "taken", null) === true, true, true);
-  check("نفس المفتاح ⇒ مُكرَّر، لا يُكتب", h.api.logSignal(st, SNAP, "taken", null) === false, false, false);
-  check("قرار مختلف ⇒ سجل جديد", h.api.logSignal(st, SNAP, "skipped", "cooldown") === true, true, true);
-  check("barTime مختلف ⇒ سجل جديد",
-    h.api.logSignal(st, { ...SNAP, barTime: "2026-10-29T14:15:00Z" }, "taken", null) === true, true, true);
-  check("رمز مختلف ⇒ سجل جديد",
-    h.api.logSignal(st, { ...SNAP, symbol: "SPY" }, "taken", null) === true, true, true);
+  let r;
+  r = h.api.logSignal(st, SNAP, "taken", null);
+  check("أول كتابة تنجح", r === true, r, true);
+  r = h.api.logSignal(st, SNAP, "taken", null);
+  check("نفس المفتاح ⇒ مُكرَّر، لا يُكتب", r === false, r, false);
+  r = h.api.logSignal(st, SNAP, "skipped", "cooldown");
+  check("قرار مختلف ⇒ سجل جديد", r === true, r, true);
+  r = h.api.logSignal(st, { ...SNAP, barTime: "2026-10-29T14:15:00Z" }, "taken", null);
+  check("barTime مختلف ⇒ سجل جديد", r === true, r, true);
+  r = h.api.logSignal(st, { ...SNAP, symbol: "SPY" }, "taken", null);
+  check("رمز مختلف ⇒ سجل جديد", r === true, r, true);
   check("إجمالاً 4 سجلات", h.appended.length === 4, h.appended.length, 4);
+  // The compact key: no day (the set carries it), time only, decision coded.
+  check("المفتاح مُختصر (رمز|HH:MM|حرف|سبب)",
+    h.api.sigKey(SNAP, "skipped", "cooldown") === "QQQ|14:00|S|cooldown",
+    h.api.sigKey(SNAP, "skipped", "cooldown"), "QQQ|14:00|S|cooldown");
+  check("والسبب غير مقتطع (لا تصادم مفاتيح)",
+    h.api.sigKey(SNAP, "skipped", "no_spot") !== h.api.sigKey(SNAP, "skipped", "no_option"),
+    [h.api.sigKey(SNAP, "skipped", "no_spot"), h.api.sigKey(SNAP, "skipped", "no_option")], "distinct");
+  // sigSeenHas is read-only: it must not mark anything
+  const stRO = {};
+  check("sigSeenHas على مجموعة فارغة ⇒ false",
+    h.api.sigSeenHas(stRO, SNAP, "taken", null) === false, h.api.sigSeenHas(stRO, SNAP, "taken", null), false);
+  check("ولا يُنشئ _sigSeen", stRO._sigSeen === undefined, stRO._sigSeen, undefined);
+  h.api.logSignal(stRO, SNAP, "taken", null);
+  check("بعد التسجيل ⇒ true",
+    h.api.sigSeenHas(stRO, SNAP, "taken", null) === true, h.api.sigSeenHas(stRO, SNAP, "taken", null), true);
+  check("وقرار آخر ما زال false",
+    h.api.sigSeenHas(stRO, SNAP, "skipped", "cooldown") === false, true, false);
   // day rollover resets the set
   const h2 = makeHelpers({ sigFile: path.join(TMP, "s2b.jsonl"), today: "2026-10-30" });
-  check("يوم جديد ⇒ المجموعة تُصفَّر", h2.api.logSignal(st, SNAP, "taken", null) === true, true, true);
+  r = h2.api.logSignal(st, SNAP, "taken", null);
+  check("يوم جديد ⇒ المجموعة تُصفَّر", r === true, r, true);
   check("والمجموعة تحمل اليوم الجديد", st._sigSeen.day === "2026-10-30", st._sigSeen.day, "2026-10-30");
-  // cap
+  // cap. The keys must be genuinely distinct UNDER THE COMPACT FORMAT,
+  // which keeps only HH:MM of barTime — a counter stuffed anywhere else
+  // collapses to one key and would make this test pass vacuously.
   const h3 = makeHelpers({ sigFile: path.join(TMP, "s2c.jsonl") });
   const st3 = {};
-  for (let i = 0; i < h3.api.SIG_SEEN_CAP + 50; i++)
-    h3.api.logSignal(st3, { ...SNAP, barTime: `b${i}` }, "taken", null);
+  const N = h3.api.SIG_SEEN_CAP + 50;
+  const mkBar = i => `2026-10-29T${String(9 + Math.floor(i / 60)).padStart(2, "0")}:${String(i % 60).padStart(2, "0")}:00Z`;
+  for (let i = 0; i < N; i++)
+    h3.api.logSignal(st3, { ...SNAP, barTime: mkBar(i) }, "taken", null);
+  check(`المفاتيح المولَّدة متمايزة فعلاً (${N})`,
+    new Set(Array.from({ length: N }, (_, i) => h3.api.sigKey({ ...SNAP, barTime: mkBar(i) }, "taken", null))).size === N,
+    "collisions", `${N} distinct`);
   check(`المجموعة محدودة بـ ${h3.api.SIG_SEEN_CAP}`,
     st3._sigSeen.keys.length === h3.api.SIG_SEEN_CAP, st3._sigSeen.keys.length, h3.api.SIG_SEEN_CAP);
   check("الإخلاء من الأقدم (الأحدث باقٍ)",
-    st3._sigSeen.keys[st3._sigSeen.keys.length - 1].includes(`b${h3.api.SIG_SEEN_CAP + 49}`),
-    st3._sigSeen.keys[st3._sigSeen.keys.length - 1], "newest kept");
+    st3._sigSeen.keys[st3._sigSeen.keys.length - 1] === h3.api.sigKey({ ...SNAP, barTime: mkBar(N - 1) }, "taken", null),
+    st3._sigSeen.keys[st3._sigSeen.keys.length - 1], h3.api.sigKey({ ...SNAP, barTime: mkBar(N - 1) }, "taken", null));
+  check("والأقدم أُزيل",
+    !st3._sigSeen.keys.includes(h3.api.sigKey({ ...SNAP, barTime: mkBar(0) }, "taken", null)),
+    "oldest still present", "evicted");
 }
 
 // ── 3) counters, not records, for the early gates ─────────
@@ -204,8 +241,11 @@ console.log("\n── 4) لا تغيير في السلوك إطلاقاً (كل 
       : {
           snapQuoteLegs: async () => ({ bid: 0.95, ask: 1.05, mid: 1.0 }),
           bumpSigCount: () => {},
+          // false, so the control also exercises the "already logged"
+          // branch — the live and no-op runs must agree either way.
           logSignal: () => false,
           queueFollowup: () => {},
+          sigSeenHas: () => false,
         };
     const stubs = {
       fs,
@@ -240,6 +280,7 @@ console.log("\n── 4) لا تغيير في السلوك إطلاقاً (كل 
       CHI_HM: { formatToParts: () => [{ type: "hour", value: "09" }] },
       bumpSigCount: shadow.bumpSigCount, logSignal: shadow.logSignal,
       queueFollowup: shadow.queueFollowup, snapQuoteLegs: shadow.snapQuoteLegs,
+      sigSeenHas: shadow.sigSeenHas,
     };
     const fn = grab(src, RE.scanEntry, "scanEntry");
     const scanEntry = new Function(...Object.keys(stubs), `${fn}\nreturn scanEntry;`)(...Object.values(stubs));
@@ -303,6 +344,138 @@ console.log("\n── 4) لا تغيير في السلوك إطلاقاً (كل 
       extra.every(k => SHADOW_KEYS.includes(k)), extra, "subset of shadow keys");
     check(`${sc.name}: نفس مخرجات console`, eqLogs, { live: clean(ra.lines), noop: clean(rb.lines) }, "identical");
     check(`${sc.name}: التسجيل الحيّ لا يرمي`, ra.err === undefined, String(ra.err), "no throw");
+  }
+}
+
+// ── 4b) THE REPEAT BUG: one bar, 30 evaluations ───────────
+// scanEntry re-runs every cycle while the same 15-min bar is the last
+// closed one — 15 cycles x 2 children ~= 30 identical evaluations. The
+// first version fetched bid/ask and queued a follow-up on every one of
+// them. This drives the real scanEntry 30 times on one bar and counts.
+console.log("\n── 4b) شمعة واحدة، 30 تقييماً ──");
+{
+  function build(scenario, sigFile, onLegsCall) {
+    const posts = [];
+    const h = makeHelpers({ sigFile });
+    let legsCalls = 0;
+    const stubs = {
+      fs,
+      MAX_DAILY_LOSS: 1000, MAX_DTE: 2, MAX_OPEN_POSITIONS: 3, MAX_TRADE_BUDGET: 1000,
+      PROFIT_FLOOR_ENABLED: true, STOP_SLIPPAGE_PAD: 0.10,
+      fetchWithTimeout: async () => ({ json: async () => ({}) }), HEADERS: {},
+      alpaca: async (p, m, b) => {
+        if (m === "POST" && p === "/orders") { posts.push(b); return { id: "ord-1" }; }
+        return {};
+      },
+      calcQty: () => 3,
+      computeSignal: () => scenario.sig(),
+      computeRSI: () => 44.1, computeVWAP: () => 731.4,
+      countOpenPositions: () => 0,
+      findOption: async () => ({ symbol: "QQQ261029P00730000", strike: 730, premium: 1.0, expiry: "2026-10-29" }),
+      getBars: async () => [{ t: "2026-10-29T14:00:00Z", o: 1, h: 2, l: 0.5, c: 1.5, v: 100 }],
+      getLatestPrice: async () => 731,
+      getQuoteLegs: async () => ({ bid: 0.95, ask: 1.05, mid: 1.0 }),
+      getToday: () => "2026-10-29",
+      getTodayRealizedDay: () => ({ net: 0, peak: 0, stopped: false, reason: null }),
+      getEntryFill: async () => ({ price: 1.02, confirmed: true, source: "entry_order", filledAt: null }),
+      isPastLastEntry: () => false,
+      loadState: () => ({}), saveState: () => {},
+      logTrade: () => true, monitorPosition: async () => {},
+      postEntryStop: async () => ({ id: "stop-1" }),
+      stopOrderIdOrNull: (_l, o) => o?.id ?? null,
+      tg: async () => 1, bumpDayPeak: c => c,
+      clamp: (v, lo, hi) => Math.max(lo, Math.min(hi, v)),
+      lookupComboMultiplier: () => ({ comboKey: "PUT|position:near_low", sizeMultiplier: 1 }),
+      positionBucket: () => "near_low", spot: 731.0,
+      CHI_HM: { formatToParts: () => [{ type: "hour", value: "09" }] },
+      bumpSigCount: h.api.bumpSigCount, logSignal: h.api.logSignal,
+      queueFollowup: h.api.queueFollowup, sigSeenHas: h.api.sigSeenHas,
+      snapQuoteLegs: async (s) => { legsCalls++; onLegsCall?.(); return { bid: 0.95, ask: 1.05, mid: 1.0 }; },
+    };
+    const fn = grab(src, RE.scanEntry, "scanEntry");
+    const scanEntry = new Function(...Object.keys(stubs), `${fn}\nreturn scanEntry;`)(...Object.values(stubs));
+    const strategy = { name: "t", version: 1, combos: {}, params: { tradeBudget: 300, stopLossPct: -30,
+      takeProfit1Pct: 15, takeProfit1LockPct: 5, takeProfit2Pct: 25, takeProfit2LockPct: 12, trailingPct: 8 } };
+    return { scanEntry, strategy, posts, h, legs: () => legsCalls };
+  }
+  const SIG = { signal: "PUT", regime: "bearish", emaFast: 1.0, emaSlow: 1.02,
+                breakoutHigh: 2, breakoutLow: 1, volRatio: 1.5, lastClose: 0.99,
+                lastVolume: 100, barTime: "2026-10-29T14:00:00Z" };
+
+  // (i) a bar whose signal is NEVER entered: the buy fails every time.
+  {
+    const b = build({ sig: () => SIG }, path.join(TMP, "s4b-i.jsonl"));
+    // make the buy fail so no "taken" record is ever written
+    const state = {};
+    b.scanEntry.__noop = 0;
+    const stubsFailBuy = build({ sig: () => SIG }, path.join(TMP, "s4b-i2.jsonl"));
+    // drive 30 evaluations of the same bar
+    for (let i = 0; i < 30; i++) {
+      await captureAsync(() => stubsFailBuy.scanEntry(state, stubsFailBuy.strategy, "QQQ", new Set(),
+        { armed: true, trusted: true, budget: 0 }));   // armed + budget 0 => gated, never entered
+    }
+    const recs = stubsFailBuy.h.appended.map(a => JSON.parse(a.line));
+    const gate = recs.filter(r => r.decision === "reached_floor_gate");
+    check("30 تقييماً ⇒ سجل reached_floor_gate واحد", gate.length === 1, gate.length, 1);
+    check("30 تقييماً ⇒ طلب bid/ask واحد على الأكثر",
+      stubsFailBuy.legs() <= 1, stubsFailBuy.legs(), "<= 1");
+    check("30 تقييماً ⇒ عنصر متابعة واحد",
+      (state._sigPending?.items ?? []).length === 1, (state._sigPending?.items ?? []).length, 1);
+    check("ولم يُفتح أي مركز", stubsFailBuy.posts.length === 0, stubsFailBuy.posts.length, 0);
+    check("و_sigSeen يحمل مفتاحاً واحداً", state._sigSeen.keys.length === 1, state._sigSeen.keys.length, 1);
+    void b;
+  }
+
+  // (ii) the same bar, gated for 29 cycles, then entered on the 30th.
+  //      entryBid/entryAsk must still be populated on the trade.
+  {
+    const b = build({ sig: () => SIG }, path.join(TMP, "s4b-ii.jsonl"));
+    const state = {};
+    for (let i = 0; i < 29; i++) {
+      await captureAsync(() => b.scanEntry(state, b.strategy, "QQQ", new Set(),
+        { armed: true, trusted: true, budget: 0 }));           // gated
+    }
+    const legsAfterGated = b.legs();
+    check("29 دورة محجوبة ⇒ طلب bid/ask واحد", legsAfterGated <= 1, legsAfterGated, "<= 1");
+    await captureAsync(() => b.scanEntry(state, b.strategy, "QQQ", new Set(),
+      { armed: false, trusted: true, budget: 0 }));             // now it enters
+    check("الدورة الأخيرة تفتح مركزاً", b.posts.length === 1, b.posts.length, 1);
+    check("والمركز يحمل entryBid",
+      state.QQQ?.entryBid === 0.95, state.QQQ?.entryBid, 0.95);
+    check("و entryAsk", state.QQQ?.entryAsk === 1.05, state.QQQ?.entryAsk, 1.05);
+    check("و entrySpreadPct", state.QQQ?.entrySpreadPct === 10, state.QQQ?.entrySpreadPct, 10);
+    check("طلب bid/ask إضافي واحد فقط للصفقة المنفَّذة",
+      b.legs() === legsAfterGated + 1, b.legs(), legsAfterGated + 1);
+    const taken = b.h.appended.map(a => JSON.parse(a.line)).filter(r => r.decision === "taken");
+    check("وسجل taken واحد", taken.length === 1, taken.length, 1);
+    check("سجل taken يحمل السبريد", taken[0].bid === 0.95 && taken[0].spreadPct === 10,
+      { bid: taken[0].bid, s: taken[0].spreadPct }, { bid: 0.95, s: 10 });
+  }
+
+  // (iii) state cost at the cap
+  {
+    const h = makeHelpers({ sigFile: path.join(TMP, "s4b-iii.jsonl") });
+    const st = {};
+    // Realistic worst case: 6 symbols x distinct bar times x 3 decisions,
+    // generated so every key is distinct, so the cap is genuinely reached.
+    const SYMS = ["SPY","QQQ","IWM","NVDA","TSLA","AMZN"];
+    const DECS = [["taken", null], ["skipped", "cooldown"], ["reached_floor_gate", null]];
+    let made = 0;
+    for (let bar = 0; bar < 40 && made < h.api.SIG_SEEN_CAP + 30; bar++) {
+      const barTime = `2026-10-29T${String(8 + Math.floor(bar / 4)).padStart(2, "0")}:${String((bar % 4) * 15).padStart(2, "0")}:00Z`;
+      for (const s of SYMS) {
+        for (const [d, rsn] of DECS) {
+          if (made >= h.api.SIG_SEEN_CAP + 30) break;
+          h.api.logSignal(st, { ...SNAP, symbol: s, barTime }, d, rsn);
+          made++;
+        }
+      }
+    }
+    const bytes = JSON.stringify(st._sigSeen).length;
+    console.log(`      → _sigSeen at cap ${h.api.SIG_SEEN_CAP} = ${bytes} bytes (${(bytes/1024).toFixed(2)} KiB)`);
+    check(`_sigSeen محدود بـ ${h.api.SIG_SEEN_CAP}`,
+      st._sigSeen.keys.length === h.api.SIG_SEEN_CAP, st._sigSeen.keys.length, h.api.SIG_SEEN_CAP);
+    check("وحجمه أقل من 4 كيبي", bytes < 4096, bytes, "< 4096");
   }
 }
 
