@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-10-30",
-    "no_signal": 257,
+    "no_signal": 261,
     "max_open_positions": 65
   },
   "_sigSeen": {
@@ -36,7 +36,9 @@
       "NVDA|13:30|T|",
       "AMZN|13:30|G|",
       "AMZN|13:30|T|",
-      "AMZN|13:30|S|cooldown"
+      "AMZN|13:30|S|cooldown",
+      "IWM|13:45|S|cooldown",
+      "AMZN|13:45|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -87,10 +89,10 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-10-30T14:00:42.469Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 40,
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 30.25641025641026,
+    "peakPct": 41.02564102564103,
     "ladder2": true,
     "trailPct": 8
   },
