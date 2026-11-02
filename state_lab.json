@@ -8,7 +8,8 @@
     "QQQ_CALL": 1793216251284,
     "IWM_CALL": 1793291993912,
     "TSLA_CALL": 1793374150067,
-    "IWM_PUT": 1793379559340
+    "IWM_PUT": 1793379559340,
+    "AMZN_CALL": 1793633580436
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -19,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-02",
-    "no_signal": 256
+    "no_signal": 264
   },
   "_sigSeen": {
     "day": "2026-11-02",
@@ -27,58 +28,13 @@
       "AMZN|14:15|G|",
       "AMZN|14:15|T|",
       "NVDA|14:30|G|",
-      "NVDA|14:30|T|"
+      "NVDA|14:30|T|",
+      "AMZN|14:30|S|cooldown"
     ]
   },
   "_sigPending": {
     "day": "2026-11-02",
     "items": []
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "AMZN261102C00250000",
-    "strike": "250",
-    "entryPremium": 1.975,
-    "qty": 1,
-    "entryTime": 1793630731707,
-    "msgId": 7213,
-    "stopOrderId": "a31fdacf-2d29-40b2-b3c4-b29353c0d66a",
-    "hardStopPrice": 1.38,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 249.84,
-      "regime": "bullish",
-      "emaFast": 242.1969,
-      "emaSlow": 241.8883,
-      "breakoutHigh": 242.6799,
-      "breakoutLow": 240.61,
-      "volRatio": 3.48,
-      "lastClose": 243.23,
-      "lastVolume": 115311,
-      "barTime": "2026-11-02T14:15:00Z",
-      "entryTimeUTC": "2026-11-02T14:45:31.707Z",
-      "vwapAtEntry": 242.2124,
-      "rsiAtEntry": 65.35,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.97,
-    "entryAsk": 1.98,
-    "entrySpreadPct": 0.506,
-    "entryFillPrice": 2.01,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-02T14:45:31.369Z",
-    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
