@@ -12,11 +12,18 @@
       "symbol": "QQQ",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-11-02",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
     "QQQ_PUT": "2026-10-29T15:30:53.605Z",
     "SPY_PUT": "2026-10-30T14:38:49.142Z",
-    "SPY_CALL": "2026-11-02T14:45:45.113Z"
+    "SPY_CALL": "2026-11-02T14:45:45.113Z",
+    "QQQ_CALL": "2026-11-02T14:47:02.307Z"
   }
 }
