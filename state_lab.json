@@ -8,7 +8,8 @@
     "IWM_CALL": 1793635638780,
     "QQQ_CALL": 1793636379449,
     "SPY_CALL": 1793636526864,
-    "NVDA_CALL": 1793636527229
+    "NVDA_CALL": 1793636527229,
+    "TSLA_CALL": 1793637641528
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -19,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-02",
-    "no_signal": 602,
+    "no_signal": 610,
     "max_open_positions": 44
   },
   "_sigSeen": {
@@ -49,59 +50,13 @@
       "AMZN|15:15|G|",
       "AMZN|15:15|T|",
       "AMZN|15:30|G|",
-      "AMZN|15:30|T|"
+      "AMZN|15:30|T|",
+      "TSLA|15:30|S|cooldown"
     ]
   },
   "_sigPending": {
     "day": "2026-11-02",
     "items": []
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261102C00412500",
-    "strike": "412.5",
-    "entryPremium": 3.275,
-    "qty": 1,
-    "entryTime": 1793634581935,
-    "msgId": 7271,
-    "stopOrderId": "12354dd7-c3a8-455c-82a3-65cb04aaa1e1",
-    "hardStopPrice": 2.29,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 413.47,
-      "regime": "bullish",
-      "emaFast": 405.3629,
-      "emaSlow": 404.0273,
-      "breakoutHigh": 410.45,
-      "breakoutLow": 397.61,
-      "volRatio": 4.91,
-      "lastClose": 410.79,
-      "lastVolume": 2599544,
-      "barTime": "2026-11-02T15:15:00Z",
-      "entryTimeUTC": "2026-11-02T15:49:41.938Z",
-      "vwapAtEntry": 405.0499,
-      "rsiAtEntry": 69.09,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 3.23,
-    "entryAsk": 3.32,
-    "entrySpreadPct": 2.748,
-    "entryFillPrice": 3.3,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-02T15:49:41.692Z",
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
