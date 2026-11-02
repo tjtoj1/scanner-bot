@@ -84,7 +84,7 @@
     "entryFilledAt": "2026-11-02T15:15:18.693Z",
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 54.662379421221864,
+    "peakPct": 57.55627009646302,
     "lastReportedThreshold": 50,
     "ladder2": true,
     "trailPct": 10
@@ -119,6 +119,6 @@
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 20.161290322580648
+    "peakPct": 21.7741935483871
   }
 }
