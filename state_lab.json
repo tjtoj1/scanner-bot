@@ -4,7 +4,6 @@
   "_lastComboLearnedDay": "2026-11-02",
   "_cooldowns": {
     "TSLA_PUT": 1793200582320,
-    "QQQ_CALL": 1793216251284,
     "TSLA_CALL": 1793374150067,
     "IWM_PUT": 1793379559340,
     "IWM_CALL": 1793635638780
@@ -19,7 +18,7 @@
   "_sigCounts": {
     "day": "2026-11-02",
     "no_signal": 522,
-    "max_open_positions": 18
+    "max_open_positions": 24
   },
   "_sigSeen": {
     "day": "2026-11-02",
@@ -35,7 +34,9 @@
       "SPY|15:00|T|",
       "AMZN|15:00|S|cooldown",
       "AMZN|15:00|G|",
-      "AMZN|15:00|T|"
+      "AMZN|15:00|T|",
+      "QQQ|15:15|G|",
+      "QQQ|15:15|T|"
     ]
   },
   "_sigPending": {
@@ -136,5 +137,50 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 17.60797342192692
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ261102C00698000",
+    "strike": "698",
+    "entryPremium": 1.9849999999999999,
+    "qty": 1,
+    "entryTime": 1793634360254,
+    "msgId": 7262,
+    "stopOrderId": "e0fc7f14-c682-4799-8963-6ae3409f7ace",
+    "hardStopPrice": 1.39,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 698.075,
+      "regime": "bullish",
+      "emaFast": 696.4458,
+      "emaSlow": 695.8389,
+      "breakoutHigh": 698.25,
+      "breakoutLow": 693.3,
+      "volRatio": 4.57,
+      "lastClose": 699.315,
+      "lastVolume": 2195398,
+      "barTime": "2026-11-02T15:15:00Z",
+      "entryTimeUTC": "2026-11-02T15:46:00.254Z",
+      "vwapAtEntry": 695.8877,
+      "rsiAtEntry": 66.66,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 1.96,
+    "entryAsk": 1.97,
+    "entrySpreadPct": 0.509,
+    "entryFillPrice": 1.95,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-02T15:45:59.941Z"
   }
 }
