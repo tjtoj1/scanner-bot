@@ -1,7 +1,7 @@
 {
-  "_lastDay": "2026-10-30",
+  "_lastDay": "2026-11-02",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-10-30",
+  "_lastComboLearnedDay": "2026-11-02",
   "_cooldowns": {
     "TSLA_PUT": 1793200582320,
     "SPY_CALL": 1793213022350,
@@ -11,7 +11,7 @@
     "TSLA_CALL": 1793374150067,
     "IWM_PUT": 1793379559340
   },
-  "_lastComboLearnedFinal": true,
+  "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
     "day": "2026-10-14",
     "symbols": [
@@ -19,10 +19,8 @@
     ]
   },
   "_sigCounts": {
-    "day": "2026-10-30",
-    "no_signal": 2822,
-    "max_open_positions": 65,
-    "past_last_entry": 330
+    "day": "2026-11-02",
+    "no_signal": 12
   },
   "_sigSeen": {
     "day": "2026-10-30",
