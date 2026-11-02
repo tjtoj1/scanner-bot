@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-02",
-    "no_signal": 474,
+    "no_signal": 482,
     "max_open_positions": 18
   },
   "_sigSeen": {
@@ -86,7 +86,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-02T15:30:52.692Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "AMZN": {
     "active": true,
