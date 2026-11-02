@@ -11,7 +11,8 @@
     "NVDA_CALL": 1793636527229,
     "TSLA_CALL": 1793637641528,
     "AMZN_CALL": 1793638086272,
-    "QQQ_PUT": 1793644469461
+    "QQQ_PUT": 1793644469461,
+    "SPY_PUT": 1793644543246
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -22,7 +23,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-02",
-    "no_signal": 1694,
+    "no_signal": 1702,
     "max_open_positions": 44
   },
   "_sigSeen": {
@@ -58,58 +59,12 @@
       "SPY|17:30|T|",
       "QQQ|17:30|G|",
       "QQQ|17:30|T|",
-      "QQQ|17:30|S|cooldown"
+      "QQQ|17:30|S|cooldown",
+      "SPY|17:30|S|cooldown"
     ]
   },
   "_sigPending": {
     "day": "2026-11-02",
     "items": []
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261102P00758000",
-    "strike": "758",
-    "entryPremium": 1.4249999999999998,
-    "qty": 2,
-    "entryTime": 1793642444707,
-    "msgId": 7291,
-    "stopOrderId": "459c9741-5ebe-456b-94fb-1aae9961ba87",
-    "hardStopPrice": 1,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 757.955,
-      "regime": "bearish",
-      "emaFast": 759.6364,
-      "emaSlow": 759.8283,
-      "breakoutHigh": 763.86,
-      "breakoutLow": 758.91,
-      "volRatio": 1.32,
-      "lastClose": 757.685,
-      "lastVolume": 1059680,
-      "barTime": "2026-11-02T17:30:00Z",
-      "entryTimeUTC": "2026-11-02T18:00:44.707Z",
-      "vwapAtEntry": 760.6356,
-      "rsiAtEntry": 38.36,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.41,
-    "entryAsk": 1.42,
-    "entrySpreadPct": 0.707,
-    "entryFillPrice": 1.4,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-02T18:00:44.311Z",
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   }
 }
