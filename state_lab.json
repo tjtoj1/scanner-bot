@@ -10,7 +10,8 @@
     "SPY_CALL": 1793636526864,
     "NVDA_CALL": 1793636527229,
     "TSLA_CALL": 1793637641528,
-    "AMZN_CALL": 1793638086272
+    "AMZN_CALL": 1793638086272,
+    "QQQ_PUT": 1793644469461
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -21,7 +22,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-02",
-    "no_signal": 1686,
+    "no_signal": 1694,
     "max_open_positions": 44
   },
   "_sigSeen": {
@@ -56,7 +57,8 @@
       "SPY|17:30|G|",
       "SPY|17:30|T|",
       "QQQ|17:30|G|",
-      "QQQ|17:30|T|"
+      "QQQ|17:30|T|",
+      "QQQ|17:30|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -107,52 +109,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-02T18:00:44.311Z",
-    "lastReportedThreshold": -10
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ261102P00691000",
-    "strike": "691",
-    "entryPremium": 1.725,
-    "qty": 1,
-    "entryTime": 1793642447962,
-    "msgId": 7292,
-    "stopOrderId": "da8954df-7a26-4ab5-8ccb-286798a893aa",
-    "hardStopPrice": 1.21,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 690.885,
-      "regime": "bearish",
-      "emaFast": 693.4582,
-      "emaSlow": 694.5001,
-      "breakoutHigh": 699.43,
-      "breakoutLow": 692.12,
-      "volRatio": 1.84,
-      "lastClose": 690.63,
-      "lastVolume": 1933864,
-      "barTime": "2026-11-02T17:30:00Z",
-      "entryTimeUTC": "2026-11-02T18:00:47.962Z",
-      "vwapAtEntry": 694.9858,
-      "rsiAtEntry": 33.2,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.71,
-    "entryAsk": 1.74,
-    "entrySpreadPct": 1.739,
-    "entryFillPrice": 1.72,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-02T18:00:45.790Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   }
 }
