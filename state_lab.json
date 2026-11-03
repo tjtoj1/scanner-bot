@@ -6,7 +6,6 @@
     "IWM_PUT": 1793379559340,
     "QQQ_CALL": 1793636379449,
     "TSLA_CALL": 1793637641528,
-    "AMZN_CALL": 1793638086272,
     "QQQ_PUT": 1793650879653,
     "SPY_PUT": 1793651377658,
     "IWM_CALL": 1793724772431,
@@ -21,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-03",
-    "no_signal": 1480,
+    "no_signal": 1488,
     "max_open_positions": 142
   },
   "_sigSeen": {
@@ -36,7 +35,9 @@
       "SPY|15:45|G|",
       "SPY|15:45|T|",
       "TSLA|16:15|G|",
-      "TSLA|16:15|T|"
+      "TSLA|16:15|T|",
+      "AMZN|18:00|G|",
+      "AMZN|18:00|T|"
     ]
   },
   "_sigPending": {
@@ -88,5 +89,50 @@
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-03T14:46:04.242Z",
     "lastReportedThreshold": -10
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN261104C00252500",
+    "strike": "252.5",
+    "entryPremium": 1.935,
+    "qty": 1,
+    "entryTime": 1793730644857,
+    "msgId": 7372,
+    "stopOrderId": "38ad732b-e136-4d22-b5ab-20d41891b033",
+    "hardStopPrice": 1.35,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 250.765,
+      "regime": "bullish",
+      "emaFast": 248.9056,
+      "emaSlow": 248.1726,
+      "breakoutHigh": 249.29,
+      "breakoutLow": 245.96,
+      "volRatio": 1.74,
+      "lastClose": 251.1001,
+      "lastVolume": 1357552,
+      "barTime": "2026-11-03T18:00:00Z",
+      "entryTimeUTC": "2026-11-03T18:30:44.857Z",
+      "vwapAtEntry": 247.8165,
+      "rsiAtEntry": 73.74,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 1.92,
+    "entryAsk": 1.95,
+    "entrySpreadPct": 1.55,
+    "entryFillPrice": 1.93,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-03T18:30:44.737Z"
   }
 }
