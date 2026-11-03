@@ -555,7 +555,6 @@ console.log("\n── 7) مناطق المرحلة A المثبّتة لم تُ�
     ["getQuoteLegs()", /async function getQuoteLegs\(optSym\) \{[\s\S]*?\n\}/],
     ["getQuote()", /async function getQuote\(optSym\) \{[\s\S]*?\n\}/],
     ["calcQty()", /function calcQty\([\s\S]*?\n\}/],
-    ["getTodayRealizedDay()", /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/],
     ["alpaca()", /async function alpaca\([\s\S]*?\n\}/],
     ["monitorPosition()", /async function monitorPosition\([\s\S]*?\n\}/],
     ["computeSignal()", /function computeSignal\(bars, params\) \{[\s\S]*?\n\}/],
@@ -565,6 +564,34 @@ console.log("\n── 7) مناطق المرحلة A المثبّتة لم تُ�
     check(`${label} مطابق لـ ${BASE_SHA.slice(0, 8)}`,
       grab(src, re, label) === grab(base, re, `${label} base`), "changed", "identical");
   }
+  // getTodayRealizedDay() left the byte-identity list above because ONE
+  // line in it switched from `net += r.pnl` to `net += effectivePnl(r)`
+  // (day-level fill-accurate P&L). The pin is NARROWED, not deleted — the
+  // same treatment as in test_daily_stop.mjs: the accumulation line is
+  // normalised back to the base wording and EVERY OTHER BYTE must still
+  // match, so the sort by exitTime, the latching stop, the peak tracking
+  // and the return shape all stay pinned, and the shadow work is still
+  // proven to have left the day replay alone.
+  {
+    const RE_DAY = /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/;
+    const now = grab(src, RE_DAY, "day");
+    const normalised = now
+      .replace(/^.*Fill-accurate where the fill is known.*\n/m, "")
+      .replace(/^.*the ONLY line in this file that switched.*\n/m, "")
+      .replace(/^.*\(tuningBucket, computeMetric, combos\), the `win` flag.*\n/m, "")
+      .replace(/^.*cooldown and daily_report\.js all still read `r\.pnl`\..*\n/m, "")
+      .replace("net += effectivePnl(r);", "net += r.pnl;");
+    check(`getTodayRealizedDay() مطابق لـ ${BASE_SHA.slice(0, 8)} بعد تطبيع سطر الجمع وحده`,
+      normalised === grab(base, RE_DAY, "day base"),
+      "changed beyond the one accumulation line", "identical");
+    check("الفرق الوحيد هو net += effectivePnl(r)",
+      /\n    net \+= effectivePnl\(r\);\n/.test(now) && !/net \+= r\.pnl;/.test(now),
+      now.match(/net \+= [^\n]*/g), "net += effectivePnl(r);");
+    check("الظل لا يعرف شيئاً عن effectivePnl",
+      !/effectivePnl/.test(grab(src, /function logSignal\([\s\S]*?\n\}/, "logSignal")),
+      "knows", "clean");
+  }
+
   // and the shadow must stay out of monitorPosition entirely
   const mp = grab(src, /async function monitorPosition\([\s\S]*?\n\}/, "mp");
   check("monitorPosition لا يعرف شيئاً عن الظل",
