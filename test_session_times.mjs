@@ -350,7 +350,6 @@ for (const f of ["scan_v21.js", "scan_lab.js", "scan_wvad.js"]) {
 for (const [label, re] of [
   ["getToday()", /function getToday\(\)[^\n]*/],
   ["daysAgoUTC()", /function daysAgoUTC\(n\)[^\n]*/],
-  ["getTodayRealizedDay()", /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/],
   ["readDayPeak()", /function readDayPeak\(\) \{[\s\S]*?\n\}/],
   ["bumpDayPeak()", /function bumpDayPeak\(candidate\) \{[\s\S]*?\n\}/],
 ]) {
@@ -360,6 +359,28 @@ for (const [label, re] of [
     check(`${f}: ${label} identical`, a === b, "changed", "identical");
   }
 }
+// getTodayRealizedDay() dropped out of the byte-identity list above because
+// ONE line in it switched to `net += effectivePnl(r)`. The pin is narrowed,
+// not deleted: the accumulation line is normalised back to the base wording
+// and every other byte must still match, so this suite still proves the DST
+// work (and anything after it) left the day replay's use of getToday() and
+// its exitTime ordering alone.
+for (const f of ["scan_v21.js", "scan_lab.js"]) {
+  const RE_DAY = /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/;
+  const now = grab(src[f], RE_DAY, `day/${f}`);
+  const was = grab(baseOf(f), RE_DAY, `day/${f}@base`);
+  const normalised = now
+    .replace(/^.*Fill-accurate where the fill is known.*\n/m, "")
+    .replace(/^.*the ONLY line in this file that switched.*\n/m, "")
+    .replace(/^.*\(tuningBucket, computeMetric, combos\), the `win` flag.*\n/m, "")
+    .replace(/^.*cooldown and daily_report\.js all still read `r\.pnl`\..*\n/m, "")
+    .replace("net += effectivePnl(r);", "net += r.pnl;");
+  check(`${f}: getTodayRealizedDay() identical after normalising the sum line`,
+    normalised === was, "changed beyond the one accumulation line", "identical");
+  check(`${f}: getTodayRealizedDay() still keyed on getToday()`,
+    /const today = getToday\(\);/.test(now), "missing", "present");
+}
+
 check("runner.js: isWeekday() identical",
   grab(src["runner.js"], /function isWeekday\(\)[^\n]*/, "iw") === grab(baseOf("runner.js"), /function isWeekday\(\)[^\n]*/, "iw base"), "changed", "identical");
 check("runner.js: today() identical",

@@ -492,7 +492,11 @@ console.log("\n── 14) السجل الحقيقي يُقرأ كما كان ─
 }
 
 // ── 15) no new field feeds any decision ───────────────────
-console.log("\n── 15) لا حقل جديد يغذّي قراراً ──");
+// Was "no new field feeds a decision". Exactly ONE site was later and
+// deliberately allowed to: the day-level replay. The section now pins that
+// boundary from both sides — the replay uses the fill, everything else does
+// not — rather than asserting a blanket claim that is no longer true.
+console.log("\n── 15) لا حقل جديد يغذّي قراراً (باستثناء واحد مقصود: صافي اليوم) ──");
 for (const bot of ["v21", "lab"]) {
   const text = src[bot];
   // The pnl/pnlPct computations must not mention a fill price.
@@ -500,10 +504,64 @@ for (const bot of ["v21", "lab"]) {
   check(`${bot}: حسابات pnl لا تذكر أي سعر تعبئة`,
     pnlLines.every(l => !/FillP|FillPrice|entryFillPx|exitFillPx/.test(l)), pnlLines, "clean");
   check(`${bot}: ${pnlLines.length} سطر pnl موجود`, pnlLines.length >= 2, pnlLines.length, ">= 2");
-  // The realised-P&L replay reads r.pnl, never r.pnlAtFill.
+  // ── the one place a fill price IS allowed to feed a decision ──
+  //
+  // This assertion used to read "the replay sums r.pnl, never r.pnlAtFill"
+  // — the guarantee that fill capture changed no decision anywhere. That
+  // guarantee was deliberately and explicitly lifted for ONE site: the
+  // day-level replay now sums effectivePnl(r), so the day's safety rails
+  // (STOP_DAY_LOSS, DAILY_LOSS_LIMIT / MAX_DAILY_LOSS, the profit floor)
+  // compare against the dollars the account actually realised.
+  //
+  // So the assertion is INVERTED rather than dropped, and the boundary it
+  // guards is now stated in both directions: the day replay MUST use the
+  // fill, and every other consumer MUST still use the reported figures.
+  // That is a strictly tighter net than the original one-sided check.
   const replay = grab(text, /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/, `replay/${bot}`);
-  check(`${bot}: إعادة تشغيل الأرباح المحققة تقرأ pnl فقط`,
-    /\+= r\.pnl\b/.test(replay) && !/pnlAtFill/.test(replay), "reads pnlAtFill", "reads pnl");
+  check(`${bot}: إعادة تشغيل اليوم تجمع effectivePnl (الحد المقصود الوحيد)`,
+    /\n    net \+= effectivePnl\(r\);\n/.test(replay) && !/net \+= r\.pnl\b/.test(replay),
+    replay.match(/net \+= [^\n]*/g), "net += effectivePnl(r);");
+  check(`${bot}: effectivePnl يقرأ pnlAtFill بـ typeof لا بـ ||`,
+    /function effectivePnl\(r\) \{\n  return \(typeof r\.pnlAtFill === "number"\) \? r\.pnlAtFill : r\.pnl;\n\}/.test(text),
+    "different helper body", "the typeof form");
+  // One call site only — the replay. Comment lines are excluded because the
+  // helper names itself in its own doc comment.
+  {
+    const codeLines = text.split("\n").filter(l => !l.trim().startsWith("//"));
+    const callSites = codeLines.filter(l => /effectivePnl\(r\)/.test(l) && !/function effectivePnl/.test(l));
+    check(`${bot}: موضع نداء واحد فقط لـ effectivePnl وهو سطر الجمع`,
+      callSites.length === 1 && callSites[0].trim() === "net += effectivePnl(r);", callSites, ["net += effectivePnl(r);"]);
+  }
+  // ── and NOTHING else switched: every other consumer still reads the
+  //    reported pnl / pnlPct / win.
+  check(`${bot}: علم win ما زال من pnl المُبلَّغ`,
+    /win: pnl > 0,/.test(text) && !/win: (pnlAtFill|pnlAtFill > 0)/.test(text), "switched", "still reported pnl");
+  check(`${bot}: pnlPct ما زال من exitPremium لا من سعر التعبئة`,
+    /const pnlPct = \(exitPremium - pos\.entryPremium\)/.test(text)
+    || pnlLines.some(l => /pnlPct/.test(l) && !/AtFill/.test(l)), "switched", "still reported");
+  if (bot === "lab") {
+    // The re-entry cooldown is LAB-only (scan_v21.js has none).
+    check(`${bot}: مفتاح التهدئة لا يذكر سعر التعبئة`,
+      !/effectivePnl|pnlAtFill/.test(grab(text, /state\._cooldowns\[[\s\S]{0,120}?COOLDOWN_DURATION;/, `cooldown/${bot}`)),
+      "mentions a fill price", "clean");
+    for (const [label, re] of [
+      ["tuningBucket()", /function tuningBucket\(r\) \{[\s\S]*?\n\}/],
+      ["computeMetric()", /function computeMetric\(metricName, records\) \{[\s\S]*?\n\}/],
+      ["computeCombos()", /function computeCombos\(records, previousCombos\) \{[\s\S]*?\n\}/],
+    ]) {
+      const fn = grab(text, re, `${label}/${bot}`);
+      check(`${bot}: ${label} لا يذكر effectivePnl ولا pnlAtFill`,
+        !/effectivePnl|pnlAtFill/.test(fn), "mentions a fill price", "clean");
+    }
+    check(`${bot}: المتعلّم ما زال يجمع r.pnl في مواضعه الثلاثة`,
+      /const netPnl = records\.reduce\(\(a, r\) => a \+ r\.pnl, 0\);/.test(text)
+      && /byReason\[bucket\]\.pnl \+= r\.pnl;/.test(text)
+      && /const pnl = subset\.reduce\(\(a, x\) => a \+ x\.r\.pnl, 0\);/.test(text),
+      "a learner site switched", "all three still r.pnl");
+    check(`${bot}: المتعلّم ما زال يقرأ r.win`,
+      /records\.filter\(r => r\.win\)\.length/.test(text) && /if \(r\.win\) byReason\[bucket\]\.wins\+\+;/.test(text),
+      "switched", "still r.win");
+  }
   // alpaca() untouched.
   check(`${bot}: alpaca() بلا تغيير`,
     grab(text, /async function alpaca\([\s\S]*?\n\}/, `alpaca/${bot}`)
@@ -514,6 +572,21 @@ for (const bot of ["v21", "lab"]) {
   check(`${bot}: calcQty() بلا تغيير`,
     grab(text, /function calcQty\([\s\S]*?\n\}/, `cq/${bot}`)
     === grab(base[bot], /function calcQty\([\s\S]*?\n\}/, `cq base/${bot}`), "changed", "identical");
+}
+
+// daily_report.js is the other reader of the outcomes log, and it is NOT
+// part of the day-level exception: the report keeps showing the reported
+// net (with fillLine() beside it) so the two figures stay comparable.
+{
+  const dr = lf(fs.readFileSync("daily_report.js", "utf8"));
+  check("daily_report.js لا يعرف effectivePnl",
+    !/effectivePnl/.test(dr), "present", "absent");
+  check("daily_report.js ما زال يجمع r.pnl للصافي",
+    /r\.pnl\b/.test(dr), "no r.pnl reader left", "still reads r.pnl");
+  check("daily_report.js ما زال يقرأ r.win",
+    /r\.win\b/.test(dr), "no r.win reader left", "still reads r.win");
+  check("daily_report.js: سطر التعبئة ما زال منفصلاً عن سطر الصافي",
+    /function fillLine\(rows\)/.test(dr) && /pnlAtFill/.test(dr), "merged", "separate");
 }
 
 // ── 16) the option object still carries no bid/ask ────────
