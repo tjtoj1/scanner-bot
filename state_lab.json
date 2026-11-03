@@ -1,7 +1,7 @@
 {
   "_lastDay": "2026-11-03",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-11-02",
+  "_lastComboLearnedDay": "2026-11-03",
   "_cooldowns": {
     "IWM_PUT": 1793379559340,
     "QQQ_CALL": 1793636379449,
@@ -23,7 +23,7 @@
     "day": "2026-11-03",
     "no_signal": 2386,
     "max_open_positions": 142,
-    "past_last_entry": 162
+    "past_last_entry": 168
   },
   "_sigSeen": {
     "day": "2026-11-03",
