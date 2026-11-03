@@ -22,7 +22,8 @@
   "_sigCounts": {
     "day": "2026-11-03",
     "no_signal": 2386,
-    "max_open_positions": 142
+    "max_open_positions": 142,
+    "past_last_entry": 6
   },
   "_sigSeen": {
     "day": "2026-11-03",
