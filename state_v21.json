@@ -6,6 +6,12 @@
       "symbol": "IWM",
       "signal": "CALL",
       "pnl": 0
+    },
+    {
+      "day": "2026-11-03",
+      "symbol": "IWM",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "range": {
@@ -50,14 +56,14 @@
     "signal": "CALL",
     "optionSymbol": "IWM261103C00281000",
     "strike": "281",
-    "entryPremium": 0.755,
-    "qty": 6,
-    "entryTime": 1793718949642,
+    "entryPremium": 0.845,
+    "qty": 5,
+    "entryTime": 1793719187738,
     "level": 280.31,
-    "msgId": 7329,
-    "stopOrderId": "6df72043-a224-49fb-8622-2d1762363e3b",
-    "hardStopPrice": 0.49,
-    "entryStockPrice": 280.81,
+    "msgId": 7332,
+    "stopOrderId": "c0487e89-45c0-4b42-a0b5-8bd6665ac427",
+    "hardStopPrice": 0.55,
+    "entryStockPrice": 280.96500000000003,
     "vwapAtEntry": 280.0637,
     "rsiAtEntry": 61.45,
     "volumeRatio": 10.518018127218465,
@@ -66,14 +72,9 @@
     "tp2Stock": null,
     "tp3Stock": null,
     "slStock": null,
-    "entryFillPrice": 0.78,
+    "entryFillPrice": 0.83,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-03T15:15:49.530Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 14.56953642384106,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
+    "entryFilledAt": "2026-11-03T15:19:47.635Z"
   }
 }
