@@ -75,6 +75,7 @@
     "entryFillPrice": 0.83,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-03T15:19:47.635Z"
+    "entryFilledAt": "2026-11-03T15:19:47.635Z",
+    "lastReportedThreshold": -10
   }
 }
