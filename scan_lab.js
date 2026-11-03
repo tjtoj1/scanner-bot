@@ -783,6 +783,35 @@ function computeRegime(bars, params) {
 // Records are sorted by exitTime rather than trusted in file order:
 // logTrade appends in close order, but this log has been rebuilt from a
 // backup branch once already and may be re-ordered again.
+// effectivePnl(r) — the dollars this trade ACTUALLY realised, when we
+// know them.
+//
+// `r.pnl` is computed from `exitPremium`, which on a broker-side stop is
+// a QUOTE fetched after the fact, not the fill: measured on this log, the
+// bot notices an `alpaca_stop` a median of 27 s after it filled (min 2 s,
+// max 69 s, n=37), and prices the exit at whatever the mid was by then.
+// `r.pnlAtFill` is the same trade priced at the real fill. Since fill
+// capture went live on 2026-10-23 the two differ in one direction:
+//   LAB  n=78  reported $+113 at fill $-483  (gap $-596,  -$7.6/trade)
+//   v21  n=27  reported $+4   at fill $-358  (gap $-362, -$13.4/trade)
+// So the day-level safety rails have been reading a day that is better
+// than the one the account actually had.
+//
+// `typeof` and not `||`: pnlAtFill === 0 is a real, already-observed
+// value (LAB TSLA 2026-10-29, v21 IWM 2026-10-29), and treating it as
+// falsy would fall back to `pnl` and re-introduce the very gap this
+// helper exists to remove — on LAB's 2026-10-29 that single record moves
+// the day net from -$449 to -$430.
+//
+// NONE of the day-level thresholds was retuned alongside this change:
+// LAB STOP_DAY_LOSS -500, MAX_DAILY_LOSS 1000, PROFIT_FLOOR 300 and
+// v21 STOP_DAY_LOSS -280, DAILY_LOSS_LIMIT -600, PROFIT_FLOOR 170 all
+// keep their current values. The numbers they are compared against get
+// more accurate; where the line sits is a separate decision.
+function effectivePnl(r) {
+  return (typeof r.pnlAtFill === "number") ? r.pnlAtFill : r.pnl;
+}
+
 function getTodayRealizedDay() {
   const today = getToday();
   const todays = [];
@@ -796,7 +825,11 @@ function getTodayRealizedDay() {
 
   let net = 0, peak = 0, stopped = false, reason = null;
   for (const r of todays) {
-    net += r.pnl;
+    // Fill-accurate where the fill is known, reported otherwise. This is
+    // the ONLY line in this file that switched: the learner
+    // (tuningBucket, computeMetric, combos), the `win` flag, `pnlPct`,
+    // the cooldown and daily_report.js all still read `r.pnl`.
+    net += effectivePnl(r);
     if (net > peak) peak = net;
     // Checked after EVERY record, so a later recovery cannot clear it.
     if (!stopped && net <= STOP_DAY_LOSS) { stopped = true; reason = "loss"; }

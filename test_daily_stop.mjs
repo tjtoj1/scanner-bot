@@ -98,6 +98,9 @@ async function captureAsync(fn) {
 // ════════════════════════════════════════════════════════════
 const RE = {
   day:     /function getTodayRealizedDay\(\) \{[\s\S]*?\n\}/,
+  // The day replay now calls this helper, so the extracted function needs
+  // it in scope. Added as its own region so it is pinned too.
+  effPnl:  /function effectivePnl\(r\) \{[\s\S]*?\n\}/,
   wrap:    /function getTodayRealizedPnl\(\) \{ return getTodayRealizedDay\(\)\.net; \}/,
   readPk:  /function readDayPeak\(\) \{[\s\S]*?\n\}/,
   bumpPk:  /function bumpDayPeak\(candidate\) \{[\s\S]*?\n\}/,
@@ -139,7 +142,8 @@ const CONSTS = bot => [
 function makeDay(bot, fileText, today = "2026-10-20") {
   const fsStub = { readFileSync: () => { if (fileText === null) throw new Error("ENOENT"); return fileText; } };
   return new Function("fs", "getToday",
-    `${CONSTS(bot)}\n${grab(src[bot], RE.day, `day/${bot}`)}\n${grab(src[bot], RE.wrap, `wrap/${bot}`)}\n` +
+    `${CONSTS(bot)}\n${grab(src[bot], RE.effPnl, `effPnl/${bot}`)}\n` +
+    `${grab(src[bot], RE.day, `day/${bot}`)}\n${grab(src[bot], RE.wrap, `wrap/${bot}`)}\n` +
     `return { getTodayRealizedDay, getTodayRealizedPnl };`)(fsStub, () => today);
 }
 
@@ -586,9 +590,27 @@ console.log("\n── G) الانحدار ──");
 for (const bot of ["v21", "lab"]) {
   const real = lf(fs.readFileSync(OUTCOMES[bot], "utf8"));
   const days = [...new Set(real.split("\n").filter(Boolean).map(l => { try { return JSON.parse(l).day; } catch { return null; } }).filter(Boolean))].sort();
-  let mismatch = 0;
-  for (const d of days) if (makeDay(bot, real, d).getTodayRealizedPnl() !== makeOld(bot, real, d)()) mismatch++;
-  check(`${bot}: الصافي مطابق للنسخة المجمَّدة على كل الأيام (${days.length} يوماً)`, mismatch === 0 && days.length > 0, { days: days.length, mismatch }, { mismatch: 0 });
+  // The day replay now sums effectivePnl, so it can no longer be identical
+  // to the frozen pnl-only implementation on days that carry pnlAtFill. The
+  // pin is NARROWED rather than deleted, and the narrowed form is strictly
+  // stronger than the old one: on a day with no pnlAtFill the two must still
+  // agree EXACTLY, and on a day that has it the difference must equal
+  // Σ(pnlAtFill − pnl) over that day's covered records — to the cent. A bug
+  // anywhere else in the replay shows up as a day that drifts by the wrong
+  // amount, which the old "mismatch === 0" could not have told apart.
+  const recs = real.split("\n").filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  let uncoveredMismatch = 0, coveredWrong = 0, coveredDays = 0, uncoveredDays = 0;
+  for (const d of days) {
+    const mine = recs.filter(r => r.day === d);
+    const expectedDelta = mine.reduce((a, r) => a + ((typeof r.pnlAtFill === "number") ? r.pnlAtFill - r.pnl : 0), 0);
+    const got = makeDay(bot, real, d).getTodayRealizedPnl() - makeOld(bot, real, d)();
+    if (expectedDelta === 0) { uncoveredDays++; if (got !== 0) uncoveredMismatch++; }
+    else { coveredDays++; if (Math.abs(got - expectedDelta) > 1e-9) coveredWrong++; }
+  }
+  check(`${bot}: الأيام بلا pnlAtFill مطابقة تماماً للنسخة المجمَّدة (${uncoveredDays} يوماً)`,
+    uncoveredMismatch === 0 && uncoveredDays > 0, { uncoveredDays, uncoveredMismatch }, { uncoveredMismatch: 0 });
+  check(`${bot}: الأيام المغطاة تتغير بمقدار Σ(pnlAtFill − pnl) بالضبط (${coveredDays} يوماً)`,
+    coveredWrong === 0 && coveredDays > 0, { coveredDays, coveredWrong }, { coveredWrong: 0 });
 
   const TIER2 = bot === "v21"
     ? [["DAILY_LOSS_LIMIT", /const DAILY_LOSS_LIMIT\s*=\s*-600;/],
@@ -618,7 +640,6 @@ const PHASE_A_REGIONS = [
   ["profitFloor()",           RE.pfFn],
   ["readDayPeak()",           RE.readPk],
   ["bumpDayPeak()",           RE.bumpPk],
-  ["getTodayRealizedDay()",   RE.day],
   ["optionExpiryISO()",       RE.expiry],
   ["getQuoteLegs()",          RE.legs],
   ["كتلة PROFIT-FLOOR GATE",  RE.gate],
@@ -637,6 +658,30 @@ for (const bot of ["v21", "lab"]) {
       grab(src[bot], re, `${label}/${bot}`) === grab(phaseA[bot], re, `${label}/${bot}@phaseA`),
       "changed", "identical");
   }
+}
+
+// getTodayRealizedDay() is no longer byte-identical to phase A: ONE line
+// in it switched from `net += r.pnl` to `net += effectivePnl(r)`. Rather
+// than drop the pin, it is NARROWED — the accumulation line is normalised
+// back to phase A's wording and EVERY OTHER BYTE of the function must
+// still match. So the sort by exitTime, the latching stop, the peak
+// tracking, the try/catch and the return shape all stay pinned, and a
+// second change anywhere in the function still fails this check.
+for (const bot of ["v21", "lab"]) {
+  const now = grab(src[bot], RE.day, `day/${bot}`);
+  const pa  = grab(phaseA[bot], RE.day, `day/${bot}@phaseA`);
+  const normalised = now
+    .replace(/^.*Fill-accurate where the fill is known.*\n/m, "")
+    .replace(/^.*the ONLY line in this file that switched.*\n/m, "")
+    .replace(/^.*\(tuningBucket, computeMetric, combos\), the `win` flag.*\n/m, "")
+    .replace(/^.*cooldown and daily_report\.js all still read `r\.pnl`\..*\n/m, "")
+    .replace("net += effectivePnl(r);", "net += r.pnl;");
+  check(`${bot}: getTodayRealizedDay() مطابق للمرحلة A بعد تطبيع سطر الجمع وحده`,
+    normalised === pa, "changed beyond the one accumulation line", "identical");
+  // And the one allowed difference really is the one we think it is.
+  check(`${bot}: الفرق الوحيد هو net += effectivePnl(r)`,
+    /\n    net \+= effectivePnl\(r\);\n/.test(now) && !/net \+= r\.pnl;/.test(now),
+    now.match(/net \+= [^\n]*/g), "net += effectivePnl(r);");
 }
 
 // runner.js: phase A's only change there was the STATE_FILES line. The rest
