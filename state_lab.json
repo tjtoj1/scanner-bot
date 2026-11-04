@@ -22,14 +22,15 @@
   },
   "_sigCounts": {
     "day": "2026-11-04",
-    "no_signal": 110
+    "no_signal": 120
   },
   "_sigSeen": {
     "day": "2026-11-04",
     "keys": [
       "AMZN|14:00|G|",
       "AMZN|14:00|T|",
-      "AMZN|14:00|S|cooldown"
+      "AMZN|14:00|S|cooldown",
+      "AMZN|14:15|S|cooldown"
     ]
   },
   "_sigPending": {
