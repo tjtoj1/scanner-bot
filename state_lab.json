@@ -8,7 +8,7 @@
     "SPY_PUT": 1793651377658,
     "NVDA_CALL": 1793735766241,
     "QQQ_PUT": 1793739004364,
-    "AMZN_CALL": 1793804624687
+    "IWM_CALL": 1793806423416
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-04",
-    "no_signal": 230,
+    "no_signal": 234,
     "max_open_positions": 12
   },
   "_sigSeen": {
@@ -34,7 +34,11 @@
       "QQQ|14:30|G|",
       "QQQ|14:30|T|",
       "IWM|14:30|G|",
-      "IWM|14:30|T|"
+      "IWM|14:30|T|",
+      "IWM|14:30|S|cooldown",
+      "AMZN|14:30|S|cooldown",
+      "AMZN|14:30|G|",
+      "AMZN|14:30|T|"
     ]
   },
   "_sigPending": {
@@ -84,7 +88,8 @@
     "entryFillPrice": 1.9,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T15:00:58.766Z"
+    "entryFilledAt": "2026-11-04T15:00:58.766Z",
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
@@ -129,19 +134,20 @@
     "entryFillPrice": 2.89,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T15:01:01.540Z"
+    "entryFilledAt": "2026-11-04T15:01:01.540Z",
+    "lastReportedThreshold": -10
   },
-  "IWM": {
+  "AMZN": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "IWM261104C00284000",
-    "strike": "284",
-    "entryPremium": 0.84,
-    "qty": 3,
-    "entryTime": 1793804463148,
-    "msgId": 7399,
-    "stopOrderId": "1427b195-8d51-463b-ad6e-ddbbb29daa96",
-    "hardStopPrice": 0.59,
+    "optionSymbol": "AMZN261104C00272500",
+    "strike": "272.5",
+    "entryPremium": 1.105,
+    "qty": 2,
+    "entryTime": 1793804632122,
+    "msgId": 7404,
+    "stopOrderId": "a47e92f4-1693-4822-ba9b-0c89d86e997f",
+    "hardStopPrice": 0.77,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -150,31 +156,30 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 283.89,
+      "spot": 271.14,
       "regime": "bullish",
-      "emaFast": 284.6346,
-      "emaSlow": 283.7563,
-      "breakoutHigh": 285.07,
-      "breakoutLow": 283.23,
-      "volRatio": 63.78,
-      "lastClose": 286.04,
-      "lastVolume": 3292733,
+      "emaFast": 262.5771,
+      "emaSlow": 259.5757,
+      "breakoutHigh": 266.91,
+      "breakoutLow": 251.316,
+      "volRatio": 58.77,
+      "lastClose": 269.165,
+      "lastVolume": 13846382,
       "barTime": "2026-11-04T14:30:00Z",
-      "entryTimeUTC": "2026-11-04T15:01:03.148Z",
-      "vwapAtEntry": 284.9332,
-      "rsiAtEntry": 71.49,
+      "entryTimeUTC": "2026-11-04T15:03:52.122Z",
+      "vwapAtEntry": 265.3669,
+      "rsiAtEntry": 88.19,
       "signalType": "breakout",
-      "positionBucket": "mid",
-      "comboKey": "CALL|position:mid",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryBid": 0.83,
-    "entryAsk": 0.85,
-    "entrySpreadPct": 2.381,
-    "entryFillPrice": 0.86,
+    "entryBid": 1.09,
+    "entryAsk": 1.12,
+    "entrySpreadPct": 2.715,
+    "entryFillPrice": 1.1,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T15:01:02.963Z",
-    "lastReportedThreshold": -20
+    "entryFilledAt": "2026-11-04T15:03:49.743Z"
   }
 }
