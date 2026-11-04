@@ -10,7 +10,8 @@
     "IWM_CALL": 1793724772431,
     "SPY_CALL": 1793725316356,
     "NVDA_CALL": 1793735766241,
-    "QQQ_PUT": 1793739004364
+    "QQQ_PUT": 1793739004364,
+    "AMZN_CALL": 1793804624687
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -21,66 +22,18 @@
   },
   "_sigCounts": {
     "day": "2026-11-04",
-    "no_signal": 20
+    "no_signal": 30
   },
   "_sigSeen": {
     "day": "2026-11-04",
     "keys": [
       "AMZN|14:00|G|",
-      "AMZN|14:00|T|"
+      "AMZN|14:00|T|",
+      "AMZN|14:00|S|cooldown"
     ]
   },
   "_sigPending": {
     "day": "2026-11-04",
     "items": []
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "AMZN261104C00267500",
-    "strike": "267.5",
-    "entryPremium": 2.52,
-    "qty": 1,
-    "entryTime": 1793802671272,
-    "msgId": 7394,
-    "stopOrderId": "d7579fcb-7ff0-43a7-87e5-e6a989c2b1d1",
-    "hardStopPrice": 1.76,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 267.78499999999997,
-      "regime": "bullish",
-      "emaFast": 259.9302,
-      "emaSlow": 257.9855,
-      "breakoutHigh": 261,
-      "breakoutLow": 251.316,
-      "volRatio": 2.19,
-      "lastClose": 261.44,
-      "lastVolume": 415354,
-      "barTime": "2026-11-04T14:00:00Z",
-      "entryTimeUTC": "2026-11-04T14:31:11.272Z",
-      "vwapAtEntry": 258.2052,
-      "rsiAtEntry": 76.5,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 2.41,
-    "entryAsk": 2.63,
-    "entrySpreadPct": 8.73,
-    "entryFillPrice": 2.6,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T14:31:10.945Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 24.60317460317459,
-    "lastReportedThreshold": 20
   }
 }
