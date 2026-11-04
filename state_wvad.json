@@ -39,7 +39,7 @@
     "entryPremium": 1.9449999999999998,
     "qty": 2,
     "entryTime": 1793808980165,
-    "stopOrderId": "1b1ccd8d-55b6-42df-9b08-8a3f6b5fd1ef",
+    "stopOrderId": "1094f19e-d737-425f-a0b6-759596ddcd17",
     "hardStopPrice": 1.26,
     "entryStockPrice": 765.715,
     "wvadSumAtEntry": 317244.59,
@@ -48,7 +48,9 @@
     "slStock": 769.45,
     "dte": 0,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.424164524421608
+    "stopPct": 10,
+    "peakPct": 24.678663239074552,
+    "ladder2": true,
+    "trailPct": 10
   }
 }
