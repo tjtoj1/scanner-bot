@@ -20,7 +20,7 @@
   "_sigCounts": {
     "day": "2026-11-04",
     "no_signal": 230,
-    "max_open_positions": 6
+    "max_open_positions": 12
   },
   "_sigSeen": {
     "day": "2026-11-04",
@@ -39,17 +39,7 @@
   },
   "_sigPending": {
     "day": "2026-11-04",
-    "items": [
-      {
-        "symbol": "IWM",
-        "optionSymbol": "IWM261104C00284000",
-        "barTime": "2026-11-04T14:30:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 0.84,
-        "queuedAt": "2026-11-04T15:01:02.848Z"
-      }
-    ]
+    "items": []
   },
   "SPY": {
     "active": true,
@@ -184,6 +174,7 @@
     "entryFillPrice": 0.86,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T15:01:02.963Z"
+    "entryFilledAt": "2026-11-04T15:01:02.963Z",
+    "lastReportedThreshold": -20
   }
 }
