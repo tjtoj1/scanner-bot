@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-04",
-    "no_signal": 254,
+    "no_signal": 260,
     "max_open_positions": 30
   },
   "_sigSeen": {
@@ -39,7 +39,8 @@
       "IWM|14:30|S|cooldown",
       "AMZN|14:30|S|cooldown",
       "AMZN|14:30|G|",
-      "AMZN|14:30|T|"
+      "AMZN|14:30|T|",
+      "AMZN|14:45|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -102,7 +103,7 @@
     "qty": 1,
     "entryTime": 1793804461736,
     "msgId": 7398,
-    "stopOrderId": "96bdcbdd-f1a9-41fa-b88f-678569f44fc4",
+    "stopOrderId": "26407d4a-ba5e-4be7-820b-c6813b1b8030",
     "hardStopPrice": 1.99,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -137,9 +138,11 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-04T15:01:01.540Z",
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 30,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 19.649122807017545
+    "stopPct": 12,
+    "peakPct": 31.403508771929822,
+    "ladder2": true,
+    "trailPct": 8
   }
 }
