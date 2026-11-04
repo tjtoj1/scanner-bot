@@ -81,7 +81,8 @@
     "entryFillPrice": 2.49,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T15:15:02.565Z"
+    "entryFilledAt": "2026-11-04T15:15:02.565Z",
+    "lastReportedThreshold": -10
   },
   "AMZN": {
     "active": true,
@@ -107,6 +108,7 @@
     "entryFillPrice": 1.66,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-04T15:15:07.603Z"
+    "entryFilledAt": "2026-11-04T15:15:07.603Z",
+    "lastReportedThreshold": -10
   }
 }
