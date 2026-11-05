@@ -23,7 +23,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 64,
-    "max_open_positions": 440
+    "max_open_positions": 446
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -81,17 +81,7 @@
   },
   "_sigPending": {
     "day": "2026-11-05",
-    "items": [
-      {
-        "symbol": "TSLA",
-        "optionSymbol": "TSLA261106P00347500",
-        "barTime": "2026-11-05T15:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 7.745,
-        "queuedAt": "2026-11-05T16:16:16.720Z"
-      }
-    ]
+    "items": []
   },
   "QQQ": {
     "active": true,
