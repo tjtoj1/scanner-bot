@@ -24,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-05",
-    "no_signal": 770,
+    "no_signal": 780,
     "max_open_positions": 452
   },
   "_sigSeen": {
@@ -132,6 +132,7 @@
     "entryFillPrice": 1.17,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T17:44:36.109Z"
+    "entryFilledAt": "2026-11-05T17:44:36.109Z",
+    "lastReportedThreshold": -10
   }
 }
