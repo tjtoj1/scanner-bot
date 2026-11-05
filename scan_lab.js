@@ -2030,6 +2030,85 @@ const COMBO_ABS_MARGIN_PP   = 5;  // |avg pnlPct| must clear this before any jud
 const COMBO_CONF_Z          = 1.28; // one-sided 90% confidence bound
 const COMBO_SIZE_MULTIPLIER = { above_avg: 1.5, average: 1.0, below_avg: 0.5, insufficient: 1.0 };
 
+// ─── FREEZE GATE: PROPOSE-ONLY COMBO LEARNING ─────────────────────────
+//
+// WHY. On 2026-11-05T21:00:39Z the learner promoted PUT|position:near_low
+// from average(×1) to above_avg(×1.5) by itself and wrote the file before
+// it sent the Telegram message — so the notification announced a change
+// that had already happened. That combo is 51.5% of LAB's trades (355 of
+// 689), so it was a sizing change on half the book, taken inside the
+// owner-approved 60-trading-day freeze (2026-10-23 .. ~2027-01-20) which
+// forbids changes to entry, exit or sizing logic without approval.
+//
+// WHAT CHANGES. Nothing about the proposal MATHS: computeCombos(),
+// positionBucket(), tierFor(), standardError() and every hard limit above
+// are untouched, so the statistics in the proposal are exactly the ones
+// the rule has always produced. The gate lives in runComboLearning()
+// only. It computes the same tier, then — unless an owner approval
+// matches — puts `tier` and `sizeMultiplier` back to the tier that is
+// actually live, records the held proposal, and notifies.
+//
+// BOTH DIRECTIONS are gated, up and down, because the freeze covers both.
+// Sizing DOWN is protective, so holding it back is a real cost: a combo
+// that turns bad keeps full size until approved. That is the owner's
+// explicit instruction, not an oversight.
+//
+// FAILS CLOSED. COMBO_AUTOAPPLY is false as shipped, and a missing,
+// unreadable or malformed combo_approvals.json yields NO approvals. The
+// safe direction is "propose, don't apply", so every error path lands
+// there rather than on "apply".
+const COMBO_AUTOAPPLY = false;
+
+// Owner-edited approval file. The container NEVER writes it and it is
+// deliberately NOT in runner.js's STATE_FILES, so it can never conflict
+// with the container's own commits under `git merge -X ours`. Shape:
+//
+//   { "approved": [ { "comboKey": "PUT|position:near_low",
+//                     "tier": "above_avg",
+//                     "expires": "2026-12-31" } ] }
+//
+// An entry authorises exactly one (comboKey, tier) pair, and only while
+// `expires` is today or later in UTC. There is deliberately no sample
+// size in the key: n and the mean move every night, so binding an
+// approval to them would make every approval unmatchable by the time it
+// was read.
+const COMBO_APPROVALS_FILE = "combo_approvals.json";
+
+// A held proposal is re-announced at most this often, so a combo that
+// sits above the threshold for weeks does not send a message every night.
+const COMBO_RENOTIFY_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Returns only well-formed approval entries. Anything else — no file,
+// unreadable file, not JSON, `approved` not an array, an entry missing a
+// field or carrying a malformed date — is dropped silently, which means
+// nothing is approved.
+function loadComboApprovals() {
+  try {
+    const j = JSON.parse(fs.readFileSync(COMBO_APPROVALS_FILE, "utf8"));
+    if (!j || !Array.isArray(j.approved)) return [];
+    return j.approved.filter(a =>
+      a && typeof a === "object" && !Array.isArray(a)
+      && typeof a.comboKey === "string" && a.comboKey.length > 0
+      && typeof a.tier === "string" && Object.prototype.hasOwnProperty.call(COMBO_SIZE_MULTIPLIER, a.tier)
+      && typeof a.expires === "string" && /^\d{4}-\d{2}-\d{2}$/.test(a.expires)
+    );
+  } catch { return []; }
+}
+
+// The approval that authorises this exact proposal, or null. `expires` is
+// INCLUSIVE: an approval dated today is still valid today and lapses
+// tomorrow. Dates are compared as UTC YYYY-MM-DD strings, the same basis
+// getToday() uses, so no timezone can shift the boundary.
+function matchComboApproval(approvals, comboKey, proposedTier, todayUtc) {
+  for (const a of approvals) {
+    if (a.comboKey !== comboKey) continue;
+    if (a.tier !== proposedTier) continue;
+    if (a.expires < todayUtc) continue;
+    return { comboKey: a.comboKey, tier: a.tier, expires: a.expires };
+  }
+  return null;
+}
+
 // CALL above VWAP / PUT below VWAP = "with" the trend the entry is
 // betting on; the opposite = "against". Same convention analyze.js (the
 // old v20 report) used. Returns null when vwapAtEntry isn't recorded yet
@@ -2183,6 +2262,43 @@ function buildComboTemplate(combo, overallAvgPnlPct) {
     + `السبب: ${causeAr}.`;
 }
 
+// The PROPOSAL message. Deliberately a different shape from
+// buildComboTemplate() above, which reports a change that HAS happened:
+// this one has to be unmistakable about the opposite. It leads with "لم
+// يُغيَّر شيء" (nothing was changed), states the size effect in dollars
+// rather than as a bare multiplier, and ends with what to edit to
+// approve. `proposal` is a pendingComboProposals entry.
+function buildComboProposalTemplate(proposal, tradeBudget, shareOfEntriesPct, overallAvgPnlPct) {
+  const p = proposal;
+  const tierAr = COMBO_TIER_AR[p.proposedTier] || p.proposedTier;
+  const curTierAr = p.currentTier ? (COMBO_TIER_AR[p.currentTier] || p.currentTier) : "غير مصنّفة";
+  const wr = p.n ? Math.round(p.wins / p.n * 100) : 0;
+  const curBudget = Math.round(tradeBudget * p.currentMultiplier);
+  const newBudget = Math.round(tradeBudget * p.proposedMultiplier);
+  const dir = p.proposedMultiplier > p.currentMultiplier ? "زيادة" : "تقليل";
+  // The 90% one-sided bound the tier decision turned on — the same
+  // quantity buildComboTemplate() shows, computed the same way.
+  const bound = (p.se != null && p.avgPnlPct != null)
+    ? (p.proposedTier === "below_avg" ? p.avgPnlPct + COMBO_CONF_Z * p.se
+      : p.proposedTier === "above_avg" ? p.avgPnlPct - COMBO_CONF_Z * p.se
+      : null)
+    : null;
+
+  return `⏸️ <b>اقتراح تعديل حجم — لم يُغيَّر شيء</b>\n`
+    + `التوليفة: ${p.comboKey}\n`
+    + `الحالي: ${curTierAr} (×${p.currentMultiplier}) — <b>ما زال سارياً</b>\n`
+    + `المقترح: ${tierAr} (×${p.proposedMultiplier})\n`
+    + `أثر الموافقة: ${dir} ميزانية الصفقة من <b>$${curBudget}</b> إلى <b>$${newBudget}</b> `
+    + `على ${shareOfEntriesPct != null ? `~${shareOfEntriesPct.toFixed(0)}%` : "جزء"} من دخولات LAB\n`
+    + `العيّنة: ${p.n} صفقة | WR ${wr}% | متوسط ${p.avgPnlPct}%`
+    + (p.se != null ? ` ± ${p.se}pp` : "")
+    + (bound != null ? ` | حدّ الثقة 90% ${bound.toFixed(1)}%` : "") + `\n`
+    + (overallAvgPnlPct != null ? `للسياق فقط — متوسط LAB العام ${overallAvgPnlPct.toFixed(1)}%\n` : "")
+    + `⚠️ القياس على pnlPct المُبلَّغ (لا pnlPctAtFill)، والخطأ المعياري يفترض استقلال الصفقات.\n`
+    + `للموافقة: أضف {"comboKey":"${p.comboKey}","tier":"${p.proposedTier}","expires":"YYYY-MM-DD"} `
+    + `إلى ${COMBO_APPROVALS_FILE}. بدون ذلك لن يُطبَّق شيء.`;
+}
+
 // Decides whether this cycle should run combo learning. The learning
 // itself is idempotent — it rebuilds every combo from the full
 // outcomes_lab.jsonl each time — so an extra call costs nothing and a
@@ -2221,6 +2337,9 @@ async function runComboLearning(state, strategy) {
   const pastClose = utcMin() >= forceExitUtc() + 5;
 
   let combos, overallAvgPnlPct, changed;
+  // comboKey -> the approval entry that authorised it this run. Declared
+  // out here so the changelog loop and the summary line can both read it.
+  const approvedBy = new Map();
   try {
     let records = [];
     try {
@@ -2242,6 +2361,60 @@ async function runComboLearning(state, strategy) {
     changed = Object.values(combos).filter(c =>
       c.sizeMultiplier !== multiplierOf(c.previousTier) || isFirstJudgment(c)
     );
+
+    // ── PROPOSE-ONLY GATE ──
+    // Runs AFTER the stats and the change detection, so the proposal
+    // carries exactly the numbers the unchanged rule produced, and
+    // BEFORE the changelog loop below, so a held proposal cannot write a
+    // combo_tier_change entry (the loop skips a combo whose multiplier
+    // did not move, and holding puts the multiplier back).
+    const approvals = COMBO_AUTOAPPLY ? [] : loadComboApprovals();
+    const prevPending = Array.isArray(strategy.pendingComboProposals) ? strategy.pendingComboProposals : [];
+    const nowIso = new Date().toISOString();
+    const held = [];
+    for (const [key, combo] of Object.entries(combos)) {
+      if (COMBO_AUTOAPPLY) break;
+      const sizeMoves = combo.sizeMultiplier !== multiplierOf(combo.previousTier) || isFirstJudgment(combo);
+      if (!sizeMoves) continue;
+
+      const approval = matchComboApproval(approvals, key, combo.tier, today);
+      if (approval) {
+        // Approved: let it through unchanged, and remember which entry
+        // authorised it so the changelog can say so.
+        approvedBy.set(key, approval);
+        continue;
+      }
+
+      // Held. Keep every statistic, but put the DECISION fields back to
+      // the tier that is actually live — lookupComboMultiplier() reads
+      // `tier`, so this is what makes the hold real rather than cosmetic.
+      const liveTier = combo.previousTier ?? "insufficient";
+      const prior = prevPending.find(p => p && p.comboKey === key && p.proposedTier === combo.tier);
+      held.push({
+        comboKey: key,
+        currentTier: combo.previousTier ?? null,
+        currentMultiplier: multiplierOf(combo.previousTier),
+        proposedTier: combo.tier,
+        proposedMultiplier: multiplierOf(combo.tier),
+        n: combo.n, wins: combo.wins, avgPnlPct: combo.avgPnlPct, se: combo.se, netPnl: combo.pnl,
+        // Carried across nights so the 7-day re-notify clock is not reset
+        // by a nightly rebuild, and so the owner can see how long a
+        // proposal has been waiting.
+        firstProposedAt: prior?.firstProposedAt ?? nowIso,
+        lastNotifiedAt: prior?.lastNotifiedAt ?? null,
+        status: "awaiting_approval",
+      });
+      combo.tier = liveTier;
+      combo.sizeMultiplier = multiplierOf(liveTier);
+    }
+    if (!COMBO_AUTOAPPLY) {
+      strategy.pendingComboProposals = held;
+      // Only combos that actually moved are "changed" now; the held ones
+      // had their multiplier restored above, so they drop out.
+      changed = Object.values(combos).filter(c =>
+        c.sizeMultiplier !== multiplierOf(c.previousTier) || isFirstJudgment(c)
+      );
+    }
 
     for (const [key, combo] of Object.entries(combos)) {
       const prevTier = combo.previousTier;
@@ -2265,6 +2438,13 @@ async function runComboLearning(state, strategy) {
         // whole run — with the day already marked as learned.
         avgPnlPct: combo.avgPnlPct != null ? combo.avgPnlPct.toFixed(2) : null,
         se: combo.se ?? null,
+        // Under the freeze a change reaches this point only because an
+        // owner approval matched it, so the entry records that and names
+        // the approval that authorised it. Absent when COMBO_AUTOAPPLY
+        // is true, which is not how this ships.
+        ...(approvedBy.has(key)
+          ? { ownerApproved: true, approvedBy: approvedBy.get(key) }
+          : {}),
         reason: `توليفة ${key}: ${prevTier ? `تغيّرت من tier ${prevTier}(×${oldMultiplier})` : "أول تصنيف"} إلى ${combo.tier}(×${newMultiplier}) بناءً على ${combo.n} صفقة حقيقية (WR ${combo.n ? Math.round(combo.wins / combo.n * 100) : 0}%, net $${combo.pnl}, متوسط ${combo.avgPnlPct ?? "—"}% ± ${combo.se ?? "—"}pp)`
       });
     }
@@ -2285,7 +2465,41 @@ async function runComboLearning(state, strategy) {
   for (const combo of changed) {
     await tg(buildComboTemplate(combo, overallAvgPnlPct));
   }
-  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, ${changed.length} change(s)${pastClose ? "" : " [catch-up run]"}.`);
+
+  // Held proposals. Announced once per (comboKey, proposedTier) and then
+  // at most every COMBO_RENOTIFY_MS while they stay held, so a combo
+  // parked above the threshold does not message every night.
+  //
+  // lastNotifiedAt is stamped ONLY after tg() returns a message id, so a
+  // Telegram failure retries on the next cycle instead of starting a
+  // silent 7-day wait. That is the safer direction: a duplicate message
+  // costs nothing, a swallowed approval request costs the owner a
+  // decision they never saw.
+  const pending = Array.isArray(strategy.pendingComboProposals) ? strategy.pendingComboProposals : [];
+  if (pending.length) {
+    const totalN = Object.values(combos).reduce((a, c) => a + (c.n || 0), 0);
+    let stamped = false;
+    for (const p of pending) {
+      const last = p.lastNotifiedAt ? Date.parse(p.lastNotifiedAt) : NaN;
+      const due = !Number.isFinite(last) || (Date.now() - last) >= COMBO_RENOTIFY_MS;
+      if (!due) continue;
+      const sharePct = totalN ? (p.n / totalN * 100) : null;
+      const msgId = await tg(buildComboProposalTemplate(p, strategy.params.tradeBudget, sharePct, overallAvgPnlPct));
+      if (msgId) { p.lastNotifiedAt = new Date().toISOString(); stamped = true; }
+    }
+    // Persist the new stamps. Wrapped because this runs after the day was
+    // already marked learned: a failure here may repeat a message
+    // tomorrow, which must not throw away the completed run.
+    if (stamped) {
+      try { saveStrategy(strategy); }
+      catch (e) { console.error("Could not persist proposal notify stamps:", e.message); }
+    }
+  }
+
+  console.log(`Combo learning: ${Object.keys(combos).length} combo(s) tracked, `
+    + `${changed.length} applied${approvedBy.size ? ` (${approvedBy.size} owner-approved)` : ""}, `
+    + `${pending.length} awaiting approval${COMBO_AUTOAPPLY ? " [AUTOAPPLY ON]" : ""}`
+    + `${pastClose ? "" : " [catch-up run]"}.`);
 }
 
 // ─── MAIN ───────────────────────────────────────────────────
