@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 2,
-    "max_open_positions": 34
+    "max_open_positions": 40
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -86,8 +86,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 123.90109890109888,
-    "lastReportedThreshold": 120
+    "peakPct": 143.9560439560439,
+    "lastReportedThreshold": 140
   },
   "QQQ": {
     "active": true,
@@ -137,8 +137,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 99.27745664739884,
-    "lastReportedThreshold": 90
+    "peakPct": 113.58381502890175,
+    "lastReportedThreshold": 110
   },
   "TSLA": {
     "active": true,
@@ -186,8 +186,8 @@
     "entryFilledAt": "2026-11-05T14:30:51.546Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 82.90796597061097,
-    "lastReportedThreshold": 80,
+    "peakPct": 93.81283836040218,
+    "lastReportedThreshold": 90,
     "ladder2": true,
     "trailPct": 8
   }
