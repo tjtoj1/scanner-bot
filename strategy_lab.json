@@ -220,7 +220,7 @@
     },
     {
       "date": "2026-11-05",
-      "appliedAt": "2026-11-05T23:40:00.000Z",
+      "appliedAt": "2026-11-05T22:58:52.000Z",
       "type": "correction",
       "comboKey": "PUT|position:near_low",
       "oldTier": "above_avg",
