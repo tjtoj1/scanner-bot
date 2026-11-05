@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 8,
-    "max_open_positions": 353
+    "max_open_positions": 359
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -114,7 +114,8 @@
     "stopPct": 12,
     "peakPct": 45.94155844155844,
     "ladder2": true,
-    "trailPct": 8
+    "trailPct": 8,
+    "nearStopWarned": true
   },
   "AMZN": {
     "active": true,
@@ -160,7 +161,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:29:36.325Z",
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 20,
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 15.167095115681253
@@ -213,7 +214,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 38.38235294117646,
-    "lastReportedThreshold": 30
+    "peakPct": 47.352941176470566,
+    "lastReportedThreshold": 40
   }
 }
