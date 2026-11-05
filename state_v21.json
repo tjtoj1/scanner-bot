@@ -1,6 +1,31 @@
 {
   "_lastDay": "2026-11-05",
-  "_dailyTrades": [],
+  "_dailyTrades": [
+    {
+      "day": "2026-11-05",
+      "symbol": "SPY",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-11-05",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-11-05",
+      "symbol": "IWM",
+      "signal": "PUT",
+      "pnl": 0
+    },
+    {
+      "day": "2026-11-05",
+      "symbol": "NVDA",
+      "signal": "PUT",
+      "pnl": 0
+    }
+  ],
   "range": {
     "SPY": {
       "day": "2026-11-05",
@@ -34,10 +59,112 @@
     }
   },
   "_cooldowns": {
-    "AMZN_PUT": "2026-10-27T14:48:47.689Z",
-    "IWM_PUT": "2026-11-04T15:16:28.463Z",
     "AMZN_CALL": "2026-11-04T15:20:20.718Z",
     "QQQ_CALL": "2026-11-04T15:22:55.439Z"
   },
-  "_dayStoppedAlerted": "2026-11-04"
+  "_dayStoppedAlerted": "2026-11-04",
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261105P00751000",
+    "strike": "751",
+    "entryPremium": 2.9299999999999997,
+    "qty": 1,
+    "entryTime": 1793891708760,
+    "level": 756.9,
+    "msgId": 7527,
+    "stopOrderId": "4d468b14-1e8b-4740-8020-3f0ee14e0bce",
+    "hardStopPrice": 1.9,
+    "entryStockPrice": 750.635,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 45.12,
+    "volumeRatio": 23.70089118025172,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 3,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T15:15:08.635Z"
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ261105P00662000",
+    "strike": "662",
+    "entryPremium": 3.8600000000000003,
+    "qty": 1,
+    "entryTime": 1793891710797,
+    "level": 670.9,
+    "msgId": 7528,
+    "stopOrderId": "73dfccf3-287f-4c21-80c9-0fc6b6eabfb7",
+    "hardStopPrice": 2.51,
+    "entryStockPrice": 662.425,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 43.13,
+    "volumeRatio": 18.287726014922413,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 3.83,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T15:15:10.667Z"
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM261105P00279000",
+    "strike": "279",
+    "entryPremium": 1.23,
+    "qty": 4,
+    "entryTime": 1793891712065,
+    "level": 281.465,
+    "msgId": 7529,
+    "stopOrderId": "5d1bd639-0d7a-4cca-b857-0efd4f1d8809",
+    "hardStopPrice": 0.8,
+    "entryStockPrice": 279.03499999999997,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 39.62,
+    "volumeRatio": 11.943866563745173,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 1.22,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T15:15:11.960Z"
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261106P00187500",
+    "strike": "187.5",
+    "entryPremium": 4.025,
+    "qty": 1,
+    "entryTime": 1793891715628,
+    "level": 191.51,
+    "msgId": 7530,
+    "stopOrderId": "d7701fe0-f776-49ac-8a66-9b8953d19227",
+    "hardStopPrice": 2.62,
+    "entryStockPrice": 185.975,
+    "vwapAtEntry": null,
+    "rsiAtEntry": 44.75,
+    "volumeRatio": 14.562918868445967,
+    "signalType": "breakout",
+    "tp1Stock": null,
+    "tp2Stock": null,
+    "tp3Stock": null,
+    "slStock": null,
+    "entryFillPrice": 4.05,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T15:15:15.330Z"
+  }
 }
