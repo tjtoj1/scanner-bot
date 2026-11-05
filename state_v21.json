@@ -73,7 +73,7 @@
     "entryTime": 1793891708760,
     "level": 756.9,
     "msgId": 7527,
-    "stopOrderId": "4d468b14-1e8b-4740-8020-3f0ee14e0bce",
+    "stopOrderId": "8206d5e1-c41d-4302-a72a-68bf0c3f27b6",
     "hardStopPrice": 1.9,
     "entryStockPrice": 750.635,
     "vwapAtEntry": null,
@@ -88,7 +88,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:08.635Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 22.52559726962458
   },
   "QQQ": {
     "active": true,
