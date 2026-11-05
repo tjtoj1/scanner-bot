@@ -80,9 +80,9 @@
       "pnl": 5383,
       "avgPnlPct": 5.62,
       "se": 2.19,
-      "tier": "above_avg",
+      "tier": "average",
       "previousTier": "average",
-      "sizeMultiplier": 1.5,
+      "sizeMultiplier": 1,
       "lastUpdated": "2026-11-05T21:00:39.176Z"
     },
     "PUT|position:mid": {
@@ -217,6 +217,18 @@
       "avgPnlPct": "5.62",
       "se": 2.19,
       "reason": "توليفة PUT|position:near_low: تغيّرت من tier average(×1) إلى above_avg(×1.5) بناءً على 355 صفقة حقيقية (WR 57%, net $5383, متوسط 5.62% ± 2.19pp)"
+    },
+    {
+      "date": "2026-11-05",
+      "appliedAt": "2026-11-05T22:58:52.000Z",
+      "type": "correction",
+      "comboKey": "PUT|position:near_low",
+      "oldTier": "above_avg",
+      "newTier": "average",
+      "oldMultiplier": 1.5,
+      "newMultiplier": 1,
+      "sampleSize": 355,
+      "reason": "Manual revert. The promotion was applied automatically at 2026-11-05T21:00:39Z without the approval the owner's standing condition requires, and inside the 60-trading-day freeze (2026-10-23 .. ~2027-01-20) that forbids sizing changes without approval. On the evidence it is also not supported: 87.3% of the combo's $5383 net comes from 2026-11-05 alone (36 of 355 trades, mean +39.21%); excluding that day the mean is 1.83% with a 90% lower bound of -0.55, which the learner's own rule scores as tier average. No parameter, threshold or exit rule was touched."
     }
   ]
 }
