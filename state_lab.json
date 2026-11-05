@@ -8,7 +8,8 @@
     "AMZN_CALL": 1793806725608,
     "SPY_CALL": 1793807577739,
     "QQQ_CALL": 1793807578120,
-    "TSLA_CALL": 1793809993915
+    "TSLA_CALL": 1793809993915,
+    "IWM_PUT": 1793893610516
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -20,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 8,
-    "max_open_positions": 207
+    "max_open_positions": 213
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -48,67 +49,14 @@
       "TSLA|14:45|G|",
       "TSLA|14:45|T|",
       "AMZN|14:45|G|",
-      "AMZN|14:45|T|"
+      "AMZN|14:45|T|",
+      "SPY|14:45|G|",
+      "SPY|14:45|T|"
     ]
   },
   "_sigPending": {
     "day": "2026-11-05",
-    "items": [
-      {
-        "symbol": "AMZN",
-        "optionSymbol": "AMZN261106P00260000",
-        "barTime": "2026-11-05T14:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 3.7750000000000004,
-        "queuedAt": "2026-11-05T15:15:33.476Z"
-      }
-    ]
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261105P00279000",
-    "strike": "279",
-    "entryPremium": 1.2850000000000001,
-    "qty": 2,
-    "entryTime": 1793891727936,
-    "msgId": 7533,
-    "stopOrderId": "bfeab190-b75f-476b-b92b-7291ab417193",
-    "hardStopPrice": 0.9,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 278.89,
-      "regime": "bearish",
-      "emaFast": 283.1792,
-      "emaSlow": 284.0079,
-      "breakoutHigh": 285.3423,
-      "breakoutLow": 281.465,
-      "volRatio": 11.94,
-      "lastClose": 280.4,
-      "lastVolume": 1796428,
-      "barTime": "2026-11-05T14:45:00Z",
-      "entryTimeUTC": "2026-11-05T15:15:27.936Z",
-      "vwapAtEntry": 282.1036,
-      "rsiAtEntry": 17.32,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.26,
-    "entryAsk": 1.31,
-    "entrySpreadPct": 3.891,
-    "entryFillPrice": 1.28,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T15:15:27.817Z"
+    "items": []
   },
   "TSLA": {
     "active": true,
@@ -199,5 +147,50 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:33.893Z"
+  },
+  "SPY": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "SPY261105P00751000",
+    "strike": "751",
+    "entryPremium": 2.7649999999999997,
+    "qty": 1,
+    "entryTime": 1793891812986,
+    "msgId": 7539,
+    "stopOrderId": "837e62fb-41a3-49dc-a96c-72f6b5e127f9",
+    "hardStopPrice": 1.94,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 751.105,
+      "regime": "bearish",
+      "emaFast": 762.7661,
+      "emaSlow": 765.1844,
+      "breakoutHigh": 768.5,
+      "breakoutLow": 756.9,
+      "volRatio": 23.7,
+      "lastClose": 754.13,
+      "lastVolume": 7167870,
+      "barTime": "2026-11-05T14:45:00Z",
+      "entryTimeUTC": "2026-11-05T15:16:52.986Z",
+      "vwapAtEntry": 757.7235,
+      "rsiAtEntry": 12.45,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 2.76,
+    "entryAsk": 2.77,
+    "entrySpreadPct": 0.362,
+    "entryFillPrice": 2.72,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T15:16:52.745Z"
   }
 }
