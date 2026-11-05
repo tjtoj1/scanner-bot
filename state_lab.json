@@ -20,7 +20,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 8,
-    "max_open_positions": 144
+    "max_open_positions": 150
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -187,7 +187,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 35.68773234200743,
-    "lastReportedThreshold": 30
+    "peakPct": 46.09665427509291,
+    "lastReportedThreshold": 40
   }
 }
