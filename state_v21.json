@@ -88,12 +88,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:08.635Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 29.86348122866894,
+    "peakPct": 52.38907849829353,
     "nearStopWarned": true
   },
   "QQQ": {
@@ -106,7 +106,7 @@
     "entryTime": 1793891710797,
     "level": 670.9,
     "msgId": 7528,
-    "stopOrderId": "73dfccf3-287f-4c21-80c9-0fc6b6eabfb7",
+    "stopOrderId": "95286ec9-9582-4add-9740-5dd57f67b58a",
     "hardStopPrice": 2.51,
     "entryStockPrice": 662.425,
     "vwapAtEntry": null,
@@ -121,7 +121,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:10.667Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 29.4041450777202
   },
   "IWM": {
     "active": true,
@@ -133,7 +138,7 @@
     "entryTime": 1793891712065,
     "level": 281.465,
     "msgId": 7529,
-    "stopOrderId": "5d1bd639-0d7a-4cca-b857-0efd4f1d8809",
+    "stopOrderId": "4f4e3e18-e711-461c-8285-407bc06b3ad7",
     "hardStopPrice": 0.8,
     "entryStockPrice": 279.03499999999997,
     "vwapAtEntry": null,
@@ -148,7 +153,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:11.960Z",
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": 20,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 24.39024390243903
   },
   "NVDA": {
     "active": true,
@@ -160,7 +170,7 @@
     "entryTime": 1793891715628,
     "level": 191.51,
     "msgId": 7530,
-    "stopOrderId": "d7701fe0-f776-49ac-8a66-9b8953d19227",
+    "stopOrderId": "11faee94-b9a1-4854-8c6e-3b434b9df95b",
     "hardStopPrice": 2.62,
     "entryStockPrice": 185.975,
     "vwapAtEntry": null,
@@ -174,6 +184,10 @@
     "entryFillPrice": 4.05,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T15:15:15.330Z"
+    "entryFilledAt": "2026-11-05T15:15:15.330Z",
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.900621118012412,
+    "lastReportedThreshold": 10
   }
 }
