@@ -88,12 +88,13 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:08.635Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 10,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 22.52559726962458
+    "peakPct": 22.52559726962458,
+    "nearStopWarned": true
   },
   "QQQ": {
     "active": true,
