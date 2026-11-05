@@ -23,7 +23,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 64,
-    "max_open_positions": 446
+    "max_open_positions": 452
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -126,7 +126,9 @@
     "entryFillPrice": 4.52,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T16:16:12.474Z"
+    "entryFilledAt": "2026-11-05T16:16:12.474Z",
+    "nearStopWarned": true,
+    "lastReportedThreshold": -20
   },
   "NVDA": {
     "active": true,
@@ -171,7 +173,8 @@
     "entryFillPrice": 3.95,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T16:16:13.774Z"
+    "entryFilledAt": "2026-11-05T16:16:13.774Z",
+    "lastReportedThreshold": -10
   },
   "TSLA": {
     "active": true,
@@ -216,6 +219,7 @@
     "entryFillPrice": 7.75,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T16:16:17.014Z"
+    "entryFilledAt": "2026-11-05T16:16:17.014Z",
+    "lastReportedThreshold": -10
   }
 }
