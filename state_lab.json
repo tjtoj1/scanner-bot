@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 5,
-    "max_open_positions": 79
+    "max_open_positions": 85
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -86,8 +86,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 381.3186813186813,
-    "lastReportedThreshold": 380,
+    "peakPct": 415.934065934066,
+    "lastReportedThreshold": 410,
     "nearStopWarned": true
   },
   "TSLA": {
@@ -136,8 +136,8 @@
     "entryFilledAt": "2026-11-05T14:30:51.546Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 230.00773395204953,
-    "lastReportedThreshold": 230,
+    "peakPct": 250.0386697602475,
+    "lastReportedThreshold": 250,
     "ladder2": true,
     "trailPct": 8
   },
@@ -185,11 +185,11 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T14:44:06.914Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 25.120192307692307
+    "peakPct": 51.802884615384606
   }
 }
