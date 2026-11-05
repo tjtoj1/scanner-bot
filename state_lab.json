@@ -19,8 +19,8 @@
   },
   "_sigCounts": {
     "day": "2026-11-05",
-    "no_signal": 17,
-    "max_open_positions": 391
+    "no_signal": 20,
+    "max_open_positions": 394
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -61,7 +61,9 @@
       "IWM|15:15|G|",
       "IWM|15:15|T|",
       "SPY|15:15|G|",
-      "SPY|15:15|T|"
+      "SPY|15:15|T|",
+      "AMZN|15:15|G|",
+      "AMZN|15:15|T|"
     ]
   },
   "_sigPending": {
@@ -111,7 +113,8 @@
     "entryFillPrice": 4.25,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T15:56:20.741Z"
+    "entryFilledAt": "2026-11-05T15:56:20.741Z",
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
@@ -156,6 +159,52 @@
     "entryFillPrice": 1.74,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T15:56:22.505Z"
+    "entryFilledAt": "2026-11-05T15:56:22.505Z",
+    "lastReportedThreshold": -10
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "AMZN261106P00255000",
+    "strike": "255",
+    "entryPremium": 4.01,
+    "qty": 1,
+    "entryTime": 1793894263276,
+    "msgId": 7626,
+    "stopOrderId": "d35672b0-2029-4df5-83d2-d4a92c7a972c",
+    "hardStopPrice": 2.81,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 254.70499999999998,
+      "regime": "bearish",
+      "emaFast": 264.6307,
+      "emaSlow": 267.0206,
+      "breakoutHigh": 273.23,
+      "breakoutLow": 259.17,
+      "volRatio": 4.55,
+      "lastClose": 256.16,
+      "lastVolume": 4289130,
+      "barTime": "2026-11-05T15:15:00Z",
+      "entryTimeUTC": "2026-11-05T15:57:43.276Z",
+      "vwapAtEntry": 263.9922,
+      "rsiAtEntry": 18.32,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 3.89,
+    "entryAsk": 4.13,
+    "entrySpreadPct": 5.985,
+    "entryFillPrice": 4.2,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T15:57:43.033Z"
   }
 }
