@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 8,
-    "max_open_positions": 317
+    "max_open_positions": 323
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -166,7 +166,7 @@
     "qty": 1,
     "entryTime": 1793892649051,
     "msgId": 7588,
-    "stopOrderId": "910b67b3-12d6-4106-91d2-a5fa03680c74",
+    "stopOrderId": "55b1813a-0ea3-43ed-91d6-ede0e02ee8d7",
     "hardStopPrice": 2.21,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -201,6 +201,9 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:30:48.715Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.689381933438987
   }
 }
