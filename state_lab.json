@@ -23,7 +23,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-05",
-    "no_signal": 96,
+    "no_signal": 104,
     "max_open_positions": 452
   },
   "_sigSeen": {
@@ -130,7 +130,8 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T16:16:13.774Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   },
   "TSLA": {
     "active": true,
@@ -176,6 +177,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T16:16:17.014Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   }
 }
