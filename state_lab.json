@@ -20,7 +20,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 20,
-    "max_open_positions": 424
+    "max_open_positions": 430
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -128,7 +128,7 @@
     "qty": 1,
     "entryTime": 1793894184654,
     "msgId": 7624,
-    "stopOrderId": "88c463e2-071c-4570-aa23-8ad47943280c",
+    "stopOrderId": "1f36bba4-f96b-4533-995b-03e33bbb8759",
     "hardStopPrice": 1.19,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -165,8 +165,10 @@
     "entryFilledAt": "2026-11-05T15:56:22.505Z",
     "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 23.893805309734503
+    "stopPct": 12,
+    "peakPct": 26.25368731563421,
+    "ladder2": true,
+    "trailPct": 8
   },
   "AMZN": {
     "active": true,
