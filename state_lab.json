@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 8,
-    "max_open_positions": 248
+    "max_open_positions": 254
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -69,7 +69,7 @@
     "qty": 1,
     "entryTime": 1793891731295,
     "msgId": 7534,
-    "stopOrderId": "9b0a6a86-e1bb-4d35-9152-f9230b9c6ab1",
+    "stopOrderId": "74af8eb3-f93c-476f-a346-a60e11e05b65",
     "hardStopPrice": 5.03,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -104,7 +104,10 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:29.161Z",
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 20,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 22.005571030640695
   },
   "SPY": {
     "active": true,
@@ -152,8 +155,8 @@
     "entryFilledAt": "2026-11-05T15:16:52.745Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 75.40687160940325,
-    "lastReportedThreshold": 70,
+    "peakPct": 107.41410488245933,
+    "lastReportedThreshold": 100,
     "ladder2": true,
     "trailPct": 8
   },
@@ -166,7 +169,7 @@
     "qty": 1,
     "entryTime": 1793892196134,
     "msgId": 7554,
-    "stopOrderId": "e8ab8952-ac5a-4182-a6eb-3b12342ca2c6",
+    "stopOrderId": "32082b25-287c-41f5-9d62-baa64cea5d9b",
     "hardStopPrice": 2.96,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -201,6 +204,11 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:23:14.084Z",
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 30,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 35.26627218934912
   }
 }
