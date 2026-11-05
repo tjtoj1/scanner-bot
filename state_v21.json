@@ -88,12 +88,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:08.635Z",
-    "lastReportedThreshold": 40,
+    "lastReportedThreshold": 50,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 52.38907849829353,
+    "peakPct": 59.21501706484643,
     "nearStopWarned": true
   },
   "QQQ": {
@@ -121,12 +121,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:10.667Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 29.4041450777202
+    "peakPct": 36.91709844559585
   },
   "IWM": {
     "active": true,
@@ -153,12 +153,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T15:15:11.960Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 10,
     "trailPct": 10,
-    "peakPct": 24.39024390243903
+    "peakPct": 30.48780487804878
   },
   "NVDA": {
     "active": true,
@@ -187,8 +187,8 @@
     "entryFilledAt": "2026-11-05T15:15:15.330Z",
     "ladder1": true,
     "stopPct": 10,
-    "peakPct": 20.62111801242236,
-    "lastReportedThreshold": 20,
+    "peakPct": 30.93167701863352,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "trailPct": 10
   }
