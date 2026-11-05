@@ -24,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-05",
-    "no_signal": 902,
+    "no_signal": 912,
     "max_open_positions": 452
   },
   "_sigSeen": {
@@ -90,56 +90,5 @@
   "_sigPending": {
     "day": "2026-11-05",
     "items": []
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261105P00271000",
-    "strike": "271",
-    "entryPremium": 1.005,
-    "qty": 2,
-    "entryTime": 1793901664941,
-    "msgId": 7680,
-    "stopOrderId": "2f716672-7e33-467d-b39e-28db30381b19",
-    "hardStopPrice": 0.7,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 271.15,
-      "regime": "bearish",
-      "emaFast": 274.73,
-      "emaSlow": 277.9446,
-      "breakoutHigh": 280.87,
-      "breakoutLow": 272.36,
-      "volRatio": 1.45,
-      "lastClose": 271.82,
-      "lastVolume": 1876951,
-      "barTime": "2026-11-05T17:30:00Z",
-      "entryTimeUTC": "2026-11-05T18:01:04.942Z",
-      "vwapAtEntry": 276.8,
-      "rsiAtEntry": 9.15,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1,
-    "entryAsk": 1.01,
-    "entrySpreadPct": 0.995,
-    "entryFillPrice": 1,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T18:01:04.642Z",
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 29.353233830845788
   }
 }
