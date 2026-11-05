@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 5,
-    "max_open_positions": 61
+    "max_open_positions": 67
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -86,8 +86,8 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 268.9560439560439,
-    "lastReportedThreshold": 260,
+    "peakPct": 299.1758241758242,
+    "lastReportedThreshold": 290,
     "nearStopWarned": true
   },
   "TSLA": {
@@ -136,9 +136,54 @@
     "entryFilledAt": "2026-11-05T14:30:51.546Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 178.65429234338748,
-    "lastReportedThreshold": 170,
+    "peakPct": 186.23356535189487,
+    "lastReportedThreshold": 180,
     "ladder2": true,
     "trailPct": 8
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ261105P00673000",
+    "strike": "673",
+    "entryPremium": 4.16,
+    "qty": 1,
+    "entryTime": 1793889847269,
+    "msgId": 7469,
+    "stopOrderId": "46804840-f33c-4ba7-9316-ff6c32619c99",
+    "hardStopPrice": 2.91,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 672.54,
+      "regime": "bearish",
+      "emaFast": 686.1627,
+      "emaSlow": 687.4618,
+      "breakoutHigh": 691.432,
+      "breakoutLow": 685.11,
+      "volRatio": 2.28,
+      "lastClose": 684.02,
+      "lastVolume": 166447,
+      "barTime": "2026-11-05T14:00:00Z",
+      "entryTimeUTC": "2026-11-05T14:44:07.269Z",
+      "vwapAtEntry": 686.6581,
+      "rsiAtEntry": 31.16,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 4.09,
+    "entryAsk": 4.23,
+    "entrySpreadPct": 3.365,
+    "entryFillPrice": 4.21,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-05T14:44:06.914Z"
   }
 }
