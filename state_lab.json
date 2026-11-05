@@ -9,7 +9,8 @@
     "SPY_CALL": 1793807577739,
     "QQQ_CALL": 1793807578120,
     "TSLA_CALL": 1793809993915,
-    "SPY_PUT": 1793896738825
+    "SPY_PUT": 1793896738825,
+    "AMZN_PUT": 1793897007378
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -20,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-05",
-    "no_signal": 44,
+    "no_signal": 54,
     "max_open_positions": 436
   },
   "_sigSeen": {
@@ -73,53 +74,6 @@
     "day": "2026-11-05",
     "items": []
   },
-  "AMZN": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "AMZN261106P00255000",
-    "strike": "255",
-    "entryPremium": 4.01,
-    "qty": 1,
-    "entryTime": 1793894263276,
-    "msgId": 7626,
-    "stopOrderId": "d35672b0-2029-4df5-83d2-d4a92c7a972c",
-    "hardStopPrice": 2.81,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 254.70499999999998,
-      "regime": "bearish",
-      "emaFast": 264.6307,
-      "emaSlow": 267.0206,
-      "breakoutHigh": 273.23,
-      "breakoutLow": 259.17,
-      "volRatio": 4.55,
-      "lastClose": 256.16,
-      "lastVolume": 4289130,
-      "barTime": "2026-11-05T15:15:00Z",
-      "entryTimeUTC": "2026-11-05T15:57:43.276Z",
-      "vwapAtEntry": 263.9922,
-      "rsiAtEntry": 18.32,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 3.89,
-    "entryAsk": 4.13,
-    "entrySpreadPct": 5.985,
-    "entryFillPrice": 4.2,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T15:57:43.033Z",
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
-  },
   "IWM": {
     "active": true,
     "signal": "PUT",
@@ -163,6 +117,7 @@
     "entryFillPrice": 1.32,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-05T16:10:37.898Z"
+    "entryFilledAt": "2026-11-05T16:10:37.898Z",
+    "lastReportedThreshold": -10
   }
 }
