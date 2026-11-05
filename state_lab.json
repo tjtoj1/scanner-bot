@@ -21,7 +21,7 @@
   "_sigCounts": {
     "day": "2026-11-05",
     "no_signal": 5,
-    "max_open_positions": 85
+    "max_open_positions": 91
   },
   "_sigSeen": {
     "day": "2026-11-05",
@@ -136,7 +136,7 @@
     "entryFilledAt": "2026-11-05T14:30:51.546Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 250.0386697602475,
+    "peakPct": 250.3480278422274,
     "lastReportedThreshold": 250,
     "ladder2": true,
     "trailPct": 8
@@ -185,7 +185,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-05T14:44:06.914Z",
-    "lastReportedThreshold": 50,
+    "lastReportedThreshold": 40,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
