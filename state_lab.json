@@ -23,7 +23,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-06",
-    "no_signal": 248
+    "no_signal": 254
   },
   "_sigSeen": {
     "day": "2026-11-06",
@@ -86,7 +86,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-06T15:00:34.897Z",
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
@@ -132,6 +132,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-06T15:00:36.616Z",
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -10
   }
 }
