@@ -23,7 +23,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-06",
-    "no_signal": 236
+    "no_signal": 242
   },
   "_sigSeen": {
     "day": "2026-11-06",
@@ -85,7 +85,8 @@
     "entryFillPrice": 3.04,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-06T15:00:34.897Z"
+    "entryFilledAt": "2026-11-06T15:00:34.897Z",
+    "lastReportedThreshold": -10
   },
   "QQQ": {
     "active": true,
@@ -130,6 +131,7 @@
     "entryFillPrice": 4.31,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-06T15:00:36.616Z"
+    "entryFilledAt": "2026-11-06T15:00:36.616Z",
+    "lastReportedThreshold": -10
   }
 }
