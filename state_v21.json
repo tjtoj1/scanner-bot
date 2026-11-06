@@ -89,7 +89,8 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-06T15:15:37.997Z",
-    "lastReportedThreshold": -20
+    "lastReportedThreshold": -30,
+    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
