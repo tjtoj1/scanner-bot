@@ -5,7 +5,6 @@
   "_cooldowns": {
     "IWM_CALL": 1793806423416,
     "AMZN_CALL": 1793806725608,
-    "TSLA_CALL": 1793809993915,
     "SPY_PUT": 1793896738825,
     "AMZN_PUT": 1793897007378,
     "QQQ_PUT": 1793897399214,
@@ -25,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-06",
-    "no_signal": 296
+    "no_signal": 302
   },
   "_sigSeen": {
     "day": "2026-11-06",
@@ -39,11 +38,60 @@
       "QQQ|14:30|T|",
       "NVDA|14:30|S|cooldown",
       "SPY|14:30|S|cooldown",
-      "QQQ|14:30|S|cooldown"
+      "QQQ|14:30|S|cooldown",
+      "SPY|14:45|S|cooldown",
+      "QQQ|14:45|S|cooldown",
+      "TSLA|14:45|G|",
+      "TSLA|14:45|T|"
     ]
   },
   "_sigPending": {
     "day": "2026-11-06",
     "items": []
+  },
+  "TSLA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "TSLA261106C00360000",
+    "strike": "360",
+    "entryPremium": 3.92,
+    "qty": 1,
+    "entryTime": 1793978145222,
+    "msgId": 7713,
+    "stopOrderId": "6ade5e7b-51af-4da4-93c4-99a9d38c0606",
+    "hardStopPrice": 2.74,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 358.5,
+      "regime": "bullish",
+      "emaFast": 351.8654,
+      "emaSlow": 350.247,
+      "breakoutHigh": 354.8,
+      "breakoutLow": 347.4,
+      "volRatio": 10.95,
+      "lastClose": 356.495,
+      "lastVolume": 2695764,
+      "barTime": "2026-11-06T14:45:00Z",
+      "entryTimeUTC": "2026-11-06T15:15:45.222Z",
+      "vwapAtEntry": 352.323,
+      "rsiAtEntry": 64.81,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 4,
+    "entryAsk": 4.01,
+    "entrySpreadPct": 0.25,
+    "entryFillPrice": 4.05,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-06T15:15:45.033Z"
   }
 }
