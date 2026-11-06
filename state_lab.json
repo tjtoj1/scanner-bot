@@ -3,7 +3,6 @@
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-11-05",
   "_cooldowns": {
-    "IWM_CALL": 1793806423416,
     "AMZN_CALL": 1793806725608,
     "SPY_PUT": 1793896738825,
     "AMZN_PUT": 1793897007378,
@@ -24,7 +23,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-06",
-    "no_signal": 362
+    "no_signal": 370
   },
   "_sigSeen": {
     "day": "2026-11-06",
@@ -42,7 +41,9 @@
       "SPY|14:45|S|cooldown",
       "QQQ|14:45|S|cooldown",
       "TSLA|14:45|G|",
-      "TSLA|14:45|T|"
+      "TSLA|14:45|T|",
+      "IWM|15:00|G|",
+      "IWM|15:00|T|"
     ]
   },
   "_sigPending": {
@@ -93,6 +94,51 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-06T15:15:45.033Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM261106C00272500",
+    "strike": "272.5",
+    "entryPremium": 1.0750000000000002,
+    "qty": 2,
+    "entryTime": 1793979027699,
+    "msgId": 7722,
+    "stopOrderId": "d2d616c3-b318-410d-824d-38a69c17b698",
+    "hardStopPrice": 0.75,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 272.46500000000003,
+      "regime": "bullish",
+      "emaFast": 272.154,
+      "emaSlow": 271.8195,
+      "breakoutHigh": 272.76,
+      "breakoutLow": 270.23,
+      "volRatio": 8.56,
+      "lastClose": 273.28,
+      "lastVolume": 1720182,
+      "barTime": "2026-11-06T15:00:00Z",
+      "entryTimeUTC": "2026-11-06T15:30:27.699Z",
+      "vwapAtEntry": 271.9982,
+      "rsiAtEntry": 66.38,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 1.07,
+    "entryAsk": 1.08,
+    "entrySpreadPct": 0.93,
+    "entryFillPrice": 1.1,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-06T15:30:27.121Z"
   }
 }
