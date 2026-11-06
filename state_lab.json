@@ -26,7 +26,8 @@
   "_sigCounts": {
     "day": "2026-11-06",
     "no_signal": 745,
-    "day_stopped": 2646
+    "day_stopped": 2646,
+    "past_last_entry": 6
   },
   "_sigSeen": {
     "day": "2026-11-06",
