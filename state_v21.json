@@ -89,7 +89,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-06T15:15:37.997Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -115,6 +115,7 @@
     "entryFillPrice": 1.15,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-06T15:30:17.296Z"
+    "entryFilledAt": "2026-11-06T15:30:17.296Z",
+    "lastReportedThreshold": -10
   }
 }
