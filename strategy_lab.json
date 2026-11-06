@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-05T21:00:39.174Z"
+      "lastUpdated": "2026-11-06T21:00:37.282Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-05T21:00:39.175Z"
+      "lastUpdated": "2026-11-06T21:00:37.283Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 280,
-      "wins": 147,
-      "pnl": 364,
-      "avgPnlPct": -0.16,
-      "se": 1.96,
+      "n": 287,
+      "wins": 148,
+      "pnl": -49,
+      "avgPnlPct": -0.63,
+      "se": 1.93,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-05T21:00:39.175Z"
+      "lastUpdated": "2026-11-06T21:00:37.283Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -83,7 +83,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-05T21:00:39.176Z"
+      "lastUpdated": "2026-11-06T21:00:37.283Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-05T21:00:39.176Z"
+      "lastUpdated": "2026-11-06T21:00:37.283Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-05T21:00:39.176Z"
+      "lastUpdated": "2026-11-06T21:00:37.283Z"
     }
   },
   "changelog": [
@@ -229,6 +229,23 @@
       "newMultiplier": 1,
       "sampleSize": 355,
       "reason": "Manual revert. The promotion was applied automatically at 2026-11-05T21:00:39Z without the approval the owner's standing condition requires, and inside the 60-trading-day freeze (2026-10-23 .. ~2027-01-20) that forbids sizing changes without approval. On the evidence it is also not supported: 87.3% of the combo's $5383 net comes from 2026-11-05 alone (36 of 355 trades, mean +39.21%); excluding that day the mean is 1.83% with a 90% lower bound of -0.55, which the learner's own rule scores as tier average. No parameter, threshold or exit rule was touched."
+    }
+  ],
+  "pendingComboProposals": [
+    {
+      "comboKey": "PUT|position:near_low",
+      "currentTier": "average",
+      "currentMultiplier": 1,
+      "proposedTier": "above_avg",
+      "proposedMultiplier": 1.5,
+      "n": 355,
+      "wins": 203,
+      "avgPnlPct": 5.62,
+      "se": 2.19,
+      "netPnl": 5383,
+      "firstProposedAt": "2026-11-06T21:00:37.284Z",
+      "lastNotifiedAt": "2026-11-06T21:00:37.360Z",
+      "status": "awaiting_approval"
     }
   ]
 }
