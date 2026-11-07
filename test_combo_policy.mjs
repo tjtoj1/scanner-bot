@@ -400,8 +400,29 @@ console.log("\n── 12) scope ──");
     lf(fs.readFileSync("runner.js", "utf8")) === showAt(BASE_SHA, "runner.js"), "changed", "identical");
   check("combo_approvals.json is NOT in STATE_FILES",
     !/combo_approvals/.test(lf(fs.readFileSync("runner.js", "utf8"))), "present", "absent");
-  check("scan_v21.js byte-identical",
-    lf(fs.readFileSync("scan_v21.js", "utf8")) === showAt(BASE_SHA, "scan_v21.js"), "changed", "identical");
+  // scan_v21.js is no longer byte-identical to this suite's base: the
+  // equity-drawdown guard, a later and unrelated change, legitimately
+  // edits it. The pin is NARROWED rather than deleted to the invariant it
+  // was actually protecting — that the combo learner is LAB-only and no
+  // part of it leaked into v21. Byte-identity was only ever a proxy for
+  // that, and it would now fail for every future v21 change regardless of
+  // whether any combo machinery appeared.
+  {
+    // Code lines only: scan_v21.js NAMES tuningBucket/combos in a comment
+    // explaining what the day-level effectivePnl switch did NOT change,
+    // and a substring search over the whole file reads that prose as a
+    // leak. The invariant is about machinery, not about mentions.
+    const v21 = lf(fs.readFileSync("scan_v21.js", "utf8"))
+      .split("\n").filter(l => !l.trim().startsWith("//")).join("\n");
+    const combo = ["computeCombos", "lookupComboMultiplier", "COMBO_SIZE_MULTIPLIER",
+                   "COMBO_AUTOAPPLY", "COMBO_APPROVALS_FILE", "pendingComboProposals",
+                   "tuningBucket", "positionBucket", "combo_approvals"];
+    const leaked = combo.filter(k => v21.includes(k));
+    check("scan_v21.js carries no combo-learner machinery (LAB-only)",
+      leaked.length === 0, leaked, []);
+    check("scan_v21.js has no sizeMultiplier concept at all",
+      !/sizeMultiplier/.test(v21), "present", "absent");
+  }
   check("scan_wvad.js byte-identical",
     lf(fs.readFileSync("scan_wvad.js", "utf8")) === showAt(BASE_SHA, "scan_wvad.js"), "changed", "identical");
   check("daily_report.js byte-identical",

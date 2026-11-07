@@ -356,7 +356,229 @@ function bumpDayPeak(candidate) {
     return cur.peakTotal;
   }
 }
-function saveState(s) { fs.writeFileSync("state_v21.json", JSON.stringify(s,null,2)); }
+// _equityGuard is the one field two children can both own: the scan child
+// can latch a halt while the monitor child is holding a state object it
+// read BEFORE that happened, and a wholesale write of the stale object
+// would erase the halt. So every save merges the guard from whatever is
+// currently on disk. The merge is conflict-free (the peak is a maximum,
+// the halt is one-way), so no ordering of the two children can lose a
+// halt — which is stronger than amending in the guard's own path alone,
+// because monitorPosition saves through here without knowing the guard
+// exists. Everything else in the state object is written as given.
+function saveState(s) {
+  let out = s;
+  try {
+    const onDisk = JSON.parse(fs.readFileSync("state_v21.json", "utf8"));
+    if (onDisk?._equityGuard || s?._equityGuard) {
+      out = { ...s, _equityGuard: mergeEquityGuard(onDisk?._equityGuard, s?._equityGuard) };
+    }
+  } catch { /* unreadable or absent: nothing on disk to preserve */ }
+  fs.writeFileSync("state_v21.json", JSON.stringify(out,null,2));
+}
+
+// ═══ EQUITY DRAWDOWN GUARD ═══════════════════════════════════════════
+//
+// THE RULE. If account equity falls 15% below the highest equity this bot
+// has seen since the guard started, NEW ENTRIES STOP. Open positions are
+// never force-closed. Signal logging continues. The halt is sticky and
+// resumes ONLY through the owner-edited resume file — never on its own,
+// however far equity recovers.
+//
+// THE REFERENCE PEAK starts at whatever equity the first cycle reads
+// (owner's decision: no historical seeding, no temporary service). So the
+// guard is armed from the first cycle and cannot halt on day one unless
+// equity drops 15% within the session.
+//
+// LOST UPDATES ARE THE REAL HAZARD HERE. The scan child and the monitor
+// child both rewrite state_v21.json WHOLESALE via saveState(), so a guard
+// field mutated only in memory is erased by whichever child saves last —
+// exactly the bug that made the entry-fill amend write to a stale object.
+// Every guard write therefore goes through amendEquityGuard(): re-read the
+// file, MERGE, apply, save, and copy the result back into the caller's
+// object so the caller's own later saveState() carries it too.
+//
+// The merge is conflict-free by construction: the peak is a maximum and
+// the halt is one-way. Two children racing converge on the same value
+// whatever order they land in.
+//
+// A residual window remains — child A can read before child B saves — so
+// a halt could in principle be erased. It is self-healing: the condition
+// that latched it (equity below peak) still holds on the next cycle, so
+// the next cycle re-latches. The only loss is the alertedAt stamp, which
+// costs one duplicate Telegram message, not a missed halt.
+const EQUITY_DRAWDOWN_HALT = 0.15;                  // 15% below the peak
+const EQUITY_BOT_ID        = "v21";
+const EQUITY_RESUME_FILE   = "equity_guard_resume.json";
+
+// Merge of two views of the guard.
+//
+// `rev` is a revision counter bumped by every amendEquityGuard write. A
+// STRICTLY NEWER rev is newer knowledge and wins outright. Without that,
+// the merge below is purely monotonic — peak only up, halt one-way — and
+// an owner resume could never clear a halt or lower the peak, because the
+// stale copy on disk would resurrect both. The rev is what makes "undo"
+// expressible while still never losing a concurrent halt.
+//
+// At the SAME rev the two views are two children acting on the same base,
+// so the conflict-free rules apply and the result is order-independent.
+function mergeEquityGuard(a = {}, b = {}) {
+  const ra = Number.isFinite(a.rev) ? a.rev : -1;
+  const rb = Number.isFinite(b.rev) ? b.rev : -1;
+  if (ra !== rb) return { ...(ra > rb ? a : b) };
+
+  const out = {};
+  if (ra >= 0) out.rev = ra;
+  const pa = Number.isFinite(a.peak) ? a.peak : -Infinity;
+  const pb = Number.isFinite(b.peak) ? b.peak : -Infinity;
+  const peak = Math.max(pa, pb);
+  if (Number.isFinite(peak)) {
+    out.peak = peak;
+    out.peakAt = (pa === peak ? a.peakAt : b.peakAt) ?? a.peakAt ?? b.peakAt ?? null;
+  }
+  // A halt recorded by EITHER child survives, and the earlier one wins so
+  // haltedAt (which the resume file must match) never moves under us.
+  if (a.halt && b.halt) {
+    out.halt = (Date.parse(a.halt.haltedAt) <= Date.parse(b.halt.haltedAt)) ? a.halt : b.halt;
+    // An alert sent by either child counts as sent.
+    out.halt = { ...out.halt, alertedAt: a.halt.alertedAt ?? b.halt.alertedAt ?? null };
+  } else if (a.halt || b.halt) {
+    out.halt = a.halt || b.halt;
+  }
+  if (a.resumedAt || b.resumedAt) out.resumedAt = a.resumedAt || b.resumedAt;
+  return out;
+}
+
+// Fresh-file read-modify-write. `mutate` must be idempotent: it is applied
+// to the merged view and may run again on a later cycle.
+function amendEquityGuard(state, mutate) {
+  let merged;
+  try {
+    const fresh = loadState();
+    merged = mergeEquityGuard(fresh._equityGuard, state._equityGuard);
+    const baseRev = Number.isFinite(merged.rev) ? merged.rev : 0;
+    mutate(merged);
+    merged.rev = baseRev + 1;          // newer knowledge than either input
+    fresh._equityGuard = merged;
+    saveState(fresh);
+  } catch (e) {
+    // A failed persist must not take the in-memory decision with it: the
+    // caller still gets a correct guard and its own saveState may land.
+    console.error("equity guard: could not persist to the fresh state file:", e.message);
+    merged = mergeEquityGuard(state._equityGuard, {});
+    try { mutate(merged); } catch {}
+  }
+  state._equityGuard = merged;
+  return merged;
+}
+
+// Owner-edited resume entries. Missing, unreadable or malformed ⇒ none,
+// so nothing resumes by accident. Never written by this process.
+function loadEquityResume() {
+  try {
+    const j = JSON.parse(fs.readFileSync(EQUITY_RESUME_FILE, "utf8"));
+    if (!j || !Array.isArray(j.resume)) return [];
+    return j.resume.filter(r =>
+      r && typeof r === "object" && !Array.isArray(r)
+      && r.bot === EQUITY_BOT_ID
+      && typeof r.clearHaltedAt === "string" && r.clearHaltedAt.length > 0
+      && Number.isFinite(r.resetPeakTo) && r.resetPeakTo > 0
+      && typeof r.expires === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.expires)
+    );
+  } catch { return []; }
+}
+
+// The entry that authorises resuming THIS halt, or null. clearHaltedAt
+// must equal the haltedAt currently held, so a stale file cannot clear a
+// future halt. `expires` is inclusive, compared as a UTC date string.
+function equityResumeFor(halt, todayUtc) {
+  if (!halt?.haltedAt) return null;
+  for (const r of loadEquityResume()) {
+    if (r.clearHaltedAt !== halt.haltedAt) continue;
+    if (r.expires < todayUtc) continue;
+    return r;
+  }
+  return null;
+}
+
+// Called ONCE PER CHILD from main(), in both modes, before any entry is
+// attempted. Returns { halted, unknown, peak }.
+async function updateEquityGuard(state, equityNow) {
+  const today = getToday();
+  const held = state._equityGuard?.halt
+    || (() => { try { return loadState()._equityGuard?.halt; } catch { return null; } })();
+
+  // 1. A halt in force. The only way out is an owner resume entry.
+  if (held) {
+    const r = equityResumeFor(held, today);
+    if (!r) {
+      console.log(`[v21 equity] HALTED since ${held.haltedAt} `
+        + `(equity $${held.equityAtHalt} vs peak $${held.peakAtHalt}, ${held.pctFromPeak}%) — new entries blocked`);
+      return { halted: true, unknown: false, peak: state._equityGuard?.peak ?? held.peakAtHalt };
+    }
+    const g = amendEquityGuard(state, guard => {
+      delete guard.halt;
+      guard.peak = r.resetPeakTo;                 // mandatory: without it the next cycle re-halts
+      guard.peakAt = new Date().toISOString();
+      guard.resumedAt = new Date().toISOString();
+    });
+    console.log(`[v21 equity] RESUMED by owner (cleared ${r.clearHaltedAt}, peak reset to $${r.resetPeakTo})`);
+    await tg(`▶️ <b>استئناف الدخول</b>\nأُلغي الإيقاف بقرارك (${r.clearHaltedAt})\nالقمة المرجعية الجديدة: $${r.resetPeakTo.toFixed(0)}`);
+    return { halted: false, unknown: false, peak: g.peak };
+  }
+
+  // 2. Unknown equity. alpaca() does not check res.ok, so an error body
+  // arrives as a normal object with no `equity` field and parseFloat gives
+  // NaN. That is "I do not know", not "I am down 15%": refuse entries for
+  // this cycle only, never latch, never touch the peak.
+  if (!Number.isFinite(equityNow) || equityNow <= 0) {
+    console.log(`[v21 equity] equity unknown this cycle — new entries blocked for this cycle only, peak untouched`);
+    return { halted: false, unknown: true, peak: state._equityGuard?.peak ?? null };
+  }
+
+  // 3. Peak, monotonic. Seeded from the first reading we ever get.
+  const g = amendEquityGuard(state, guard => {
+    if (!Number.isFinite(guard.peak) || equityNow > guard.peak) {
+      guard.peak = equityNow;
+      guard.peakAt = new Date().toISOString();
+    }
+  });
+
+  // 4. The threshold. `<=` so exactly 15% down halts.
+  const trigger = g.peak * (1 - EQUITY_DRAWDOWN_HALT);
+  const pct = +((equityNow / g.peak - 1) * 100).toFixed(1);
+  if (equityNow <= trigger) {
+    const latched = amendEquityGuard(state, guard => {
+      if (guard.halt) return;                     // keep the first halt and its alert stamp
+      guard.halt = {
+        haltedAt: new Date().toISOString(),
+        equityAtHalt: +equityNow.toFixed(2),
+        peakAtHalt: +g.peak.toFixed(2),
+        pctFromPeak: pct,
+        alertedAt: null,
+      };
+    });
+    console.log(`[v21 equity] HALT LATCHED: equity $${equityNow.toFixed(0)} <= `
+      + `$${trigger.toFixed(0)} (peak $${g.peak.toFixed(0)}, ${pct}%) — new entries stop, positions untouched`);
+    if (!latched.halt.alertedAt) {
+      const msgId = await tg(`تم إيقاف الدخول الجديد 🛑\n`
+        + `حقوق الملكية: <b>$${equityNow.toFixed(0)}</b>\n`
+        + `أعلى قمة مرجعية: <b>$${g.peak.toFixed(0)}</b>\n`
+        + `الهبوط: <b>${pct}%</b> (الحد ${-(EQUITY_DRAWDOWN_HALT * 100).toFixed(0)}%)\n`
+        + `المراكز المفتوحة لم تُغلق، وتسجيل الإشارات مستمر.\n`
+        + `لا استئناف تلقائي — يتطلب قرارك في ${EQUITY_RESUME_FILE}.`);
+      // Stamped only on a confirmed send, so a Telegram outage retries
+      // next cycle instead of silently swallowing the one alert.
+      if (msgId) amendEquityGuard(state, guard => {
+        if (guard.halt && !guard.halt.alertedAt) guard.halt.alertedAt = new Date().toISOString();
+      });
+    }
+    return { halted: true, unknown: false, peak: g.peak };
+  }
+
+  console.log(`[v21 equity] equity $${equityNow.toFixed(0)} vs peak $${g.peak.toFixed(0)} (${pct}%), `
+    + `halt at $${trigger.toFixed(0)}`);
+  return { halted: false, unknown: false, peak: g.peak };
+}
 
 async function tg(text, replyTo=null) {
   try {
@@ -1294,6 +1516,21 @@ async function scanEntry(state, symbol, portfolio, liveInAlpaca, dayCtx) {
     return;
   }
 
+  // ── EQUITY DRAWDOWN GUARD — the gate ──
+  // v21 has no signal shadow log, so there is nothing to keep logging and
+  // the cheapest placement is the right one: before checkBreakout(), so a
+  // halted v21 costs no bars fetch per ticker per cycle.
+  //
+  // Read-only. The peak and the latch were decided once in main().
+  if (dayCtx?.equityHalted) {
+    console.log(`${symbol}: equity halt in force — no new entries until resumed by the owner`);
+    return;
+  }
+  if (dayCtx?.equityUnknown) {
+    console.log(`${symbol}: account equity unknown this cycle — skipping entry (fail closed)`);
+    return;
+  }
+
   // ─── COOLDOWN CHECK (prevent re-entry chains) ───────────────
   // Compute signal first to check cooldown for this symbol×signal
   const breakout = await checkBreakout(state, symbol);
@@ -1702,11 +1939,30 @@ ${slLine}`);
 
   // Get portfolio value
   let portfolio = 5000;
+  // ── EQUITY DRAWDOWN GUARD ──
+  // Equity rides along on the /account call this function ALREADY makes,
+  // so the guard adds ZERO requests to v21. `equity` and not
+  // `portfolio_value`: they are equal on a paper options account, but
+  // `equity` is the field the rule names, and portfolio_value is kept
+  // exactly as it was for the daily-target logic that depends on it.
+  // NaN stays NaN — never defaulted to a number, because a default would
+  // be indistinguishable from a real reading.
+  let equityNow = NaN;
   try {
     const acctInfo = await alpaca("/account");
     portfolio = parseFloat(acctInfo.portfolio_value) || 5000;
+    equityNow = parseFloat(acctInfo?.equity);
     console.log(`Account: $${portfolio.toFixed(0)}`);
   } catch(e) { console.error("Account fetch failed:", e.message); }
+
+  // Peak bumped and halt evaluated once per child, in both modes, before
+  // any entry is attempted. dayCtx is assigned to rather than extended in
+  // its literal, which sits inside a region test_daily_stop pins
+  // byte-identical.
+  const equityGuard = await updateEquityGuard(state, equityNow);
+  dayCtx.equityNow = equityNow;
+  dayCtx.equityHalted = equityGuard.halted;
+  dayCtx.equityUnknown = equityGuard.unknown;
 
   // Daily loss breaker — one-time alert, so a breached day is visible
   // immediately rather than inferred from a silent absence of entries.
