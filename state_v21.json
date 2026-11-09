@@ -64,7 +64,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 104,
+    "rev": 106,
     "peak": 4263.12,
     "peakAt": "2026-11-09T14:30:12.696Z"
   },
@@ -93,35 +93,5 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-09T15:15:20.223Z"
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261109C00675000",
-    "strike": "675",
-    "entryPremium": 2.125,
-    "qty": 2,
-    "entryTime": 1794237323735,
-    "level": 670.64,
-    "msgId": 7783,
-    "stopOrderId": "e16ebaea-b2e8-4d94-ab49-bb863b6b86dc",
-    "hardStopPrice": 1.38,
-    "entryStockPrice": 674.515,
-    "vwapAtEntry": 667.1657,
-    "rsiAtEntry": 86.15,
-    "volumeRatio": 11.339432211184532,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 2.165,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:15:21.703Z",
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 14.11764705882352
   }
 }

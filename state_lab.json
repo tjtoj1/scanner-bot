@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 228,
+    "no_signal": 234,
     "max_open_positions": 158
   },
   "_sigSeen": {
@@ -44,7 +44,8 @@
       "TSLA|14:45|G|",
       "TSLA|14:45|T|",
       "QQQ|14:45|G|",
-      "QQQ|14:45|T|"
+      "QQQ|14:45|T|",
+      "IWM|15:00|G|"
     ]
   },
   "_sigPending": {
@@ -53,7 +54,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 104,
+    "rev": 106,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   },
@@ -147,60 +148,9 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-09T15:24:05.467Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 10,
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 21.604938271604958
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261109C00377500",
-    "strike": "377.5",
-    "entryPremium": 2.6799999999999997,
-    "qty": 1,
-    "entryTime": 1794238135554,
-    "msgId": 7811,
-    "stopOrderId": "38829e19-5f37-404b-945e-25fe9d7762da",
-    "hardStopPrice": 1.88,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 377.88,
-      "regime": "bullish",
-      "emaFast": 366.0597,
-      "emaSlow": 362.6803,
-      "breakoutHigh": 376.29,
-      "breakoutLow": 357.58,
-      "volRatio": 10.33,
-      "lastClose": 377.51,
-      "lastVolume": 2491802,
-      "barTime": "2026-11-09T14:45:00Z",
-      "entryTimeUTC": "2026-11-09T15:28:55.555Z",
-      "vwapAtEntry": 371.7228,
-      "rsiAtEntry": 85.63,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 2.65,
-    "entryAsk": 2.71,
-    "entrySpreadPct": 2.239,
-    "entryFillPrice": 2.74,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:28:55.388Z",
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 30.597014925373152,
-    "lastReportedThreshold": 30
   }
 }
