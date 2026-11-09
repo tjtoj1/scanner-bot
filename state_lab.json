@@ -13,7 +13,8 @@
     "QQQ_CALL": 1793979435696,
     "TSLA_CALL": 1793980912285,
     "IWM_CALL": 1793981313391,
-    "AMZN_CALL": 1794237444778
+    "AMZN_CALL": 1794237444778,
+    "NVDA_PUT": 1794237592453
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -24,7 +25,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 154
+    "no_signal": 162
   },
   "_sigSeen": {
     "day": "2026-11-09",
@@ -33,7 +34,8 @@
       "AMZN|14:00|T|",
       "NVDA|14:15|G|",
       "NVDA|14:15|T|",
-      "AMZN|14:15|S|cooldown"
+      "AMZN|14:15|S|cooldown",
+      "NVDA|14:15|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -42,54 +44,8 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 32,
+    "rev": 34,
     "peak": 7745.99,
     "peakAt": "2026-11-09T14:38:47.694Z"
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261109P00177500",
-    "strike": "177.5",
-    "entryPremium": 3.325,
-    "qty": 1,
-    "entryTime": 1794235567898,
-    "msgId": 7760,
-    "stopOrderId": "3e0b764f-b5c6-4e42-8696-f724fdae1964",
-    "hardStopPrice": 2.33,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 175.79,
-      "regime": "bearish",
-      "emaFast": 175.7801,
-      "emaSlow": 177.7683,
-      "breakoutHigh": 177.86,
-      "breakoutLow": 174.45,
-      "volRatio": 3.57,
-      "lastClose": 172.99,
-      "lastVolume": 5326949,
-      "barTime": "2026-11-09T14:15:00Z",
-      "entryTimeUTC": "2026-11-09T14:46:07.898Z",
-      "vwapAtEntry": 176.3254,
-      "rsiAtEntry": 22.52,
-      "signalType": "breakout",
-      "positionBucket": "mid",
-      "comboKey": "PUT|position:mid",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 3.14,
-    "entryAsk": 3.37,
-    "entrySpreadPct": 7.066,
-    "entryFillPrice": 3.3,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T14:46:05.636Z",
-    "lastReportedThreshold": -20
   }
 }
