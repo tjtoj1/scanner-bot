@@ -23,7 +23,7 @@
   "_sigCounts": {
     "day": "2026-11-09",
     "no_signal": 226,
-    "max_open_positions": 18
+    "max_open_positions": 24
   },
   "_sigSeen": {
     "day": "2026-11-09",
@@ -48,7 +48,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 56,
+    "rev": 58,
     "peak": 7745.99,
     "peakAt": "2026-11-09T14:38:47.694Z"
   },
@@ -151,12 +151,12 @@
     "signal": "CALL",
     "optionSymbol": "IWM261109C00279000",
     "strike": "279",
-    "entryPremium": 0.775,
+    "entryPremium": 0.925,
     "qty": 3,
-    "entryTime": 1794236461146,
-    "msgId": 7766,
-    "stopOrderId": "3960612f-c42e-4332-9f39-1459648c5bf8",
-    "hardStopPrice": 0.54,
+    "entryTime": 1794236680648,
+    "msgId": 7771,
+    "stopOrderId": "daf56cce-9ad3-49f1-ab6b-c3bdc6b142f7",
+    "hardStopPrice": 0.65,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -165,7 +165,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 278.885,
+      "spot": 279.2,
       "regime": "bullish",
       "emaFast": 277.5596,
       "emaSlow": 276.9508,
@@ -175,7 +175,7 @@
       "lastClose": 278.14,
       "lastVolume": 2212451,
       "barTime": "2026-11-09T14:30:00Z",
-      "entryTimeUTC": "2026-11-09T15:01:01.146Z",
+      "entryTimeUTC": "2026-11-09T15:04:40.648Z",
       "vwapAtEntry": 277.6895,
       "rsiAtEntry": 68.89,
       "signalType": "breakout",
@@ -183,17 +183,12 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryBid": 0.77,
-    "entryAsk": 0.78,
-    "entrySpreadPct": 1.29,
-    "entryFillPrice": 0.77,
+    "entryBid": 0.91,
+    "entryAsk": 0.96,
+    "entrySpreadPct": 5.348,
+    "entryFillPrice": 0.94,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:00:58.780Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 21.93548387096773,
-    "lastReportedThreshold": 20,
-    "nearStopWarned": true
+    "entryFilledAt": "2026-11-09T15:04:40.323Z"
   }
 }
