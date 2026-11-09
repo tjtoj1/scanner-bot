@@ -24,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 40
+    "no_signal": 50
   },
   "_sigSeen": {
     "day": "2026-11-09",
@@ -39,9 +39,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 8,
-    "peak": 7645.99,
-    "peakAt": "2026-11-09T14:33:58.214Z"
+    "rev": 10,
+    "peak": 7680.99,
+    "peakAt": "2026-11-09T14:35:11.950Z"
   },
   "AMZN": {
     "active": true,
@@ -91,7 +91,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 52.99806576402322,
-    "lastReportedThreshold": 50
+    "peakPct": 67.31141199226303,
+    "lastReportedThreshold": 60
   }
 }
