@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 234,
+    "no_signal": 240,
     "max_open_positions": 158
   },
   "_sigSeen": {
@@ -45,7 +45,8 @@
       "TSLA|14:45|T|",
       "QQQ|14:45|G|",
       "QQQ|14:45|T|",
-      "IWM|15:00|G|"
+      "IWM|15:00|G|",
+      "QQQ|15:00|G|"
     ]
   },
   "_sigPending": {
@@ -54,7 +55,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 106,
+    "rev": 108,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   },
@@ -103,54 +104,5 @@
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-09T15:16:49.475Z",
     "lastReportedThreshold": 10
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261109C00674000",
-    "strike": "674",
-    "entryPremium": 2.4299999999999997,
-    "qty": 1,
-    "entryTime": 1794237845708,
-    "msgId": 7805,
-    "stopOrderId": "5931f65a-9516-400f-87b1-5a475b6149ab",
-    "hardStopPrice": 1.7,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 674.44,
-      "regime": "bullish",
-      "emaFast": 665.2642,
-      "emaSlow": 662.1694,
-      "breakoutHigh": 670.64,
-      "breakoutLow": 655.608,
-      "volRatio": 11.34,
-      "lastClose": 673.31,
-      "lastVolume": 3211571,
-      "barTime": "2026-11-09T14:45:00Z",
-      "entryTimeUTC": "2026-11-09T15:24:05.708Z",
-      "vwapAtEntry": 667.1657,
-      "rsiAtEntry": 86.13,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 2.4,
-    "entryAsk": 2.43,
-    "entrySpreadPct": 1.242,
-    "entryFillPrice": 2.46,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:24:05.467Z",
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 21.604938271604958
   }
 }
