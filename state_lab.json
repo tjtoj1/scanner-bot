@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 282,
+    "no_signal": 288,
     "max_open_positions": 158
   },
   "_sigSeen": {
@@ -46,68 +46,30 @@
       "QQQ|14:45|G|",
       "QQQ|14:45|T|",
       "IWM|15:00|G|",
-      "QQQ|15:00|G|"
+      "QQQ|15:00|G|",
+      "SPY|15:15|G|",
+      "QQQ|15:15|G|",
+      "IWM|15:15|G|"
     ]
   },
   "_sigPending": {
     "day": "2026-11-09",
-    "items": []
+    "items": [
+      {
+        "symbol": "IWM",
+        "optionSymbol": "IWM261109C00280000",
+        "barTime": "2026-11-09T15:15:00Z",
+        "decision": "reached_floor_gate",
+        "reason": null,
+        "premium": 0.585,
+        "queuedAt": "2026-11-09T15:45:14.596Z"
+      }
+    ]
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 122,
+    "rev": 124,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY261109C00749000",
-    "strike": "749",
-    "entryPremium": 1.705,
-    "qty": 1,
-    "entryTime": 1794237409881,
-    "msgId": 7790,
-    "stopOrderId": "1673e2a8-8f94-4a1f-b159-6e1fa7f63ee6",
-    "hardStopPrice": 1.19,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 748.825,
-      "regime": "bullish",
-      "emaFast": 743.4827,
-      "emaSlow": 741.4517,
-      "breakoutHigh": 746.8,
-      "breakoutLow": 739.74,
-      "volRatio": 12.13,
-      "lastClose": 747.73,
-      "lastVolume": 2919384,
-      "barTime": "2026-11-09T14:45:00Z",
-      "entryTimeUTC": "2026-11-09T15:16:49.881Z",
-      "vwapAtEntry": 745.0161,
-      "rsiAtEntry": 82.46,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.7,
-    "entryAsk": 1.71,
-    "entrySpreadPct": 0.587,
-    "entryFillPrice": 1.72,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:16:49.475Z",
-    "lastReportedThreshold": 20,
-    "ladder1": true,
-    "stopPct": 12,
-    "peakPct": 28.739002932551333,
-    "ladder2": true,
-    "trailPct": 8
   }
 }

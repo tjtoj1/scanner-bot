@@ -64,7 +64,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 122,
+    "rev": 124,
     "peak": 4263.12,
     "peakAt": "2026-11-09T14:30:12.696Z"
   },
@@ -96,6 +96,7 @@
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 16.06648199445981,
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "nearStopWarned": true
   }
 }
