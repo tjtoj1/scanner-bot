@@ -63,7 +63,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 86,
+    "rev": 88,
     "peak": 4263.12,
     "peakAt": "2026-11-09T14:30:12.696Z"
   },
@@ -143,7 +143,8 @@
     "entryFillPrice": 1.01,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:15:24.940Z"
+    "entryFilledAt": "2026-11-09T15:15:24.940Z",
+    "lastReportedThreshold": -10
   },
   "NVDA": {
     "active": true,
@@ -170,6 +171,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-09T15:15:28.702Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -30,
+    "nearStopWarned": true
   }
 }
