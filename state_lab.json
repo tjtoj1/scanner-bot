@@ -6,7 +6,6 @@
     "SPY_PUT": 1793896738825,
     "AMZN_PUT": 1793897007378,
     "QQQ_PUT": 1793897399214,
-    "NVDA_PUT": 1793898417274,
     "TSLA_PUT": 1793898491315,
     "IWM_PUT": 1793904011498,
     "NVDA_CALL": 1793978724445,
@@ -24,13 +23,15 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 130
+    "no_signal": 138
   },
   "_sigSeen": {
     "day": "2026-11-09",
     "keys": [
       "AMZN|14:00|G|",
-      "AMZN|14:00|T|"
+      "AMZN|14:00|T|",
+      "NVDA|14:15|G|",
+      "NVDA|14:15|T|"
     ]
   },
   "_sigPending": {
@@ -39,7 +40,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 26,
+    "rev": 28,
     "peak": 7745.99,
     "peakAt": "2026-11-09T14:38:47.694Z"
   },
@@ -87,5 +88,50 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-09T14:42:26.948Z"
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261109P00177500",
+    "strike": "177.5",
+    "entryPremium": 3.325,
+    "qty": 1,
+    "entryTime": 1794235567898,
+    "msgId": 7760,
+    "stopOrderId": "3e0b764f-b5c6-4e42-8696-f724fdae1964",
+    "hardStopPrice": 2.33,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 175.79,
+      "regime": "bearish",
+      "emaFast": 175.7801,
+      "emaSlow": 177.7683,
+      "breakoutHigh": 177.86,
+      "breakoutLow": 174.45,
+      "volRatio": 3.57,
+      "lastClose": 172.99,
+      "lastVolume": 5326949,
+      "barTime": "2026-11-09T14:15:00Z",
+      "entryTimeUTC": "2026-11-09T14:46:07.898Z",
+      "vwapAtEntry": 176.3254,
+      "rsiAtEntry": 22.52,
+      "signalType": "breakout",
+      "positionBucket": "mid",
+      "comboKey": "PUT|position:mid",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 3.14,
+    "entryAsk": 3.37,
+    "entrySpreadPct": 7.066,
+    "entryFillPrice": 3.3,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-09T14:46:05.636Z"
   }
 }
