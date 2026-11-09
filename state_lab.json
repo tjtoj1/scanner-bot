@@ -22,7 +22,7 @@
   "_sigCounts": {
     "day": "2026-11-09",
     "no_signal": 227,
-    "max_open_positions": 112
+    "max_open_positions": 118
   },
   "_sigSeen": {
     "day": "2026-11-09",
@@ -42,7 +42,9 @@
       "SPY|14:45|G|",
       "SPY|14:45|T|",
       "TSLA|14:45|G|",
-      "TSLA|14:45|T|"
+      "TSLA|14:45|T|",
+      "QQQ|14:45|G|",
+      "QQQ|14:45|T|"
     ]
   },
   "_sigPending": {
@@ -51,7 +53,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 88,
+    "rev": 90,
     "peak": 7745.99,
     "peakAt": "2026-11-09T14:38:47.694Z"
   },
@@ -146,17 +148,17 @@
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-09T15:16:49.475Z"
   },
-  "TSLA": {
+  "QQQ": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "TSLA261109C00377500",
-    "strike": "377.5",
-    "entryPremium": 2.25,
+    "optionSymbol": "QQQ261109C00674000",
+    "strike": "674",
+    "entryPremium": 2.4299999999999997,
     "qty": 1,
-    "entryTime": 1794237416588,
-    "msgId": 7792,
-    "stopOrderId": "7ea0b69d-c712-482c-aad2-57b77f4928f8",
-    "hardStopPrice": 1.57,
+    "entryTime": 1794237845708,
+    "msgId": 7805,
+    "stopOrderId": "5d6e426c-a21f-4745-b7e8-4a098648132d",
+    "hardStopPrice": 1.7,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -165,37 +167,30 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 376.345,
+      "spot": 674.44,
       "regime": "bullish",
-      "emaFast": 366.0597,
-      "emaSlow": 362.6803,
-      "breakoutHigh": 376.29,
-      "breakoutLow": 357.58,
-      "volRatio": 10.33,
-      "lastClose": 377.51,
-      "lastVolume": 2491802,
+      "emaFast": 665.2642,
+      "emaSlow": 662.1694,
+      "breakoutHigh": 670.64,
+      "breakoutLow": 655.608,
+      "volRatio": 11.34,
+      "lastClose": 673.31,
+      "lastVolume": 3211571,
       "barTime": "2026-11-09T14:45:00Z",
-      "entryTimeUTC": "2026-11-09T15:16:56.589Z",
-      "vwapAtEntry": 371.7228,
-      "rsiAtEntry": 85.63,
+      "entryTimeUTC": "2026-11-09T15:24:05.708Z",
+      "vwapAtEntry": 667.1657,
+      "rsiAtEntry": 86.13,
       "signalType": "breakout",
       "positionBucket": "near_high",
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryBid": 2.23,
-    "entryAsk": 2.27,
-    "entrySpreadPct": 1.778,
-    "entryFillPrice": 2.22,
+    "entryBid": 2.4,
+    "entryAsk": 2.43,
+    "entrySpreadPct": 1.242,
+    "entryFillPrice": 2.46,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-09T15:16:54.394Z",
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 36.66666666666668,
-    "lastReportedThreshold": 20,
-    "nearStopWarned": true
+    "entryFilledAt": "2026-11-09T15:24:05.467Z"
   }
 }
