@@ -24,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 100
+    "no_signal": 110
   },
   "_sigSeen": {
     "day": "2026-11-09",
@@ -39,8 +39,53 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 20,
+    "rev": 22,
     "peak": 7745.99,
     "peakAt": "2026-11-09T14:38:47.694Z"
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN261109C00275000",
+    "strike": "275",
+    "entryPremium": 1.6549999999999998,
+    "qty": 1,
+    "entryTime": 1794235349224,
+    "msgId": 7759,
+    "stopOrderId": "6e57e691-c89f-451d-b16f-7cc4fdbaa01e",
+    "hardStopPrice": 1.16,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 274.02,
+      "regime": "bullish",
+      "emaFast": 267.1578,
+      "emaSlow": 265.3508,
+      "breakoutHigh": 268.27,
+      "breakoutLow": 265.6,
+      "volRatio": 2.75,
+      "lastClose": 268.67,
+      "lastVolume": 181627,
+      "barTime": "2026-11-09T14:00:00Z",
+      "entryTimeUTC": "2026-11-09T14:42:29.225Z",
+      "vwapAtEntry": 266.5281,
+      "rsiAtEntry": 75.4,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 1.65,
+    "entryAsk": 1.66,
+    "entrySpreadPct": 0.604,
+    "entryFillPrice": 1.67,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-09T14:42:26.948Z"
   }
 }
