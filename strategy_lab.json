@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-09T14:30:19.108Z"
+      "lastUpdated": "2026-11-09T21:00:26.452Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-09T14:30:19.108Z"
+      "lastUpdated": "2026-11-09T21:00:26.452Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 287,
-      "wins": 148,
-      "pnl": -49,
-      "avgPnlPct": -0.63,
-      "se": 1.93,
+      "n": 298,
+      "wins": 158,
+      "pnl": 366,
+      "avgPnlPct": -0.08,
+      "se": 1.89,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-09T14:30:19.109Z"
+      "lastUpdated": "2026-11-09T21:00:26.452Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -83,7 +83,7 @@
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-09T14:30:19.112Z"
+      "lastUpdated": "2026-11-09T21:00:26.453Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -92,15 +92,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 11,
+      "n": 12,
       "wins": 3,
-      "pnl": -453,
-      "avgPnlPct": -15.91,
-      "se": 6.19,
+      "pnl": -559,
+      "avgPnlPct": -17.24,
+      "se": 5.81,
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-09T14:30:19.112Z"
+      "lastUpdated": "2026-11-09T21:00:26.453Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-09T14:30:19.112Z"
+      "lastUpdated": "2026-11-09T21:00:26.453Z"
     }
   },
   "changelog": [
