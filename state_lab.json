@@ -24,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 60
+    "no_signal": 70
   },
   "_sigSeen": {
     "day": "2026-11-09",
@@ -39,7 +39,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 12,
+    "rev": 14,
     "peak": 7735.99,
     "peakAt": "2026-11-09T14:36:25.609Z"
   },
@@ -91,7 +91,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 87.81431334622826,
+    "peakPct": 88.00773694390716,
     "lastReportedThreshold": 80
   }
 }
