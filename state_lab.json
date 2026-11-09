@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-09",
-    "no_signal": 430,
+    "no_signal": 434,
     "max_open_positions": 158
   },
   "_sigSeen": {
@@ -61,30 +61,11 @@
   },
   "_sigPending": {
     "day": "2026-11-09",
-    "items": [
-      {
-        "symbol": "IWM",
-        "optionSymbol": "IWM261109C00281000",
-        "barTime": "2026-11-09T15:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 0.575,
-        "queuedAt": "2026-11-09T16:15:44.177Z"
-      },
-      {
-        "symbol": "TSLA",
-        "optionSymbol": "TSLA261109C00377500",
-        "barTime": "2026-11-09T15:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 2.44,
-        "queuedAt": "2026-11-09T16:15:45.174Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 172,
+    "rev": 174,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
