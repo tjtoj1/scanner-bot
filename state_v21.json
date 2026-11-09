@@ -1,63 +1,7 @@
 {
-  "_lastDay": "2026-11-06",
-  "_dailyTrades": [
-    {
-      "day": "2026-11-06",
-      "symbol": "SPY",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-11-06",
-      "symbol": "QQQ",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-11-06",
-      "symbol": "TSLA",
-      "signal": "CALL",
-      "pnl": 0
-    },
-    {
-      "day": "2026-11-06",
-      "symbol": "IWM",
-      "signal": "CALL",
-      "pnl": 0
-    }
-  ],
-  "range": {
-    "SPY": {
-      "day": "2026-11-06",
-      "high": 738.99,
-      "low": 734.58
-    },
-    "QQQ": {
-      "day": "2026-11-06",
-      "high": 661.73,
-      "low": 655.17
-    },
-    "IWM": {
-      "day": "2026-11-06",
-      "high": 272.12,
-      "low": 270.23
-    },
-    "NVDA": {
-      "day": "2026-11-06",
-      "high": 194.53,
-      "low": 187
-    },
-    "TSLA": {
-      "day": "2026-11-06",
-      "high": 354.8,
-      "low": 347.6
-    },
-    "AMZN": {
-      "day": "2026-11-06",
-      "high": 263.55,
-      "low": 258.53
-    }
-  },
+  "_lastDay": "2026-11-09",
+  "_dailyTrades": [],
+  "range": {},
   "_cooldowns": {
     "AMZN_CALL": "2026-11-04T15:20:20.718Z",
     "SPY_CALL": "2026-11-06T15:28:52.617Z",
@@ -65,5 +9,10 @@
     "TSLA_CALL": "2026-11-06T15:34:47.347Z",
     "IWM_CALL": "2026-11-06T15:38:31.000Z"
   },
-  "_dayStoppedAlerted": "2026-11-06"
+  "_dayStoppedAlerted": "2026-11-06",
+  "_equityGuard": {
+    "rev": 2,
+    "peak": 4263.12,
+    "peakAt": "2026-11-09T14:30:12.696Z"
+  }
 }

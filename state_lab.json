@@ -1,7 +1,7 @@
 {
-  "_lastDay": "2026-11-06",
+  "_lastDay": "2026-11-09",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-11-06",
+  "_lastComboLearnedDay": "2026-11-09",
   "_cooldowns": {
     "SPY_PUT": 1793896738825,
     "AMZN_PUT": 1793897007378,
@@ -13,10 +13,9 @@
     "SPY_CALL": 1793979435233,
     "QQQ_CALL": 1793979435696,
     "TSLA_CALL": 1793980912285,
-    "IWM_CALL": 1793981313391,
-    "AMZN_CALL": 1793983852247
+    "IWM_CALL": 1793981313391
   },
-  "_lastComboLearnedFinal": true,
+  "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
     "day": "2026-10-14",
     "symbols": [
@@ -24,39 +23,69 @@
     ]
   },
   "_sigCounts": {
-    "day": "2026-11-06",
-    "no_signal": 745,
-    "day_stopped": 2646,
-    "past_last_entry": 324
+    "day": "2026-11-09",
+    "no_signal": 10
   },
   "_sigSeen": {
-    "day": "2026-11-06",
+    "day": "2026-11-09",
     "keys": [
-      "NVDA|14:15|G|",
-      "NVDA|14:15|T|",
-      "NVDA|14:15|S|cooldown",
-      "SPY|14:30|G|",
-      "SPY|14:30|T|",
-      "QQQ|14:30|G|",
-      "QQQ|14:30|T|",
-      "NVDA|14:30|S|cooldown",
-      "SPY|14:30|S|cooldown",
-      "QQQ|14:30|S|cooldown",
-      "SPY|14:45|S|cooldown",
-      "QQQ|14:45|S|cooldown",
-      "TSLA|14:45|G|",
-      "TSLA|14:45|T|",
-      "IWM|15:00|G|",
-      "IWM|15:00|T|",
-      "TSLA|15:00|S|cooldown",
-      "IWM|15:00|S|cooldown",
-      "AMZN|15:30|G|",
-      "AMZN|15:30|T|"
+      "AMZN|14:00|G|",
+      "AMZN|14:00|T|"
     ]
   },
   "_sigPending": {
-    "day": "2026-11-06",
+    "day": "2026-11-09",
     "items": []
   },
-  "_dayStoppedAlerted": "2026-11-06"
+  "_dayStoppedAlerted": "2026-11-06",
+  "_equityGuard": {
+    "rev": 2,
+    "peak": 7518.02,
+    "peakAt": "2026-11-09T14:30:16.397Z"
+  },
+  "AMZN": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "AMZN261109C00270000",
+    "strike": "270",
+    "entryPremium": 2.585,
+    "qty": 1,
+    "entryTime": 1794234618997,
+    "msgId": 7750,
+    "stopOrderId": "8897f99a-16e0-45e2-ae8d-ceb873ce9618",
+    "hardStopPrice": 1.81,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 270.27,
+      "regime": "bullish",
+      "emaFast": 267.1578,
+      "emaSlow": 265.3508,
+      "breakoutHigh": 268.27,
+      "breakoutLow": 265.6,
+      "volRatio": 2.75,
+      "lastClose": 268.67,
+      "lastVolume": 181627,
+      "barTime": "2026-11-09T14:00:00Z",
+      "entryTimeUTC": "2026-11-09T14:30:18.997Z",
+      "vwapAtEntry": 266.5281,
+      "rsiAtEntry": 75.4,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 2.5,
+    "entryAsk": 2.65,
+    "entrySpreadPct": 5.825,
+    "entryFillPrice": 2.62,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-09T14:30:18.557Z"
+  }
 }
