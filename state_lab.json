@@ -9,7 +9,8 @@
     "TSLA_PUT": 1793898491315,
     "IWM_PUT": 1793904011498,
     "NVDA_CALL": 1793978724445,
-    "AMZN_CALL": 1794237444778
+    "AMZN_CALL": 1794237444778,
+    "NVDA_PUT": 1794324726876
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -20,13 +21,14 @@
   },
   "_sigCounts": {
     "day": "2026-11-10",
-    "no_signal": 274
+    "no_signal": 284
   },
   "_sigSeen": {
     "day": "2026-11-10",
     "keys": [
       "NVDA|14:15|G|",
-      "NVDA|14:15|T|"
+      "NVDA|14:15|T|",
+      "NVDA|14:30|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -35,54 +37,8 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 742,
+    "rev": 744,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261111P00172500",
-    "strike": "172.5",
-    "entryPremium": 3.6550000000000002,
-    "qty": 1,
-    "entryTime": 1794322457881,
-    "msgId": 7838,
-    "stopOrderId": "8c7a079b-7a36-4f40-a718-295a928f70c7",
-    "hardStopPrice": 2.56,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 171.505,
-      "regime": "bearish",
-      "emaFast": 176.1998,
-      "emaSlow": 177.5969,
-      "breakoutHigh": 179.2,
-      "breakoutLow": 175,
-      "volRatio": 3.06,
-      "lastClose": 173.99,
-      "lastVolume": 2091676,
-      "barTime": "2026-11-10T14:15:00Z",
-      "entryTimeUTC": "2026-11-10T14:54:17.881Z",
-      "vwapAtEntry": 178.1333,
-      "rsiAtEntry": 27.04,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 3.65,
-    "entryAsk": 3.66,
-    "entrySpreadPct": 0.274,
-    "entryFillPrice": 3.7,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-10T14:54:17.518Z",
-    "lastReportedThreshold": -20
   }
 }
