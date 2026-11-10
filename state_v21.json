@@ -57,7 +57,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 764,
+    "rev": 766,
     "peak": 4263.12,
     "peakAt": "2026-11-09T14:30:12.696Z"
   },
@@ -85,7 +85,8 @@
     "entryFillPrice": 2.06,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-10T15:15:01.193Z"
+    "entryFilledAt": "2026-11-10T15:15:01.193Z",
+    "lastReportedThreshold": -20
   },
   "QQQ": {
     "active": true,
@@ -111,7 +112,8 @@
     "entryFillPrice": 2.69,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-10T15:15:03.333Z"
+    "entryFilledAt": "2026-11-10T15:15:03.333Z",
+    "lastReportedThreshold": -20
   },
   "IWM": {
     "active": true,
@@ -137,6 +139,7 @@
     "entryFillPrice": 0.62,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-10T15:15:05.273Z"
+    "entryFilledAt": "2026-11-10T15:15:05.273Z",
+    "lastReportedThreshold": -10
   }
 }
