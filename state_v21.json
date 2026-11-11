@@ -62,39 +62,13 @@
     "AMZN_CALL": "2026-11-04T15:20:20.718Z",
     "SPY_CALL": "2026-11-10T15:24:04.995Z",
     "QQQ_CALL": "2026-11-10T15:24:05.505Z",
-    "IWM_CALL": "2026-11-10T15:24:06.008Z"
+    "IWM_CALL": "2026-11-10T15:24:06.008Z",
+    "SPY_PUT": "2026-11-11T15:42:33.390Z"
   },
   "_dayStoppedAlerted": "2026-11-10",
   "_equityGuard": {
-    "rev": 1502,
+    "rev": 1504,
     "peak": 4263.12,
     "peakAt": "2026-11-09T14:30:12.696Z"
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261111P00756000",
-    "strike": "756",
-    "entryPremium": 1.01,
-    "qty": 4,
-    "entryTime": 1794411283686,
-    "level": 755.66,
-    "msgId": 7912,
-    "stopOrderId": "a1b4f66c-89b5-4bfd-8a54-dd693060d964",
-    "hardStopPrice": 0.66,
-    "entryStockPrice": 756.485,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 34.98,
-    "volumeRatio": 4.110997519820444,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 0.99,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-11T15:34:43.513Z",
-    "lastReportedThreshold": -20
   }
 }
