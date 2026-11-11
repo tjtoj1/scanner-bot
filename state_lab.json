@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-11",
-    "no_signal": 724
+    "no_signal": 734
   },
   "_sigSeen": {
     "day": "2026-11-11",
@@ -30,7 +30,8 @@
       "TSLA|14:30|T|",
       "TSLA|15:00|G|",
       "TSLA|15:15|G|",
-      "AMZN|15:15|G|"
+      "AMZN|15:15|G|",
+      "QQQ|15:30|G|"
     ]
   },
   "_sigPending": {
@@ -39,7 +40,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 1530,
+    "rev": 1532,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
