@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-11",
-    "no_signal": 318
+    "no_signal": 326
   },
   "_sigSeen": {
     "day": "2026-11-11",
@@ -37,7 +37,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 1446,
+    "rev": 1448,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   },
@@ -84,7 +84,8 @@
     "entryFillPrice": 1.19,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-11T15:00:01.515Z"
+    "entryFilledAt": "2026-11-11T15:00:01.515Z",
+    "lastReportedThreshold": -20
   },
   "TSLA": {
     "active": true,
@@ -95,7 +96,7 @@
     "qty": 1,
     "entryTime": 1794409524525,
     "msgId": 7897,
-    "stopOrderId": "6c338210-32a5-4a31-9db7-2389ed9320b1",
+    "stopOrderId": "ac1868d7-084e-4e06-8444-352a09eb8d90",
     "hardStopPrice": 2.53,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -129,6 +130,12 @@
     "entryFillPrice": 3.85,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-11T15:05:24.278Z"
+    "entryFilledAt": "2026-11-11T15:05:24.278Z",
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 34.80662983425414,
+    "lastReportedThreshold": 30
   }
 }
