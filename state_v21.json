@@ -60,7 +60,7 @@
   },
   "_dayStoppedAlerted": "2026-11-10",
   "_equityGuard": {
-    "rev": 1488,
+    "rev": 1490,
     "peak": 4263.12,
     "peakAt": "2026-11-09T14:30:12.696Z"
   },
@@ -74,7 +74,7 @@
     "entryTime": 1794411032212,
     "level": 755.66,
     "msgId": 7907,
-    "stopOrderId": "b13729c4-ca07-47a4-bbce-b367b22be62b",
+    "stopOrderId": "ae3b3c2e-0f31-42ca-b175-cbcd1e91ef46",
     "hardStopPrice": 0.93,
     "entryStockPrice": 756.595,
     "vwapAtEntry": null,
@@ -88,7 +88,11 @@
     "entryFillPrice": 1.43,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-11T15:30:31.935Z"
+    "entryFilledAt": "2026-11-11T15:30:31.935Z",
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 16.84210526315791,
+    "lastReportedThreshold": 10
   },
   "TSLA": {
     "active": true,
