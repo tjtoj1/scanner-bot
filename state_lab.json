@@ -3,7 +3,6 @@
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-11-10",
   "_cooldowns": {
-    "AMZN_PUT": 1793897007378,
     "QQQ_PUT": 1793897399214,
     "TSLA_PUT": 1793898491315,
     "IWM_PUT": 1793904011498,
@@ -20,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-11",
-    "no_signal": 628
+    "no_signal": 636
   },
   "_sigSeen": {
     "day": "2026-11-11",
@@ -29,7 +28,9 @@
       "NVDA|14:30|T|",
       "TSLA|14:30|G|",
       "TSLA|14:30|T|",
-      "TSLA|15:00|G|"
+      "TSLA|15:00|G|",
+      "TSLA|15:15|G|",
+      "AMZN|15:15|G|"
     ]
   },
   "_sigPending": {
@@ -38,7 +39,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 1506,
+    "rev": 1508,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
