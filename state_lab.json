@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-11",
-    "no_signal": 838
+    "no_signal": 842
   },
   "_sigSeen": {
     "day": "2026-11-11",
@@ -39,30 +39,11 @@
   },
   "_sigPending": {
     "day": "2026-11-11",
-    "items": [
-      {
-        "symbol": "NVDA",
-        "optionSymbol": "NVDA261111C00175000",
-        "barTime": "2026-11-11T15:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 1.135,
-        "queuedAt": "2026-11-11T16:15:48.726Z"
-      },
-      {
-        "symbol": "TSLA",
-        "optionSymbol": "TSLA261111C00395000",
-        "barTime": "2026-11-11T15:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 1.21,
-        "queuedAt": "2026-11-11T16:15:49.777Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 1554,
+    "rev": 1556,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
