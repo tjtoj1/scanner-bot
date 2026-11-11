@@ -20,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-11",
-    "no_signal": 518
+    "no_signal": 528
   },
   "_sigSeen": {
     "day": "2026-11-11",
@@ -28,7 +28,8 @@
       "NVDA|14:30|G|",
       "NVDA|14:30|T|",
       "TSLA|14:30|G|",
-      "TSLA|14:30|T|"
+      "TSLA|14:30|T|",
+      "TSLA|15:00|G|"
     ]
   },
   "_sigPending": {
@@ -37,7 +38,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 1484,
+    "rev": 1486,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
