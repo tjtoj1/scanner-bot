@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-12",
-    "no_signal": 918
+    "no_signal": 926
   },
   "_sigSeen": {
     "day": "2026-11-12",
@@ -45,7 +45,9 @@
       "QQQ|15:45|G|",
       "QQQ|15:45|T|",
       "SPY|15:45|S|cooldown",
-      "QQQ|15:45|S|cooldown"
+      "QQQ|15:45|S|cooldown",
+      "SPY|16:00|S|cooldown",
+      "QQQ|16:00|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -54,7 +56,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2248,
+    "rev": 2250,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
