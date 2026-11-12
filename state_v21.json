@@ -53,7 +53,8 @@
     }
   },
   "_cooldowns": {
-    "SPY_PUT": "2026-11-11T15:42:33.390Z"
+    "SPY_PUT": "2026-11-11T15:42:33.390Z",
+    "AMZN_CALL": "2026-11-12T15:21:34.026Z"
   },
   "_dayStoppedAlerted": "2026-11-10",
   "_equityGuard": {
@@ -78,7 +79,7 @@
     "entryTime": 1794496561675,
     "level": 280.36,
     "msgId": 7935,
-    "stopOrderId": "615d2c12-c273-4205-8919-26d2c7df7fd6",
+    "stopOrderId": "eaeee4c9-877e-45b2-b84e-e3df656d4d40",
     "hardStopPrice": 0.46,
     "entryStockPrice": 279.21500000000003,
     "vwapAtEntry": null,
@@ -92,33 +93,10 @@
     "entryFillPrice": 0.73,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-12T15:16:01.195Z"
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "AMZN261113C00272500",
-    "strike": "272.5",
-    "entryPremium": 2.02,
-    "qty": 2,
-    "entryTime": 1794496568242,
-    "level": 272.48,
-    "msgId": 7937,
-    "stopOrderId": "ccac16da-a604-40d7-bb1d-c8f0ae04086a",
-    "hardStopPrice": 1.31,
-    "entryStockPrice": 271.21500000000003,
-    "vwapAtEntry": null,
-    "rsiAtEntry": 59.22,
-    "volumeRatio": 9.35794460257149,
-    "signalType": "breakout",
-    "tp1Stock": null,
-    "tp2Stock": null,
-    "tp3Stock": null,
-    "slStock": null,
-    "entryFillPrice": 2.07,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-12T15:16:08.055Z",
-    "lastReportedThreshold": -20
+    "entryFilledAt": "2026-11-12T15:16:01.195Z",
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 17.605633802816904,
+    "lastReportedThreshold": 10
   }
 }
