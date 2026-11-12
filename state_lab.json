@@ -6,7 +6,8 @@
     "QQQ_PUT": 1793897399214,
     "TSLA_PUT": 1793898491315,
     "IWM_PUT": 1793904011498,
-    "SPY_PUT": 1794337271687
+    "SPY_PUT": 1794337271687,
+    "NVDA_PUT": 1794495737297
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -17,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-12",
-    "no_signal": 8
+    "no_signal": 16
   },
   "_sigSeen": {
     "day": "2026-11-12",
@@ -25,7 +26,8 @@
       "NVDA|14:00|G|",
       "NVDA|14:00|T|",
       "AMZN|14:00|G|",
-      "AMZN|14:00|T|"
+      "AMZN|14:00|T|",
+      "NVDA|14:00|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -34,54 +36,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2062,
+    "rev": 2064,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261113P00149000",
-    "strike": "149",
-    "entryPremium": 5.375,
-    "qty": 1,
-    "entryTime": 1794493861307,
-    "msgId": 7926,
-    "stopOrderId": "a7a29ab1-d026-400b-86c1-d8eedcfe9170",
-    "hardStopPrice": 3.76,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 149.42000000000002,
-      "regime": "bearish",
-      "emaFast": 157.8689,
-      "emaSlow": 160.0917,
-      "breakoutHigh": 173.296,
-      "breakoutLow": 154.02,
-      "volRatio": 4.96,
-      "lastClose": 152.88,
-      "lastVolume": 14094900,
-      "barTime": "2026-11-12T14:00:00Z",
-      "entryTimeUTC": "2026-11-12T14:31:01.307Z",
-      "vwapAtEntry": 158.6986,
-      "rsiAtEntry": 20.86,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 5.3,
-    "entryAsk": 5.45,
-    "entrySpreadPct": 2.791,
-    "entryFillPrice": 5.45,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-12T14:31:01.096Z"
   },
   "AMZN": {
     "active": true,
