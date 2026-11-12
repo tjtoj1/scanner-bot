@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-12",
-    "no_signal": 96
+    "no_signal": 106
   },
   "_sigSeen": {
     "day": "2026-11-12",
@@ -29,7 +29,8 @@
       "AMZN|14:00|G|",
       "AMZN|14:00|T|",
       "NVDA|14:00|S|cooldown",
-      "AMZN|14:00|S|cooldown"
+      "AMZN|14:00|S|cooldown",
+      "NVDA|14:15|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -38,7 +39,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2084,
+    "rev": 2086,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
