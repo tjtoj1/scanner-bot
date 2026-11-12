@@ -6,7 +6,8 @@
     "QQQ_PUT": 1793897399214,
     "TSLA_PUT": 1793898491315,
     "SPY_PUT": 1794337271687,
-    "NVDA_PUT": 1794495737297
+    "NVDA_PUT": 1794495737297,
+    "AMZN_CALL": 1794498539131
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -17,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-12",
-    "no_signal": 342
+    "no_signal": 350
   },
   "_sigSeen": {
     "day": "2026-11-12",
@@ -33,7 +34,8 @@
       "AMZN|14:30|G|",
       "AMZN|14:30|T|",
       "IWM|14:45|G|",
-      "IWM|14:45|T|"
+      "IWM|14:45|T|",
+      "AMZN|14:45|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -42,56 +44,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2134,
+    "rev": 2136,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
-  },
-  "AMZN": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "AMZN261113C00272500",
-    "strike": "272.5",
-    "entryPremium": 2.515,
-    "qty": 1,
-    "entryTime": 1794496082423,
-    "msgId": 7933,
-    "stopOrderId": "b04ba206-4148-496b-afe8-e06ebaa00459",
-    "hardStopPrice": 1.76,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 272.2,
-      "regime": "bullish",
-      "emaFast": 268.3139,
-      "emaSlow": 267.4979,
-      "breakoutHigh": 270.8822,
-      "breakoutLow": 263.16,
-      "volRatio": 60.5,
-      "lastClose": 272.24,
-      "lastVolume": 4127895,
-      "barTime": "2026-11-12T14:30:00Z",
-      "entryTimeUTC": "2026-11-12T15:08:02.423Z",
-      "vwapAtEntry": 269.9707,
-      "rsiAtEntry": 64.62,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 2.45,
-    "entryAsk": 2.52,
-    "entrySpreadPct": 2.817,
-    "entryFillPrice": 2.54,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-12T15:08:02.148Z",
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   },
   "IWM": {
     "active": true,
@@ -136,6 +91,7 @@
     "entryFillPrice": 0.73,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-12T15:16:15.660Z"
+    "entryFilledAt": "2026-11-12T15:16:15.660Z",
+    "lastReportedThreshold": -10
   }
 }
