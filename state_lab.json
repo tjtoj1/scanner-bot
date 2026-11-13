@@ -1,5 +1,5 @@
 {
-  "_lastDay": "2026-11-12",
+  "_lastDay": "2026-11-13",
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-11-12",
   "_cooldowns": {
@@ -20,9 +20,8 @@
     ]
   },
   "_sigCounts": {
-    "day": "2026-11-12",
-    "no_signal": 3234,
-    "past_last_entry": 324
+    "day": "2026-11-13",
+    "no_signal": 12
   },
   "_sigSeen": {
     "day": "2026-11-12",
@@ -57,7 +56,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2750,
+    "rev": 2752,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   }
