@@ -20,7 +20,7 @@
   "_sigCounts": {
     "day": "2026-11-13",
     "no_signal": 310,
-    "max_open_positions": 178
+    "max_open_positions": 181
   },
   "_sigSeen": {
     "day": "2026-11-13",
@@ -54,60 +54,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2864,
+    "rev": 2866,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
-  },
-  "NVDA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "NVDA261113P00160000",
-    "strike": "160",
-    "entryPremium": 1.46,
-    "qty": 2,
-    "entryTime": 1794583809362,
-    "msgId": 8031,
-    "stopOrderId": "8d89be1a-ae1e-42ae-a891-11d3dfb11c2c",
-    "hardStopPrice": 1.02,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 160.10000000000002,
-      "regime": "bearish",
-      "emaFast": 165.6204,
-      "emaSlow": 167.274,
-      "breakoutHigh": 171.48,
-      "breakoutLow": 161.22,
-      "volRatio": 4.41,
-      "lastClose": 160.27,
-      "lastVolume": 20673583,
-      "barTime": "2026-11-13T15:00:00Z",
-      "entryTimeUTC": "2026-11-13T15:30:09.362Z",
-      "vwapAtEntry": 164.6801,
-      "rsiAtEntry": 22.41,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.45,
-    "entryAsk": 1.47,
-    "entrySpreadPct": 1.37,
-    "entryFillPrice": 1.44,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-13T15:30:09.044Z",
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 45.890410958904106,
-    "lastReportedThreshold": 40
   },
   "TSLA": {
     "active": true,
@@ -164,7 +113,7 @@
     "qty": 1,
     "entryTime": 1794583816213,
     "msgId": 8033,
-    "stopOrderId": "33258011-52be-4362-b57c-0a05d1fd60ca",
+    "stopOrderId": "5f417d1f-0352-4bcb-9675-88e5a8c664e5",
     "hardStopPrice": 1.6,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -201,7 +150,9 @@
     "entryFilledAt": "2026-11-13T15:30:13.755Z",
     "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 23.362445414847166
+    "stopPct": 12,
+    "peakPct": 29.475982532751082,
+    "ladder2": true,
+    "trailPct": 8
   }
 }
