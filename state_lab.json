@@ -20,7 +20,7 @@
   "_sigCounts": {
     "day": "2026-11-13",
     "no_signal": 310,
-    "max_open_positions": 142
+    "max_open_positions": 148
   },
   "_sigSeen": {
     "day": "2026-11-13",
@@ -50,21 +50,11 @@
   },
   "_sigPending": {
     "day": "2026-11-13",
-    "items": [
-      {
-        "symbol": "AMZN",
-        "optionSymbol": "AMZN261113P00267500",
-        "barTime": "2026-11-13T15:00:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 2.29,
-        "queuedAt": "2026-11-13T15:30:13.299Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2852,
+    "rev": 2854,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   },
