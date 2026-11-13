@@ -19,7 +19,7 @@
   "_sigCounts": {
     "day": "2026-11-13",
     "no_signal": 301,
-    "max_open_positions": 5
+    "max_open_positions": 11
   },
   "_sigSeen": {
     "day": "2026-11-13",
@@ -34,21 +34,11 @@
   },
   "_sigPending": {
     "day": "2026-11-13",
-    "items": [
-      {
-        "symbol": "NVDA",
-        "optionSymbol": "NVDA261113P00162500",
-        "barTime": "2026-11-13T14:30:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 2.0445,
-        "queuedAt": "2026-11-13T15:00:22.570Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2802,
+    "rev": 2804,
     "peak": 7848.28,
     "peakAt": "2026-11-09T15:32:40.751Z"
   },
@@ -140,7 +130,8 @@
     "entryFillPrice": 1.03,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-13T15:00:18.234Z"
+    "entryFilledAt": "2026-11-13T15:00:18.234Z",
+    "lastReportedThreshold": 10
   },
   "NVDA": {
     "active": true,
