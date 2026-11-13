@@ -18,7 +18,7 @@
   "_sigCounts": {
     "day": "2026-11-13",
     "no_signal": 307,
-    "max_open_positions": 76
+    "max_open_positions": 82
   },
   "_sigSeen": {
     "day": "2026-11-13",
@@ -30,7 +30,9 @@
       "NVDA|14:30|G|",
       "NVDA|14:30|T|",
       "SPY|14:45|G|",
-      "SPY|14:45|T|"
+      "SPY|14:45|T|",
+      "QQQ|14:45|G|",
+      "QQQ|14:45|T|"
     ]
   },
   "_sigPending": {
@@ -39,7 +41,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2828,
+    "rev": 2830,
     "peak": 7956.4,
     "peakAt": "2026-11-13T15:14:35.484Z"
   },
@@ -89,8 +91,8 @@
     "entryFilledAt": "2026-11-13T15:06:23.762Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 71.36150234741787,
-    "lastReportedThreshold": 60,
+    "peakPct": 92.48826291079811,
+    "lastReportedThreshold": 90,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -138,6 +140,52 @@
     "entryFillPrice": 2.5,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-13T15:15:51.783Z"
+    "entryFilledAt": "2026-11-13T15:15:51.783Z",
+    "lastReportedThreshold": 10
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "QQQ261113P00675000",
+    "strike": "675",
+    "entryPremium": 3.385,
+    "qty": 1,
+    "entryTime": 1794583024191,
+    "msgId": 8007,
+    "stopOrderId": "95a7d9cf-fd40-47cf-a62e-54a1dc5462fc",
+    "hardStopPrice": 2.37,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 675.25,
+      "regime": "bearish",
+      "emaFast": 686.7573,
+      "emaSlow": 687.9673,
+      "breakoutHigh": 693.13,
+      "breakoutLow": 683.79,
+      "volRatio": 10.13,
+      "lastClose": 681.16,
+      "lastVolume": 2123086,
+      "barTime": "2026-11-13T14:45:00Z",
+      "entryTimeUTC": "2026-11-13T15:17:04.191Z",
+      "vwapAtEntry": 685.7953,
+      "rsiAtEntry": 26.61,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 3.38,
+    "entryAsk": 3.39,
+    "entrySpreadPct": 0.295,
+    "entryFillPrice": 3.38,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-13T15:17:03.863Z"
   }
 }
