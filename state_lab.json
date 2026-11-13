@@ -18,7 +18,7 @@
   "_sigCounts": {
     "day": "2026-11-13",
     "no_signal": 307,
-    "max_open_positions": 94
+    "max_open_positions": 100
   },
   "_sigSeen": {
     "day": "2026-11-13",
@@ -41,9 +41,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 2834,
-    "peak": 8019.3,
-    "peakAt": "2026-11-13T15:18:14.634Z"
+    "rev": 2836,
+    "peak": 8141.3,
+    "peakAt": "2026-11-13T15:20:34.306Z"
   },
   "IWM": {
     "active": true,
@@ -91,8 +91,8 @@
     "entryFilledAt": "2026-11-13T15:06:23.762Z",
     "ladder1": true,
     "stopPct": 12,
-    "peakPct": 116.9014084507042,
-    "lastReportedThreshold": 110,
+    "peakPct": 123.94366197183098,
+    "lastReportedThreshold": 120,
     "ladder2": true,
     "trailPct": 8,
     "nearStopWarned": true
@@ -106,7 +106,7 @@
     "qty": 1,
     "entryTime": 1794582954026,
     "msgId": 8006,
-    "stopOrderId": "408a543a-40e2-4e08-bdbf-1d8631610dff",
+    "stopOrderId": "ea542419-d8c4-4d15-9803-a6597393cb9d",
     "hardStopPrice": 1.77,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -141,10 +141,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-13T15:15:51.783Z",
-    "lastReportedThreshold": 10,
+    "lastReportedThreshold": 30,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 23.36633663366338
+    "stopPct": 12,
+    "peakPct": 38.61386138613862,
+    "ladder2": true,
+    "trailPct": 8
   },
   "QQQ": {
     "active": true,
@@ -155,7 +157,7 @@
     "qty": 1,
     "entryTime": 1794583024191,
     "msgId": 8007,
-    "stopOrderId": "95a7d9cf-fd40-47cf-a62e-54a1dc5462fc",
+    "stopOrderId": "66373352-c4ba-4b72-a48c-d1a7878f8030",
     "hardStopPrice": 2.37,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -189,6 +191,12 @@
     "entryFillPrice": 3.38,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-13T15:17:03.863Z"
+    "entryFilledAt": "2026-11-13T15:17:03.863Z",
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 31.31462333825703,
+    "lastReportedThreshold": 30
   }
 }
