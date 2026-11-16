@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 1794,
+    "no_signal": 1804,
     "max_open_positions": 49
   },
   "_sigSeen": {
@@ -63,7 +63,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3832,
+    "rev": 3834,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   },
@@ -76,7 +76,7 @@
     "qty": 1,
     "entryTime": 1794852047672,
     "msgId": 8117,
-    "stopOrderId": "a1335c34-ce12-4378-bbc4-b27c75a69fb7",
+    "stopOrderId": "bdc625ec-f47a-4d89-9cb8-ac06453827ed",
     "hardStopPrice": 1.24,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -111,6 +111,9 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-16T18:00:45.543Z",
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 10,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 15.29745042492918
   }
 }
