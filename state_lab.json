@@ -6,10 +6,7 @@
     "AMZN_CALL": 1794498539131,
     "SPY_CALL": 1794502619856,
     "QQQ_CALL": 1794502620202,
-    "AMZN_PUT": 1794845333050,
-    "TSLA_PUT": 1794845547175,
-    "QQQ_PUT": 1794845758166,
-    "SPY_PUT": 1794846183337
+    "TSLA_PUT": 1794845547175
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -20,7 +17,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 2292,
+    "no_signal": 2296,
     "max_open_positions": 49
   },
   "_sigSeen": {
@@ -55,16 +52,39 @@
       "NVDA|17:30|G|",
       "NVDA|17:30|T|",
       "IWM|17:45|G|",
-      "IWM|17:45|T|"
+      "IWM|17:45|T|",
+      "SPY|18:30|G|",
+      "QQQ|18:30|G|",
+      "IWM|18:30|G|",
+      "AMZN|18:30|G|"
     ]
   },
   "_sigPending": {
     "day": "2026-11-16",
-    "items": []
+    "items": [
+      {
+        "symbol": "IWM",
+        "optionSymbol": "IWM261116P00273000",
+        "barTime": "2026-11-16T18:30:00Z",
+        "decision": "reached_floor_gate",
+        "reason": null,
+        "premium": 0.495,
+        "queuedAt": "2026-11-16T19:00:31.643Z"
+      },
+      {
+        "symbol": "AMZN",
+        "optionSymbol": "AMZN261116P00257500",
+        "barTime": "2026-11-16T18:30:00Z",
+        "decision": "reached_floor_gate",
+        "reason": null,
+        "premium": 0.535,
+        "queuedAt": "2026-11-16T19:00:32.719Z"
+      }
+    ]
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3926,
+    "rev": 3928,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   }
