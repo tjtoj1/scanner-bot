@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 1804,
+    "no_signal": 1814,
     "max_open_positions": 49
   },
   "_sigSeen": {
@@ -63,7 +63,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3834,
+    "rev": 3836,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   },
@@ -72,12 +72,12 @@
     "signal": "PUT",
     "optionSymbol": "NVDA261116P00157500",
     "strike": "157.5",
-    "entryPremium": 1.7650000000000001,
+    "entryPremium": 1.99,
     "qty": 1,
-    "entryTime": 1794852047672,
-    "msgId": 8117,
-    "stopOrderId": "bdc625ec-f47a-4d89-9cb8-ac06453827ed",
-    "hardStopPrice": 1.24,
+    "entryTime": 1794852401881,
+    "msgId": 8121,
+    "stopOrderId": "7ea6f759-00d4-4da3-8118-b02d6bad4681",
+    "hardStopPrice": 1.39,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -86,7 +86,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 156.195,
+      "spot": 155.90499999999997,
       "regime": "bearish",
       "emaFast": 158.2625,
       "emaSlow": 158.6627,
@@ -96,7 +96,7 @@
       "lastClose": 156.845,
       "lastVolume": 10544801,
       "barTime": "2026-11-16T17:30:00Z",
-      "entryTimeUTC": "2026-11-16T18:00:47.672Z",
+      "entryTimeUTC": "2026-11-16T18:06:41.881Z",
       "vwapAtEntry": 159.4957,
       "rsiAtEntry": 40.08,
       "signalType": "breakout",
@@ -104,16 +104,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "entryBid": 1.75,
-    "entryAsk": 1.78,
-    "entrySpreadPct": 1.7,
-    "entryFillPrice": 1.8,
+    "entryBid": 1.96,
+    "entryAsk": 2.02,
+    "entrySpreadPct": 3.015,
+    "entryFillPrice": 2,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-16T18:00:45.543Z",
-    "lastReportedThreshold": 10,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.29745042492918
+    "entryFilledAt": "2026-11-16T18:06:41.756Z"
   }
 }
