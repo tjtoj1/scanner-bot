@@ -17,7 +17,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 2296,
+    "no_signal": 2300,
     "max_open_positions": 49
   },
   "_sigSeen": {
@@ -61,30 +61,11 @@
   },
   "_sigPending": {
     "day": "2026-11-16",
-    "items": [
-      {
-        "symbol": "IWM",
-        "optionSymbol": "IWM261116P00273000",
-        "barTime": "2026-11-16T18:30:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 0.495,
-        "queuedAt": "2026-11-16T19:00:31.643Z"
-      },
-      {
-        "symbol": "AMZN",
-        "optionSymbol": "AMZN261116P00257500",
-        "barTime": "2026-11-16T18:30:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 0.535,
-        "queuedAt": "2026-11-16T19:00:32.719Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3928,
+    "rev": 3930,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   }
