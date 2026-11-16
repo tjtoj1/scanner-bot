@@ -6,7 +6,6 @@
     "AMZN_CALL": 1794498539131,
     "SPY_CALL": 1794502619856,
     "QQQ_CALL": 1794502620202,
-    "IWM_PUT": 1794844916989,
     "AMZN_PUT": 1794845333050,
     "TSLA_PUT": 1794845547175,
     "QQQ_PUT": 1794845758166,
@@ -21,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 1884,
+    "no_signal": 1892,
     "max_open_positions": 49
   },
   "_sigSeen": {
@@ -54,7 +53,9 @@
       "NVDA|17:15|G|",
       "NVDA|17:15|T|",
       "NVDA|17:30|G|",
-      "NVDA|17:30|T|"
+      "NVDA|17:30|T|",
+      "IWM|17:45|G|",
+      "IWM|17:45|T|"
     ]
   },
   "_sigPending": {
@@ -63,7 +64,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3850,
+    "rev": 3852,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   },
@@ -111,5 +112,50 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-16T18:06:41.756Z"
+  },
+  "IWM": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "IWM261116P00273000",
+    "strike": "273",
+    "entryPremium": 0.355,
+    "qty": 8,
+    "entryTime": 1794852964261,
+    "msgId": 8122,
+    "stopOrderId": "21019b55-ceb8-4965-810c-30f2a95f7886",
+    "hardStopPrice": 0.25,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 273.4,
+      "regime": "bearish",
+      "emaFast": 274.3259,
+      "emaSlow": 274.9007,
+      "breakoutHigh": 275.39,
+      "breakoutLow": 273.85,
+      "volRatio": 1.61,
+      "lastClose": 273.77,
+      "lastVolume": 745747,
+      "barTime": "2026-11-16T17:45:00Z",
+      "entryTimeUTC": "2026-11-16T18:16:04.261Z",
+      "vwapAtEntry": 274.8345,
+      "rsiAtEntry": 32.03,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 0.37,
+    "entryAsk": 0.38,
+    "entrySpreadPct": 2.667,
+    "entryFillPrice": 0.36,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-16T18:16:04.066Z"
   }
 }
