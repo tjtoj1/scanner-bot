@@ -18,7 +18,8 @@
   "_sigCounts": {
     "day": "2026-11-16",
     "no_signal": 3120,
-    "max_open_positions": 49
+    "max_open_positions": 49,
+    "past_last_entry": 6
   },
   "_sigSeen": {
     "day": "2026-11-16",
@@ -65,7 +66,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4080,
+    "rev": 4082,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   }
