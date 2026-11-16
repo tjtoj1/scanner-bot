@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 120
+    "no_signal": 132
   },
   "_sigSeen": {
     "day": "2026-11-13",
@@ -61,7 +61,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3488,
+    "rev": 3490,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   }
