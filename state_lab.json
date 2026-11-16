@@ -8,7 +8,8 @@
     "QQQ_CALL": 1794502620202,
     "SPY_PUT": 1794844058228,
     "IWM_PUT": 1794844916989,
-    "AMZN_PUT": 1794845333050
+    "AMZN_PUT": 1794845333050,
+    "TSLA_PUT": 1794845547175
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -19,7 +20,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-16",
-    "no_signal": 466,
+    "no_signal": 468,
     "max_open_positions": 49
   },
   "_sigSeen": {
@@ -42,7 +43,8 @@
       "IWM|15:00|S|cooldown",
       "AMZN|15:00|G|",
       "AMZN|15:00|T|",
-      "AMZN|15:00|S|cooldown"
+      "AMZN|15:00|S|cooldown",
+      "TSLA|15:00|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -51,56 +53,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 3588,
+    "rev": 3590,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "TSLA261116P00382500",
-    "strike": "382.5",
-    "entryPremium": 5.635,
-    "qty": 1,
-    "entryTime": 1794842259781,
-    "msgId": 8084,
-    "stopOrderId": "a03c3668-9a15-4375-9f30-81aaa3927201",
-    "hardStopPrice": 3.94,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 382.365,
-      "regime": "bearish",
-      "emaFast": 384.6307,
-      "emaSlow": 385.691,
-      "breakoutHigh": 389.7983,
-      "breakoutLow": 382.12,
-      "volRatio": 10.87,
-      "lastClose": 378.55,
-      "lastVolume": 2068853,
-      "barTime": "2026-11-16T14:45:00Z",
-      "entryTimeUTC": "2026-11-16T15:17:39.782Z",
-      "vwapAtEntry": 384.2242,
-      "rsiAtEntry": 24.18,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 5.59,
-    "entryAsk": 5.68,
-    "entrySpreadPct": 1.597,
-    "entryFillPrice": 5.65,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-16T15:17:39.407Z",
-    "lastReportedThreshold": -20,
-    "nearStopWarned": true
   },
   "QQQ": {
     "active": true,
@@ -146,6 +101,6 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-16T15:30:39.448Z",
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": -10
   }
 }
