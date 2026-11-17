@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-17",
-    "no_signal": 638
+    "no_signal": 646
   },
   "_sigSeen": {
     "day": "2026-11-17",
@@ -40,9 +40,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4310,
-    "peak": 8503.06,
-    "peakAt": "2026-11-17T15:43:04.723Z"
+    "rev": 4312,
+    "peak": 8573.06,
+    "peakAt": "2026-11-17T15:44:13.157Z"
   },
   "SPY": {
     "active": true,
@@ -88,12 +88,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-17T15:30:02.765Z",
-    "lastReportedThreshold": 170,
+    "lastReportedThreshold": 180,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 173.8
+    "peakPct": 189.39999999999998
   },
   "NVDA": {
     "active": true,
@@ -139,7 +139,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-17T15:30:05.545Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 10,
     "ladder1": true,
     "stopPct": 5,
     "peakPct": 16.47966339410938
