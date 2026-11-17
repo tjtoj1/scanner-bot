@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-17",
-    "no_signal": 670
+    "no_signal": 678
   },
   "_sigSeen": {
     "day": "2026-11-17",
@@ -40,60 +40,9 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4318,
+    "rev": 4320,
     "peak": 8751.06,
     "peakAt": "2026-11-17T15:47:46.214Z"
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261117P00737000",
-    "strike": "737",
-    "entryPremium": 2.5,
-    "qty": 1,
-    "entryTime": 1794929403123,
-    "msgId": 8156,
-    "stopOrderId": "f138cf4f-8a8b-4c66-9e34-ae9bfb4c7c78",
-    "hardStopPrice": 1.75,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 736.605,
-      "regime": "bearish",
-      "emaFast": 738.7111,
-      "emaSlow": 739.0821,
-      "breakoutHigh": 740.35,
-      "breakoutLow": 737.47,
-      "volRatio": 6.06,
-      "lastClose": 737.31,
-      "lastVolume": 1594555,
-      "barTime": "2026-11-17T15:00:00Z",
-      "entryTimeUTC": "2026-11-17T15:30:03.123Z",
-      "vwapAtEntry": 738.4699,
-      "rsiAtEntry": 40.24,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 2.47,
-    "entryAsk": 2.49,
-    "entrySpreadPct": 0.806,
-    "entryFillPrice": 2.46,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-17T15:30:02.765Z",
-    "lastReportedThreshold": 250,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 252.99999999999997
   },
   "NVDA": {
     "active": true,
@@ -104,7 +53,7 @@
     "qty": 1,
     "entryTime": 1794929405889,
     "msgId": 8157,
-    "stopOrderId": "ff07ffb1-3384-4d61-96e8-c155a8a60b75",
+    "stopOrderId": "c35454a2-1c24-48d9-852e-c34259521a76",
     "hardStopPrice": 4.99,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -141,7 +90,9 @@
     "entryFilledAt": "2026-11-17T15:30:05.545Z",
     "lastReportedThreshold": 20,
     "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 16.47966339410938
+    "stopPct": 12,
+    "peakPct": 25.596072931276286,
+    "ladder2": true,
+    "trailPct": 8
   }
 }
