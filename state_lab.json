@@ -6,7 +6,8 @@
     "AMZN_CALL": 1794498539131,
     "SPY_CALL": 1794502619856,
     "QQQ_CALL": 1794502620202,
-    "TSLA_PUT": 1794845547175
+    "TSLA_PUT": 1794845547175,
+    "IWM_CALL": 1794929575426
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -17,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-17",
-    "no_signal": 316
+    "no_signal": 324
   },
   "_sigSeen": {
     "day": "2026-11-17",
@@ -25,7 +26,8 @@
       "SPY|14:30|G|",
       "SPY|14:30|T|",
       "IWM|14:30|G|",
-      "IWM|14:30|T|"
+      "IWM|14:30|T|",
+      "IWM|14:30|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -34,7 +36,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4240,
+    "rev": 4242,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   },
@@ -86,53 +88,7 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 25.327510917030573,
-    "lastReportedThreshold": 20
-  },
-  "IWM": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "IWM261117C00273000",
-    "strike": "273",
-    "entryPremium": 0.6950000000000001,
-    "qty": 4,
-    "entryTime": 1794927627794,
-    "msgId": 8144,
-    "stopOrderId": "5620dc74-81b4-41a4-a99b-acc8d02e9eda",
-    "hardStopPrice": 0.49,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 272.615,
-      "regime": "bullish",
-      "emaFast": 272.0385,
-      "emaSlow": 272.0328,
-      "breakoutHigh": 272.36,
-      "breakoutLow": 271.35,
-      "volRatio": 88.12,
-      "lastClose": 272.53,
-      "lastVolume": 1643597,
-      "barTime": "2026-11-17T14:30:00Z",
-      "entryTimeUTC": "2026-11-17T15:00:27.794Z",
-      "vwapAtEntry": 272.2018,
-      "rsiAtEntry": 56.48,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 0.67,
-    "entryAsk": 0.72,
-    "entrySpreadPct": 7.194,
-    "entryFillPrice": 0.7,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-17T15:00:27.654Z",
-    "lastReportedThreshold": -20
+    "peakPct": 43.01310043668122,
+    "lastReportedThreshold": 40
   }
 }
