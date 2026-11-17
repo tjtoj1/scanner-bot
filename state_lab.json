@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-17",
-    "no_signal": 434
+    "no_signal": 446
   },
   "_sigSeen": {
     "day": "2026-11-17",
@@ -36,59 +36,8 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4268,
+    "rev": 4270,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
-  },
-  "SPY": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "SPY261117P00737000",
-    "strike": "737",
-    "entryPremium": 2.3049999999999997,
-    "qty": 1,
-    "entryTime": 1794928133143,
-    "msgId": 8153,
-    "stopOrderId": "7bd13d6d-a3e9-493a-9c7b-7a6063efad34",
-    "hardStopPrice": 1.61,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 737.4449999999999,
-      "regime": "bearish",
-      "emaFast": 738.9942,
-      "emaSlow": 739.2523,
-      "breakoutHigh": 741.725,
-      "breakoutLow": 738.3,
-      "volRatio": 53.39,
-      "lastClose": 737.87,
-      "lastVolume": 2807908,
-      "barTime": "2026-11-17T14:30:00Z",
-      "entryTimeUTC": "2026-11-17T15:08:53.143Z",
-      "vwapAtEntry": 738.573,
-      "rsiAtEntry": 40.28,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 2.3,
-    "entryAsk": 2.31,
-    "entrySpreadPct": 0.434,
-    "entryFillPrice": 2.29,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-17T15:08:52.872Z",
-    "lastReportedThreshold": 20,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 25.162689804772242
   }
 }
