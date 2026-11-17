@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-17",
-    "no_signal": 356
+    "no_signal": 364
   },
   "_sigSeen": {
     "day": "2026-11-17",
@@ -36,21 +36,21 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4250,
+    "rev": 4252,
     "peak": 8189.3,
     "peakAt": "2026-11-13T15:21:45.172Z"
   },
   "SPY": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "SPY261117P00738000",
-    "strike": "738",
-    "entryPremium": 2.465,
+    "optionSymbol": "SPY261117P00737000",
+    "strike": "737",
+    "entryPremium": 2.3049999999999997,
     "qty": 1,
-    "entryTime": 1794927919628,
-    "msgId": 8150,
-    "stopOrderId": "494baf4b-ad9b-45b6-8d6c-4d32cbab0766",
-    "hardStopPrice": 1.73,
+    "entryTime": 1794928133143,
+    "msgId": 8153,
+    "stopOrderId": "df3b64ff-7539-4fe7-a2c8-4842afac4231",
+    "hardStopPrice": 1.61,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -59,7 +59,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 738.04,
+      "spot": 737.4449999999999,
       "regime": "bearish",
       "emaFast": 738.9942,
       "emaSlow": 739.2523,
@@ -69,7 +69,7 @@
       "lastClose": 737.87,
       "lastVolume": 2807908,
       "barTime": "2026-11-17T14:30:00Z",
-      "entryTimeUTC": "2026-11-17T15:05:19.628Z",
+      "entryTimeUTC": "2026-11-17T15:08:53.143Z",
       "vwapAtEntry": 738.573,
       "rsiAtEntry": 40.28,
       "signalType": "breakout",
@@ -77,16 +77,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "entryBid": 2.44,
-    "entryAsk": 2.46,
-    "entrySpreadPct": 0.816,
-    "entryFillPrice": 2.42,
+    "entryBid": 2.3,
+    "entryAsk": 2.31,
+    "entrySpreadPct": 0.434,
+    "entryFillPrice": 2.29,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-17T15:05:19.490Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.821501014198788,
-    "lastReportedThreshold": 10
+    "entryFilledAt": "2026-11-17T15:08:52.872Z"
   }
 }
