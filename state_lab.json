@@ -1,7 +1,7 @@
 {
   "_lastDay": "2026-11-17",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-11-16",
+  "_lastComboLearnedDay": "2026-11-17",
   "_cooldowns": {
     "AMZN_CALL": 1794498539131,
     "SPY_CALL": 1794502619856,
@@ -20,7 +20,7 @@
     "day": "2026-11-17",
     "no_signal": 2798,
     "max_open_positions": 180,
-    "past_last_entry": 139
+    "past_last_entry": 145
   },
   "_sigSeen": {
     "day": "2026-11-17",
@@ -48,7 +48,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4858,
+    "rev": 4860,
     "peak": 8751.06,
     "peakAt": "2026-11-17T15:47:46.214Z"
   }
