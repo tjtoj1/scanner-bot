@@ -16,27 +16,8 @@
   ],
   "_cooldowns": {
     "SPY_PUT": "2026-11-16T15:42:30.900Z",
-    "QQQ_CALL": "2026-11-16T17:09:18.248Z"
-  },
-  "SPY": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "SPY261117C00738000",
-    "strike": "738",
-    "entryPremium": 2.99,
-    "qty": 1,
-    "entryTime": 1794926714879,
-    "stopOrderId": "b8e94b5c-1288-41a6-bbeb-9ce850f59098",
-    "hardStopPrice": 1.94,
-    "entryStockPrice": 738.405,
-    "wvadSumAtEntry": 3040144.53,
-    "signalLineAtEntry": -4367576.09,
-    "atrAtEntry": 1.7067,
-    "slStock": 735.84,
-    "dte": 0,
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 10.869565217391294
+    "QQQ_CALL": "2026-11-16T17:09:18.248Z",
+    "SPY_CALL": "2026-11-17T15:01:46.378Z"
   },
   "QQQ": {
     "active": true,
@@ -46,13 +27,18 @@
     "entryPremium": 3.1100000000000003,
     "qty": 1,
     "entryTime": 1794927634073,
-    "stopOrderId": "8c9f337d-ab46-47d7-a373-f6fb71011a25",
+    "stopOrderId": "fd27ca5a-55e8-49aa-86a7-50e1e05691f1",
     "hardStopPrice": 2.02,
     "entryStockPrice": 662.2550000000001,
     "wvadSumAtEntry": -2910742.07,
     "signalLineAtEntry": -2347326.75,
     "atrAtEntry": 2.3483,
     "slStock": 665.78,
-    "dte": 0
+    "dte": 0,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 10,
+    "trailPct": 10,
+    "peakPct": 24.115755627009644
   }
 }
