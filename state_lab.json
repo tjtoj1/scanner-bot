@@ -15,7 +15,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-18",
-    "no_signal": 339,
+    "no_signal": 345,
     "max_open_positions": 58
   },
   "_sigSeen": {
@@ -32,7 +32,8 @@
       "TSLA|14:30|G|",
       "AMZN|14:30|G|",
       "IWM|14:45|G|",
-      "AMZN|14:45|G|"
+      "AMZN|14:45|G|",
+      "IWM|14:45|T|"
     ]
   },
   "_sigPending": {
@@ -41,7 +42,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5004,
+    "rev": 5006,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -95,5 +96,50 @@
     "peakPct": 43.20388349514563,
     "ladder2": true,
     "trailPct": 8
+  },
+  "IWM": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "IWM261118C00271000",
+    "strike": "271",
+    "entryPremium": 0.975,
+    "qty": 1,
+    "entryTime": 1795015635728,
+    "msgId": 8248,
+    "stopOrderId": "547ecb53-0140-495c-b413-a88d37bfdd9a",
+    "hardStopPrice": 0.68,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 270.935,
+      "regime": "bullish",
+      "emaFast": 269.0857,
+      "emaSlow": 269.0165,
+      "breakoutHigh": 269.91,
+      "breakoutLow": 267.47,
+      "volRatio": 10.25,
+      "lastClose": 270.92,
+      "lastVolume": 1417327,
+      "barTime": "2026-11-18T14:45:00Z",
+      "entryTimeUTC": "2026-11-18T15:27:15.728Z",
+      "vwapAtEntry": 269.3941,
+      "rsiAtEntry": 67.61,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 0.97,
+    "entryAsk": 0.98,
+    "entrySpreadPct": 1.026,
+    "entryFillPrice": 0.96,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-18T15:27:15.557Z"
   }
 }
