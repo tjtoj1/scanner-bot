@@ -425,8 +425,40 @@ console.log("\n── 12) scope ──");
   }
   check("scan_wvad.js byte-identical",
     lf(fs.readFileSync("scan_wvad.js", "utf8")) === showAt(BASE_SHA, "scan_wvad.js"), "changed", "identical");
-  check("daily_report.js byte-identical",
-    lf(fs.readFileSync("daily_report.js", "utf8")) === showAt(BASE_SHA, "daily_report.js"), "changed", "identical");
+  // Same treatment as the scan_v21.js pin just above, and for the same
+  // reason. daily_report.js was pinned byte-identical to assert that the
+  // combo learner stayed inside scan_lab.js — the report reads
+  // strategy_lab.json to PRINT the changelog, and must never become a
+  // second writer of it or a second place a tier can be applied. The
+  // report has since legitimately changed for unrelated reasons, so the
+  // pin is NARROWED to that invariant instead of deleted.
+  {
+    const rep = lf(fs.readFileSync("daily_report.js", "utf8"));
+    const code = rep.split("\n").filter(l => !l.trim().startsWith("//")).join("\n");
+
+    const combo = ["computeCombos", "lookupComboMultiplier", "COMBO_SIZE_MULTIPLIER",
+                   "COMBO_AUTOAPPLY", "COMBO_APPROVALS_FILE", "loadComboApprovals",
+                   "matchComboApproval", "buildComboProposalTemplate",
+                   "pendingComboProposals", "combo_approvals", "sizeMultiplier",
+                   "tierFor", "positionBucket", "tuningBucket"];
+    const leaked = combo.filter(k => code.includes(k));
+    check("daily_report.js carries no combo-learner machinery", leaked.length === 0, leaked, []);
+
+    // It may read strategy_lab.json; it may never write it.
+    check("daily_report.js reads strategy_lab.json", /strategy_lab\.json/.test(code), "absent", "present");
+    const writes = code.match(/writeFileSync\(\s*"([^"]+)"/g) || [];
+    check("daily_report.js writes exactly one file, report_state.json",
+      writes.length === 1 && /writeFileSync\(\s*"report_state\.json"/.test(code), writes, "report_state.json only");
+    check("…so strategy_lab.json is never written by the report",
+      !/writeFileSync\(\s*"strategy_lab\.json"/.test(code), "written", "read-only");
+
+    // The one function that touches the changelog is unchanged, so the
+    // propose-only entries are displayed exactly as they were.
+    const reLab = /function buildLabChangesSection\([\s\S]*?\n\}/;
+    check("daily_report.js: buildLabChangesSection() byte-identical",
+      grab(rep, reLab, "buildLabChangesSection") === grab(showAt(BASE_SHA, "daily_report.js"), reLab, "buildLabChangesSection@base"),
+      "changed", "identical");
+  }
   check("the changelog records the applied approval",
     /ownerApproved: true, approvedBy: approvedBy\.get\(key\)/.test(src), "missing", "present");
 }

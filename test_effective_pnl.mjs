@@ -482,13 +482,51 @@ for (const bot of ["v21", "lab"]) {
 }
 
 // ════════════════════════════════════════════════════════════
-// 9) daily_report.js untouched (reduced to byte-identity)
+// 9) daily_report.js: the reported-pnl semantics of its daily lines
 // ════════════════════════════════════════════════════════════
-console.log(`\n── 9) daily_report.js byte-identical to ${BASE_SHA.slice(0, 8)} ──`);
+// This was a whole-file byte-identity pin. What it protected is that the
+// day-level effectivePnl switch did NOT reach the report: the report's
+// daily lines keep summing the reported `r.pnl`, and the report never
+// borrows the scan-side day/stop helpers. The report has since gained a
+// cumulative section, which is a legitimate change, so the pin is
+// NARROWED to those invariants — the P&L-computing regions themselves are
+// still pinned byte-for-byte.
+console.log(`\n── 9) daily_report.js P&L semantics vs ${BASE_SHA.slice(0, 8)} ──`);
 {
   const now = lf(fs.readFileSync("daily_report.js", "utf8"));
-  check("daily_report.js whole file byte-identical", now === showAt(BASE_SHA, "daily_report.js"), "changed", "identical");
+  const base = showAt(BASE_SHA, "daily_report.js");
+  const code = now.split("\n").filter(l => !l.trim().startsWith("//")).join("\n");
+
+  // The regions that compute every existing daily number, byte-for-byte.
+  for (const [label, re] of [
+    ["stats()", /function stats\(rows\) \{[\s\S]*?\n\}/],
+    ["groupBy()", /function groupBy\([\s\S]*?\n\}/],
+    ["fillLine()", /function fillLine\(rows\) \{[\s\S]*?\n\}/],
+    ["pctLine()", /function pctLine\(rows, portfolioValue\) \{[\s\S]*?\n\}/],
+  ]) {
+    check(`daily_report.js: ${label} byte-identical`,
+      grab(now, re, label) === grab(base, re, `${label}@base`), "changed", "identical");
+  }
+
+  // stats() is what the daily lines render, and it still sums r.pnl.
+  const statsSrc = grab(now, /function stats\(rows\) \{[\s\S]*?\n\}/, "stats");
+  check("daily_report.js: the daily lines still sum the reported r.pnl",
+    /r\.pnl\b/.test(statsSrc) && !/pnlAtFill/.test(statsSrc), statsSrc.slice(0, 60), "sums r.pnl");
+
+  // The report never borrows the scan-side day/stop machinery, which is
+  // where the effectivePnl switch lives.
+  const scanSide = ["effectivePnl", "getTodayRealizedDay", "readDayPeak", "bumpDayPeak",
+                    "profitFloor", "STOP_DAY_LOSS", "DAILY_LOSS_LIMIT"];
+  const leaked = scanSide.filter(k => code.includes(k));
+  check("daily_report.js borrows no scan-side day/stop machinery", leaked.length === 0, leaked, []);
   check("daily_report.js still has no effectivePnl reference", !/effectivePnl/.test(now), "present", "absent");
+
+  // Where the report DOES use fills, it does so on its own terms: the raw
+  // pnlAtFill field with a typeof guard, not the scan-side helper.
+  if (/pnlAtFill/.test(code)) {
+    check("…and where it uses fills it reads pnlAtFill directly, typeof-guarded",
+      /typeof r\.pnlAtFill === "number"/.test(code), "unguarded", "typeof-guarded");
+  }
   check("scan_wvad.js whole file byte-identical",
     lf(fs.readFileSync("scan_wvad.js", "utf8")) === showAt(BASE_SHA, "scan_wvad.js"), "changed", "identical");
   check("runner.js whole file byte-identical",
