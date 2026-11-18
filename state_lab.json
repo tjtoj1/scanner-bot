@@ -1,7 +1,7 @@
 {
   "_lastDay": "2026-11-18",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-11-17",
+  "_lastComboLearnedDay": "2026-11-18",
   "_cooldowns": {
     "SPY_CALL": 1794502619856,
     "QQQ_CALL": 1794502620202,
@@ -18,7 +18,7 @@
     "day": "2026-11-18",
     "no_signal": 3293,
     "max_open_positions": 58,
-    "past_last_entry": 162
+    "past_last_entry": 168
   },
   "_sigSeen": {
     "day": "2026-11-18",
@@ -49,7 +49,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5574,
+    "rev": 5576,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   }
