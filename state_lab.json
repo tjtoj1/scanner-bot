@@ -4,8 +4,7 @@
   "_lastComboLearnedDay": "2026-11-17",
   "_cooldowns": {
     "SPY_CALL": 1794502619856,
-    "QQQ_CALL": 1794502620202,
-    "IWM_CALL": 1794929575426
+    "QQQ_CALL": 1794502620202
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -16,7 +15,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-18",
-    "no_signal": 279,
+    "no_signal": 285,
     "max_open_positions": 58
   },
   "_sigSeen": {
@@ -31,7 +30,9 @@
       "NVDA|14:30|G|",
       "NVDA|14:30|T|",
       "TSLA|14:30|G|",
-      "AMZN|14:30|G|"
+      "AMZN|14:30|G|",
+      "IWM|14:45|G|",
+      "AMZN|14:45|G|"
     ]
   },
   "_sigPending": {
@@ -40,7 +41,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4984,
+    "rev": 4986,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
