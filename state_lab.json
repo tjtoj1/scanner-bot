@@ -19,7 +19,7 @@
   "_sigCounts": {
     "day": "2026-11-18",
     "no_signal": 275,
-    "max_open_positions": 4
+    "max_open_positions": 10
   },
   "_sigSeen": {
     "day": "2026-11-18",
@@ -36,23 +36,13 @@
   },
   "_sigPending": {
     "day": "2026-11-18",
-    "items": [
-      {
-        "symbol": "NVDA",
-        "optionSymbol": "NVDA261118P00155000",
-        "barTime": "2026-11-18T14:30:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 2.06,
-        "queuedAt": "2026-11-18T15:00:49.589Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4962,
-    "peak": 8759.05,
-    "peakAt": "2026-11-18T15:00:45.274Z"
+    "rev": 4964,
+    "peak": 8954,
+    "peakAt": "2026-11-18T15:01:59.801Z"
   },
   "SPY": {
     "active": true,
@@ -63,7 +53,7 @@
     "qty": 1,
     "entryTime": 1795014043185,
     "msgId": 8226,
-    "stopOrderId": "237eb556-7ec2-4034-a41c-334eccb8095e",
+    "stopOrderId": "1e258cc6-43a0-4c9e-a605-fe4af5934dbc",
     "hardStopPrice": 1.94,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -97,7 +87,13 @@
     "entryFillPrice": 2.76,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-18T15:00:40.957Z"
+    "entryFilledAt": "2026-11-18T15:00:40.957Z",
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 27.6173285198556,
+    "lastReportedThreshold": 20
   },
   "QQQ": {
     "active": true,
@@ -108,7 +104,7 @@
     "qty": 1,
     "entryTime": 1795014044455,
     "msgId": 8227,
-    "stopOrderId": "775726aa-a38f-4967-bb27-2e2dae7ac190",
+    "stopOrderId": "34caf94a-6eb4-4300-837d-ab2a3f158df8",
     "hardStopPrice": 2.63,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -142,7 +138,13 @@
     "entryFillPrice": 3.72,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-18T15:00:44.295Z"
+    "entryFilledAt": "2026-11-18T15:00:44.295Z",
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 28.22902796271637,
+    "lastReportedThreshold": 20
   },
   "NVDA": {
     "active": true,
@@ -187,6 +189,7 @@
     "entryFillPrice": 2.11,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-18T15:00:49.733Z"
+    "entryFilledAt": "2026-11-18T15:00:49.733Z",
+    "lastReportedThreshold": 10
   }
 }
