@@ -334,8 +334,18 @@ console.log("\n── 9) scope ──");
   const untracked = execFileSync("git", ["ls-files", "--others", "--exclude-standard"], { encoding: "utf8" })
     .split("\n").filter(Boolean);
   const allowed = new Set(["daily_report.js", "test_report_cumulative.mjs"]);
-  const strayTracked = changed.filter(f => !allowed.has(f));
-  check("no tracked file outside daily_report.js changed", strayTracked.length === 0, strayTracked, []);
+  // The invariant is that no PRODUCTION file but daily_report.js moved.
+  // Test files are exempt: three sibling suites pinned daily_report.js
+  // byte-identical and had to be narrowed on this same branch, which is a
+  // test-only change. The per-file byte-identity list below is the strong
+  // form of this check for every production file that matters.
+  const isTest = f => /^test_.*\.mjs$/.test(f);
+  const strayTracked = changed.filter(f => !allowed.has(f) && !isTest(f));
+  check("no production file outside daily_report.js changed", strayTracked.length === 0, strayTracked, []);
+  const strayTests = changed.filter(f => isTest(f) && !allowed.has(f));
+  check(`only the narrowed scope pins changed among tests (${strayTests.length})`,
+    strayTests.every(f => ["test_equity_guard.mjs", "test_combo_policy.mjs", "test_effective_pnl.mjs"].includes(f)),
+    strayTests, "the three narrowed suites only");
   for (const f of ["scan_v21.js", "scan_lab.js", "scan_wvad.js", "runner.js",
                    "state_v21.json", "state_lab.json", "state_wvad.json",
                    "outcomes_v21.jsonl", "outcomes_lab.jsonl", "outcomes_wvad.jsonl",
