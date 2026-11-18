@@ -6,6 +6,12 @@
       "symbol": "QQQ",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-11-18",
+      "symbol": "QQQ",
+      "signal": "PUT",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
@@ -15,23 +21,18 @@
   "QQQ": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "QQQ261118P00662000",
-    "strike": "662",
-    "entryPremium": 3.87,
+    "optionSymbol": "QQQ261118P00661000",
+    "strike": "661",
+    "entryPremium": 3.825,
     "qty": 1,
-    "entryTime": 1795014052612,
-    "stopOrderId": "ebf0e155-7773-4909-89f3-6e11f0b85937",
-    "hardStopPrice": 2.52,
-    "entryStockPrice": 661.505,
+    "entryTime": 1795014760395,
+    "stopOrderId": "c9a05861-1891-434f-95d8-5d99492dbc1d",
+    "hardStopPrice": 2.49,
+    "entryStockPrice": 660.51,
     "wvadSumAtEntry": -2072049.14,
     "signalLineAtEntry": -1960585.97,
     "atrAtEntry": 3.1226,
-    "slStock": 666.19,
-    "dte": 0,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 35.78811369509044
+    "slStock": 665.19,
+    "dte": 0
   }
 }
