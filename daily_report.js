@@ -17,6 +17,12 @@ import fs from "fs";
 const TG_TOKEN      = process.env.TG_TOKEN;
 const PERSONAL_CHAT = "810642442";
 
+// Start of the cumulative window. ONE constant, used by every bot's
+// cumulative line — the same date the equity-drawdown guard and the
+// trading freeze are measured from, so the three agree by construction
+// instead of by coincidence.
+const CUMULATIVE_FROM = "2026-10-23";
+
 function readJSONL(path) {
   try {
     return fs.readFileSync(path, "utf8").split("\n").filter(l => l.trim())
@@ -81,14 +87,14 @@ function detectPatterns(rows) {
       notes.push(`كل الدخول تركّز خلال ${spanMin.toFixed(0)} دقيقة فقط.`);
     }
   }
-  const lateAlpacaStops = rows.filter(r => {
-    if (r.reason !== "alpaca_stop" && r.reason !== "alpaca_stop_est") return false;
-    const holdMin = (new Date(r.exitTime) - new Date(r.entryTime)) / 60000;
-    return holdMin > 60;
-  });
-  if (lateAlpacaStops.length) {
-    notes.push(`${lateAlpacaStops.length} صفقة أُغلقت عبر alpaca_stop بعد أكثر من ساعة من الدخول — احتمال تأخر مراقبة، السعر المسجَّل قد لا يعكس سعر التنفيذ الفعلي.`);
-  }
+  // REMOVED: the "احتمال تأخر مراقبة" (possible monitoring lag) note on
+  // alpaca_stop trades held over an hour. It read as a fault report, but
+  // alpaca_stop is the DESIGNED path — the broker's resting stop fired —
+  // and the stops themselves do not slip (measured: median $0.00 against
+  // the live stop price, v21 n=38, LAB n=53). The one true half of the
+  // claim, that the recorded exit price is not the fill price, is already
+  // reported precisely and quantitatively by fillLine() above, so the
+  // note added nothing but an implication of a problem that is not there.
   return notes;
 }
 
@@ -103,7 +109,12 @@ function suggestV21Improvement(todayRows, allRows) {
   const n = rows.length;
 
   if (alpacaStop.length / n > 0.4) {
-    return `${alpacaStop.length}/${n} صفقة (${Math.round(alpacaStop.length/n*100)}%) أُغلقت عبر alpaca_stop — أي اكتُشف إغلاقها متأخراً بدل أن يديرها monitorPosition مباشرة وقت وقوعه. مقترح للمراجعة: تحقّق من استقرار جدولة Railway حول أوقات هذه الصفقات تحديداً.`;
+    // REMOVED: "مقترح للمراجعة: تحقّق من استقرار جدولة Railway…". It sent
+    // the reader after a scheduling fault that does not exist —
+    // alpaca_stop means the broker's own resting stop fired between bot
+    // polls, which is what that stop is for. The ratio itself is a real
+    // and useful fact, so it stays; only the false lead is gone.
+    return `${alpacaStop.length}/${n} صفقة (${Math.round(alpacaStop.length/n*100)}%) أُغلقت عبر alpaca_stop — أي نفّذ وقف الوسيط نفسه بين دورتَي المراقبة. هذا المسار المقصود للوقف، وليس خللاً في الجدولة.`;
   }
   if (hardStop.length / n > 0.4) {
     return `${hardStop.length}/${n} صفقة أُغلقت عبر وقف الخسارة الصلب (-35%) — نسبة مرتفعة قد تستدعي مراجعة شرط الدخول (تأكيد الحجم/الاتجاه) لتقليل الإشارات الضعيفة.`;
@@ -155,7 +166,94 @@ function fillLine(rows) {
     + ` (${withFill.length} من ${rows.length} صفقة)\n`;
 }
 
-function buildBotSection(title, todayRows, activeSymbols, portfolioValue = 0) {
+// ─── CUMULATIVE TOTALS ────────────────────────────────────────────────
+//
+// The fill-based value of a trade: pnlAtFill when it is a number, else
+// the reported pnl. `typeof` and not a truthiness test, because a
+// pnlAtFill of exactly 0 is a real outcome and `|| pnl` would silently
+// substitute the optimistic figure for it.
+//
+// WIN is defined on this same value, so the win rate, the net and the
+// profit factor all agree. A trade whose reported pnl is positive but
+// whose fill-based pnl is negative counts as a loss here and as a win in
+// the existing daily lines — that divergence is the point of the section,
+// not a bug, and it is why these lines live beside the daily ones rather
+// than replacing them.
+function effPnl(r) {
+  return (typeof r.pnlAtFill === "number") ? r.pnlAtFill : r.pnl;
+}
+
+// days / trades / win rate / net / profit factor over `rows`.
+// PF is gross profit over gross loss. With no losses it is unbounded, so
+// it prints ∞ rather than a number that would read as a real ratio.
+function cumulative(rows, val) {
+  const n = rows.length;
+  const wins = rows.filter(r => val(r) > 0).length;
+  const gp = rows.filter(r => val(r) > 0).reduce((a, r) => a + val(r), 0);
+  const gl = Math.abs(rows.filter(r => val(r) < 0).reduce((a, r) => a + val(r), 0));
+  return {
+    days: new Set(rows.map(r => r.day)).size,
+    n, wins,
+    wr: n ? Math.round(wins / n * 100) : 0,
+    net: Math.round(rows.reduce((a, r) => a + val(r), 0)),
+    pf: gl > 0 ? +(gp / gl).toFixed(2) : (gp > 0 ? Infinity : null),
+  };
+}
+
+// The sign goes BEFORE the $, so a loss reads "-$1034" and not "$-1034".
+// The existing daily lines use `${net>=0?"+":""}$${net}`, which renders
+// "+$100" but "$-1034"; these new lines are not bound by that and read
+// better without it. Flagged for the owner rather than changed above,
+// because the daily lines are to be left exactly as they are.
+function fmtCumulative(c) {
+  const pf = c.pf === null ? "—" : (c.pf === Infinity ? "∞" : c.pf.toFixed(2));
+  return `${c.days} يوم | ${c.n} صفقة | WR ${c.wr}% | `
+    + `صافي ${c.net >= 0 ? "+" : "-"}$${Math.abs(c.net)} | PF ${pf}`;
+}
+
+// Both cumulative lines for one bot. `reported` marks a bot whose rows
+// carry no fills at all (WVAD), so the label says so instead of implying
+// a fill-based figure it cannot produce.
+//
+// Never throws: any failure degrades to a "غير متاح" line, because a
+// cumulative total is the least important thing in the report and must
+// never be the reason the report does not arrive.
+function cumulativeLines(allRows, { reported = false } = {}) {
+  try {
+    if (!Array.isArray(allRows) || !allRows.length) {
+      return `📈 تراكمي منذ ${CUMULATIVE_FROM}: غير متاح\n`;
+    }
+    const val = reported ? (r => r.pnl) : effPnl;
+    const tag = reported ? " (مُبلَّغ)" : "";
+    const win = allRows.filter(r => r.day >= CUMULATIVE_FROM);
+    const w = win.length
+      ? fmtCumulative(cumulative(win, val))
+      : "لا صفقات في هذه النافذة";
+    return `📈 تراكمي منذ ${CUMULATIVE_FROM}${tag}: ${w}\n`
+      + `📊 منذ البداية${tag}: ${fmtCumulative(cumulative(allRows, val))}\n`;
+  } catch (e) {
+    console.error("[daily_report] cumulative failed:", e.message);
+    return `📈 تراكمي منذ ${CUMULATIVE_FROM}: غير متاح\n`;
+  }
+}
+
+// Equity-drawdown guard status, read from the bot's own state file.
+// READ-ONLY and never throws: an unreadable file, a file with no
+// _equityGuard (WVAD has no guard at all), or any malformed shape all
+// report "غير متاح" rather than guessing that the guard is active.
+function equityGuardLine(stateFile) {
+  try {
+    const g = readJSON(stateFile, null)?._equityGuard;
+    if (!g || typeof g !== "object") return `🛡 الحارس: غير متاح\n`;
+    if (g.halt?.haltedAt) return `🛡 الحارس: موقوف منذ ${g.halt.haltedAt}\n`;
+    return `🛡 الحارس: نشط\n`;
+  } catch (e) {
+    console.error("[daily_report] equity guard read failed:", e.message);
+    return `🛡 الحارس: غير متاح\n`;
+  }
+}
+
+function buildBotSection(title, todayRows, activeSymbols, portfolioValue = 0, cum = null) {
   let msg = `\n<b>━━ ${title} ━━</b>\n`;
   if (!todayRows.length) {
     msg += `لا صفقات مغلقة اليوم.\n`;
@@ -180,6 +278,12 @@ function buildBotSection(title, todayRows, activeSymbols, portfolioValue = 0) {
     if (patterns.length) msg += `\n🔍 ملاحظات:\n` + patterns.map(p => `- ${p}`).join("\n") + "\n";
   }
   if (activeSymbols.length) msg += `\n📌 مفتوحة الآن: ${activeSymbols.join(", ")}\n`;
+  // Appended AFTER the daily block, so every line above is untouched and
+  // a reader who only wants today still reads it first.
+  if (cum) {
+    msg += "\n" + cumulativeLines(cum.allRows, { reported: cum.reported });
+    msg += equityGuardLine(cum.stateFile);
+  }
   return msg;
 }
 
@@ -278,11 +382,16 @@ async function wvadPortfolioValue() {
   }
 
   let msg = `📊 <b>التقرير اليومي — ${today}</b>\n`;
-  msg += buildBotSection("v21 ORB", v21Today, v21Active);
+  msg += buildBotSection("v21 ORB", v21Today, v21Active, 0,
+    { allRows: v21Outcomes, stateFile: "state_v21.json" });
   msg += `\n💡 <b>اقتراح تحسين v21 — للمراجعة فقط، لا يُنفَّذ إلا بموافقة المستخدم و Claude معاً:</b>\n${suggestV21Improvement(v21Today, v21Outcomes)}\n`;
-  msg += buildBotSection("LAB", labToday, labActive);
+  msg += buildBotSection("LAB", labToday, labActive, 0,
+    { allRows: labOutcomes, stateFile: "state_lab.json" });
   msg += buildLabChangesSection(strategy, today);
-  msg += buildBotSection("WVAD (SPY/QQQ)", wvadToday, wvadActive, await wvadPortfolioValue());
+  // WVAD carries no pnlAtFill on any row, so its cumulative figures are
+  // reported-pnl only and are labelled as such.
+  msg += buildBotSection("WVAD (SPY/QQQ)", wvadToday, wvadActive, await wvadPortfolioValue(),
+    { allRows: wvadOutcomes, stateFile: "state_wvad.json", reported: true });
 
   const result = await tg(msg);
   if (result && result.ok) {
