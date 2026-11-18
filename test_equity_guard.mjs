@@ -42,6 +42,10 @@ const check = (name, ok, got, want) => {
   }
 };
 
+// The report's broker call path, pinned by section 11 in place of the
+// whole-file daily_report.js pin.
+const RE_REPORT_PORTFOLIO = /async function wvadPortfolioValue\(\) \{[\s\S]*?\n\}/;
+
 const RE = {
   threshold: /const EQUITY_DRAWDOWN_HALT = [\d.]+;[^\n]*/,
   botId: /const EQUITY_BOT_ID        = "[^"]+";/,
@@ -526,8 +530,53 @@ check("equity_guard_resume.json is NOT in STATE_FILES (owner-edited, never conta
   !/equity_guard_resume/.test(lf(fs.readFileSync("runner.js", "utf8"))), "present", "absent");
 check("scan_wvad.js byte-identical",
   lf(fs.readFileSync("scan_wvad.js", "utf8")) === showAt(BASE_SHA, "scan_wvad.js"), "changed", "identical");
-check("daily_report.js byte-identical",
-  lf(fs.readFileSync("daily_report.js", "utf8")) === showAt(BASE_SHA, "daily_report.js"), "changed", "identical");
+// daily_report.js was pinned byte-identical because the guard's journal
+// lives inside state_v21.json / state_lab.json, and the report must never
+// be the thing that touches it. The report now READS that journal to print
+// a status line, which is a legitimate change, so the pin is NARROWED to
+// the invariant it was actually protecting: the report may read the guard,
+// but it carries no part of the guard's write machinery and writes no
+// state file. Byte-identity was only ever a proxy for that.
+{
+  const rep = lf(fs.readFileSync("daily_report.js", "utf8"));
+  const code = rep.split("\n").filter(l => !l.trim().startsWith("//")).join("\n");
+
+  // No write machinery: none of the functions or knobs that can create,
+  // move, clear or merge a halt may exist here.
+  const writeMachinery = [
+    "mergeEquityGuard", "amendEquityGuard", "updateEquityGuard",
+    "loadEquityResume", "equityResumeFor", "saveState",
+    "EQUITY_DRAWDOWN_HALT", "EQUITY_RESUME_FILE", "EQUITY_BOT_ID",
+  ];
+  const leaked = writeMachinery.filter(k => code.includes(k));
+  check("daily_report.js carries none of the guard's write machinery", leaked.length === 0, leaked, []);
+
+  // The guard is read, never assigned. An assignment in any form would be
+  // a write to the journal from the report process.
+  check("daily_report.js never assigns _equityGuard",
+    !/_equityGuard\s*(=[^=]|:)/.test(code), "assigns it", "read-only");
+  check("…and reads it only through the optional-chained accessor",
+    (code.match(/_equityGuard/g) || []).length === 1
+    && /readJSON\(stateFile, null\)\?\._equityGuard/.test(code), "other access", "one guarded read");
+
+  // Exactly one write in the whole file, and it is the report's own state.
+  const writes = code.match(/writeFileSync\(\s*"([^"]+)"/g) || [];
+  check("daily_report.js writes exactly one file", writes.length === 1, writes, 1);
+  check("…and that file is report_state.json, never a state_*.json",
+    /writeFileSync\(\s*"report_state\.json"/.test(code) && !/writeFileSync\(\s*"state_/.test(code),
+    writes, "report_state.json only");
+
+  // The broker call path the guard reads equity through is untouched here.
+  check("daily_report.js: wvadPortfolioValue() byte-identical",
+    grab(lf(fs.readFileSync("daily_report.js", "utf8")), RE_REPORT_PORTFOLIO, "wvadPortfolioValue")
+    === grab(showAt(BASE_SHA, "daily_report.js"), RE_REPORT_PORTFOLIO, "wvadPortfolioValue@base"),
+    "changed", "identical");
+
+  // Non-vacuity: the status line really is there, so this block is
+  // asserting about live code and not about an absent feature.
+  check("daily_report.js does print a guard status line (so this is not vacuous)",
+    /الحارس/.test(code) && /equityGuardLine/.test(code), "absent", "present");
+}
 check("strategy_lab.json byte-identical (no sizing change)",
   lf(fs.readFileSync("strategy_lab.json", "utf8")) === showAt(BASE_SHA, "strategy_lab.json"), "changed", "identical");
 for (const bot of ["v21", "lab"]) {
