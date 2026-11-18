@@ -16,7 +16,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-18",
-    "no_signal": 1505,
+    "no_signal": 1515,
     "max_open_positions": 58
   },
   "_sigSeen": {
@@ -37,7 +37,8 @@
       "IWM|14:45|T|",
       "AMZN|15:00|G|",
       "AMZN|15:15|G|",
-      "NVDA|15:30|G|"
+      "NVDA|15:30|G|",
+      "AMZN|17:00|G|"
     ]
   },
   "_sigPending": {
@@ -46,7 +47,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5214,
+    "rev": 5216,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   }
