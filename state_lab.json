@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-18",
-    "no_signal": 234
+    "no_signal": 244
   },
   "_sigSeen": {
     "day": "2026-11-18",
@@ -33,21 +33,21 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4952,
+    "rev": 4954,
     "peak": 8751.06,
     "peakAt": "2026-11-17T15:47:46.214Z"
   },
   "TSLA": {
     "active": true,
     "signal": "CALL",
-    "optionSymbol": "TSLA261118C00382500",
-    "strike": "382.5",
-    "entryPremium": 3.175,
+    "optionSymbol": "TSLA261118C00385000",
+    "strike": "385",
+    "entryPremium": 2.44,
     "qty": 1,
-    "entryTime": 1795013471736,
-    "msgId": 8217,
-    "stopOrderId": "6193adea-bd05-484b-9c3a-b4d8bfd7b092",
-    "hardStopPrice": 2.22,
+    "entryTime": 1795013756902,
+    "msgId": 8221,
+    "stopOrderId": "9be64d10-65e2-442c-9ea7-a6b3ea69c697",
+    "hardStopPrice": 1.71,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -56,7 +56,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 382.595,
+      "spot": 384.385,
       "regime": "bullish",
       "emaFast": 383.7182,
       "emaSlow": 383.5394,
@@ -66,24 +66,20 @@
       "lastClose": 385.44,
       "lastVolume": 82078,
       "barTime": "2026-11-18T14:15:00Z",
-      "entryTimeUTC": "2026-11-18T14:51:11.736Z",
+      "entryTimeUTC": "2026-11-18T14:55:56.902Z",
       "vwapAtEntry": 383.7005,
       "rsiAtEntry": 61.12,
       "signalType": "breakout",
-      "positionBucket": "mid",
-      "comboKey": "CALL|position:mid",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryBid": 3.12,
-    "entryAsk": 3.28,
-    "entrySpreadPct": 5,
-    "entryFillPrice": 3.25,
+    "entryBid": 2.42,
+    "entryAsk": 2.46,
+    "entrySpreadPct": 1.639,
+    "entryFillPrice": 2.44,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-18T14:51:11.466Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 24.724409448818903,
-    "lastReportedThreshold": 10
+    "entryFilledAt": "2026-11-18T14:55:56.786Z"
   }
 }
