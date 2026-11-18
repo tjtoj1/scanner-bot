@@ -18,7 +18,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-18",
-    "no_signal": 264
+    "no_signal": 274
   },
   "_sigSeen": {
     "day": "2026-11-18",
@@ -33,7 +33,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 4958,
+    "rev": 4960,
     "peak": 8751.06,
     "peakAt": "2026-11-17T15:47:46.214Z"
   },
@@ -42,12 +42,12 @@
     "signal": "CALL",
     "optionSymbol": "TSLA261118C00385000",
     "strike": "385",
-    "entryPremium": 2.44,
+    "entryPremium": 2.79,
     "qty": 1,
-    "entryTime": 1795013756902,
-    "msgId": 8221,
-    "stopOrderId": "a72ddb17-8d0a-4860-b935-29338edcdfd6",
-    "hardStopPrice": 1.71,
+    "entryTime": 1795013969702,
+    "msgId": 8225,
+    "stopOrderId": "13475759-d2ad-41d0-a42f-7134c15a97bf",
+    "hardStopPrice": 1.95,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -56,7 +56,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 384.385,
+      "spot": 385.18,
       "regime": "bullish",
       "emaFast": 383.7182,
       "emaSlow": 383.5394,
@@ -66,7 +66,7 @@
       "lastClose": 385.44,
       "lastVolume": 82078,
       "barTime": "2026-11-18T14:15:00Z",
-      "entryTimeUTC": "2026-11-18T14:55:56.902Z",
+      "entryTimeUTC": "2026-11-18T14:59:29.703Z",
       "vwapAtEntry": 383.7005,
       "rsiAtEntry": 61.12,
       "signalType": "breakout",
@@ -74,18 +74,12 @@
       "comboKey": "CALL|position:near_high",
       "sizeMultiplier": 1
     },
-    "entryBid": 2.42,
-    "entryAsk": 2.46,
-    "entrySpreadPct": 1.639,
-    "entryFillPrice": 2.44,
+    "entryBid": 2.78,
+    "entryAsk": 2.8,
+    "entrySpreadPct": 0.717,
+    "entryFillPrice": 2.83,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-18T14:55:56.786Z",
-    "ladder1": true,
-    "stopPct": 12,
-    "peakPct": 35.040983606557376,
-    "lastReportedThreshold": 30,
-    "ladder2": true,
-    "trailPct": 8
+    "entryFilledAt": "2026-11-18T14:59:29.439Z"
   }
 }
