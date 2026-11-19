@@ -19,7 +19,7 @@
   "_sigCounts": {
     "day": "2026-11-19",
     "no_signal": 980,
-    "max_open_positions": 221
+    "max_open_positions": 227
   },
   "_sigSeen": {
     "day": "2026-11-19",
@@ -57,21 +57,11 @@
   },
   "_sigPending": {
     "day": "2026-11-19",
-    "items": [
-      {
-        "symbol": "IWM",
-        "optionSymbol": "IWM261119P00265000",
-        "barTime": "2026-11-19T16:45:00Z",
-        "decision": "reached_floor_gate",
-        "reason": null,
-        "premium": 1.1749999999999998,
-        "queuedAt": "2026-11-19T17:15:23.310Z"
-      }
-    ]
+    "items": []
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5912,
+    "rev": 5914,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
