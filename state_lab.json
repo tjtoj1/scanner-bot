@@ -5,7 +5,8 @@
   "_cooldowns": {
     "SPY_CALL": 1794502619856,
     "QQQ_CALL": 1794502620202,
-    "IWM_CALL": 1795017795197
+    "IWM_CALL": 1795017795197,
+    "IWM_PUT": 1795101577323
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -16,13 +17,14 @@
   },
   "_sigCounts": {
     "day": "2026-11-19",
-    "no_signal": 186
+    "no_signal": 196
   },
   "_sigSeen": {
     "day": "2026-11-19",
     "keys": [
       "IWM|14:15|G|",
-      "IWM|14:15|T|"
+      "IWM|14:15|T|",
+      "IWM|14:15|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -31,54 +33,8 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5660,
+    "rev": 5662,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
-  },
-  "IWM": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "IWM261119P00270000",
-    "strike": "270",
-    "entryPremium": 1.295,
-    "qty": 2,
-    "entryTime": 1795099563590,
-    "msgId": 8259,
-    "stopOrderId": "2504bce9-67e1-4492-9349-caa33b24c0dc",
-    "hardStopPrice": 0.91,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 269.68,
-      "regime": "bearish",
-      "emaFast": 271.5283,
-      "emaSlow": 271.5488,
-      "breakoutHigh": 272.29,
-      "breakoutLow": 271.19,
-      "volRatio": 3.79,
-      "lastClose": 271.07,
-      "lastVolume": 58706,
-      "barTime": "2026-11-19T14:15:00Z",
-      "entryTimeUTC": "2026-11-19T14:46:03.590Z",
-      "vwapAtEntry": 271.6485,
-      "rsiAtEntry": 42.31,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.29,
-    "entryAsk": 1.3,
-    "entrySpreadPct": 0.772,
-    "entryFillPrice": 1.28,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-19T14:46:03.413Z",
-    "lastReportedThreshold": 10
   }
 }
