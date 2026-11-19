@@ -25,13 +25,16 @@
     "entryPremium": 5.58,
     "qty": 1,
     "entryTime": 1795101408381,
-    "stopOrderId": "5c1c755d-a86e-452c-b6a4-9438e4698ee4",
+    "stopOrderId": "e1263baa-2651-45f8-9cbf-0435e7a29772",
     "hardStopPrice": 3.63,
     "entryStockPrice": 733.47,
     "wvadSumAtEntry": 131665.75,
     "signalLineAtEntry": 285808.47,
     "atrAtEntry": 2.659,
     "slStock": 737.46,
-    "dte": 0
+    "dte": 0,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.00716845878136
   }
 }
