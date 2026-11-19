@@ -27,23 +27,7 @@
     }
   ],
   "_cooldowns": {
-    "QQQ_CALL": "2026-11-16T17:09:18.248Z"
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ261119P00659000",
-    "strike": "659",
-    "entryPremium": 4.6850000000000005,
-    "qty": 1,
-    "entryTime": 1795103601141,
-    "stopOrderId": "25370e12-6742-4765-842a-4973fed59700",
-    "hardStopPrice": 3.05,
-    "entryStockPrice": 658.615,
-    "wvadSumAtEntry": -2128763.43,
-    "signalLineAtEntry": -426934.75,
-    "atrAtEntry": 3.9406,
-    "slStock": 664.53,
-    "dte": 0
+    "QQQ_CALL": "2026-11-16T17:09:18.248Z",
+    "QQQ_PUT": "2026-11-19T16:02:36.912Z"
   }
 }
