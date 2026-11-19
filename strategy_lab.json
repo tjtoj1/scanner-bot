@@ -32,7 +32,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-18T21:00:52.820Z"
+      "lastUpdated": "2026-11-19T21:00:09.773Z"
     },
     "CALL|position:mid": {
       "factors": {
@@ -49,7 +49,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-18T21:00:52.821Z"
+      "lastUpdated": "2026-11-19T21:00:09.773Z"
     },
     "CALL|position:near_high": {
       "factors": {
@@ -58,15 +58,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 310,
+      "n": 311,
       "wins": 164,
-      "pnl": 107,
-      "avgPnlPct": -0.46,
+      "pnl": 41,
+      "avgPnlPct": -0.58,
       "se": 1.84,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-18T21:00:52.821Z"
+      "lastUpdated": "2026-11-19T21:00:09.773Z"
     },
     "PUT|position:near_low": {
       "factors": {
@@ -75,15 +75,15 @@
       },
       "depth": 1.5,
       "parentKey": null,
-      "n": 405,
-      "wins": 233,
-      "pnl": 6383,
-      "avgPnlPct": 6.19,
-      "se": 2.12,
+      "n": 419,
+      "wins": 238,
+      "pnl": 5812,
+      "avgPnlPct": 5.61,
+      "se": 2.07,
       "tier": "average",
       "previousTier": "average",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-18T21:00:52.821Z"
+      "lastUpdated": "2026-11-19T21:00:09.773Z"
     },
     "PUT|position:mid": {
       "factors": {
@@ -100,7 +100,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-18T21:00:52.821Z"
+      "lastUpdated": "2026-11-19T21:00:09.773Z"
     },
     "PUT|position:near_high": {
       "factors": {
@@ -117,7 +117,7 @@
       "tier": "insufficient",
       "previousTier": "insufficient",
       "sizeMultiplier": 1,
-      "lastUpdated": "2026-11-18T21:00:52.821Z"
+      "lastUpdated": "2026-11-19T21:00:09.774Z"
     }
   },
   "changelog": [
@@ -238,11 +238,11 @@
       "currentMultiplier": 1,
       "proposedTier": "above_avg",
       "proposedMultiplier": 1.5,
-      "n": 405,
-      "wins": 233,
-      "avgPnlPct": 6.19,
-      "se": 2.12,
-      "netPnl": 6383,
+      "n": 419,
+      "wins": 238,
+      "avgPnlPct": 5.61,
+      "se": 2.07,
+      "netPnl": 5812,
       "firstProposedAt": "2026-11-06T21:00:37.284Z",
       "lastNotifiedAt": "2026-11-13T21:00:40.047Z",
       "status": "awaiting_approval"
