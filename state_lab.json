@@ -17,8 +17,8 @@
   },
   "_sigCounts": {
     "day": "2026-11-19",
-    "no_signal": 497,
-    "max_open_positions": 92
+    "no_signal": 498,
+    "max_open_positions": 96
   },
   "_sigSeen": {
     "day": "2026-11-19",
@@ -48,7 +48,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5766,
+    "rev": 5768,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -147,14 +147,14 @@
   "IWM": {
     "active": true,
     "signal": "PUT",
-    "optionSymbol": "IWM261119P00268000",
-    "strike": "268",
-    "entryPremium": 1.205,
+    "optionSymbol": "IWM261119P00267500",
+    "strike": "267.5",
+    "entryPremium": 1.1150000000000002,
     "qty": 2,
-    "entryTime": 1795103317541,
-    "msgId": 8283,
-    "stopOrderId": "3f2a44c3-02b8-48b9-ae7c-d751b9233081",
-    "hardStopPrice": 0.84,
+    "entryTime": 1795103528288,
+    "msgId": 8287,
+    "stopOrderId": "4d4712c9-a8cd-4b85-914e-0a2f77ddf2e9",
+    "hardStopPrice": 0.78,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
     "takeProfit1LockPct": 5,
@@ -163,7 +163,7 @@
     "trailingPct": 8,
     "strategyVersion": 1,
     "entryConditions": {
-      "spot": 267.88,
+      "spot": 267.54499999999996,
       "regime": "bearish",
       "emaFast": 270.1971,
       "emaSlow": 270.8491,
@@ -173,7 +173,7 @@
       "lastClose": 268.565,
       "lastVolume": 771564,
       "barTime": "2026-11-19T15:15:00Z",
-      "entryTimeUTC": "2026-11-19T15:48:37.541Z",
+      "entryTimeUTC": "2026-11-19T15:52:08.288Z",
       "vwapAtEntry": 270.0183,
       "rsiAtEntry": 20.67,
       "signalType": "breakout",
@@ -181,17 +181,12 @@
       "comboKey": "PUT|position:near_low",
       "sizeMultiplier": 1
     },
-    "entryBid": 1.18,
-    "entryAsk": 1.23,
-    "entrySpreadPct": 4.149,
-    "entryFillPrice": 1.22,
+    "entryBid": 1.11,
+    "entryAsk": 1.12,
+    "entrySpreadPct": 0.897,
+    "entryFillPrice": 1.13,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-19T15:48:37.289Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 17.84232365145227,
-    "lastReportedThreshold": 10,
-    "nearStopWarned": true
+    "entryFilledAt": "2026-11-19T15:52:07.981Z"
   }
 }
