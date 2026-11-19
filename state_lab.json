@@ -7,7 +7,8 @@
     "QQQ_CALL": 1794502620202,
     "IWM_CALL": 1795017795197,
     "IWM_PUT": 1795105883508,
-    "AMZN_PUT": 1795106091677
+    "AMZN_PUT": 1795106091677,
+    "QQQ_PUT": 1795107331604
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -18,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-19",
-    "no_signal": 530,
+    "no_signal": 538,
     "max_open_positions": 215
   },
   "_sigSeen": {
@@ -55,7 +56,7 @@
   },
   "_dayStoppedAlerted": "2026-11-06",
   "_equityGuard": {
-    "rev": 5824,
+    "rev": 5826,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -104,52 +105,6 @@
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-19T15:00:13.274Z",
     "lastReportedThreshold": 10
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ261119P00660000",
-    "strike": "660",
-    "entryPremium": 4.0794999999999995,
-    "qty": 1,
-    "entryTime": 1795104084799,
-    "msgId": 8294,
-    "stopOrderId": "1c180c18-8631-4924-ad40-dfbfb05e1c17",
-    "hardStopPrice": 2.86,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 660.36,
-      "regime": "bearish",
-      "emaFast": 667.9202,
-      "emaSlow": 669.6505,
-      "breakoutHigh": 675.3,
-      "breakoutLow": 660.004,
-      "volRatio": 6.29,
-      "lastClose": 659.722,
-      "lastVolume": 4357501,
-      "barTime": "2026-11-19T15:30:00Z",
-      "entryTimeUTC": "2026-11-19T16:01:24.799Z",
-      "vwapAtEntry": 668.135,
-      "rsiAtEntry": 27.72,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 4.059,
-    "entryAsk": 4.1,
-    "entrySpreadPct": 1.005,
-    "entryFillPrice": 4.1,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-19T16:01:24.523Z",
-    "lastReportedThreshold": -20
   },
   "SPY": {
     "active": true,
