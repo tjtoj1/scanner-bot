@@ -12,7 +12,8 @@
     "IWM_CALL": 1795189849313,
     "TSLA_CALL": 1795190064598,
     "AMZN_CALL": 1795191325411,
-    "NVDA_PUT": 1795191676428
+    "NVDA_PUT": 1795191676428,
+    "QQQ_PUT": 1795192932673
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -23,7 +24,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-20",
-    "no_signal": 791,
+    "no_signal": 799,
     "max_open_positions": 29
   },
   "_sigSeen": {
@@ -47,7 +48,8 @@
       "NVDA|15:15|S|cooldown",
       "QQQ|15:30|G|",
       "QQQ|15:30|T|",
-      "NVDA|15:30|S|cooldown"
+      "NVDA|15:30|S|cooldown",
+      "QQQ|15:30|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -56,54 +58,8 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 6536,
+    "rev": 6538,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "PUT",
-    "optionSymbol": "QQQ261120P00627000",
-    "strike": "627",
-    "entryPremium": 4.140000000000001,
-    "qty": 1,
-    "entryTime": 1795190855596,
-    "msgId": 8363,
-    "stopOrderId": "43d718c5-1ac2-4f4f-93df-8fff3b940f07",
-    "hardStopPrice": 2.9,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 627.05,
-      "regime": "bearish",
-      "emaFast": 634.5022,
-      "emaSlow": 635.9091,
-      "breakoutHigh": 645.523,
-      "breakoutLow": 629.911,
-      "volRatio": 3.72,
-      "lastClose": 628.94,
-      "lastVolume": 4675954,
-      "barTime": "2026-11-20T15:30:00Z",
-      "entryTimeUTC": "2026-11-20T16:07:35.596Z",
-      "vwapAtEntry": 635.737,
-      "rsiAtEntry": 36.42,
-      "signalType": "breakout",
-      "positionBucket": "near_low",
-      "comboKey": "PUT|position:near_low",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 4.08,
-    "entryAsk": 4.2,
-    "entrySpreadPct": 2.899,
-    "entryFillPrice": 4.2,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-20T16:07:33.397Z",
-    "lastReportedThreshold": -10
   }
 }
