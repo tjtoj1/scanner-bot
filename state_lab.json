@@ -10,7 +10,6 @@
     "IWM_CALL": 1795189849313,
     "TSLA_CALL": 1795190064598,
     "AMZN_CALL": 1795191325411,
-    "NVDA_PUT": 1795191676428,
     "QQQ_PUT": 1795197298332
   },
   "_lastComboLearnedFinal": true,
@@ -22,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-20",
-    "no_signal": 2447,
+    "no_signal": 2457,
     "max_open_positions": 106
   },
   "_sigSeen": {
@@ -61,7 +60,9 @@
       "IWM|16:30|T|",
       "QQQ|17:00|S|cooldown",
       "TSLA|17:00|G|",
-      "TSLA|17:00|T|"
+      "TSLA|17:00|T|",
+      "NVDA|19:00|G|",
+      "NVDA|19:00|T|"
     ]
   },
   "_sigPending": {
@@ -70,8 +71,53 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 6880,
+    "rev": 6882,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261120P00131000",
+    "strike": "131",
+    "entryPremium": 1.595,
+    "qty": 1,
+    "entryTime": 1795203021988,
+    "msgId": 8430,
+    "stopOrderId": "29a52657-ac77-438a-ad4b-e008815d7879",
+    "hardStopPrice": 1.12,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 130.58,
+      "regime": "bearish",
+      "emaFast": 135.3596,
+      "emaSlow": 137.0541,
+      "breakoutHigh": 136.75,
+      "breakoutLow": 134.82,
+      "volRatio": 1.36,
+      "lastClose": 133,
+      "lastVolume": 19931058,
+      "barTime": "2026-11-20T19:00:00Z",
+      "entryTimeUTC": "2026-11-20T19:30:21.988Z",
+      "vwapAtEntry": 137.8249,
+      "rsiAtEntry": 29.84,
+      "signalType": "breakout",
+      "positionBucket": "near_low",
+      "comboKey": "PUT|position:near_low",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 1.56,
+    "entryAsk": 1.63,
+    "entrySpreadPct": 4.389,
+    "entryFillPrice": 1.6,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-20T19:30:21.703Z"
   }
 }
