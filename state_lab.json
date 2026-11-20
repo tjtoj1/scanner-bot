@@ -22,7 +22,7 @@
   "_sigCounts": {
     "day": "2026-11-20",
     "no_signal": 1205,
-    "max_open_positions": 53
+    "max_open_positions": 59
   },
   "_sigSeen": {
     "day": "2026-11-20",
@@ -64,7 +64,7 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 6628,
+    "rev": 6630,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -112,12 +112,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-20T16:58:27.511Z",
-    "lastReportedThreshold": 20,
+    "lastReportedThreshold": 30,
     "ladder2": true,
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 28.538102643856934
+    "peakPct": 30.48211508553656
   },
   "SPY": {
     "active": true,
@@ -219,6 +219,6 @@
     "ladder1": true,
     "stopPct": 12,
     "trailPct": 8,
-    "peakPct": 35.23447401774396
+    "peakPct": 35.36121673003801
   }
 }
