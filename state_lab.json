@@ -21,7 +21,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-20",
-    "no_signal": 340
+    "no_signal": 350
   },
   "_sigSeen": {
     "day": "2026-11-20",
@@ -36,8 +36,53 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 6422,
+    "rev": 6424,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "PUT",
+    "optionSymbol": "NVDA261120P00142000",
+    "strike": "142",
+    "entryPremium": 1.845,
+    "qty": 1,
+    "entryTime": 1795187135385,
+    "msgId": 8328,
+    "stopOrderId": "983831bb-9467-4f54-afe4-dfc628c84843",
+    "hardStopPrice": 1.29,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 141.59,
+      "regime": "bearish",
+      "emaFast": 141.7376,
+      "emaSlow": 142.456,
+      "breakoutHigh": 144.28,
+      "breakoutLow": 140.25,
+      "volRatio": 55.05,
+      "lastClose": 139.525,
+      "lastVolume": 48168015,
+      "barTime": "2026-11-20T14:30:00Z",
+      "entryTimeUTC": "2026-11-20T15:05:35.385Z",
+      "vwapAtEntry": 141.2125,
+      "rsiAtEntry": 32.7,
+      "signalType": "breakout",
+      "positionBucket": "mid",
+      "comboKey": "PUT|position:mid",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 1.81,
+    "entryAsk": 1.88,
+    "entrySpreadPct": 3.794,
+    "entryFillPrice": 1.84,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-20T15:05:33.183Z"
   }
 }
