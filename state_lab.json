@@ -10,7 +10,8 @@
     "QQQ_PUT": 1795110667162,
     "IWM_PUT": 1795110667512,
     "SPY_CALL": 1795189848949,
-    "IWM_CALL": 1795189849313
+    "IWM_CALL": 1795189849313,
+    "TSLA_CALL": 1795190064598
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -21,7 +22,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-20",
-    "no_signal": 431,
+    "no_signal": 435,
     "max_open_positions": 29
   },
   "_sigSeen": {
@@ -38,7 +39,8 @@
       "TSLA|14:45|G|",
       "TSLA|14:45|T|",
       "AMZN|14:45|G|",
-      "AMZN|14:45|T|"
+      "AMZN|14:45|T|",
+      "TSLA|14:45|S|cooldown"
     ]
   },
   "_sigPending": {
@@ -47,55 +49,9 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 6454,
+    "rev": 6456,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261120C00370000",
-    "strike": "370",
-    "entryPremium": 1.565,
-    "qty": 1,
-    "entryTime": 1795188051082,
-    "msgId": 8343,
-    "stopOrderId": "2979bd97-933a-4a5c-9fe6-a67c40af46c1",
-    "hardStopPrice": 1.1,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 368.86,
-      "regime": "bullish",
-      "emaFast": 368.2849,
-      "emaSlow": 368.2033,
-      "breakoutHigh": 371.3,
-      "breakoutLow": 362.61,
-      "volRatio": 7.8,
-      "lastClose": 372.94,
-      "lastVolume": 1554357,
-      "barTime": "2026-11-20T14:45:00Z",
-      "entryTimeUTC": "2026-11-20T15:20:51.082Z",
-      "vwapAtEntry": 368.7643,
-      "rsiAtEntry": 63.65,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 1.54,
-    "entryAsk": 1.59,
-    "entrySpreadPct": 3.195,
-    "entryFillPrice": 1.56,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-20T15:20:50.917Z",
-    "lastReportedThreshold": -10
   },
   "AMZN": {
     "active": true,
