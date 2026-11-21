@@ -370,16 +370,47 @@ for (const bot of ["v21", "lab"]) {
 // ════════════════════════════════════════════════════════════
 console.log(`\n── 7) learner regions byte-identical to ${BASE_SHA.slice(0, 8)} ──`);
 for (const [label, re] of [["tuningBucket()", RE.tuningBucket], ["computeMetric()", RE.computeMetric],
-                           ["computeCombos()", RE.computeCombos], ["cooldown write", RE.cooldownSet],
+                           ["cooldown write", RE.cooldownSet],
                            ["cooldown gate", RE.cooldownGate]]) {
   check(`lab: ${label} byte-identical`,
     grab(src.lab, re, label) === grab(base.lab, re, `${label}@base`), "changed", "identical");
 }
-check("lab: the learner still sums r.pnl, not effectivePnl",
+// computeCombos(): PIN NARROWED. This suite's concern is that the
+// DAY-LEVEL effectivePnl switch did not leak into the learner. That is
+// still true and still asserted below — the combo learner now reads the
+// raw per-trade record fields pnlPctAtFill / pnlAtFill under the
+// owner-approved day-cluster rule, never the scan-side effectivePnl
+// helper, and never the day-level realized/stop machinery this suite is
+// about. Byte-identity stopped being the right test when the owner
+// approved that rule; the arithmetic itself lives in test_combo_rule.mjs.
+{
+  const cc = grab(src.lab, RE.computeCombos, "computeCombos");
+  check("lab: computeCombos borrows no scan-side effectivePnl helper",
+    !/effectivePnl/.test(cc), "present", "absent");
+  check("lab: computeCombos borrows no day-level realized/stop machinery",
+    !/getTodayRealizedDay|readDayPeak|bumpDayPeak|profitFloor|DAILY_LOSS_LIMIT|STOP_DAY_LOSS/.test(cc),
+    "present", "absent");
+  check("lab: where it uses fills it reads the raw record fields directly",
+    /Number\.isFinite\(x\.r\.pnlPctAtFill\)/.test(cc) && /x\.r\.pnlPctAtFill/.test(cc),
+    "indirect", "raw record fields");
+  check("lab: computeCombos still reads nothing from state and writes nothing",
+    !/readFileSync|writeFileSync|loadState|saveState/.test(cc), "touches state", "pure");
+}
+// The two LEGACY learner sites still sum reported r.pnl — those are the
+// global tuner's metrics, which this suite's change was never about and
+// which the owner has not asked to move. The combo learner's own net is
+// now fill-based by owner decision (display only; no decision reads it),
+// so it is asserted separately rather than lumped in with them.
+check("lab: the two legacy learner sites still sum r.pnl",
   /const netPnl = records\.reduce\(\(a, r\) => a \+ r\.pnl, 0\);/.test(src.lab)
-  && /byReason\[bucket\]\.pnl \+= r\.pnl;/.test(src.lab)
-  && /const pnl = subset\.reduce\(\(a, x\) => a \+ x\.r\.pnl, 0\);/.test(src.lab),
-  "a learner site switched", "all three still r.pnl");
+  && /byReason\[bucket\]\.pnl \+= r\.pnl;/.test(src.lab),
+  "a legacy learner site switched", "both still r.pnl");
+check("lab: the combo learner's net is fill-based (owner-approved, display only)",
+  /const pnl = evidence\.reduce\(\(a, x\) => a \+ \(Number\.isFinite\(x\.r\.pnlAtFill\) \? x\.r\.pnlAtFill : 0\)\);?/
+    .test(grab(src.lab, RE.computeCombos, "cc2").replace(/, 0\)/g, ")")),
+  "not fill-based", "fill-based");
+check("lab: and its win count is on the same fill-based measure",
+  /x\.r\.pnlAtFill > 0/.test(grab(src.lab, RE.computeCombos, "cc3")), "mixed measures", "consistent");
 check("lab: no effectivePnl( call anywhere after the replay",
   src.lab.indexOf("effectivePnl(r);") === src.lab.lastIndexOf("effectivePnl(r);"), "more than one call", "one call");
 

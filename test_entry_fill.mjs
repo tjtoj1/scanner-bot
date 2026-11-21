@@ -547,17 +547,36 @@ for (const bot of ["v21", "lab"]) {
     for (const [label, re] of [
       ["tuningBucket()", /function tuningBucket\(r\) \{[\s\S]*?\n\}/],
       ["computeMetric()", /function computeMetric\(metricName, records\) \{[\s\S]*?\n\}/],
-      ["computeCombos()", /function computeCombos\(records, previousCombos\) \{[\s\S]*?\n\}/],
     ]) {
       const fn = grab(text, re, `${label}/${bot}`);
       check(`${bot}: ${label} لا يذكر effectivePnl ولا pnlAtFill`,
         !/effectivePnl|pnlAtFill/.test(fn), "mentions a fill price", "clean");
     }
-    check(`${bot}: المتعلّم ما زال يجمع r.pnl في مواضعه الثلاثة`,
+    // computeCombos(): PIN NARROWED. This suite's subject is the ENTRY
+    // fill price and the effectivePnl helper built on it. The combo
+    // learner now reads the per-trade record fields pnlPctAtFill /
+    // pnlAtFill directly, under the owner-approved day-cluster rule —
+    // which is a different thing from the scan-side effectivePnl helper
+    // this suite guards, and must stay a different thing.
+    {
+      const cc = grab(text, /function computeCombos\(records, previousCombos\) \{[\s\S]*?\n\}/, `computeCombos/${bot}`);
+      check(`${bot}: computeCombos() لا يذكر effectivePnl`,
+        !/effectivePnl/.test(cc), "mentions the helper", "clean");
+      check(`${bot}: computeCombos() يقرأ حقول السجل مباشرة لا عبر مساعد`,
+        /x\.r\.pnlPctAtFill/.test(cc) && /x\.r\.pnlAtFill/.test(cc), "indirect", "direct record fields");
+      check(`${bot}: computeCombos() لا يستدعي أي دالة سعر تعبئة`,
+        !/\b(effectivePnl|getQuote|getEntryFill|alpaca)\s*\(/.test(cc), "calls a helper", "pure arithmetic");
+    }
+    // The two LEGACY tuner sites still sum reported r.pnl. The combo
+    // learner's own net moved to the fill basis by owner decision
+    // (display only — no trading decision reads it), so it is asserted
+    // separately instead of being lumped in with them.
+    check(`${bot}: موضعا المتعلّم القديمان ما زالا يجمعان r.pnl`,
       /const netPnl = records\.reduce\(\(a, r\) => a \+ r\.pnl, 0\);/.test(text)
-      && /byReason\[bucket\]\.pnl \+= r\.pnl;/.test(text)
-      && /const pnl = subset\.reduce\(\(a, x\) => a \+ x\.r\.pnl, 0\);/.test(text),
-      "a learner site switched", "all three still r.pnl");
+      && /byReason\[bucket\]\.pnl \+= r\.pnl;/.test(text),
+      "a legacy learner site switched", "both still r.pnl");
+    check(`${bot}: صافي متعلّم التوليفات على أساس التعبئة (بقرار المالك، للعرض فقط)`,
+      /Number\.isFinite\(x\.r\.pnlAtFill\) \? x\.r\.pnlAtFill : 0/.test(text), "not fill-based", "fill-based");
     check(`${bot}: المتعلّم ما زال يقرأ r.win`,
       /records\.filter\(r => r\.win\)\.length/.test(text) && /if \(r\.win\) byReason\[bucket\]\.wins\+\+;/.test(text),
       "switched", "still r.win");

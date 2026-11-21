@@ -51,12 +51,18 @@ const RE = {
   loadApprovals: /function loadComboApprovals\(\) \{[\s\S]*?\n\}/,
   matchApproval: /function matchComboApproval\(approvals, comboKey, proposedTier, todayUtc\) \{[\s\S]*?\n\}/,
   sizeMult: /const COMBO_SIZE_MULTIPLIER = \{[^\n]*\};/,
-  limits: /const MIN_COMBO_SAMPLE_DOWN = [\s\S]*?const COMBO_CONF_Z\s+= [\d.]+;/,
+  // The day-cluster rule replaced the two iid sample constants and the
+  // fixed z with day+trade gates and a t-table, so this block is spelled
+  // from its new first and last lines. The VALUES are asserted
+  // structurally in section 11 rather than pinned as literals, except
+  // COMBO_ABS_MARGIN_PP and the multipliers, which stay hard literals.
+  limits: /const COMBO_EVIDENCE_FROM\s+= [\s\S]*?const COMBO_T90_ASYMPTOTIC\s+= [\d.]+;/,
+  tCrit: /function comboTCrit\(df\) \{[\s\S]*?\n\}/,
   computeCombos: /function computeCombos\(records, previousCombos\) \{[\s\S]*?\n\}/,
   positionBucket: /function positionBucket\(spot, breakoutHigh, breakoutLow\) \{[\s\S]*?\n\}/,
   calcQty: /function calcQty\(premium, tradeBudget\) \{[\s\S]*?\n\}/,
   lookup: /function lookupComboMultiplier\(combos, signal, positionBkt\) \{[\s\S]*?\n\}/,
-  tierFor: /  function tierFor\(n, avgPnlPct, se\) \{[\s\S]*?\n  \}/,
+  tierFor: /  function tierFor\(st\) \{[\s\S]*?\n  \}/,
   // Anchored on the gate's LAST line, not on the first `\n    }` — a
   // non-greedy match stops at the for-loop's brace and silently drops
   // the tail that records the proposals, which made the hold look like a
@@ -86,6 +92,16 @@ function makeLookup() {
   return new Function(
     `${grab(src, RE.sizeMult, "sizeMult")}\n${grab(src, RE.lookup, "lookup")}\n`
     + `return lookupComboMultiplier;`)();
+}
+
+// The real day-cluster rule, lifted out of scan_lab.js by text so this
+// suite judges the shipped code and not a copy of it.
+function makeRuleApi() {
+  return new Function(
+    `${grab(src, RE.limits, "limits")}\n${grab(src, RE.sizeMult, "sizeMult")}\n`
+    + `${grab(src, RE.tCrit, "tCrit")}\n`
+    + `${grab(src, RE.positionBucket, "pb")}\n${grab(src, RE.computeCombos, "cc")}\n`
+    + `return { computeCombos, comboTCrit };`)();
 }
 
 // A faithful stand-in for the gate: the extracted gate block executed
@@ -354,6 +370,9 @@ console.log("\n── 10) the proposal message ──");
     comboKey: KEY, currentTier: "average", currentMultiplier: 1,
     proposedTier: "above_avg", proposedMultiplier: 1.5,
     n: 355, wins: 203, avgPnlPct: 5.62, se: 2.19, netPnl: 5383,
+    // Day-cluster fields the proposal now carries. tCrit stands in for
+    // the old fixed z, so the bound in the message is t-based.
+    days: 16, maxDayShare: 0.24, maxDayShareDay: "2026-11-05", tCrit: 1.341,
   };
   const msg = tpl(p, 300, 51.5, 0.9);
   check("says nothing was changed", /لم يُغيَّر شيء/.test(msg), msg.slice(0, 80), "لم يُغيَّر شيء");
@@ -362,9 +381,24 @@ console.log("\n── 10) the proposal message ──");
   check("states the share of entries affected", /51%|52%/.test(msg), msg, "~51%");
   check("states the sample size", /355 صفقة/.test(msg));
   check("states the standard error", /2\.19pp/.test(msg));
-  check("states the 90% bound", /حدّ الثقة 90% 2\.8%/.test(msg), msg, "2.8%");
-  check("discloses that it measures reported pnlPct", /pnlPct المُبلَّغ/.test(msg) && /pnlPctAtFill/.test(msg));
-  check("discloses the independence assumption", /استقلال الصفقات/.test(msg));
+  // The bound is now t-based: 5.62 - 1.341*2.19 = 2.68 -> "2.7%".
+  // Under the old fixed z of 1.28 the same inputs gave 2.8%.
+  check("states the 90% bound, computed from the proposal's own t",
+    /حدّ الثقة 90% 2\.7%/.test(msg), msg, "2.7%");
+  check("reports the day count beside the trade count", /355 صفقة على 16 يوم/.test(msg), msg, "355 صفقة على 16 يوم");
+  check("reports the largest single-day share against its cap",
+    /أكبر حصة ليوم واحد: 24% \(2026-11-05\) — الحد 25%/.test(msg), msg, "24% vs 25%");
+  // PIN INVERTED (was: "discloses that it measures reported pnlPct").
+  // The disclosure existed because the measure was known to be wrong.
+  // Now the message must disclose the corrected measure instead.
+  check("discloses that it measures pnlPctAtFill, not reported pnlPct",
+    /pnlPctAtFill/.test(msg) && !/pnlPct المُبلَّغ/.test(msg), msg, "pnlPctAtFill only");
+  check("discloses the evidence window", /من 2026-10-23/.test(msg), msg, "window stated");
+  // PIN INVERTED (was: "discloses the independence assumption").
+  check("no longer claims trades are independent",
+    !/استقلال الصفقات/.test(msg), msg, "claim removed");
+  check("…and states the day-level standard error and the LOO requirement instead",
+    /على مستوى اليوم/.test(msg) && /حذف أي يوم واحد/.test(msg), msg, "day-level se + LOO");
   check("tells the owner exactly what to add", msg.includes(`"comboKey":"${KEY}"`) && msg.includes(`"tier":"above_avg"`) && /combo_approvals\.json/.test(msg));
   check("says nothing applies without it", /لن يُطبَّق شيء/.test(msg));
   // A down-proposal must read as a reduction, not an increase.
@@ -375,23 +409,94 @@ console.log("\n── 10) the proposal message ──");
 
 // ── 11) the maths and the hard limits are untouched ───────────────────
 console.log(`\n── 11) proposal maths and hard limits identical to ${BASE_SHA.slice(0, 8)} ──`);
+// These regions are still pinned byte-for-byte: nothing in the
+// day-cluster rule touches entry sizing, bucketing or the entry-time
+// lookup, and if any of them moves, this suite must say so.
 for (const [label, re] of [
-  ["computeCombos()", RE.computeCombos],
   ["positionBucket()", RE.positionBucket],
   ["calcQty()", RE.calcQty],
   ["lookupComboMultiplier()", RE.lookup],
-  ["tierFor()", RE.tierFor],
   ["COMBO_SIZE_MULTIPLIER", RE.sizeMult],
-  ["the four hard limits", RE.limits],
 ]) {
   check(`${label} byte-identical`, grab(src, re, label) === grab(base, re, `${label}@base`), "changed", "identical");
 }
-check("MIN_COMBO_SAMPLE_DOWN still 20", /const MIN_COMBO_SAMPLE_DOWN = 20;/.test(src));
-check("MIN_COMBO_SAMPLE_UP still 30", /const MIN_COMBO_SAMPLE_UP   = 30;/.test(src));
+
+// ── computeCombos() / tierFor() / the limits block: pins NARROWED ──
+// These three were pinned byte-identical to assert that the owner's
+// approved propose-only gate had not quietly come with a change to the
+// maths underneath it. The owner has now approved a replacement rule
+// (fill-based value, the day as the unit, a concentration cap and
+// leave-one-day-out), so byte-identity is the wrong assertion. It is
+// replaced by the invariants it was actually protecting — the shape of
+// the decision, not its text. The rule's own arithmetic is covered in
+// full by test_combo_rule.mjs, and its verdicts by test_combo_replay.mjs.
+{
+  const cc = grab(src, RE.computeCombos, "computeCombos");
+
+  // Still exactly 6 combos, 2 signals x 3 positions, no seeding.
+  check("computeCombos still builds exactly 6 combos from 2 signals x 3 positions",
+    /for \(const signal of \["CALL", "PUT"\]\)/.test(cc)
+    && /for \(const position of \["near_low", "mid", "near_high"\]\)/.test(cc), "changed", "6 combos");
+  check("computeCombos still seeds nothing", /NO SEEDING/.test(cc));
+  check("computeCombos is still pure (no I/O, no network)",
+    !/readFileSync|writeFileSync|appendFileSync|fetch\(|alpaca\(/.test(cc), "does I/O", "pure");
+
+  // A verdict still needs BOTH a margin against zero and a one-sided
+  // bound on the same side of zero. This is the heart of the old pin.
+  check("a verdict still needs the margin AND the one-sided bound",
+    /theta >= COMBO_ABS_MARGIN_PP && theta - t \* se > 0/.test(cc)
+    && /theta <= -COMBO_ABS_MARGIN_PP && theta \+ t \* se < 0/.test(cc), "changed", "margin + bound");
+  check("the margin is still anchored at ZERO, not at LAB's own mean",
+    !/overallAvgPnlPct/.test(grab(src, RE.tierFor, "tierFor")), "anchored on the mean", "anchored at 0");
+  check("sizing UP still demands a strictly larger sample than sizing down",
+    /D >= COMBO_MIN_DAYS_UP && N >= COMBO_MIN_TRADES_UP/.test(cc)
+    && /D >= COMBO_MIN_DAYS_DOWN && N >= COMBO_MIN_TRADES_DOWN/.test(cc), "changed", "asymmetric gates");
+  check("the DOWN branch is still evaluated before the UP branch",
+    cc.indexOf('tier: "below_avg"') < cc.indexOf('tier: "above_avg"'), "up first", "down first");
+  check("one shared margin+bound helper serves the full sample and every LOO subsample",
+    (cc.match(/marginAndBound\(/g) || []).length >= 4
+    && /function leaveOneDayOutHolds\(direction, means\) \{/.test(cc), "duplicated", "shared helper");
+  check("leave-one-day-out drops exactly one day and requires every subsample to pass",
+    /means\.every\(\(_, i\) => marginAndBound\(direction, means\.filter\(\(__, j\) => j !== i\)\)\)/.test(cc),
+    "changed", "every subsample");
+}
+// Structural invariants on the constants, in place of the four literals.
 check("COMBO_ABS_MARGIN_PP still 5", /const COMBO_ABS_MARGIN_PP   = 5;/.test(src));
-check("COMBO_CONF_Z still 1.28", /const COMBO_CONF_Z          = 1\.28;/.test(src));
 check("the multipliers are unchanged",
   /\{ above_avg: 1\.5, average: 1\.0, below_avg: 0\.5, insufficient: 1\.0 \}/.test(grab(src, RE.sizeMult, "sm")));
+{
+  const lim = new Function(`${grab(src, RE.limits, "limits")}\nreturn {
+    COMBO_EVIDENCE_FROM, COMBO_MIN_DAYS_DOWN, COMBO_MIN_TRADES_DOWN,
+    COMBO_MIN_DAYS_UP, COMBO_MIN_TRADES_UP, COMBO_ABS_MARGIN_PP,
+    COMBO_MAX_DAY_SHARE, COMBO_SE_FLOOR_PP, COMBO_T90, COMBO_T90_ASYMPTOTIC };`)();
+  check("the evidence window is the frozen-version start 2026-10-23",
+    lim.COMBO_EVIDENCE_FROM === "2026-10-23", lim.COMBO_EVIDENCE_FROM, "2026-10-23");
+  check("up-gates >= down-gates on DAYS", lim.COMBO_MIN_DAYS_UP >= lim.COMBO_MIN_DAYS_DOWN,
+    { up: lim.COMBO_MIN_DAYS_UP, down: lim.COMBO_MIN_DAYS_DOWN }, "up >= down");
+  check("up-gates >= down-gates on TRADES", lim.COMBO_MIN_TRADES_UP >= lim.COMBO_MIN_TRADES_DOWN,
+    { up: lim.COMBO_MIN_TRADES_UP, down: lim.COMBO_MIN_TRADES_DOWN }, "up >= down");
+  check("at least one of the two up-gates is strictly larger",
+    lim.COMBO_MIN_DAYS_UP > lim.COMBO_MIN_DAYS_DOWN || lim.COMBO_MIN_TRADES_UP > lim.COMBO_MIN_TRADES_DOWN,
+    "identical gates", "up strictly harder");
+  check("every day gate needs at least a week and a half of sessions",
+    lim.COMBO_MIN_DAYS_DOWN >= 10 && lim.COMBO_MIN_DAYS_UP >= 10, lim.COMBO_MIN_DAYS_DOWN, ">= 10");
+  check("a day gate can never be below 3 (LOO needs 2 days per subsample)",
+    lim.COMBO_MIN_DAYS_DOWN >= 3, lim.COMBO_MIN_DAYS_DOWN, ">= 3");
+  check("the day-share cap is a real fraction and not vacuous",
+    lim.COMBO_MAX_DAY_SHARE > 0 && lim.COMBO_MAX_DAY_SHARE <= 0.5, lim.COMBO_MAX_DAY_SHARE, "(0, 0.5]");
+  check("the se floor is positive and small", lim.COMBO_SE_FLOOR_PP > 0 && lim.COMBO_SE_FLOOR_PP <= 1,
+    lim.COMBO_SE_FLOOR_PP, "(0, 1]");
+  // The t-table must be monotone decreasing toward the normal quantile.
+  const dfs = Object.keys(lim.COMBO_T90).map(Number).sort((a, b) => a - b);
+  check("the t-table is monotone decreasing in df",
+    dfs.every((d, i) => i === 0 || lim.COMBO_T90[d] < lim.COMBO_T90[dfs[i - 1]]), "not monotone", "monotone");
+  check("every tabulated t is above the asymptotic normal quantile",
+    dfs.every(d => lim.COMBO_T90[d] > lim.COMBO_T90_ASYMPTOTIC), "below z", "above z");
+  check("the asymptotic quantile is the one-sided 90% normal 1.282",
+    lim.COMBO_T90_ASYMPTOTIC === 1.282, lim.COMBO_T90_ASYMPTOTIC, 1.282);
+  check("…and it is never larger than the old fixed z of 1.28 by more than rounding",
+    Math.abs(lim.COMBO_T90_ASYMPTOTIC - 1.28) < 0.01, lim.COMBO_T90_ASYMPTOTIC, "~1.28");
+}
 
 // ── 12) scope: runner.js and the other bots untouched ─────────────────
 console.log("\n── 12) scope ──");
@@ -471,7 +576,17 @@ console.log("\n── 13) the PUT|position:near_low revert ──");
   check("tier is average", c.tier === "average", c.tier, "average");
   check("previousTier is average", c.previousTier === "average", c.previousTier, "average");
   check("sizeMultiplier is 1", c.sizeMultiplier === 1, c.sizeMultiplier, 1);
-  check("the statistics are left as recorded (n=355)", c.n === 355 && c.avgPnlPct === 5.62, { n: c.n }, { n: 355 });
+  // REPAIRS AN ALREADY-RED TEST. This pinned the live combos[].n at 355,
+  // but the learner rewrites that object from outcomes_lab.jsonl every
+  // night, so n grows daily and the pin could never hold (it read 404,
+  // then 435). What the revert actually had to preserve is the
+  // IMMUTABLE record of what was promoted — the changelog entries — and
+  // the live tier. Both are asserted; the moving recount is not.
+  check("the live recount has moved on from the recorded 355 (it is recomputed nightly)",
+    typeof c.n === "number" && c.n >= 355, c.n, ">= 355");
+  check("the promotion entry still records the sample it was made on (355)",
+    j.changelog.some(e => e.type === "combo_tier_change" && e.comboKey === KEY
+      && e.newTier === "above_avg" && e.sampleSize === 355), "missing", "sampleSize 355 preserved");
   const lookup = makeLookup();
   check("the entry path sizes it ×1", lookup(j.combos, "PUT", "near_low").sizeMultiplier === 1,
     lookup(j.combos, "PUT", "near_low"), 1);
@@ -517,17 +632,67 @@ console.log("\n── 14) audit regression pins (real outcomes_lab.jsonl) ──
   check("2026-11-05 is in the sample", d.length >= 36, d.length, ">= 36");
   const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
   const se = a => { const n = a.length, m = mean(a); return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / (n - 1)) / Math.sqrt(n); };
+  // The original audit measured this on the all-time reported-pnlPct
+  // basis, because that is what the rule of the day used. Those two
+  // assertions went red once the live file grew past them (the mean rose
+  // back above +5), which was the stale-pin failure carried in this
+  // suite for weeks. They are restated on the basis the audit was
+  // actually ABOUT — what happens when 2026-11-05 is removed — and on
+  // the measure the approved rule now uses, where the finding still
+  // holds. REPAIRS AN ALREADY-RED TEST; the old numbers are preserved in
+  // the message so the history stays readable.
   const exDay = sub.filter(r => r.day !== "2026-11-05").map(r => r.pnlPct);
   const m0 = mean(exDay), lb0 = m0 - 1.28 * se(exDay);
-  check(`excluding 2026-11-05 the mean falls below the +5 gate (${m0.toFixed(2)}%)`, m0 < 5, +m0.toFixed(2), "< 5");
-  check(`and its 90% lower bound is not positive (${lb0.toFixed(2)})`, lb0 <= 0, +lb0.toFixed(2), "<= 0");
-  check("so the learner's own rule would score it `average` without that day",
-    !(exDay.length >= 30 && m0 >= 5 && lb0 > 0), { n: exDay.length, mean: +m0.toFixed(2), lb: +lb0.toFixed(2) }, "not above_avg");
-  // The learner reads reported pnlPct, not the fill-accurate field.
-  check("computeCombos still reads reported pnlPct (documented, not fixed here)",
-    /const pcts = subset\.map\(x => x\.r\.pnlPct\);/.test(grab(src, RE.computeCombos, "cc"))
-    && !/pnlPctAtFill/.test(grab(src, RE.computeCombos, "cc")),
-    "changed", "still reported pnlPct");
+  const full = sub.map(r => r.pnlPct);
+  check(`removing 2026-11-05 drops the all-time reported mean (${mean(full).toFixed(2)}% -> ${m0.toFixed(2)}%)`,
+    m0 < mean(full), { withDay: +mean(full).toFixed(2), without: +m0.toFixed(2) }, "it drops");
+  check(`…and drops its 90% lower bound too (${lb0.toFixed(2)})`,
+    lb0 < mean(full) - 1.28 * se(full), +lb0.toFixed(2), "lower");
+  // On the approved day-cluster measure the finding is unambiguous: the
+  // combo cannot be promoted, and leave-one-day-out is what says so.
+  {
+    const api = makeRuleApi();
+    const v = api.computeCombos(rows, null).combos[KEY];
+    check("on the approved rule PUT|position:near_low is NOT above_avg",
+      v.tier !== "above_avg", v.tier, "not above_avg");
+    check("…and its size multiplier is 1, not 1.5", v.sizeMultiplier === 1, v.sizeMultiplier, 1);
+    check("…blocked by leave-one-day-out or a sample/concentration gate",
+      v.blockedBy == null || /leave-one-day-out|concentration|sample gate/.test(v.blockedBy),
+      v.blockedBy, "a stated guard");
+  }
+  // PIN INVERTED. This assertion existed to mark the reported-pnlPct
+  // defect as known-and-unfixed ("documented, not fixed here"). The owner
+  // has approved the fix, so it becomes its mirror image: the learner
+  // measures the fill-based percent and never falls back to the
+  // optimistic reported one for evidence.
+  {
+    const cc = grab(src, RE.computeCombos, "cc");
+    check("computeCombos now measures pnlPctAtFill", /pnlPctAtFill/.test(cc), "absent", "present");
+    // The ONE remaining reported-pnlPct use is overallAvgPnlPct, the
+    // context figure the message prints as "does not enter the
+    // decision". Every line that feeds a verdict must use the fill
+    // field, so assert that precisely rather than banning the string.
+    // Strip the whole overallAvgPnlPct statement first — it spans three
+    // lines, so filtering line-by-line on the name would miss the line
+    // the reduce actually sits on.
+    const ccNoCtx = cc.replace(/const overallAvgPnlPct = [\s\S]*?: null;/, "");
+    const evidenceLines = ccNoCtx.split("\n")
+      .filter(l => !l.trim().startsWith("//"))
+      .filter(l => /pnlPct|pnlAtFill/.test(l));
+    check("…and no verdict-feeding line reads reported pnlPct",
+      evidenceLines.every(l => !/\br\.pnlPct\b/.test(l) && !/x\.r\.pnlPct\b/.test(l)),
+      evidenceLines.filter(l => /\.pnlPct\b/.test(l)).map(l => l.trim()), []);
+    check("the only reported-pnlPct use left is the context average",
+      (cc.match(/\.pnlPct\b/g) || []).length === 1
+      && /overallAvgPnlPct[\s\S]{0,120}\.pnlPct\b/.test(cc),
+      (cc.match(/\.pnlPct\b/g) || []).length, 1);
+    check("…and that average is still flagged as not entering the decision",
+      /لا يدخل في القرار/.test(src), "flag removed", "still flagged");
+    check("a trade without a finite fill percent is EXCLUDED, not defaulted",
+      /Number\.isFinite\(x\.r\.pnlPctAtFill\)/.test(cc), "typeof-only or defaulted", "isFinite filter");
+    check("the evidence window is applied alongside it",
+      /x\.r\.day >= COMBO_EVIDENCE_FROM/.test(cc), "no window", "windowed");
+  }
 }
 
 fs.rmSync(TMP, { recursive: true, force: true });

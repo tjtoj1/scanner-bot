@@ -2262,18 +2262,102 @@ async function runDailyLearning(state, strategy) {
 // pnlPct on these options runs a ~30pp standard deviation, so an 8-trade
 // mean is indistinguishable from noise (the one combo ever promoted to
 // x1.5 had a single +115% trade carrying 8 samples; without it the mean
-// was -3.4%). COMBO_CONF_Z requires the one-sided 90% bound to stay on
-// the same side of zero as the mean before acting.
+// was -3.4%). The one-sided 90% bound must stay on the same side of zero
+// as the mean before acting.
 //
 // The two sample gates are deliberately ASYMMETRIC: sizing down is cheap
 // insurance against a combo that may be bad, sizing up puts 50% more
 // capital at risk on a combo that may only look good. A missed
 // opportunity is cheaper than a leveraged loss.
-const MIN_COMBO_SAMPLE_DOWN = 20; // sample needed before a combo may be sized DOWN
-const MIN_COMBO_SAMPLE_UP   = 30; // sizing UP demands more evidence than sizing down
-const COMBO_ABS_MARGIN_PP   = 5;  // |avg pnlPct| must clear this before any judgment
-const COMBO_CONF_Z          = 1.28; // one-sided 90% confidence bound
+//
+// ══════════════════════════════════════════════════════════════════════
+// DAY-CLUSTER RULE (owner-approved; replaces the per-trade iid rule)
+// ══════════════════════════════════════════════════════════════════════
+// The previous version of this rule measured the REPORTED pnlPct of every
+// trade ever logged and treated the trades as independent draws. Three
+// things were wrong with that, and all three are fixed below.
+//
+// 1. VALUE. Reported pnlPct prices the exit at a quote, which is
+//    systematically optimistic. CALL|position:near_high measured -0.46pp
+//    reported and -7.61pp at the real fills: the optimistic measure was
+//    hiding a combo that genuinely loses. Evidence is now pnlPctAtFill
+//    only, and a trade without a finite one is EXCLUDED rather than
+//    falling back to the optimistic figure. Fill recording began on
+//    2026-10-23, the same day the evidence window opens, so this costs
+//    one trade (2026-11-09) out of the whole window.
+//
+// 2. UNIT. Trades taken on the same day share one regime, one gap, one
+//    VIX print; they are not independent. Measured on LAB's own data the
+//    day-level standard error is 2.2-2.3x the iid one, so the old rule
+//    understated its own uncertainty by more than half. Worse, the
+//    per-trade mean is TRADE-WEIGHTED, so a day on which LAB happened to
+//    take 36 of these trades dominated the estimate: for
+//    PUT|position:near_low the unweighted day mean is +7.66pp against a
+//    trade-weighted +14.62pp. Sizing up on the latter is sizing up on
+//    "this pays well on days we trade it a lot", which is a within-day
+//    autocorrelation artifact and not a forward per-trade edge.
+//    The estimator is now the MEAN OF DAILY MEANS, equally weighted,
+//    which caps any single day's influence on the point estimate at 1/D
+//    by construction and needs no cluster-robust sandwich. Its cost,
+//    accepted deliberately: a 1-trade day counts as much as a 36-trade
+//    day, which raises the variance of the day means and makes the rule
+//    slower. Requiring >=2 trades for a day to count was considered and
+//    rejected — it discards real days and reintroduces exactly the
+//    high-volume-day bias being removed here.
+//    With D around 15 the normal quantile understates the interval, so
+//    the z constant becomes a one-sided 90% Student-t at df = D-1.
+//
+// 3. CONCENTRATION. On zero-truth data carrying LAB's real day-cluster
+//    structure, the old rule fired above_avg 48-66% of the time, and the
+//    rate ROSE with more data because the iid se shrinks like sqrt(n)
+//    while the real uncertainty does not — more evidence made it more
+//    confidently wrong. Two guards now sit on top of the bound:
+//      - a cap: no single day may supply more than COMBO_MAX_DAY_SHARE
+//        of a combo's usable trades. This is a BACKSTOP, not the guard:
+//        2026-11-05 was only 10.1% of the trade count at the moment it
+//        drove the bad promotion (while supplying 90.3% of the net), so
+//        a cap tight enough to have caught it would block everything.
+//      - leave-one-day-out: the verdict must survive deleting ANY single
+//        day. This is what actually works. It blocks
+//        PUT|position:near_low (5 of 14 days each individually carried
+//        the verdict) and it held CALL|position:near_high at average for
+//        six sessions after the full-sample test already passed.
+//    Measured false-positive rate of the new rule on zero-truth
+//    day-clustered data: 0-3.5% up, 4.5% down, against a nominal 10%.
+//
+// COMBO_ABS_MARGIN_PP stays 5 and the multipliers stay as they were.
+const COMBO_EVIDENCE_FROM   = "2026-10-23"; // frozen-version window; also the first day with fills
+const COMBO_MIN_DAYS_DOWN   = 10; // distinct trading days before a combo may be sized DOWN
+const COMBO_MIN_TRADES_DOWN = 20; // and usable trades; BOTH gates must pass
+const COMBO_MIN_DAYS_UP     = 15; // sizing UP demands more days than sizing down
+const COMBO_MIN_TRADES_UP   = 30; // and more trades
+const COMBO_ABS_MARGIN_PP   = 5;  // |mean of daily means| must clear this before any judgment
+const COMBO_MAX_DAY_SHARE   = 0.25; // no single day may supply more than this share of the trades
+const COMBO_SE_FLOOR_PP     = 0.1;  // never let a degenerate sample buy unlimited confidence
+// One-sided 90% Student-t by degrees of freedom (D-1). Beyond df 40 the
+// difference from the normal 1.282 is below the third decimal.
+const COMBO_T90 = {
+  1: 3.078, 2: 1.886, 3: 1.638, 4: 1.533, 5: 1.476, 6: 1.440, 7: 1.415, 8: 1.397,
+  9: 1.383, 10: 1.372, 11: 1.363, 12: 1.356, 13: 1.350, 14: 1.345, 15: 1.341,
+  16: 1.337, 17: 1.333, 18: 1.330, 19: 1.328, 20: 1.325, 21: 1.323, 22: 1.321,
+  23: 1.319, 24: 1.318, 25: 1.316, 26: 1.315, 27: 1.314, 28: 1.313, 29: 1.311,
+  30: 1.310, 35: 1.306, 40: 1.303,
+};
+const COMBO_T90_ASYMPTOTIC  = 1.282; // df > 40
 const COMBO_SIZE_MULTIPLIER = { above_avg: 1.5, average: 1.0, below_avg: 0.5, insufficient: 1.0 };
+
+// One-sided 90% critical value for D-1 degrees of freedom. Returns null
+// below 2 days, where the variance of the daily means is undefined and no
+// judgment is possible at all.
+function comboTCrit(df) {
+  if (!Number.isFinite(df) || df < 1) return null;
+  if (COMBO_T90[df] != null) return COMBO_T90[df];
+  if (df > 40) return COMBO_T90_ASYMPTOTIC;
+  // Between tabulated points (31-34, 36-39) take the next LOWER df, which
+  // is the larger critical value — erring toward demanding more evidence.
+  for (let k = df; k >= 1; k--) if (COMBO_T90[k] != null) return COMBO_T90[k];
+  return null;
+}
 
 // ─── FREEZE GATE: PROPOSE-ONLY COMBO LEARNING ─────────────────────────
 //
@@ -2399,41 +2483,127 @@ function computeCombos(records, previousCombos) {
     ? withPosition.reduce((a, x) => a + x.r.pnlPct, 0) / withPosition.length
     : null;
 
-  // Standard error of the mean pnlPct. null below 2 samples, where the
-  // sample variance is undefined.
-  function standardError(pcts) {
-    const n = pcts.length;
-    if (n < 2) return null;
-    const mean = pcts.reduce((a, b) => a + b, 0) / n;
-    const variance = pcts.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1);
-    return Math.sqrt(variance) / Math.sqrt(n);
+  // ─── EVIDENCE ─────────────────────────────────────────────────────
+  // A trade counts as evidence only if it is inside the frozen-version
+  // window AND carries a finite fill-based percent. Number.isFinite and
+  // not typeof: a zero entryFillPrice would make pnlPctAtFill Infinity,
+  // which typeof reports as "number".
+  const isEvidence = x =>
+    x.r.day >= COMBO_EVIDENCE_FROM && Number.isFinite(x.r.pnlPctAtFill);
+
+  // ─── DAY-LEVEL STATISTICS ─────────────────────────────────────────
+  // The estimator is the mean of DAILY MEANS, equally weighted, so one
+  // busy day cannot carry the point estimate.
+  function dayStats(subset) {
+    const byDay = new Map();
+    for (const x of subset) {
+      if (!byDay.has(x.r.day)) byDay.set(x.r.day, []);
+      byDay.get(x.r.day).push(x.r.pnlPctAtFill);
+    }
+    const days = [...byDay.keys()].sort();
+    const means = days.map(d => {
+      const v = byDay.get(d);
+      return v.reduce((a, b) => a + b, 0) / v.length;
+    });
+    const counts = days.map(d => byDay.get(d).length);
+    const D = days.length;
+    const N = counts.reduce((a, b) => a + b, 0);
+    const theta = D ? means.reduce((a, b) => a + b, 0) / D : null;
+    let se = null;
+    if (D >= 2) {
+      const variance = means.reduce((a, b) => a + (b - theta) ** 2, 0) / (D - 1);
+      // Floored: all-identical day means would otherwise give se 0 and
+      // make the bound test pass on no evidence of stability at all.
+      se = Math.max(Math.sqrt(variance) / Math.sqrt(D), COMBO_SE_FLOOR_PP);
+    }
+    return {
+      days, means, counts, D, N, theta, se,
+      maxDayShare: N ? Math.max(...counts) / N : 0,
+      maxDayShareDay: N ? days[counts.indexOf(Math.max(...counts))] : null,
+    };
   }
 
-  function tierFor(n, avgPnlPct, se) {
-    if (n < MIN_COMBO_SAMPLE_DOWN || avgPnlPct == null || se == null) return "insufficient";
-    // Size down: mean clears the margin AND its upper 90% bound stays below 0.
-    if (avgPnlPct <= -COMBO_ABS_MARGIN_PP && avgPnlPct + COMBO_CONF_Z * se < 0) return "below_avg";
-    // Size up: the same test mirrored, behind the larger sample gate.
-    if (n >= MIN_COMBO_SAMPLE_UP && avgPnlPct >= COMBO_ABS_MARGIN_PP && avgPnlPct - COMBO_CONF_Z * se > 0) return "above_avg";
-    return "average";
+  // The directional margin+bound test, on an arbitrary set of daily
+  // means. Shared by the full sample and by every leave-one-day-out
+  // subsample, so the two can never drift apart.
+  function marginAndBound(direction, means) {
+    const D = means.length;
+    if (D < 2) return false;
+    const theta = means.reduce((a, b) => a + b, 0) / D;
+    const variance = means.reduce((a, b) => a + (b - theta) ** 2, 0) / (D - 1);
+    const se = Math.max(Math.sqrt(variance) / Math.sqrt(D), COMBO_SE_FLOOR_PP);
+    const t = comboTCrit(D - 1);
+    if (t == null) return false;
+    return direction === "up"
+      ? (theta >= COMBO_ABS_MARGIN_PP && theta - t * se > 0)
+      : (theta <= -COMBO_ABS_MARGIN_PP && theta + t * se < 0);
+  }
+
+  // Leave-one-DAY-out: the verdict must survive deleting any single day.
+  // This is the guard that actually stops a one-session verdict; the
+  // share cap is only a backstop. Needs 3 days so each subsample still
+  // has the 2 a variance requires.
+  function leaveOneDayOutHolds(direction, means) {
+    if (means.length < 3) return false;
+    return means.every((_, i) => marginAndBound(direction, means.filter((__, j) => j !== i)));
+  }
+
+  // Returns the tier plus WHY, so the proposal and the changelog can
+  // state what blocked a verdict instead of only that none was reached.
+  function tierFor(st) {
+    const { D, N, theta, se, means, maxDayShare, maxDayShareDay } = st;
+    if (D < 2 || theta == null || se == null) return { tier: "insufficient", blockedBy: "no variance (D<2)" };
+
+    const concentrated = maxDayShare > COMBO_MAX_DAY_SHARE;
+    const concReason = `concentration ${Math.round(maxDayShare * 100)}% on ${maxDayShareDay}`;
+
+    // Size down first: it is the cheaper error, and it sits behind the
+    // smaller of the two sample gates.
+    if (D >= COMBO_MIN_DAYS_DOWN && N >= COMBO_MIN_TRADES_DOWN && marginAndBound("down", means)) {
+      if (concentrated) return { tier: "average", blockedBy: concReason };
+      if (!leaveOneDayOutHolds("down", means)) return { tier: "average", blockedBy: "leave-one-day-out" };
+      return { tier: "below_avg", blockedBy: null };
+    }
+    // Size up: the same test mirrored, behind the larger gates.
+    if (D >= COMBO_MIN_DAYS_UP && N >= COMBO_MIN_TRADES_UP && marginAndBound("up", means)) {
+      if (concentrated) return { tier: "average", blockedBy: concReason };
+      if (!leaveOneDayOutHolds("up", means)) return { tier: "average", blockedBy: "leave-one-day-out" };
+      return { tier: "above_avg", blockedBy: null };
+    }
+    // Judged, but not extreme enough — once the smaller gate is met.
+    if (D >= COMBO_MIN_DAYS_DOWN && N >= COMBO_MIN_TRADES_DOWN) {
+      return { tier: "average", blockedBy: null };
+    }
+    return { tier: "insufficient", blockedBy: `sample gate (D=${D}, N=${N})` };
   }
 
   function makeEntry(key, factors, depth, parentKey, subset) {
-    const n = subset.length;
-    const wins = subset.filter(x => x.r.win).length;
-    const pnl = subset.reduce((a, x) => a + x.r.pnl, 0);
-    const pcts = subset.map(x => x.r.pnlPct);
-    const avgPnlPct = n ? pcts.reduce((a, b) => a + b, 0) / n : null;
-    const se = standardError(pcts);
-    const tier = tierFor(n, avgPnlPct, se);
+    const evidence = subset.filter(isEvidence);
+    const st = dayStats(evidence);
+    const { tier, blockedBy } = tierFor(st);
+    // Counted over the EVIDENCE, so n, wins and pnl describe exactly the
+    // trades the verdict was computed from. Net is fill-based too, for
+    // consistency with the fill-based percent — display only, no trading
+    // decision reads it.
+    const n = evidence.length;
+    const wins = evidence.filter(x => x.r.pnlAtFill > 0).length;
+    const pnl = evidence.reduce((a, x) => a + (Number.isFinite(x.r.pnlAtFill) ? x.r.pnlAtFill : 0), 0);
     const prev = previousCombos?.[key];
     return {
       factors, depth, parentKey: parentKey || null,
       n, wins, pnl: Math.round(pnl),
-      avgPnlPct: avgPnlPct != null ? +avgPnlPct.toFixed(2) : null,
+      // The mean of daily means, not the per-trade mean. Key name kept so
+      // the notification, changelog and strategy file stay readable.
+      avgPnlPct: st.theta != null ? +st.theta.toFixed(2) : null,
       // Persisted so the notification and the changelog can show exactly
       // how far the judgment was from the zero anchor.
-      se: se != null ? +se.toFixed(2) : null,
+      se: st.se != null ? +st.se.toFixed(2) : null,
+      // Day-cluster provenance: what the verdict was actually based on.
+      days: st.D,
+      maxDayShare: +st.maxDayShare.toFixed(3),
+      maxDayShareDay: st.maxDayShareDay,
+      tCrit: comboTCrit(st.D - 1),
+      blockedBy,
       tier, previousTier: prev?.tier ?? null,
       sizeMultiplier: COMBO_SIZE_MULTIPLIER[tier],
       lastUpdated: new Date().toISOString(),
@@ -2487,23 +2657,30 @@ function buildComboTemplate(combo, overallAvgPnlPct) {
   const wr = combo.n ? Math.round(combo.wins / combo.n * 100) : 0;
   const tierAr = COMBO_TIER_AR[combo.tier] || combo.tier;
   // The 90% one-sided bound on the far side of the mean from zero — the
-  // number the tier decision actually turned on.
+  // number the tier decision actually turned on. Uses the combo's own
+  // stored t (df = days-1), not a fixed z, so the message shows the same
+  // quantity the rule tested.
+  const tc = Number.isFinite(combo.tCrit) ? combo.tCrit : COMBO_T90_ASYMPTOTIC;
   const bound = combo.se != null && combo.avgPnlPct != null
-    ? (combo.tier === "below_avg" ? combo.avgPnlPct + COMBO_CONF_Z * combo.se
-      : combo.tier === "above_avg" ? combo.avgPnlPct - COMBO_CONF_Z * combo.se
+    ? (combo.tier === "below_avg" ? combo.avgPnlPct + tc * combo.se
+      : combo.tier === "above_avg" ? combo.avgPnlPct - tc * combo.se
       : null)
     : null;
   const causeAr = combo.tier === "above_avg"
-    ? `متوسط ربحها ≥ +${COMBO_ABS_MARGIN_PP}% ويبقى موجباً عند حدّ الثقة 90% (${bound.toFixed(1)}%)، على عيّنة ≥${MIN_COMBO_SAMPLE_UP} صفقة`
+    ? `متوسط المتوسطات اليومية ≥ +${COMBO_ABS_MARGIN_PP}% ويبقى موجباً عند حدّ الثقة 90% (${bound.toFixed(1)}%)، على ≥${COMBO_MIN_DAYS_UP} يوم و≥${COMBO_MIN_TRADES_UP} صفقة، ويصمد عند حذف أي يوم واحد`
     : combo.tier === "below_avg"
-    ? `متوسط خسارتها ≤ -${COMBO_ABS_MARGIN_PP}% ويبقى سالباً عند حدّ الثقة 90% (${bound.toFixed(1)}%)، على عيّنة ≥${MIN_COMBO_SAMPLE_DOWN} صفقة`
+    ? `متوسط المتوسطات اليومية ≤ -${COMBO_ABS_MARGIN_PP}% ويبقى سالباً عند حدّ الثقة 90% (${bound.toFixed(1)}%)، على ≥${COMBO_MIN_DAYS_DOWN} يوم و≥${COMBO_MIN_TRADES_DOWN} صفقة، ويصمد عند حذف أي يوم واحد`
+    : combo.blockedBy
+    ? `لم تجتز الشرط: ${combo.blockedBy}`
     : `لم تعد تجتاز عتبة الدلالة مقابل الصفر — لا يمكن تمييز أدائها عن التعادل بثقة كافية`;
 
   return `🧪 <b>تعلّم توليفة</b>: ${label}\n`
     + `الحجم: ×${prevMultiplier} → <b>×${combo.sizeMultiplier}</b> (${tierAr})\n`
-    + `العيّنة: ${combo.n} صفقة | WR ${wr}% | متوسط الربح ${combo.avgPnlPct}%`
-    + (combo.se != null ? ` (الخطأ المعياري ±${combo.se}pp)` : "")
+    + `العيّنة: ${combo.n} صفقة على ${combo.days ?? "—"} يوم | WR ${wr}% | متوسط المتوسطات اليومية ${combo.avgPnlPct}%`
+    + (combo.se != null ? ` (الخطأ المعياري اليومي ±${combo.se}pp)` : "")
+    + (combo.maxDayShare != null ? `\nأكبر حصة ليوم واحد: ${Math.round(combo.maxDayShare * 100)}% (${combo.maxDayShareDay ?? "—"})` : "")
     + (overallAvgPnlPct != null ? `\nللسياق فقط — متوسط LAB العام ${overallAvgPnlPct.toFixed(1)}% (لا يدخل في القرار)` : "") + `\n`
+    + `القياس: pnlPctAtFill داخل النافذة من ${COMBO_EVIDENCE_FROM}، والخطأ المعياري على مستوى اليوم.\n`
     + `السبب: ${causeAr}.`;
 }
 
@@ -2522,10 +2699,12 @@ function buildComboProposalTemplate(proposal, tradeBudget, shareOfEntriesPct, ov
   const newBudget = Math.round(tradeBudget * p.proposedMultiplier);
   const dir = p.proposedMultiplier > p.currentMultiplier ? "زيادة" : "تقليل";
   // The 90% one-sided bound the tier decision turned on — the same
-  // quantity buildComboTemplate() shows, computed the same way.
+  // quantity buildComboTemplate() shows, computed the same way, from the
+  // proposal's own stored t (df = days-1) rather than a fixed z.
+  const tc = Number.isFinite(p.tCrit) ? p.tCrit : COMBO_T90_ASYMPTOTIC;
   const bound = (p.se != null && p.avgPnlPct != null)
-    ? (p.proposedTier === "below_avg" ? p.avgPnlPct + COMBO_CONF_Z * p.se
-      : p.proposedTier === "above_avg" ? p.avgPnlPct - COMBO_CONF_Z * p.se
+    ? (p.proposedTier === "below_avg" ? p.avgPnlPct + tc * p.se
+      : p.proposedTier === "above_avg" ? p.avgPnlPct - tc * p.se
       : null)
     : null;
 
@@ -2535,11 +2714,12 @@ function buildComboProposalTemplate(proposal, tradeBudget, shareOfEntriesPct, ov
     + `المقترح: ${tierAr} (×${p.proposedMultiplier})\n`
     + `أثر الموافقة: ${dir} ميزانية الصفقة من <b>$${curBudget}</b> إلى <b>$${newBudget}</b> `
     + `على ${shareOfEntriesPct != null ? `~${shareOfEntriesPct.toFixed(0)}%` : "جزء"} من دخولات LAB\n`
-    + `العيّنة: ${p.n} صفقة | WR ${wr}% | متوسط ${p.avgPnlPct}%`
+    + `العيّنة: ${p.n} صفقة على ${p.days ?? "—"} يوم | WR ${wr}% | متوسط المتوسطات اليومية ${p.avgPnlPct}%`
     + (p.se != null ? ` ± ${p.se}pp` : "")
     + (bound != null ? ` | حدّ الثقة 90% ${bound.toFixed(1)}%` : "") + `\n`
+    + (p.maxDayShare != null ? `أكبر حصة ليوم واحد: ${Math.round(p.maxDayShare * 100)}% (${p.maxDayShareDay ?? "—"}) — الحد ${Math.round(COMBO_MAX_DAY_SHARE * 100)}%\n` : "")
     + (overallAvgPnlPct != null ? `للسياق فقط — متوسط LAB العام ${overallAvgPnlPct.toFixed(1)}%\n` : "")
-    + `⚠️ القياس على pnlPct المُبلَّغ (لا pnlPctAtFill)، والخطأ المعياري يفترض استقلال الصفقات.\n`
+    + `القياس: pnlPctAtFill فقط داخل النافذة من ${COMBO_EVIDENCE_FROM}؛ الوحدة هي اليوم (متوسط المتوسطات اليومية)، والخطأ المعياري على مستوى اليوم مع t أحادي الطرف 90%، ويشترط صمود النتيجة عند حذف أي يوم واحد.\n`
     + `للموافقة: أضف {"comboKey":"${p.comboKey}","tier":"${p.proposedTier}","expires":"YYYY-MM-DD"} `
     + `إلى ${COMBO_APPROVALS_FILE}. بدون ذلك لن يُطبَّق شيء.`;
 }
@@ -2642,6 +2822,13 @@ async function runComboLearning(state, strategy) {
         proposedTier: combo.tier,
         proposedMultiplier: multiplierOf(combo.tier),
         n: combo.n, wins: combo.wins, avgPnlPct: combo.avgPnlPct, se: combo.se, netPnl: combo.pnl,
+        // Day-cluster provenance, so the owner can see what the verdict
+        // rested on without recomputing it: how many distinct days, how
+        // concentrated they were, and which t was used.
+        days: combo.days ?? null,
+        maxDayShare: combo.maxDayShare ?? null,
+        maxDayShareDay: combo.maxDayShareDay ?? null,
+        tCrit: combo.tCrit ?? null,
         // Carried across nights so the 7-day re-notify clock is not reset
         // by a nightly rebuild, and so the owner can see how long a
         // proposal has been waiting.
@@ -2653,6 +2840,41 @@ async function runComboLearning(state, strategy) {
       combo.sizeMultiplier = multiplierOf(liveTier);
     }
     if (!COMBO_AUTOAPPLY) {
+      // ── WITHDRAWN PROPOSALS ──
+      // pendingComboProposals is rebuilt from scratch every run, so a
+      // proposal the rule no longer makes would simply VANISH — and a
+      // standing request to the owner disappearing without a trace is
+      // exactly the kind of silent state change this gate exists to
+      // prevent. Record each one explicitly before the list is replaced.
+      // Nothing here touches a tier, a multiplier or an approval: it is
+      // bookkeeping only.
+      for (const p of prevPending) {
+        if (!p || !p.comboKey) continue;
+        const stillProposed = held.some(h => h.comboKey === p.comboKey && h.proposedTier === p.proposedTier);
+        if (stillProposed) continue;
+        // An approval that let the change through is NOT a withdrawal —
+        // the changelog records that case as a combo_tier_change.
+        if (approvedBy.has(p.comboKey) && combos[p.comboKey]?.tier === p.proposedTier) continue;
+        strategy.changelog.push({
+          date: today,
+          appliedAt: nowIso,
+          type: "combo_proposal_withdrawn",
+          comboKey: p.comboKey,
+          proposedTier: p.proposedTier ?? null,
+          proposedMultiplier: p.proposedMultiplier ?? null,
+          currentTier: combos[p.comboKey]?.tier ?? p.currentTier ?? null,
+          firstProposedAt: p.firstProposedAt ?? null,
+          lastNotifiedAt: p.lastNotifiedAt ?? null,
+          // What the rule says about this combo NOW, so the withdrawal is
+          // auditable against the numbers that caused it.
+          n: combos[p.comboKey]?.n ?? null,
+          days: combos[p.comboKey]?.days ?? null,
+          avgPnlPct: combos[p.comboKey]?.avgPnlPct ?? null,
+          se: combos[p.comboKey]?.se ?? null,
+          blockedBy: combos[p.comboKey]?.blockedBy ?? null,
+          reason: "withdrawn by rule change",
+        });
+      }
       strategy.pendingComboProposals = held;
       // Only combos that actually moved are "changed" now; the held ones
       // had their multiplier restored above, so they drop out.
