@@ -10,7 +10,8 @@
     "SPY_CALL": 1795446344817,
     "IWM_CALL": 1795446345172,
     "NVDA_CALL": 1795446631642,
-    "AMZN_CALL": 1795446631999
+    "AMZN_CALL": 1795446631999,
+    "TSLA_CALL": 1795446704544
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -21,7 +22,8 @@
   },
   "_sigCounts": {
     "day": "2026-11-23",
-    "max_open_positions": 35
+    "max_open_positions": 35,
+    "day_stopped": 12
   },
   "_sigSeen": {
     "day": "2026-11-23",
@@ -49,55 +51,17 @@
     "day": "2026-11-23",
     "items": []
   },
-  "_dayStoppedAlerted": "2026-11-19",
+  "_dayStoppedAlerted": "2026-11-23",
   "_equityGuard": {
-    "rev": 7108,
+    "rev": 7111,
     "peak": 9077,
-    "peakAt": "2026-11-18T15:11:19.228Z"
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261123C00387500",
-    "strike": "387.5",
-    "entryPremium": 4.71,
-    "qty": 1,
-    "entryTime": 1795444833765,
-    "msgId": 8464,
-    "stopOrderId": "2ee008b5-ba26-4d7b-9390-d4211443d59f",
-    "hardStopPrice": 3.3,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 386.05,
-      "regime": "bullish",
-      "emaFast": 363.3732,
-      "emaSlow": 360.873,
-      "breakoutHigh": 363.3,
-      "breakoutLow": 359.4545,
-      "volRatio": 8.07,
-      "lastClose": 370.4828,
-      "lastVolume": 559771,
-      "barTime": "2026-11-23T14:00:00Z",
-      "entryTimeUTC": "2026-11-23T14:40:33.765Z",
-      "vwapAtEntry": 363.3329,
-      "rsiAtEntry": 78.35,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 4.53,
-    "entryAsk": 4.89,
-    "entrySpreadPct": 7.643,
-    "entryFillPrice": 4.85,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-23T14:40:33.580Z"
+    "peakAt": "2026-11-18T15:11:19.228Z",
+    "halt": {
+      "haltedAt": "2026-11-23T14:41:44.645Z",
+      "equityAtHalt": 7590.54,
+      "peakAtHalt": 9077,
+      "pctFromPeak": -16.4,
+      "alertedAt": "2026-11-23T14:41:44.693Z"
+    }
   }
 }
