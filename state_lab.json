@@ -13,7 +13,7 @@
     "AMZN_CALL": 1795446631999,
     "TSLA_CALL": 1795446704544
   },
-  "_lastComboLearnedFinal": false,
+  "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
     "day": "2026-10-14",
     "symbols": [
@@ -24,7 +24,7 @@
     "day": "2026-11-23",
     "max_open_positions": 35,
     "day_stopped": 3720,
-    "past_last_entry": 162
+    "past_last_entry": 168
   },
   "_sigSeen": {
     "day": "2026-11-23",
