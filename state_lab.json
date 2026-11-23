@@ -4,11 +4,11 @@
   "_lastComboLearnedDay": "2026-11-23",
   "_cooldowns": {
     "AMZN_PUT": 1795106091677,
-    "NVDA_CALL": 1795108932310,
     "TSLA_CALL": 1795190064598,
     "AMZN_CALL": 1795191325411,
     "QQQ_PUT": 1795197298332,
-    "NVDA_PUT": 1795205172313
+    "NVDA_PUT": 1795205172313,
+    "QQQ_CALL": 1795446273298
   },
   "_lastComboLearnedFinal": false,
   "_noStopAlerted": {
@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-23",
-    "max_open_positions": 12
+    "max_open_positions": 17
   },
   "_sigSeen": {
     "day": "2026-11-23",
@@ -29,7 +29,10 @@
       "QQQ|14:00|G|",
       "QQQ|14:00|T|",
       "IWM|14:00|G|",
-      "IWM|14:00|T|"
+      "IWM|14:00|T|",
+      "QQQ|14:00|S|cooldown",
+      "NVDA|14:00|G|",
+      "NVDA|14:00|T|"
     ]
   },
   "_sigPending": {
@@ -38,7 +41,7 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 7096,
+    "rev": 7098,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -85,56 +88,8 @@
     "entryFillPrice": 4.23,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-23T14:32:10.052Z"
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261123C00651000",
-    "strike": "651",
-    "entryPremium": 6.145,
-    "qty": 1,
-    "entryTime": 1795444331408,
-    "msgId": 8442,
-    "stopOrderId": "a59b2004-46fc-4447-a5fb-389278bef34c",
-    "hardStopPrice": 4.3,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 650.855,
-      "regime": "bullish",
-      "emaFast": 636.7448,
-      "emaSlow": 631.7099,
-      "breakoutHigh": 647.5,
-      "breakoutLow": 626.72,
-      "volRatio": 11.47,
-      "lastClose": 651.24,
-      "lastVolume": 2681214,
-      "barTime": "2026-11-23T14:00:00Z",
-      "entryTimeUTC": "2026-11-23T14:32:11.408Z",
-      "vwapAtEntry": 639.531,
-      "rsiAtEntry": 81.92,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 6.05,
-    "entryAsk": 6.24,
-    "entrySpreadPct": 3.092,
-    "entryFillPrice": 6.45,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-23T14:32:11.190Z",
-    "ladder1": true,
-    "stopPct": 5,
-    "peakPct": 15.215622457282352,
-    "lastReportedThreshold": 10
+    "entryFilledAt": "2026-11-23T14:32:10.052Z",
+    "lastReportedThreshold": -10
   },
   "IWM": {
     "active": true,
@@ -180,5 +135,50 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-23T14:32:12.199Z"
+  },
+  "NVDA": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "NVDA261123C00160000",
+    "strike": "160",
+    "entryPremium": 4.03,
+    "qty": 1,
+    "entryTime": 1795444474557,
+    "msgId": 8447,
+    "stopOrderId": "ce6b0d8d-c6ab-457f-aa3e-666da4e637b0",
+    "hardStopPrice": 2.82,
+    "stopLossPct": -30,
+    "takeProfit1Pct": 15,
+    "takeProfit1LockPct": 5,
+    "takeProfit2Pct": 25,
+    "takeProfit2LockPct": 12,
+    "trailingPct": 8,
+    "strategyVersion": 1,
+    "entryConditions": {
+      "spot": 160.345,
+      "regime": "bullish",
+      "emaFast": 144.8668,
+      "emaSlow": 139.4785,
+      "breakoutHigh": 160,
+      "breakoutLow": 133.75,
+      "volRatio": 17.69,
+      "lastClose": 162.01,
+      "lastVolume": 33744291,
+      "barTime": "2026-11-23T14:00:00Z",
+      "entryTimeUTC": "2026-11-23T14:34:34.557Z",
+      "vwapAtEntry": 152.1111,
+      "rsiAtEntry": 88.76,
+      "signalType": "breakout",
+      "positionBucket": "near_high",
+      "comboKey": "CALL|position:near_high",
+      "sizeMultiplier": 1
+    },
+    "entryBid": 3.98,
+    "entryAsk": 4.08,
+    "entrySpreadPct": 2.481,
+    "entryFillPrice": 4.15,
+    "entryFillConfirmed": true,
+    "fillSourceEntry": "entry_order",
+    "entryFilledAt": "2026-11-23T14:34:34.270Z"
   }
 }
