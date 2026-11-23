@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-23",
-    "max_open_positions": 26
+    "max_open_positions": 32
   },
   "_sigSeen": {
     "day": "2026-11-23",
@@ -47,7 +47,7 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 7102,
+    "rev": 7104,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -106,7 +106,7 @@
     "qty": 1,
     "entryTime": 1795444546636,
     "msgId": 8451,
-    "stopOrderId": "9b5e4849-b91a-4e19-93bb-2239853d6a95",
+    "stopOrderId": "d9fe26c2-fc96-4822-935d-85b84edaa5a5",
     "hardStopPrice": 4.22,
     "stopLossPct": -30,
     "takeProfit1Pct": 15,
@@ -141,7 +141,12 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-23T14:35:46.327Z",
-    "lastReportedThreshold": 10
+    "lastReportedThreshold": 40,
+    "ladder2": true,
+    "ladder1": true,
+    "stopPct": 12,
+    "trailPct": 8,
+    "peakPct": 48.46473029045642
   },
   "AMZN": {
     "active": true,
@@ -186,6 +191,7 @@
     "entryFillPrice": 4.25,
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-23T14:35:47.470Z"
+    "entryFilledAt": "2026-11-23T14:35:47.470Z",
+    "lastReportedThreshold": -10
   }
 }
