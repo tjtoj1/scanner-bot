@@ -23,7 +23,8 @@
   "_sigCounts": {
     "day": "2026-11-23",
     "max_open_positions": 35,
-    "day_stopped": 3720
+    "day_stopped": 3720,
+    "past_last_entry": 6
   },
   "_sigSeen": {
     "day": "2026-11-23",
