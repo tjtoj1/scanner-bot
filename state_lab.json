@@ -19,7 +19,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-23",
-    "max_open_positions": 32
+    "max_open_positions": 35
   },
   "_sigSeen": {
     "day": "2026-11-23",
@@ -47,7 +47,7 @@
   },
   "_dayStoppedAlerted": "2026-11-19",
   "_equityGuard": {
-    "rev": 7104,
+    "rev": 7106,
     "peak": 9077,
     "peakAt": "2026-11-18T15:11:19.228Z"
   },
@@ -95,58 +95,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-23T14:34:34.270Z",
-    "lastReportedThreshold": 10
-  },
-  "TSLA": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "TSLA261123C00382500",
-    "strike": "382.5",
-    "entryPremium": 6.025,
-    "qty": 1,
-    "entryTime": 1795444546636,
-    "msgId": 8451,
-    "stopOrderId": "d9fe26c2-fc96-4822-935d-85b84edaa5a5",
-    "hardStopPrice": 4.22,
-    "stopLossPct": -30,
-    "takeProfit1Pct": 15,
-    "takeProfit1LockPct": 5,
-    "takeProfit2Pct": 25,
-    "takeProfit2LockPct": 12,
-    "trailingPct": 8,
-    "strategyVersion": 1,
-    "entryConditions": {
-      "spot": 382.265,
-      "regime": "bullish",
-      "emaFast": 363.3732,
-      "emaSlow": 360.873,
-      "breakoutHigh": 363.3,
-      "breakoutLow": 359.4545,
-      "volRatio": 8.07,
-      "lastClose": 370.4828,
-      "lastVolume": 559771,
-      "barTime": "2026-11-23T14:00:00Z",
-      "entryTimeUTC": "2026-11-23T14:35:46.636Z",
-      "vwapAtEntry": 363.3329,
-      "rsiAtEntry": 78.35,
-      "signalType": "breakout",
-      "positionBucket": "near_high",
-      "comboKey": "CALL|position:near_high",
-      "sizeMultiplier": 1
-    },
-    "entryBid": 5.82,
-    "entryAsk": 6.23,
-    "entrySpreadPct": 6.805,
-    "entryFillPrice": 6,
-    "entryFillConfirmed": true,
-    "fillSourceEntry": "entry_order",
-    "entryFilledAt": "2026-11-23T14:35:46.327Z",
-    "lastReportedThreshold": 40,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 12,
-    "trailPct": 8,
-    "peakPct": 48.46473029045642
+    "lastReportedThreshold": -10
   },
   "AMZN": {
     "active": true,
@@ -192,6 +141,7 @@
     "entryFillConfirmed": true,
     "fillSourceEntry": "entry_order",
     "entryFilledAt": "2026-11-23T14:35:47.470Z",
-    "lastReportedThreshold": -10
+    "lastReportedThreshold": -20,
+    "nearStopWarned": true
   }
 }
