@@ -1,5 +1,5 @@
 {
-  "_lastDay": "2026-11-23",
+  "_lastDay": "2026-11-24",
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-11-23",
   "_cooldowns": {
@@ -21,10 +21,8 @@
     ]
   },
   "_sigCounts": {
-    "day": "2026-11-23",
-    "max_open_positions": 35,
-    "day_stopped": 3720,
-    "past_last_entry": 324
+    "day": "2026-11-24",
+    "no_signal": 12
   },
   "_sigSeen": {
     "day": "2026-11-23",
