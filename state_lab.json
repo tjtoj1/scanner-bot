@@ -5,7 +5,6 @@
   "_cooldowns": {
     "AMZN_PUT": 1795106091677,
     "QQQ_PUT": 1795197298332,
-    "NVDA_PUT": 1795205172313,
     "QQQ_CALL": 1795446273298,
     "SPY_CALL": 1795446344817,
     "IWM_CALL": 1795446345172,
@@ -22,28 +21,12 @@
   },
   "_sigCounts": {
     "day": "2026-11-24",
-    "no_signal": 300
+    "no_signal": 310
   },
   "_sigSeen": {
-    "day": "2026-11-23",
+    "day": "2026-11-24",
     "keys": [
-      "SPY|14:00|G|",
-      "SPY|14:00|T|",
-      "QQQ|14:00|G|",
-      "QQQ|14:00|T|",
-      "IWM|14:00|G|",
-      "IWM|14:00|T|",
-      "QQQ|14:00|S|cooldown",
-      "NVDA|14:00|G|",
-      "NVDA|14:00|T|",
-      "SPY|14:00|S|cooldown",
-      "IWM|14:00|S|cooldown",
-      "TSLA|14:00|G|",
-      "TSLA|14:00|T|",
-      "AMZN|14:00|G|",
-      "AMZN|14:00|T|",
-      "NVDA|14:00|S|cooldown",
-      "AMZN|14:00|S|cooldown"
+      "NVDA|14:30|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
