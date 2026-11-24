@@ -7,7 +7,6 @@
     "QQQ_PUT": 1795197298332,
     "QQQ_CALL": 1795446273298,
     "SPY_CALL": 1795446344817,
-    "IWM_CALL": 1795446345172,
     "NVDA_CALL": 1795446631642,
     "AMZN_CALL": 1795446631999,
     "TSLA_CALL": 1795446704544
@@ -21,12 +20,13 @@
   },
   "_sigCounts": {
     "day": "2026-11-24",
-    "no_signal": 430
+    "no_signal": 440
   },
   "_sigSeen": {
     "day": "2026-11-24",
     "keys": [
-      "NVDA|14:30|S|equity_drawdown_halt"
+      "NVDA|14:30|S|equity_drawdown_halt",
+      "IWM|14:45|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
