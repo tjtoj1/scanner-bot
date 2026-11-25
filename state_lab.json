@@ -25,7 +25,13 @@
     "keys": [
       "AMZN|14:00|S|equity_drawdown_halt",
       "SPY|14:15|S|equity_drawdown_halt",
-      "NVDA|14:15|S|equity_drawdown_halt"
+      "NVDA|14:15|S|equity_drawdown_halt",
+      "SPY|14:30|S|equity_drawdown_halt",
+      "QQQ|14:30|S|equity_drawdown_halt",
+      "IWM|14:30|S|equity_drawdown_halt",
+      "NVDA|14:30|S|equity_drawdown_halt",
+      "TSLA|14:30|S|equity_drawdown_halt",
+      "AMZN|14:30|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
