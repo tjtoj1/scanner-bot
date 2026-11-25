@@ -1,9 +1,8 @@
 {
-  "_lastDay": "2026-11-24",
+  "_lastDay": "2026-11-25",
   "_lastLearnedDay": "2026-09-02",
   "_lastComboLearnedDay": "2026-11-24",
   "_cooldowns": {
-    "AMZN_PUT": 1795106091677,
     "QQQ_CALL": 1795446273298,
     "SPY_CALL": 1795446344817,
     "NVDA_CALL": 1795446631642,
@@ -18,22 +17,13 @@
     ]
   },
   "_sigCounts": {
-    "day": "2026-11-24",
-    "no_signal": 3480,
-    "past_last_entry": 324
+    "day": "2026-11-25",
+    "no_signal": 10
   },
   "_sigSeen": {
-    "day": "2026-11-24",
+    "day": "2026-11-25",
     "keys": [
-      "NVDA|14:30|S|equity_drawdown_halt",
-      "IWM|14:45|S|equity_drawdown_halt",
-      "NVDA|15:15|S|equity_drawdown_halt",
-      "TSLA|15:15|S|equity_drawdown_halt",
-      "QQQ|15:30|S|equity_drawdown_halt",
-      "NVDA|15:30|S|equity_drawdown_halt",
-      "QQQ|16:00|S|equity_drawdown_halt",
-      "NVDA|16:00|S|equity_drawdown_halt",
-      "IWM|17:30|S|equity_drawdown_halt"
+      "AMZN|14:00|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
