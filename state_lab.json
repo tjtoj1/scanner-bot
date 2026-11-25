@@ -18,12 +18,14 @@
   },
   "_sigCounts": {
     "day": "2026-11-25",
-    "no_signal": 120
+    "no_signal": 128
   },
   "_sigSeen": {
     "day": "2026-11-25",
     "keys": [
-      "AMZN|14:00|S|equity_drawdown_halt"
+      "AMZN|14:00|S|equity_drawdown_halt",
+      "SPY|14:15|S|equity_drawdown_halt",
+      "NVDA|14:15|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
