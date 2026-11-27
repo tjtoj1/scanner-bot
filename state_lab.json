@@ -6,8 +6,7 @@
     "QQQ_CALL": 1795446273298,
     "SPY_CALL": 1795446344817,
     "NVDA_CALL": 1795446631642,
-    "AMZN_CALL": 1795446631999,
-    "TSLA_CALL": 1795446704544
+    "AMZN_CALL": 1795446631999
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -18,24 +17,12 @@
   },
   "_sigCounts": {
     "day": "2026-11-27",
-    "no_signal": 156
+    "no_signal": 166
   },
   "_sigSeen": {
-    "day": "2026-11-25",
+    "day": "2026-11-27",
     "keys": [
-      "AMZN|14:00|S|equity_drawdown_halt",
-      "SPY|14:15|S|equity_drawdown_halt",
-      "NVDA|14:15|S|equity_drawdown_halt",
-      "SPY|14:30|S|equity_drawdown_halt",
-      "QQQ|14:30|S|equity_drawdown_halt",
-      "IWM|14:30|S|equity_drawdown_halt",
-      "NVDA|14:30|S|equity_drawdown_halt",
-      "TSLA|14:30|S|equity_drawdown_halt",
-      "AMZN|14:30|S|equity_drawdown_halt",
-      "AMZN|15:15|S|equity_drawdown_halt",
-      "AMZN|15:30|S|equity_drawdown_halt",
-      "IWM|17:00|S|equity_drawdown_halt",
-      "IWM|18:30|S|equity_drawdown_halt"
+      "TSLA|14:15|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
