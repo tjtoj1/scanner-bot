@@ -25,14 +25,17 @@
     "entryPremium": 2.16,
     "qty": 2,
     "entryTime": 1795792551597,
-    "stopOrderId": "a035982f-1398-4f65-981a-08c32f33d560",
+    "stopOrderId": "e3e70480-19ed-4aad-bf32-9e3ed385d869",
     "hardStopPrice": 1.4,
     "entryStockPrice": 722.5999999999999,
     "wvadSumAtEntry": 3471702.42,
     "signalLineAtEntry": 4688726.12,
     "atrAtEntry": 3.5465,
     "slStock": 727.92,
-    "dte": 0
+    "dte": 0,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.731481481481477
   },
   "QQQ": {
     "active": true,
@@ -42,13 +45,16 @@
     "entryPremium": 2.335,
     "qty": 2,
     "entryTime": 1795792554821,
-    "stopOrderId": "b386ddc7-c992-47a1-ae96-4a0d88336ee7",
+    "stopOrderId": "91bfe0de-ea1f-45af-b732-ccd4d3a51300",
     "hardStopPrice": 1.52,
     "entryStockPrice": 641.065,
     "wvadSumAtEntry": 7830506.7,
     "signalLineAtEntry": 9237343.96,
     "atrAtEntry": 4.3804,
     "slStock": 647.64,
-    "dte": 0
+    "dte": 0,
+    "ladder1": true,
+    "stopPct": 5,
+    "peakPct": 12.847965738758022
   }
 }
