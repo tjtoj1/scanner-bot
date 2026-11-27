@@ -5,8 +5,7 @@
   "_cooldowns": {
     "QQQ_CALL": 1795446273298,
     "SPY_CALL": 1795446344817,
-    "NVDA_CALL": 1795446631642,
-    "AMZN_CALL": 1795446631999
+    "NVDA_CALL": 1795446631642
   },
   "_lastComboLearnedFinal": true,
   "_noStopAlerted": {
@@ -17,7 +16,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-27",
-    "no_signal": 738
+    "no_signal": 746
   },
   "_sigSeen": {
     "day": "2026-11-27",
@@ -28,7 +27,9 @@
       "SPY|14:45|S|equity_drawdown_halt",
       "IWM|14:45|S|equity_drawdown_halt",
       "NVDA|14:45|S|equity_drawdown_halt",
-      "TSLA|15:15|S|equity_drawdown_halt"
+      "TSLA|15:15|S|equity_drawdown_halt",
+      "TSLA|15:30|S|equity_drawdown_halt",
+      "AMZN|15:30|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
