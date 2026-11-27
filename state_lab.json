@@ -14,7 +14,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-27",
-    "no_signal": 2902
+    "no_signal": 2912
   },
   "_sigSeen": {
     "day": "2026-11-27",
@@ -33,7 +33,8 @@
       "SPY|17:45|S|equity_drawdown_halt",
       "QQQ|17:45|S|equity_drawdown_halt",
       "IWM|17:45|S|equity_drawdown_halt",
-      "SPY|17:45|S|no_option"
+      "SPY|17:45|S|no_option",
+      "IWM|19:15|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
