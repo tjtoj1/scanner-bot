@@ -17,7 +17,7 @@
   },
   "_sigCounts": {
     "day": "2026-11-27",
-    "no_signal": 608
+    "no_signal": 618
   },
   "_sigSeen": {
     "day": "2026-11-27",
@@ -27,7 +27,8 @@
       "TSLA|14:30|S|equity_drawdown_halt",
       "SPY|14:45|S|equity_drawdown_halt",
       "IWM|14:45|S|equity_drawdown_halt",
-      "NVDA|14:45|S|equity_drawdown_halt"
+      "NVDA|14:45|S|equity_drawdown_halt",
+      "TSLA|15:15|S|equity_drawdown_halt"
     ]
   },
   "_sigPending": {
