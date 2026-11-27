@@ -1,7 +1,7 @@
 {
   "_lastDay": "2026-11-27",
   "_lastLearnedDay": "2026-09-02",
-  "_lastComboLearnedDay": "2026-11-26",
+  "_lastComboLearnedDay": "2026-11-27",
   "_cooldowns": {
     "NVDA_CALL": 1795446631642
   },
@@ -15,7 +15,7 @@
   "_sigCounts": {
     "day": "2026-11-27",
     "no_signal": 3346,
-    "past_last_entry": 162
+    "past_last_entry": 168
   },
   "_sigSeen": {
     "day": "2026-11-27",
