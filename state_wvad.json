@@ -12,11 +12,56 @@
       "symbol": "QQQ",
       "signal": "PUT",
       "pnl": 0
+    },
+    {
+      "day": "2026-11-27",
+      "symbol": "SPY",
+      "signal": "CALL",
+      "pnl": 0
+    },
+    {
+      "day": "2026-11-27",
+      "symbol": "QQQ",
+      "signal": "CALL",
+      "pnl": 0
     }
   ],
   "_cooldowns": {
-    "QQQ_CALL": "2026-11-25T15:25:18.301Z",
     "SPY_PUT": "2026-11-27T15:23:09.130Z",
     "QQQ_PUT": "2026-11-27T15:23:09.315Z"
+  },
+  "SPY": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "SPY261127C00723000",
+    "strike": "723",
+    "entryPremium": 1.8650000000000002,
+    "qty": 2,
+    "entryTime": 1795793422966,
+    "stopOrderId": "6a8cd973-51c0-4b0d-9a33-888dc8974801",
+    "hardStopPrice": 1.21,
+    "entryStockPrice": 723.3,
+    "wvadSumAtEntry": 6457858.51,
+    "signalLineAtEntry": 5243897.05,
+    "atrAtEntry": 3.5089,
+    "slStock": 718.04,
+    "dte": 0
+  },
+  "QQQ": {
+    "active": true,
+    "signal": "CALL",
+    "optionSymbol": "QQQ261127C00642000",
+    "strike": "642",
+    "entryPremium": 2.165,
+    "qty": 2,
+    "entryTime": 1795793424251,
+    "stopOrderId": "9152efe6-6a58-47d8-8d22-5dd628c20d22",
+    "hardStopPrice": 1.41,
+    "entryStockPrice": 642.04,
+    "wvadSumAtEntry": 10638402.79,
+    "signalLineAtEntry": 9733685.99,
+    "atrAtEntry": 4.39,
+    "slStock": 635.45,
+    "dte": 0
   }
 }
