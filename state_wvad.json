@@ -51,27 +51,5 @@
     "peakPct": 62.19839142091153,
     "ladder2": true,
     "trailPct": 10
-  },
-  "QQQ": {
-    "active": true,
-    "signal": "CALL",
-    "optionSymbol": "QQQ261127C00642000",
-    "strike": "642",
-    "entryPremium": 2.165,
-    "qty": 2,
-    "entryTime": 1795793424251,
-    "stopOrderId": "5f053833-f807-4608-acdb-9ff1ecc0d91c",
-    "hardStopPrice": 1.41,
-    "entryStockPrice": 642.04,
-    "wvadSumAtEntry": 10638402.79,
-    "signalLineAtEntry": 9733685.99,
-    "atrAtEntry": 4.39,
-    "slStock": 635.45,
-    "dte": 0,
-    "ladder2": true,
-    "ladder1": true,
-    "stopPct": 10,
-    "trailPct": 10,
-    "peakPct": 100.23094688221707
   }
 }
